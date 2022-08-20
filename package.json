@@ -1,0 +1,13 @@
+{
+  "name": "@phfaist/zoobase",
+  "version": "0.1.0",
+  "main": "src/index.js",
+  "author": "Philippe Faist",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@apidevtools/json-schema-ref-parser": "^9.0.9",
+    "glob": "^8.0.3",
+    "js-yaml": "^4.1.0"
+  }
+}
