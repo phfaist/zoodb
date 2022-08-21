@@ -1,5 +1,6 @@
 {
   "name": "@phfaist/zoobase",
+  "type": "module",
   "version": "0.1.0",
   "main": "src/index.js",
   "author": "Philippe Faist",
@@ -8,6 +9,9 @@
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
     "glob": "^8.0.3",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "jsonschema": "^1.4.1",
+    "pino": "^8.4.2",
+    "pino-pretty": "^9.0.1"
   }
 }

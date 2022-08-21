@@ -7,6 +7,12 @@ import glob from 'glob';
 import jsonschema from 'jsonschema';
 import $RefParser from "@apidevtools/json-schema-ref-parser";
 import json_refparser_resolver_http from "@apidevtools/json-schema-ref-parser/lib/resolvers/http.js";
+import json_refparser_resolver_file from "@apidevtools/json-schema-ref-parser/lib/resolvers/file.js";
+
+
+import _zoologger from '../_zoologger.js';
+let logger = _zoologger.child({module:'zoodbdataloader'});
+
 
 
 /*
@@ -14,8 +20,8 @@ const zoodbdataloader = new ZooDbDataLoader({
     objects: {
       code: {
         schema_name: 'ecc',
-        data_src_path: 'codes/',
-        //glob_pattern: '**'+'/'+'*.yml',
+        data_src_path: 'codes', // Search ‘codes/’ folder in the root data dir
+        //file_name_match: /\.yml$/,
         //load_objects: (d) => [ d ] // single file data contents = single object
       },
       domain: {
@@ -38,13 +44,15 @@ const zoodbdataloader = new ZooDbDataLoader({
             (d) => Object.entries(d).map( (k, v) => Object.extend({}, {contributorid: k}) ),
       }
     },
-    data_root_dir: '/path/to/data/files/root/',
+    root_data_dir: '/path/to/data/files/root/',
     object_defaults: {
-      glob_pattern: '**'+'/'+'*.yml',
+      file_name_match: /\.(ya?ml|json)$/i,
+      ignore_file_name_match: /(\~|\.bak|^\.DS_Store)$/i,
       load_objects: (d) => [ d ],
     }
     schemas: {
-      schema_root: 'https://errorcorrectionzoo.org/schemas/',
+      schema_root: 'https://errorcorrectionzoo.org/',
+      schema_rel_path: '/schemas/',
       schema_add_extension: '.json',
     },
   });
@@ -61,30 +69,86 @@ class ZooDbDataLoader
         this.config = Object.assign({}, config);
         this.config.objects = Object.assign({}, this.config.objects || {});
         this.config.object_defaults = Object.assign({}, this.config.object_defaults || {});
-        this.config.schemas = Object.assign({}, this.config.schemas || {}) : {};
+        this.config.schemas = Object.assign({}, this.config.schemas || {});
 
         // set defaults in config
-        this.config.object_defaults.glob_pattern ||= '**/*.{yml,yaml,json}';
+        this.config.object_defaults.file_name_match ||= /\.(ya?ml|json)$/i;
+        this.config.object_defaults.ignore_file_name_match ||= /^(.*\~|.*\.bak|\.DS_Store)$/i;
         this.config.object_defaults.load_objects ||=  (d) => [ d ] ;
+        this.config.object_defaults.expected_msg ||=
+            `File name matching ‘/${this.config.object_defaults.file_name_match.source}/`
+            +`${this.config.object_defaults.file_name_match.flags}’`;
         Object.entries(this.config.objects).forEach(
-            (objectname, objectconfig) => {
+            (objpair) => {
+                let [objectname, objectconfig] = objpair;
+                objectconfig.objectname = objectname;
                 objectconfig.schema_name ||= objectname;
-                objectconfig.data_src_path ||= objectname + 's/'; // 'code' -> 'codes/'
-                objectconfig.glob_pattern ||= this.object_defaults.glob_pattern;
-                objectconfig.load_objects ||= this.object_defaults.load_objects;
+                objectconfig.data_src_path ||= objectname + 's'; // 'code' -> 'codes/'
+                objectconfig.file_name_match ||= this.config.object_defaults.file_name_match;
+                objectconfig.ignore_file_name_match ||=
+                    this.config.object_defaults.ignore_file_name_match;
+                objectconfig.expected_msg ||= this.config.object_defaults.expected_msg;
+                objectconfig.load_objects ||= this.config.object_defaults.load_objects;
             }
         );
 
+        // simplify schema_root URL (e.g., remove x/y/../z -> x/z, will be
+        // needed to compare when to add our custom extension)
+        this.config.schemas.schema_root = new URL(this.config.schemas.schema_root).href;
+
         this.schema_validator = new jsonschema.Validator();
         this.schema_ref_parser = new $RefParser();
+        this.schemas_by_name = {};
 
-        
-        this.schema_refparser_resolver_http = {
+        if (!this.config.schemas.schema_root) {
+            throw new Error("You did not specify a schema_root: in your config!");
+        }
+        let _config = this.config;
+        this.schema_refparser_resolver = {
             ...json_refparser_resolver_http,
             order: 1,
+            canRead(file) { return true; },
             read(file) {
-                if (! file.url.endsWith(this.config.schemas.schema_add_extension) ) {
-                    file.url += this.config.schemas.schema_add_extension;
+                try {
+                    // logger.debug(`file.url = ${file.url}, `
+                    //              +`schema_root = ${_config.schemas.schema_root}`);
+
+                    let url = file.url;
+                    if (url.startsWith('file://') &&
+                        ! url.startsWith(_config.schemas.schema_root)) {
+                        // a "/schemas/xyz" path was already interpreted as
+                        // being a path relative to the root directory, make it
+                        // relative to the schema_root:
+                        url = (new URL(url)).pathname.substring(1); // skip leading '/'
+                    }
+
+                    let full_url =
+                        new URL(url, _config.schemas.schema_root).href;
+
+                    // logger.debug(`full_url = ${full_url} (from url=${url})`);
+
+                    if (full_url.startsWith(_config.schemas.schema_root) &&
+                        ! full_url.endsWith(_config.schemas.schema_add_extension) ) {
+                        full_url += _config.schemas.schema_add_extension;
+                    }
+
+                    const newfile = {
+                        url: full_url,
+                        extension: path.extname(full_url),
+                    };
+                    const protocol = (new URL(newfile.url)).protocol;
+
+                    logger.debug(`resolved schema URL --> url = ${newfile.url}, `
+                                 +`extension = ${newfile.extension} (protocol=${protocol})`);
+                    
+                    if ( protocol == 'file:' ) { 
+                        return json_refparser_resolver_file.read(newfile);
+                    } else {
+                        return json_refparser_resolver_http.read(newfile);
+                    }
+                } catch (err) {
+                    logger.error(`Error reading ${file.url}: ${err}`);
+                    throw err;
                 }
             }
         };
@@ -94,124 +158,231 @@ class ZooDbDataLoader
     // methods to load zoo data
     // -------------------------------------------
 
-    load()
+    // returns promise (as if async)
+    async load()
     {
-        const promises = Object.entries(config.objects).map(
-            (o) => {
-                const [objectname, objectconfig] = o;
-                return this._load_objects_of_type(objectname, objectconfig);
+        logger.info(`Loading Zoo from ‘${this.config.root_data_dir}’ ...`);
+
+        const objects_promises = Object.values(this.config.objects).map(
+            async (objectconfig) => {
+                return await this._load_objects_of_type(objectconfig);
             }
         );
 
-        return Promise.all(promises).then( (results) => {
+        logger.debug(`load() objects_promises = ${objects_promises}`);
+
+        return await Promise.all(objects_promises).then( (objects_results) => {
             // results = [ (objectname1, d1), (objectname2, d2), ... ]
+            // logger.debug(
+            //     `load() -> got final objects_results=${JSON.stringify(objects_results)}`
+            // );
             const dbdata = {
                 //
-                // Provide all the schema objects (contains circular refs!):
+                // Provide all the schema objects (might contain circular refs!):
                 //
-                schemas: 
-                  Object.entries(this.config.objects).map(
-                      (objectname, objectconfig) =>
-                          this.schema_validator.getSchema(objectconfig.schema_name)
-                  ),
+                schemas: this.schemas_by_name,
                 //
                 // Provide all the object data:
                 //
-                objects: Object.fromEntries( results ),
+                objects: Object.fromEntries( objects_results ),
             };
+            //logger.debug(`load() -> got final data=${JSON.stringify(dbdata)}`);
             return dbdata;
         } );
     }
 
-    async _get_schema_by_name(schema_name)
+    async get_schema_by_name(schema_name)
     {
-        let full_schema_path = this.config.schemas.schema_root + schema_name;
-        return await this.schema_ref_parser.dereference(
-            full_schema_path,
+        if ( this.schemas_by_name.hasOwnProperty(schema_name) ) {
+            return this.schemas_by_name[schema_name];
+        }
+
+        let schema_path = path.posix.join(this.config.schemas.schema_rel_path, schema_name);
+        schema_path = new URL(schema_path, this.config.schemas.schema_root).href;
+        const schema = await this.schema_ref_parser.dereference(
+            schema_path,
             {
                 resolve: {
+                    file: false,
                     http: false,
-                    myhttp: this.schema_refparser_resolver_http,
+                    myresolver: this.schema_refparser_resolver,
                 }
             }
         );
+        this.schemas_by_name[schema_name] = schema;
+        return schema;
     }
 
-    async _load_objects_of_type(loadconfig, objectname, objectconfig) {
+    async _load_objects_of_type(objectconfig)
+    {
+        logger.debug(`Loading objects of type ${objectconfig.objectname} ...`);
 
         const schema_name = objectconfig.schema_name;
-        const schema = await this._get_schema_by_name(schema_name);
+        const schema = await this.get_schema_by_name(schema_name);
 
         this.schema_validator.addSchema(schema);
-        
-        const data_src_files = this.gather_src_files(
-            loadconfig,
-            objectconfig.data_src_path,
-            objectconfig.glob_pattern,
-        );
-        
-        let loaded_objects = [];
 
-        data_src_files.forEach( (data_file_name) => {
-            const objects = this._parse_object_file_into_objects(data_file_name, objectname,
-                                                                 objectconfig);
-            objects.forEach( (o) => {
-                // o == [objid,obj]
-                loaded_objects.push(o);
-            } );
-        });
+        objectconfig.schema = schema;
+        
+        // const loaded_objects = [ ['aid',{ a: 'b', c: 'd' }],
+        //                          ['bid',{ e: 'f', g: 'h' }] ];
+
+        const loaded_objects = await this.walk_src_files(objectconfig);
+
+        //logger.debug(`_load_objects_of_type() [${objectconfig.objectname}] --> loaded_objects = ${JSON.stringify(loaded_objects)}`);
 
         let d = {};
 
         loaded_objects.forEach( (o) => {
             const [objid, obj] = o;
+            //logger.debug(`Got object: objid=${objid}, obj=${JSON.stringify(obj)}`);
             if (d.hasOwnProperty(objid)) {
                 throw new Error(
                     `ID ‘${objid}’ was assigned to multiple objects, in `
-                    +`files ‘${d[objid].o.source_filename}’ and ‘${obj.o.source_filename}’`
+                    +`files ‘${d[objid]._zoodb.source_file_path}’ and `
+                    +`‘${obj._zoodb.source_file_path}’`
                 );
             }
+            d[objid] = obj;
         } );
 
-        return [objectname, d];
+        //logger.debug(`_load_objects_of_type() [${objectconfig.objectname}] --> ${JSON.stringify(d)}`);
+
+        return [objectconfig.objectname, d];
     }
 
-    gather_src_files(loadconfig, data_src_path, objectconfig)
+    /// Recursively explores the given directory `root_path` and calls
+    /// `dir_callback(root_path, rel_path, dirent)` for each encountered
+    /// directory and `file_callback(root_path, rel_path, dirent)` for each
+    /// encountered file.  The `file_callback()` is assumed async and must
+    /// return an array.  The return value is a merged array of all the values
+    /// returned by each call to `file_callback()`.  Any values returned from
+    /// `dir_callback()` are ignored.
+    ///
+    /// If `root_path` is a file, then the `file_callback()` is called and its
+    /// value returned in a length-1 array.
+    async walk(root_path, dir_callback, file_callback)
     {
-        const fullsrcpath = path.join(loadconfig.root_data_dir, data_src_path);
-        if ( fs.statSync(fullsrcpath).isDirectory() ) {
-            const the_glob_pattern = objectconfig.glob_pattern || '**/*.yml';
-            return glob.sync( path.join( fullsrcpath, the_glob_pattern ) );
-        } else {
-            return [ fullsrcpath ];
-        }
+        logger.debug(`walk(), root_path=‘${root_path}’`);
+        // heavily inspired by
+        // https://git.rootprojects.org/root/walk.js/src/branch/main/walk.js
+        const do_walk_dir = async (rel_path, dirent) => {
+            if (!dirent.isDirectory()) {
+                const result = await file_callback(root_path, rel_path, dirent);
+                // note, result must be list.
+                console.assert(result instanceof Array, result);
+                return result;
+            }
+            //logger.debug(`Walking ‘${root_path}’ → directory ${rel_path}`);
+            dir_callback(root_path, rel_path, dirent);
+            const pathname = path.join(root_path, rel_path);
+            const direntries = fs.readdirSync(pathname, { withFileTypes: true });
+            // list of recursive call results, each is itself a list; will need
+            // to flatten (cf below)
+            const results_list = await Promise.all(
+                direntries.map(
+                    (dirent) => do_walk_dir(path.join(rel_path, dirent.name), dirent)
+                )
+            );
+            return results_list.flat();
+        };
+        let dirent = fs.lstatSync(root_path);
+        dirent.name = path.basename(root_path);
+        return await do_walk_dir('', dirent);
     }
 
-    read_file_contents(path)
+    async walk_src_files(objectconfig)
     {
-        return fs.readFileSync(path);
+        const fullsrcpath = path.join(this.config.root_data_dir, objectconfig.data_src_path);
+
+        const dir_callback = (root_path, rel_path, dirent) => {
+            logger.debug(`Looking for ${objectconfig.objectname} objects in ‘${rel_path}’ ...`);
+        };
+        const file_callback = async (root_path, rel_path, dirent) => {
+            const filename = dirent.name;
+            if ( objectconfig.file_name_match.test( filename ) ) {
+                // is data file, collect it!
+                //logger.debug(`Loading data from ‘${rel_path}’ ...`);
+                return await this.parse_file_into_objects( root_path, rel_path, objectconfig );
+            } else if ( objectconfig.ignore_file_name_match.test( filename ) ) {
+                logger.debug(`Ignored file ‘${filename}’`);
+                return [];
+            } else {
+                throw new Error(
+                    `Encountered unknown file ‘${filename}’ in `
+                        +`‘${path.dirname(rel_path)}’.  Expected: `
+                        +`${objectconfig.expected_msg}.`
+                );
+            }
+        };
+
+        return await Promise.all(
+            await this.walk(
+                fullsrcpath,
+                // callback for directories:
+                dir_callback,
+                // callback for files:
+                file_callback
+            )
+        );
     }
-    parse_file_data(objectconfig, path, file_contents)
+
+    read_file_contents(root_path, rel_path)
     {
-        if (path.endsWith('.yml') || path.endsWith('.yaml')) {
+        const fullpath = path.join(root_path, rel_path);
+        return fs.readFileSync(fullpath);
+    }
+    parse_file_data(file_contents, objectconfig, root_path, rel_path)
+    {
+        if ( /\.ya?ml$/i.test(rel_path) ) {
             return jsyaml.load( file_contents );
-        } else if (path.endsWith('.json')) {
+        } else if ( /\.json$/i.test(rel_path) ) {
             return JSON.parse( file_contents );
         } else {
             throw new Error(`Unknown file type for path ‘${path}’`);
         }
     }
 
-    _parse_object_file_into_objects(data_file_name, objectname, objectconfig)
+    async parse_file_into_objects(root_path, rel_path, objectconfig)
     {
-        const load_objects = objectconfig.load_objects ||  (d) => [ d ] ;
+        const file_contents = this.read_file_contents(root_path, rel_path);
+        const file_data = this.parse_file_data( file_contents, objectconfig,
+                                                root_path, rel_path );
 
-        const file_contents = this.read_file_contents(data_file_name);
-        const file_data = this.parse_file_data( objectconfig, data_file_name, file_contents );
+        let objects_data = objectconfig.load_objects( file_data );
 
-        const objects_data = load_objects( file_data );
+        logger.debug(`Loaded ${objects_data.length} ${objectconfig.objectname} object(s) `
+                     +`from ‘${path.join(objectconfig.data_src_path,rel_path)}’`);
 
-        
+        // add _object field:
+        objects_data.forEach( (obj) => {
+            this.finalize_object(obj, objectconfig, root_path, rel_path);
+        } );
+
+        return objects_data.map( (obj) => [ obj._zoodb.id, obj ] );
     }
-}
 
+    finalize_object(obj, objectconfig, root_path, rel_path)
+    {
+        // validate according to the JSON schema
+        const validation_result = this.schema_validator.validate(obj, objectconfig.schema);
+        if (!validation_result.valid) {
+            throw new Error(
+                `Invalid ${objectconfig.objectname} object data in `
+                +`‘${path.join(objectconfig.data_src_path,rel_path)}’:\n\n`
+                +`*** ${ validation_result.errors.join("\n*** ") }\n`
+            );
+        }
+        //logger.debug(`Validated ${JSON.stringify(obj)} against `
+        //             +`${JSON.stringify(objectconfig.schema)}`);
+
+        obj._zoodb = {
+            id: obj[objectconfig.schema._primarykey],
+            source_file_path: rel_path,
+        };
+    }
+};
+
+export default {
+    ZooDbDataLoader: ZooDbDataLoader
+};
