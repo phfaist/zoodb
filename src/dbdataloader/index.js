@@ -11,7 +11,7 @@ import json_refparser_resolver_file from "@apidevtools/json-schema-ref-parser/li
 
 
 import _zoologger from '../_zoologger.js';
-let logger = _zoologger.child({module:'zoodbdataloader'});
+let logger = _zoologger.child({module:'zoodb.dbdataloader'});
 
 
 
@@ -180,7 +180,12 @@ class ZooDbDataLoader
                 //
                 // Provide all the schema objects (might contain circular refs!):
                 //
-                schemas: this.schemas_by_name,
+                schemas: Object.fromEntries(
+                    Object.values(this.config.objects).map( (objectconfig) => {
+                        return [objectconfig.objectname,
+                                this.schemas_by_name[objectconfig.schema_name]];
+                    } )
+                ),
                 //
                 // Provide all the object data:
                 //
@@ -377,7 +382,7 @@ class ZooDbDataLoader
         //             +`${JSON.stringify(objectconfig.schema)}`);
 
         obj._zoodb = {
-            id: obj[objectconfig.schema._primarykey],
+            id: obj[objectconfig.schema._zoo_primarykey],
             source_file_path: rel_path,
         };
     }

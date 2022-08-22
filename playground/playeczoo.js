@@ -1,8 +1,13 @@
 import fs from 'fs';
 
-import zoodbdataloader from '../src/zoodbdataloader/index.js';
+import zoodbdataloader from '../src/dbdataloader/index.js';
 import _zoologger from '../src/_zoologger.js';
 const logger = _zoologger.child({module: 'play'});
+
+import zoodbrelations from '../src/dbprocessors/relations.js';
+
+import jsoncycle from 'cycle/cycle.js';
+
 
 const eczoo_data_dir = process.env.ECZOO_DATA_DIR;
 if (!eczoo_data_dir) {
@@ -32,10 +37,23 @@ const loader = new zoodbdataloader.ZooDbDataLoader({
 
 const zoodbdata = await loader.load(); // load!
 
+
+{ const jsondata = JSON.stringify( zoodbdata );
+  fs.writeFileSync("zoo_dbdata_output.json", jsondata, {encoding:'utf8'}); }
+
+
+//
+// Populate relations fields, including backreferences!
+//
+zoodbrelations.populate_relations(zoodbdata);
+logger.debug("CSS code's first parent relation object is: ")
+logger.debug(zoodbdata.objects.code.css.relations.parents[0]);
+
+
 logger.info("Zoo is now loaded!");
 //logger.info(zoodbdata);
-const jsondata = JSON.stringify(zoodbdata);
-fs.writeFileSync("zoo_dbdata_output.json", jsondata, {encoding:'utf8'});
+{ const jsondata = JSON.stringify( jsoncycle.decycle(zoodbdata), undefined, 4 );
+  fs.writeFileSync("zoo_dbdata_output_relationsdecycled.json", jsondata, {encoding:'utf8'}); }
 
 
 // console.log("Zoo loaded!");

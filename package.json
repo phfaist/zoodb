@@ -1,5 +1,5 @@
 {
-  "name": "@phfaist/zoobase",
+  "name": "@phfaist/zoodb",
   "type": "module",
   "version": "0.1.0",
   "main": "src/index.js",
@@ -8,6 +8,7 @@
   "private": true,
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
+    "cycle": "^1.0.3",
     "glob": "^8.0.3",
     "js-yaml": "^4.1.0",
     "jsonschema": "^1.4.1",
