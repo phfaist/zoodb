@@ -37,23 +37,27 @@ const loader = new zoodbdataloader.ZooDbDataLoader({
 
 const zoodbdata = await loader.load(); // load!
 
+logger.info("Zoo is now loaded!");
 
 { const jsondata = JSON.stringify( zoodbdata );
   fs.writeFileSync("zoo_dbdata_output.json", jsondata, {encoding:'utf8'}); }
 
+logger.info("Zoo saved as json.");
 
 //
 // Populate relations fields, including backreferences!
 //
 zoodbrelations.populate_relations(zoodbdata);
-logger.debug("CSS code's first parent relation object is: ")
-logger.debug(zoodbdata.objects.code.css.relations.parents[0]);
+// logger.debug("CSS code's first parent relation object is: ")
+// logger.debug(zoodbdata.objects.code.css.relations.parents[0]);
 
+logger.info("Zoo relations populated!");
 
-logger.info("Zoo is now loaded!");
 //logger.info(zoodbdata);
-{ const jsondata = JSON.stringify( jsoncycle.decycle(zoodbdata), undefined, 4 );
+{ const jsondata = JSON.stringify( jsoncycle.decycle(zoodbdata) );
   fs.writeFileSync("zoo_dbdata_output_relationsdecycled.json", jsondata, {encoding:'utf8'}); }
+
+logger.info("Zoo with relation data saved as JSON with $ref's");
 
 
 // console.log("Zoo loaded!");

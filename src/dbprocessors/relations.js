@@ -160,8 +160,8 @@ function populate_relations(zoodbdata, object_names)
                 return;
             }
 
-            logger.debug(`Processing ${objectname}'s relations: `
-                         +`${JSON.stringify(schema_zoo_relations)}`);
+            // logger.debug(`Processing ${objectname}'s relations: `
+            //              +`${JSON.stringify(schema_zoo_relations)}`);
 
             Object.values(objectsdict).forEach(
                 (obj) => {
