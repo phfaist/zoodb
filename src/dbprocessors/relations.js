@@ -62,7 +62,7 @@ function concatlistfield(obj, field, items)
 
 
 
-class RelationsPopulator
+export class RelationsPopulator
 {
     constructor(zoodbdata, config)
     {
@@ -191,6 +191,3 @@ class RelationsPopulator
 
 };
 
-export default {
-    RelationsPopulator,
-};

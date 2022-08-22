@@ -8,6 +8,9 @@
   "private": true,
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
+    "@citation-js/core": "^0.6.1",
+    "@citation-js/plugin-csl": "^0.6.4",
+    "@citation-js/plugin-doi": "^0.6.1",
     "cycle": "^1.0.3",
     "glob": "^8.0.3",
     "js-yaml": "^4.1.0",

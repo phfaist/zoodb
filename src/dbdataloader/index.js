@@ -61,7 +61,7 @@ const dbdata = zoodbdataloader.load();
 */
 
 
-class ZooDbDataLoader
+export class ZooDbDataLoader
 {
 
     constructor(config)
@@ -138,8 +138,8 @@ class ZooDbDataLoader
                     };
                     const protocol = (new URL(newfile.url)).protocol;
 
-                    logger.debug(`resolved schema URL --> url = ${newfile.url}, `
-                                 +`extension = ${newfile.extension} (protocol=${protocol})`);
+                    logger.debug(`Resolved schema URL ${file.url} → ${newfile.url} `
+                                 + `extension=${newfile.extension} protocol=${protocol}`);
                     
                     if ( protocol == 'file:' ) { 
                         return json_refparser_resolver_file.read(newfile);
@@ -388,6 +388,3 @@ class ZooDbDataLoader
     }
 };
 
-export default {
-    ZooDbDataLoader: ZooDbDataLoader
-};
