@@ -47,7 +47,8 @@ logger.info("Zoo saved as json.");
 //
 // Populate relations fields, including backreferences!
 //
-zoodbrelations.populate_relations(zoodbdata);
+{ let zoo_relations_populator = new zoodbrelations.RelationsPopulator(zoodbdata);
+  zoo_relations_populator.populate_relations(); }
 // logger.debug("CSS code's first parent relation object is: ")
 // logger.debug(zoodbdata.objects.code.css.relations.parents[0]);
 

@@ -61,122 +61,136 @@ function concatlistfield(obj, field, items)
 }
 
 
-function process_object_relation(zoodbdata, objectname, objdata, zoorelinfo, object_names)
+
+class RelationsPopulator
 {
-    const {object_field, to_object_type} = zoorelinfo;
+    constructor(zoodbdata, config)
+    {
+        this.zoodbdata = zoodbdata;
+        this.config = config || {};
 
-    if ( !zoodbdata.objects.hasOwnProperty(to_object_type) ) {
-        throw new Error(`Invalid _zoo_relation definition in ‘${objectname}’: `
-                        +`There is no such object type ‘${to_object_type}’`);
+        this.config.object_names ||= Object.keys(this.zoodbdata.objects);
     }
 
-    if (get_field_schema(zoodbdata.schemas[objectname], object_field).type == 'array') {
-        const relation_objs = getfield(objdata, object_field) || [];
-        relation_objs.forEach(
-            (obj_rel_data) => {
-                process_single_relation(zoodbdata, objectname, objdata, obj_rel_data,
-                                        zoorelinfo, object_names);
-            }
-        );
-    } else {
-        const obj_rel_data = getfield(objdata, object_field);
-        process_single_relation(zoodbdata, objectname, objdata, obj_rel_data,
-                                zoorelinfo, object_names);
-    }
-};
-function process_single_relation(zoodbdata, objectname, obj, obj_rel_data,
-                                 zoorelinfo, object_names)
-{
-    const {object_field,
-           to_object_type,
-           relation_add_object_field,
-           relation_primary_key_field,
-           backreference} = zoorelinfo;
+    _process_object_relation(objectname, obj, zoo_relation_spec)
+    {
+        let zoodbdata = this.zoodbdata;
+        const {object_field, to_object_type} = zoo_relation_spec;
 
-    const target_obj_id = obj_rel_data[relation_primary_key_field];
-
-    if ( !zoodbdata.objects[to_object_type].hasOwnProperty( target_obj_id ) ) {
-        throw new Error(
-            `In ${objectname} object ‘${obj._zoodb.id}’ `
-            +`(‘${obj._zodb.source_file_path}’): Invalid reference in ‘${object_field}’ `
-            +`to ${to_object_type} object with nonexistent ID ‘${target_obj_id}’`
-        );
-    }
-
-    const target_object = zoodbdata.objects[to_object_type][target_obj_id];
-    
-    let rel_object_nopkobjfld =
-        Object.fromEntries( Object.entries(obj_rel_data).filter(  (ropair) => {
-            const [relobjkey, relobjval] = ropair;
-            return relobjkey != relation_primary_key_field;
-        } ) );
-                                 
-    if (relation_add_object_field) {
-        obj_rel_data[relation_add_object_field] = target_object;
-    }
-
-    if (backreference && object_names.includes(to_object_type)) {
-
-        const backref_object = Object.assign({}, rel_object_nopkobjfld);
-
-        const backref_relation_primary_key_field =
-              backreference.relation_primary_key_field || (objectname + '_id');
-        backref_object[backref_relation_primary_key_field] = obj._zoodb.id;
-
-        const backref_relation_object_field =
-              backreference.relation_object_field || objectname;
-        backref_object[backref_relation_object_field] = obj;
-
-        const backref_field = backreference.field;
-        if (!backref_field) {
-            throw new Error(`Invalid field: in backreference: in relation object `
-                            +`in ${objectname}`)
+        if ( !zoodbdata.objects.hasOwnProperty(to_object_type) ) {
+            throw new Error(`Invalid _zoo_relation definition in ‘${objectname}’: `
+                            +`There is no such object type ‘${to_object_type}’`);
         }
 
-        concatlistfield(target_object, backref_field, [ backref_object ]);
-
-    }
-};
-
-
-function populate_relations(zoodbdata, object_names)
-{
-    if (!object_names) {
-        object_names = Object.keys(zoodbdata.objects);
-    }
-
-    // inspect schema to see which fields are relations to process
-
-    // explore all objects and populate relations
-    object_names.forEach(
-        (objectname) => {
-
-            logger.debug(`Processing relations for ${objectname} object relations`);
-
-            let objectsdict = zoodbdata.objects[objectname];
-            
-            const schema_zoo_relations = zoodbdata.schemas[objectname]._zoo_relations || [];
-            if (!schema_zoo_relations) {
-                return;
-            }
-
-            // logger.debug(`Processing ${objectname}'s relations: `
-            //              +`${JSON.stringify(schema_zoo_relations)}`);
-
-            Object.values(objectsdict).forEach(
-                (obj) => {
-                    schema_zoo_relations.forEach(
-                        (zoorelinfo) => {
-                            process_object_relation(zoodbdata, objectname, obj, zoorelinfo,
-                                                    object_names);
-                        }
-                    );
+        const field_schema = get_field_schema(zoodbdata.schemas[objectname], object_field);
+        if (field_schema.type == 'array') {
+            const relation_objs = getfield(obj, object_field) || [];
+            relation_objs.forEach(
+                (relation_object) => {
+                    this._process_single_relation(objectname, obj, relation_object,
+                                                  zoo_relation_spec);
                 }
             );
+        } else {
+            const relation_object = getfield(obj, object_field);
+            process_single_relation(objectname, obj, relation_object, zoo_relation_spec);
         }
-    );
+    }
+
+    _process_single_relation(objectname, obj, relation_object, zoo_relation_spec)
+    {
+        let zoodbdata = this.zoodbdata;
+        const object_names = this.config.object_names;
+
+        const {object_field,
+               to_object_type,
+               relation_add_object_field,
+               relation_primary_key_field,
+               backreference} = zoo_relation_spec;
+
+        const target_obj_id = relation_object[relation_primary_key_field];
+
+        if ( !zoodbdata.objects[to_object_type].hasOwnProperty( target_obj_id ) ) {
+            throw new Error(
+                `In ${objectname} object ‘${obj._zoodb.id}’ `
+                + `(‘${obj._zodb.source_file_path}’): Invalid reference in ‘${object_field}’ `
+                + `to ${to_object_type} object with nonexistent ID ‘${target_obj_id}’`
+            );
+        }
+
+        const target_object = zoodbdata.objects[to_object_type][target_obj_id];
+        
+        let rel_object_nopkobjfld =
+            Object.fromEntries( Object.entries(relation_object).filter(  (ropair) => {
+                const [relobjkey, relobjval] = ropair;
+                return relobjkey != relation_primary_key_field;
+            } ) );
+        
+        if (relation_add_object_field) {
+            relation_object[relation_add_object_field] = target_object;
+        }
+
+        if (backreference && object_names.includes(to_object_type)) {
+
+            const backref_object = Object.assign({}, rel_object_nopkobjfld);
+
+            const backref_relation_primary_key_field =
+                  backreference.relation_primary_key_field || (objectname + '_id');
+            backref_object[backref_relation_primary_key_field] = obj._zoodb.id;
+
+            const backref_relation_object_field =
+                  backreference.relation_object_field || objectname;
+            backref_object[backref_relation_object_field] = obj;
+
+            const backref_field = backreference.field;
+            if (!backref_field) {
+                throw new Error(`Invalid field: in backreference: in relation object `
+                                +`in ${objectname}`)
+            }
+
+            concatlistfield(target_object, backref_field, [ backref_object ]);
+
+        }
+    };
+
+
+    populate_relations()
+    {
+        let zoodbdata = this.zoodbdata;
+        const object_names = this.config.object_names;
+
+        // explore all objects and populate relations
+        object_names.forEach(
+            (objectname) => {
+
+                logger.debug(`Processing relations for ${objectname} object relations`);
+
+                let objectsdict = zoodbdata.objects[objectname];
+                
+                const schema_zoo_relations = zoodbdata.schemas[objectname]._zoo_relations || [];
+                if (!schema_zoo_relations) {
+                    return;
+                }
+
+                // logger.debug(`Processing ${objectname}'s relations: `
+                //              +`${JSON.stringify(schema_zoo_relations)}`);
+
+                Object.values(objectsdict).forEach(
+                    (obj) => {
+                        schema_zoo_relations.forEach(
+                            (zoo_relation_spec) => {
+                                this._process_object_relation(objectname, obj,
+                                                              zoo_relation_spec,);
+                            }
+                        );
+                    }
+                );
+            }
+        );
+    };
+
 };
 
 export default {
-    populate_relations: populate_relations,
+    RelationsPopulator,
 };
