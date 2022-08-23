@@ -27,13 +27,6 @@ export class ZooLLMScanner extends latexnodes_nodes.LatexNodesVisitor
         return this.encountered[scanned_type];
     }
 
-    // get_encountered_in_resource_info(scanned_type, resource_info)
-    // {
-    //     return this.get_encountered(scanned_type).filter(
-    //         (x) => (x.encountered_resource_info == resource_info)
-    //     );
-    // }
-
     get_encountered_referenceables_by_reftype(ref_type)
     {
         const encountered_referenceables = this.get_encountered('referenceables');
@@ -131,30 +124,46 @@ export class ZooLLMScanner extends latexnodes_nodes.LatexNodesVisitor
 
     scan_object_with_schema(obj, schema, what=undefined)
     {
-        visitor_scan_schemadatalike_obj(this, obj, schema, what);
+        visitor_scan_object(this, obj, schema, what);
+    }
+
+    scan_zoo(zoodbdata, options=undefined)
+    {
+        visitor_scan_zoo(this, zoodbdata, options);
     }
 };
 
 
 
-export function visitor_scan_schemadatalike_obj(visitor, obj, schema, what=undefined)
+export function visitor_scan_object(visitor, obj, schema, what=undefined)
 {
     for (const {fieldname, fieldvalue, fieldschema}
          of iter_object_fields_recursive(obj, schema)) {
 
         if (fieldschema._llm) {
-            if (! fieldvalue instanceof LLMFragment ) {
+            if ( ! fieldvalue instanceof LLMFragment ) {
                 throw new Error(
                     `Field ${fieldname} of object ${JSON.stringify(obj)} is not an `
-                    + `LLM object: ${fieldvalue}`
+                    + `LLM object, even though its schema claims so: ${fieldvalue}`
                 );
             }
 
             fieldvalue.start_node_visitor(this);
         }
-
     }
-
 }
 
+export function visitor_scan_zoo(visitor, zoodbdata, options)
+{
+    const options = options || {};
 
+    const object_types = options.object_types || Object.keys(zoodbdata.objects);
+    
+
+    for (const object_type of object_types) {
+        const schema = zoodbdata.schemas[object_type];
+        for (const [objid,obj] of Object.entries(zoodbdata.objects[object_types])) {
+            visitor_scan_object(visitor, obj, schema, `${object_type}:${objid}`);
+        }
+    }
+}

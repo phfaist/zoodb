@@ -4,7 +4,7 @@ let logger = _zoologger.child({module:'zoodb.zoollm'});
 import path from 'path'; // path.join()
 
 import {$$kw, repr} from 'llm-js/py.js';
-export {$$kw};
+export {$$kw, repr};
 
 import * as llmstd from 'llm-js/llm.llmstd.js';
 import * as llm_feature from 'llm-js/llm.feature.js';
@@ -286,42 +286,39 @@ function prep_llm_environ_features(zoollm_options)
 }
 
 
-export class ZooLLMEnvironment extends llmstd.LLMStandardEnvironment
+//export class ZooLLMEnvironment extends llmstd.LLMStandardEnvironment
+export function make_zoo_llm_environment(zoollm_options)
 {
-    constructor(zoollm_options)
-    {
-        // since we cannot assign to this.xyz before calling the superclass
-        // constructor, we prepare a temporary object (simple dictionary) with
-        // the values we'd like to assign, and we'll assign them to 'this'
-        // later below, after calling the superclass constructor.
-        const _futurethis = prep_llm_environ_features(zoollm_options);
+    // since we cannot assign to this.xyz before calling the superclass
+    // constructor, we prepare a temporary object (simple dictionary) with
+    // the values we'd like to assign, and we'll assign them to 'this'
+    // later below, after calling the superclass constructor.
+    const _feature_props = prep_llm_environ_features(zoollm_options);
 
-        const features =  [
-            _futurethis.feature_headings,
-            _futurethis.feature_refs,
-            _futurethis.feature_endnotes,
-            _futurethis.feature_citations,
-            _futurethis.feature_floats,
-            _futurethis.feature_defterm,
-            _futurethis.graphics_collection,
-        ];
+    const features =  [
+        _feature_props.feature_headings,
+        _feature_props.feature_refs,
+        _feature_props.feature_endnotes,
+        _feature_props.feature_citations,
+        _feature_props.feature_floats,
+        _feature_props.feature_defterm,
+        _feature_props.graphics_collection,
+    ];
 
-        super(
-            $$kw({
-                features: features
-            })
-        );
-        
-        // copy all properties from _futurethis. to this.
-        Object.entries(_futurethis).forEach( (pair) => {
-            const [prop, value] = pair;
-            this[prop] = value;
-        } );
+    const zoollm_environ = llmstd.LLMStandardEnvironment(
+        $$kw({
+            features: features
+        })
+    );
+    
+    // copy all properties from _feature_props. to the new object
+    Object.entries(_feature_props).forEach( (pair) => {
+        const [prop, value] = pair;
+        zoollm_environ[prop] = value;
+    } );
 
-    }
-
-};
-
+    return zoollm_environ;
+}
 
 
 

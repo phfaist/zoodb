@@ -9,6 +9,8 @@ import $RefParser from "@apidevtools/json-schema-ref-parser";
 import json_refparser_resolver_http from "@apidevtools/json-schema-ref-parser/lib/resolvers/http.js";
 import json_refparser_resolver_file from "@apidevtools/json-schema-ref-parser/lib/resolvers/file.js";
 
+import { ZooDb } from '../zoodb.js';
+
 
 import _zoologger from '../_zoologger.js';
 let logger = _zoologger.child({module:'zoodb.dbdataloader'});
@@ -192,7 +194,7 @@ export class ZooDbDataLoader
                 objects: Object.fromEntries( objects_results ),
             };
             //logger.debug(`load() -> got final data=${JSON.stringify(dbdata)}`);
-            return dbdata;
+            return new ZooDb(dbdata);
         } );
     }
 

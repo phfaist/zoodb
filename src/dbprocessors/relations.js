@@ -9,7 +9,7 @@ import {getfield, setfield, iterfield, concatlistfield, get_field_schema}
 
 class ZooRelation
 {
-    constructor(object_type, relation_spec, zoodbdata)
+    constructor(object_type, relation_spec, zoodb)
     {
         this.object_type = object_type;
         this.relation_spec = relation_spec;
@@ -31,15 +31,15 @@ class ZooRelation
             this.use_backreference = false;
         }
 
-        this.zoodbdata = zoodbdata;
+        this.zoodb = zoodb;
         
-        if ( !this.zoodbdata.objects.hasOwnProperty(this.to_object_type) ) {
+        if ( !this.zoodb.objects.hasOwnProperty(this.to_object_type) ) {
             throw new Error(`Invalid _zoo_relation definition in ‘${this.object_type}’: `
                             + `There is no such object type ‘${this.to_object_type}’`);
         }
 
         const relation_field_schema =
-              get_field_schema(this.zoodbdata.schemas[this.object_type], this.object_field);
+              get_field_schema(this.zoodb.schema(this.object_type), this.object_field);
         if (relation_field_schema.type == 'array') {
             this.source_has_multiple_relations = true;
             this.fully_specified_relation_add_object_field =
@@ -89,12 +89,12 @@ class ZooRelation
 
     _process_single_relation(obj, relation_object, options)
     {
-        let zoodbdata = this.zoodbdata;
+        let zoodb = this.zoodb;
         const {process_object_types} = options;
 
         const target_obj_id = relation_object[this.relation_primary_key_field];
 
-        if ( !zoodbdata.objects[this.to_object_type].hasOwnProperty( target_obj_id ) ) {
+        if ( !zoodb.objects[this.to_object_type].hasOwnProperty( target_obj_id ) ) {
             throw new Error(
                 `In ${this.object_type} object ‘${obj._zoodb.id}’ `
                 + `(‘${obj._zodb.source_file_path}’): Invalid reference in `
@@ -103,7 +103,7 @@ class ZooRelation
             );
         }
 
-        const target_object = zoodbdata.objects[this.to_object_type][target_obj_id];
+        const target_object = zoodb.objects[this.to_object_type][target_obj_id];
         
         let rel_object_copy_nopkfld =
             Object.fromEntries( Object.entries(relation_object).filter(  (ropair) => {
@@ -147,18 +147,18 @@ class ZooRelation
 
 export class RelationsPopulator
 {
-    constructor(zoodbdata, config)
+    constructor(zoodb, config)
     {
-        this.zoodbdata = zoodbdata;
+        this.zoodb = zoodb;
         this.config = config || {};
 
-        this.config.object_types ||= Object.keys(this.zoodbdata.objects);
+        this.config.object_types ||= this.zoodb.object_types;
 
         this.relations = Object.fromEntries(
             this.config.object_types.map( (object_type) => {
-                const rels = (this.zoodbdata.schemas[object_type]._zoo_relations || []).map(
+                const rels = (this.zoodb.schema(object_type)._zoo_relations || []).map(
                     (relation_spec) =>
-                        new ZooRelation(object_type, relation_spec, this.zoodbdata)
+                        new ZooRelation(object_type, relation_spec, this.zoodb)
                 );
                 return [object_type, rels];
             } )
@@ -182,7 +182,7 @@ export class RelationsPopulator
         } );
         
         for (const [otype, ofields] of Object.entries(all_relations_computed_fields)) {
-            for (const object of Object.values(this.zoodbdata.objects[otype])) {
+            for (const object of Object.values(this.zoodb.objects[otype])) {
 
                 for (const fldinfo of ofields) {
                     for (const value of iterfield(object, fldinfo.fieldname)) {
@@ -201,7 +201,7 @@ export class RelationsPopulator
 
     populate_relations()
     {
-        let zoodbdata = this.zoodbdata;
+        let zoodb = this.zoodb;
         const object_types = this.config.object_types;
 
         if (!this.relations) {
@@ -226,7 +226,7 @@ export class RelationsPopulator
                 // now we populate the relations in all objects of this type
                 //
 
-                let objectsdict = zoodbdata.objects[object_type];
+                let objectsdict = zoodb.objects[object_type];
                 
                 // logger.debug(`Processing ${object_type}'s relations: `
                 //              +`${JSON.stringify(schema_zoo_relations)}`);
