@@ -52,6 +52,7 @@ logger.info("Zoo is now loaded!");
 // Populate relations fields, including backreferences!
 //
 { let zoo_relations_populator = new zoodbrelations.RelationsPopulator(zoodbdata);
+  zoo_relations_populator.check_all_clean_fields();
   zoo_relations_populator.populate_relations();
   // logger.debug("CSS code's first parent relation object is: ")
   // logger.debug(zoodbdata.objects.code.css.relations.parents[0]);
@@ -68,16 +69,6 @@ logger.info("Zoo is now loaded!");
 // see if we can mix in some LLM processing
 let zoollmenviron = new zoollm.ZooLLMEnvironment();
 
-// will need this reference
-zoollmenviron.external_ref_resolver.add_ref(
-    zoollm.RefInstance($$kw({
-        ref_type: 'code',
-        ref_label: 'binary_linear',
-        formatted_ref_llm_text: 'Binary \\emph{linear} code',
-        target_href: 'https://errorcorrectionzoo.org/c/binary_linear',
-    }))
-);
-
 // logger.debug("refs database is now ")
 // logger.debug(zoollmenviron.external_ref_resolver.ref_instance_database);
 
@@ -92,6 +83,18 @@ let frag = zoollmenviron.make_fragment(
     })
 );
 let doc = zoollmenviron.make_document(frag.render);
+
+// We'll need this reference. Note we're specifying it after the relevant
+// fragment was parsed, and it still works.
+zoollmenviron.external_ref_resolver.add_ref(
+    zoollm.RefInstance($$kw({
+        ref_type: 'code',
+        ref_label: 'binary_linear',
+        formatted_ref_llm_text: 'Binary \\emph{linear} code',
+        target_href: 'https://errorcorrectionzoo.org/c/binary_linear',
+    }))
+);
+
 let [render_result, render_context] = doc.render( new zoollm.ZooHtmlFragmentRenderer() );
 logger.info("Rendered HTML: ");
 logger.info(render_result);

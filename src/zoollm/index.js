@@ -1,13 +1,10 @@
 import _zoologger from '../_zoologger.js';
 let logger = _zoologger.child({module:'zoodb.zoollm'});
 
-import path from 'path'; // path.join
+import path from 'path'; // path.join()
 
 import {$$kw, repr} from 'llm-js/py.js';
-
 export {$$kw};
-
-import * as latexnodes_nodes from 'llm-js/pylatexenc.latexnodes.nodes.js';
 
 import * as llmstd from 'llm-js/llm.llmstd.js';
 import * as llm_feature from 'llm-js/llm.feature.js';
@@ -349,27 +346,6 @@ export class ZooHtmlFragmentRenderer extends llm_fragmentrenderer_html.HtmlFragm
 }
 
 
-
-
-// latexnodes_nodes.LatexNodesVisitor
-
-// llm_feature.Feature
-
-// llm_feature_headings.FeatureHeadings
-
-// llm_feature_endnotes.FeatureEndnotes, llm_feature_endnotes.EndnoteCategory
-
-// llm_feature_refs.FeatureRefs, llm_feature_refs.RefInstance
-
-// llm_feature_cite.FeatureExternalPrefixedCitations
-
-// llm_feature_floats.FeatureFloatsIncludeGraphicsOnly, llm_feature_floats.FloatType
-
-// llm_feature_defterm.FeatureDefTerm
-
-// llm_feature_graphics.GraphicsResource
-
-// llm_fragmentrenderer_html.HtmlFragmentRenderer
 
 // llm_fragmentrenderer_text.TextFragmentRenderer
 
