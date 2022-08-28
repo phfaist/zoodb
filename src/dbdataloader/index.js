@@ -75,7 +75,8 @@ export class ZooDbDataLoader
 
         // set defaults in config
         this.config.object_defaults.file_name_match ||= /\.(ya?ml|json)$/i;
-        this.config.object_defaults.ignore_file_name_match ||= /^(.*\~|.*\.bak|\.DS_Store)$/i;
+        this.config.object_defaults.ignore_file_name_match
+            ||= /^(.*\~|.*\.bak|\.DS_Store|\.gitignore)$/i;
         this.config.object_defaults.load_objects ||=  (d) => [ d ] ;
         this.config.object_defaults.expected_msg ||=
             `File name matching ‘/${this.config.object_defaults.file_name_match.source}/`
@@ -171,7 +172,7 @@ export class ZooDbDataLoader
             }
         );
 
-        logger.debug(`load() objects_promises = ${objects_promises}`);
+        // logger.debug(`load() objects_promises = ${objects_promises}`);
 
         return await Promise.all(objects_promises).then( (objects_results) => {
             // results = [ (objectname1, d1), (objectname2, d2), ... ]

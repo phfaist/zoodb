@@ -6,3 +6,5 @@ node_modules
 
 # playground test files
 zoo_dbdata_output*.json
+downloaded_citationinfo_cache.json
+

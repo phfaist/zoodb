@@ -12,6 +12,7 @@ function default_arrayitemfieldname(fieldname, i) {
 
 export function * iter_object_fields_recursive(obj, schema, options, fieldname=undefined)
 {
+    options ||= {};
     const propfieldname = options.propfieldname || default_propfieldname;
     const arrayitemfieldname = options.arrayitemfieldname || default_arrayitemfieldname;
     const only_schema_properties = 

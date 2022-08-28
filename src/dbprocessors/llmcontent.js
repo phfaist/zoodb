@@ -57,7 +57,7 @@ export class LLMContentCompiler
         }
     }
 
-    async compile_object(object_type, objid, obj, schema)
+    compile_object(object_type, objid, obj, schema)
     {
         for (const {fieldname, fieldvalue, fieldschema, parent, parent_index}
              of iter_object_fields_recursive(obj, schema, {provide_parent: true})) {
@@ -85,17 +85,15 @@ export class LLMContentCompiler
         }
     }
 
-    async compile_all_zoo()
+    compile_all_zoo()
     {
         let promises = [];
         for (const object_type of this.config.object_types) {
             const schema = this.zoodb.schema(object_type);
             for (const [objid, obj] of Object.entries(this.zoodb.objects[object_type])) {
-                promises.push( this.compile_object(object_type, objid, obj, schema) );
+                this.compile_object(object_type, objid, obj, schema);
             }
         }
-
-        return await Promise.all(promises);
     }
 
 }

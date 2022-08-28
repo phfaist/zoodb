@@ -81,7 +81,7 @@ export class ZooLLMResourceInfo
 
     toString()
     {
-        return `${this.object_type} object ‘${this.object_id}’ in ‘${this.source_path}’`;
+        return `${this.object_type} ‘${this.object_id}’ in ‘${this.source_path}’`;
     }
 };
 

@@ -11,12 +11,21 @@ import * as zoodbllmcontent from '../src/dbprocessors/llmcontent.js';
 import * as zoollm from '../src/zoollm/index.js';
 const {$$kw, repr} = zoollm;
 
+import * as zoollmscanner from '../src/zoollm/scanner.js';
+
+import { CitationFetcherArxiv } from '../src/citationmanager/sources/arxiv.js';
+import { CitationDatabaseManager } from '../src/citationmanager/index.js';
+
 import jsoncycle from 'cycle/cycle.js';
 
 
 const eczoo_data_dir = process.env.ECZOO_DATA_DIR;
 if (!eczoo_data_dir) {
     throw new Error("Please define process environment variable $ECZOO_DATA_DIR");
+}
+const eczoo_schema_dir = process.env.ECZOO_SCHEMA_DIR;
+if (!eczoo_schema_dir) {
+    throw new Error("Please define process environment variable $ECZOO_SCHEMA_DIR");
 }
 
 
@@ -30,11 +39,11 @@ const loader = new zoodbdataloader.ZooDbDataLoader({
     },
     object_defaults: {
         ignore_file_name_match:
-        /(\~|^\.DS_Store|\.(bak|svg|tex|pdf|aux|log|dvi|xcf|ai|indd|afdesign|afpub))$/i,
+        /(\~|^\.DS_Store|^\.gitignore|\.(bak|svg|tex|pdf|aux|log|dvi|xcf|ai|indd|afdesign|afpub|png|jpeg|jpg))$/i,
     },
-    root_data_dir: process.env.ECZOO_DATA_DIR,
+    root_data_dir: eczoo_data_dir,
     schemas: {
-        schema_root: `file://${process.env.ECZOO_DATA_DIR}/../eczoo_generator/`,
+        schema_root: `file://${eczoo_schema_dir}`,
         schema_rel_path: 'schemas/',
         schema_add_extension: '.yml',
     },
@@ -120,9 +129,36 @@ logger.info(render_result);
     logger.info("Zoo LLM content populated!");
 }
 
-setTimeout(() => { console.log("Now, for instance, we have steane.name = ",
-                               repr(zoodb.objects.code.steane.name)); }, 500 );
+// logger.debug("Now, for instance, we have steane.name = "
+//              + repr(zoodb.objects.code.steane.name));
 
+//
+// Scan LLM content in the zoo
+//
+const scanner = new zoollmscanner.ZooLLMScanner();
+scanner.scan_zoo(zoodb);
+
+logger.info(`List of graphics paths used: ${JSON.stringify(scanner.get_encountered('graphics_paths'))}`);
+logger.info(`Found ${scanner.get_encountered('citations').length} citation instances in total`);
+
+
+
+
+//
+// Fetch citations!
+//
+let citation_fetchers = {
+    'arxiv': new CitationFetcherArxiv({ chain_to_doi: false }),
+};
+let citation_manager = new CitationDatabaseManager(citation_fetchers);
+
+logger.debug("Fetching arxiv citations ...");
+// keep only arxiv citations 'cause I didn't code the other fetchers for now....
+await citation_manager.fetch_citations(
+    scanner.get_encountered('citations').filter( (c) => (c.cite_prefix == 'arxiv') )
+);
+// citations database ready
+logger.info("Citation database ready!")
 
 // finish printing out tasks etc.
 setTimeout(() => { console.log("Timeout done!"); }, 1500);

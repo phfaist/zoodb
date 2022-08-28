@@ -6,7 +6,48 @@ import {iter_object_fields_recursive} from '../util/objectinspector.js';
 
 
 
-export class ZooLLMScanner extends latexnodes_nodes.LatexNodesVisitor
+
+// --- since it doesn't look like we can inherit a Transcrypt-ed class,
+// we'll provide all necessary definitions here directly: ---
+class LatexNodesVisitorJS
+{
+    constructor() { }
+
+    visit(node) { }
+
+    visit_chars_node(node) { this.visit(node); }
+    visit_group_node(node) { this.visit(node); }
+    visit_comment_node(node) {this.visit(node); }
+    visit_macro_node(node) { this.visit(node); }
+    visit_environment_node(node) { this.visit(node); }
+    visit_specials_node(node) { this.visit(node); }
+    visit_math_node(node) { this.visit(node); }
+    visit_node_list(nodes) { this.visit(nodes); }
+    visit_parsed_arguments(parsed_args) { this.visit(parsed_args); }
+    visit_unknown_node(node) { this.visit(node); }
+
+    // ---
+
+    start(node) {
+        // r"""
+        // A shortcut for calling `node.accept_node_visitor()` with this visitor
+        // object.  It's a convenient starting point for your visiting pattern:
+        //
+        // .. code::
+        //
+        //    visitor = MyNodeVisitor()
+        //    visitor.start(node)
+        //
+        // You probably shouldn't override this method in your visitor subclass.
+        // """
+        node.accept_node_visitor(this);
+    }
+
+};
+
+
+// extends latexnodes_nodes.LatexNodesVisitor
+export class ZooLLMScanner extends LatexNodesVisitorJS
 {
     constructor()
     {
@@ -102,7 +143,7 @@ export class ZooLLMScanner extends latexnodes_nodes.LatexNodesVisitor
         if (node.hasOwnProperty('llm_referenceable_info'))
         {
             // it's something referenceable, like a defterm or a section heading
-            const [referenceable] = node.llm_referenceable_info;
+            const referenceable = node.llm_referenceable_info;
             this.encountered['referenceables'].append(
                 {
                     referenceable_info: node.llm_referenceable_info,
@@ -148,14 +189,14 @@ export function visitor_scan_object(visitor, obj, schema, what=undefined)
                 );
             }
 
-            fieldvalue.start_node_visitor(this);
+            fieldvalue.start_node_visitor(visitor);
         }
     }
 }
 
 export function visitor_scan_zoo(visitor, zoodbdata, options)
 {
-    const options = options || {};
+    options = options || {};
 
     const object_types = options.object_types || Object.keys(zoodbdata.objects);
     
