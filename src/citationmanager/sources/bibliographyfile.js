@@ -3,7 +3,7 @@ import path from 'path';
 import jsyaml from 'js-yaml';
 
 import _zoologger from '../../_zoologger.js';
-const logger = _zoologger.child({module: 'zoodb.citationmanager.sources.manual'});
+const logger = _zoologger.child({module: 'zoodb.citationmanager.sources.bibliographyfile'});
 
 import { CitationSourceBase } from './base.js';
 

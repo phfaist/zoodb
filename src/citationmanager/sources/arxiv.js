@@ -1,9 +1,14 @@
-import _zoologger from '../../_zoologger.js';
-const logger = _zoologger.child({module: 'zoodb.citationmanager.sources.arxiv'});
+import fs from 'fs';
+
+import jsyaml from 'js-yaml';
 
 import FeedParser from 'feedparser';
 
+import _zoologger from '../../_zoologger.js';
+const logger = _zoologger.child({module: 'zoodb.citationmanager.sources.arxiv'});
+
 import { CitationSourceBase } from './base.js';
+
 
 export class CitationSourceArxiv extends CitationSourceBase
 {
@@ -29,6 +34,9 @@ export class CitationSourceArxiv extends CitationSourceBase
 
         this.chain_to_doi = chain_to_doi;
         this.data_for_versionless_arxivid = {};
+
+        this.override_arxiv_dois_file = this.options.override_arxiv_dois_file || null;
+        this.override_arxiv_dois = this.options.override_arxiv_dois || {};
     }
 
     add_query(ids)
@@ -43,6 +51,16 @@ export class CitationSourceArxiv extends CitationSourceBase
             )
         );
 
+    }
+
+    source_finalize_run()
+    {
+        if (this.override_arxiv_dois_file) {
+            Object.assign(
+                this.override_arxiv_dois,
+                jsyaml.load(fs.fileReadSync(this.override_arxiv_dois_file))
+            );
+        }
     }
 
     async run_query_chunk(id_list)
@@ -120,6 +138,13 @@ export class CitationSourceArxiv extends CitationSourceBase
         logger.debug(`Got arXiv entry for ‘${arxivid}’: `
                      + `“${author_names.join(', ')}; ${title}”`);
         
+        let doi = null;
+        if (this.override_arxiv_dois.hasOwnProperty(arxivid)) {
+            doi = this.override_arxiv_dois[arxivid];
+        } else if (atom_article['arxiv:doi']) {
+            doi = atom_article['arxiv:doi']['#'] || null;
+        }
+
         const citeprocjsond = {
             // No need to specify `id` in JSON entry, will be added automatically
             // by citation manager:
@@ -134,7 +159,7 @@ export class CitationSourceArxiv extends CitationSourceBase
                     issued_date.getDate(), // but date of the month is 1-based. NOT getDay()!
                 ]],
             },
-            doi: (atom_article['arxiv:doi']||{})['#'] || null,
+            doi: doi,
             arxiv_id: arxivid,
             arxiv_version_number: arxivversionnum,
         };

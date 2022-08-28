@@ -38,7 +38,7 @@ export class CitationSourceDoi extends CitationSourceBase
         let response = await this.fetch_url( 'https://doi.org/' + doi_encoded, {
             method: 'get',
             headers: Object.assign({}, this._get_default_headers(), {
-                // when querying https://doi.org/<DOI> with accept csl+json type-->
+                // query https://doi.org/<DOI> with Accept: csl+json type-->
                 'Accept': 'application/vnd.citationstyles.csl+json',
             }),
         } );

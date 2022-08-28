@@ -164,7 +164,6 @@ for (const encountered_referenceable of scanner.get_encountered('referenceables'
     const { referenceable_info, encountered_in } = encountered_referenceable;
     for (const lbl of referenceable_info.labels) {
         const [ref_type, ref_label] = lbl;
-        console.log(`lbl = ${JSON.stringify(lbl)}; ref_type=${ref_type}, ref_label=${ref_label}`);
         zoollmenviron.external_ref_resolver.add_ref(
             zoollm.RefInstance($$kw({
                 ref_type: ref_type,
@@ -183,7 +182,9 @@ for (const encountered_referenceable of scanner.get_encountered('referenceables'
 // Fetch citations!
 //
 let citation_sources = {
-    'arxiv': new CitationSourceArxiv(),
+    'arxiv': new CitationSourceArxiv({
+        override_arxiv_dois_file: 'playground/biboverridearxivdois.yaml',
+    }),
     'doi': new CitationSourceDoi(),
     'manual': new CitationSourceManual(),
     'preset': new CitationSourceBibliographyFile({

@@ -39,6 +39,9 @@ export class CitationDatabaseManager
         this.cache = new Cache();
 
         this.load_cache();
+
+        logger.debug(`Citation database will be regularly saved back to the `
+                     + `cache file ‘${this.cache_file}’`);
     }
 
     load_cache()
@@ -53,7 +56,7 @@ export class CitationDatabaseManager
 
     save_cache()
     {
-        logger.debug(`Saving database to cache file ‘${this.cache_file}’`);
+        // logger.debug(`Saving database to cache file ‘${this.cache_file}’`);
         // to this.cache_file
         fs.writeFileSync(this.cache_file, this.cache.exportJson());
     }
