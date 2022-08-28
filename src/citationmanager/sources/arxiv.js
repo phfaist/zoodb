@@ -47,6 +47,8 @@ export class CitationSourceArxiv extends CitationSourceBase
 
     async run_query_chunk(id_list)
     {
+        // logger.debug(`Running arXiv.org API query for a chunk of ${id_list.length} IDs`);
+
         let response = await this.fetch_url( 'https://export.arxiv.org/api/query', {
             method: 'post',
             body: `max_results=${id_list.length}&id_list=${id_list.join(',')}`,

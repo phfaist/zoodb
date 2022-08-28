@@ -15,6 +15,8 @@ import * as zoollmscanner from '../src/zoollm/scanner.js';
 
 import { CitationSourceArxiv } from '../src/citationmanager/sources/arxiv.js';
 import { CitationSourceDoi } from '../src/citationmanager/sources/doi.js';
+import { CitationSourceManual } from '../src/citationmanager/sources/manual.js';
+import { CitationSourceBibliographyFile } from '../src/citationmanager/sources/bibliographyfile.js';
 import { CitationDatabaseManager } from '../src/citationmanager/index.js';
 
 import jsoncycle from 'cycle/cycle.js';
@@ -151,6 +153,10 @@ logger.debug(`Found ${scanner.get_encountered('citations').filter((c)=>(c.cite_p
 let citation_sources = {
     'arxiv': new CitationSourceArxiv(),
     'doi': new CitationSourceDoi(),
+    'manual': new CitationSourceManual(),
+    'preset': new CitationSourceBibliographyFile({
+        bibliography_file: 'playground/bibpreset.yaml'
+    }),
 };
 //const a = Buffer.from('cGhmYWlzdEBnb'+'WFpbC5jb20=', 'base64').toString();
 const uagent = `ecczoogen-bibliography-build-script/0.1 `
@@ -163,12 +169,9 @@ let citation_manager = new CitationDatabaseManager(
     },
 );
 
-logger.debug("Fetching arxiv citations ...");
-// keep only arxiv & doi citations 'cause I didn't code the other sources for now....
+logger.debug("Fetching citations ...");
 await citation_manager.query_citations(
-    scanner.get_encountered('citations').filter(
-        (c) => ['arxiv','doi'].includes(c.cite_prefix)
-    )
+    scanner.get_encountered('citations')
 );
 // citations database ready
 logger.info("Citation database ready!")

@@ -1,0 +1,28 @@
+aCoolPaper:
+  author:
+    - family: Li
+      given: Lu
+    - family: Bu
+      given: Kaifeng
+    - family: Koh
+      given: Dax Enshan
+    - family: Jaffe
+      given: Arthur
+    - family: Lloyd
+      given: Seth
+  DOI: 10.48550/arXiv.2208.06306
+  issued:
+    - year: 2022
+      month: 8
+      day: 12
+  number: arXiv:2208.06306
+  publisher: arXiv
+  source: arXiv.org
+  title: Wasserstein Complexity of Quantum Circuits
+  type: article
+
+PreskillNotes:
+  _formatted_llm_text: >-
+    J. Preskill.  \emph{Lecture notes on Quantum Computation.} (1997–2020)
+    \href{http://theory.caltech.edu/~preskill/ph219/}{URL}
+  

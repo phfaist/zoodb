@@ -5,7 +5,7 @@ const logger = _zoologger.child({module: 'zoodb.citationmanager.manager'});
 import fs from 'fs';
 
 
-import { Cache } from 'memory-cache';
+import { Cache } from './_cache.js';
 
 
 const one_day = 1000 * 3600 * 24;
@@ -31,11 +31,11 @@ export class CitationDatabaseManager
 
         for (const [cite_prefix, source] of Object.entries(this.sources))
         {
-            source.set_citation_manager( this );
+            source.set_citation_manager( this, cite_prefix );
         }
 
         this.cache_file = this.options.cache_file || 'downloaded_citationinfo_cache.json';
-        this.cache_entry_duration_ms = this.options.cache_entry_duration_ms || 7*one_day;
+        this.cache_entry_duration_ms = this.options.cache_entry_duration_ms || 30*one_day;
         this.cache = new Cache();
 
         this.load_cache();
@@ -44,7 +44,10 @@ export class CitationDatabaseManager
     load_cache()
     {
         if ( fs.existsSync(this.cache_file) ) {
-            this.cache.importJson(fs.readFileSync(this.cache_file));
+            const json_data = fs.readFileSync(this.cache_file);
+            this.cache.importJson(json_data);
+            logger.debug(`Loaded citations cache from ‘${this.cache_file}’ `
+                         + `(${this.cache.size()} items)`);
         }
     }
 
@@ -60,9 +63,9 @@ export class CitationDatabaseManager
         // group citations by (lowercase) cite_prefix
 
         let keys_to_query = Object.fromEntries(
-            Object.keys(this.sources).map( (cite_prefix) => [cite_prefix, []] )
+            Object.keys(this.sources).map( (cite_prefix) => [cite_prefix, new Set()] )
         );
-        let process_citations = [...citations]
+        let process_citations = [...citations];
         while (process_citations.length)
         {
             const c = process_citations.pop();
@@ -79,14 +82,14 @@ export class CitationDatabaseManager
 
             const d = this.cache.get( `${cite_prefix}:${cite_key}` );
             if (d === null) {
-                keys_to_query[cite_prefix].push( cite_key );
+                keys_to_query[cite_prefix].add( cite_key );
             }
             // if we already have an entry for this citation, there's no need to
             // query it.
 
             // Check if this citation is chained to another citation source; we
             // might need to process that one, too.
-            if (d.chained) {
+            if (d !== null && d.chained) {
                 process_citations.push({
                     cite_prefix: d.chained.cite_prefix,
                     cite_key: d.chained.cite_key,
@@ -103,7 +106,7 @@ export class CitationDatabaseManager
 
         for (const [cite_prefix, source] of Object.entries(this.sources))
         {
-            source.add_query( keys_to_query[cite_prefix] );
+            source.add_query( Array.from(keys_to_query[cite_prefix]) );
             source_run_promises[cite_prefix] = source.run();
         }
 

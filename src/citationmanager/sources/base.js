@@ -1,6 +1,7 @@
 import _zoologger from '../../_zoologger.js';
 const logger = _zoologger.child({module: 'zoodb.citationmanager.sources.base'});
 
+import fs from 'fs';
 import fetch from 'node-fetch';
 
 
@@ -56,9 +57,10 @@ export class CitationSourceBase
         this._running = false;
     }
 
-    set_citation_manager(citation_manager)
+    set_citation_manager(citation_manager, cite_prefix)
     {
         this.citation_manager = citation_manager;
+        this.cite_prefix = cite_prefix;
     }
 
     add_query(ids)
@@ -86,8 +88,8 @@ export class CitationSourceBase
 
             let last_chunk_query_hrtime = null;
 
-            logger.info(`${this.source_name}: querying `
-                        + `${this.keys_to_query_remaining.length} citations`);
+            logger.info(`${this.source_name}: there are `
+                        + `${this.keys_to_query_remaining.length} citation(s) to query`);
             while (true) {
 
                 if (this.keys_to_query_remaining.length) {
@@ -162,6 +164,11 @@ export class CitationSourceBase
     fetch_url(url, fetch_options)
     {
         logger.debug(`Fetching URL ‘${url}’ ...`);
+        if (url.startsWith('file://')) {
+            // a local file.
+            const urlobj = new URL(url);
+            return fs.readFileSync(urlobj.pathname);
+        }
         return fetch(url, fetch_options);
     }
 
