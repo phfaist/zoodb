@@ -4,17 +4,6 @@ const logger = _zoologger.child({module: 'zoodb.citationmanager.manager'});
 
 import fs from 'fs';
 
-// we might as well directly use instead fetch('https://doi.org/XXXXX', ... with
-// Accept: csl-json type .....)
-//
-// import { Cite } from '@citation-js/core';
-// import '@citation-js/plugin-doi';
-// import '@citation-js/plugin-csl';
-
-//let c = new Cite('10.1103/PRXQuantum.3.010329', {forceType:'@doi/id'})
-//c.format('bibliography', { template: 'apa', lang: 'en-US', format: 'html' })
-//csljson = c.format('data', {type:'object'}) [0];
-
 
 import { Cache } from 'memory-cache';
 
@@ -24,9 +13,19 @@ const one_day = 1000 * 3600 * 24;
 
 export class CitationDatabaseManager
 {
+    /**
+     *
+     * Possible options:
+     *
+     * - cache_file
+     *
+     * - cache_entry_duration_ms
+     *
+     * - default_use_user_agent, default_user_agent
+     */
     constructor(sources, options)
     {
-        options ||= {};
+        this.options = options || {};
 
         this.sources = Object.assign(sources);
 
@@ -35,8 +34,8 @@ export class CitationDatabaseManager
             source.set_citation_manager( this );
         }
 
-        this.cache_file = options.cache_file || 'downloaded_citationinfo_cache.json';
-        this.cache_entry_duration_ms = options.cache_entry_duration_ms || 30*one_day;
+        this.cache_file = this.options.cache_file || 'downloaded_citationinfo_cache.json';
+        this.cache_entry_duration_ms = this.options.cache_entry_duration_ms || 7*one_day;
         this.cache = new Cache();
 
         this.load_cache();
@@ -63,8 +62,13 @@ export class CitationDatabaseManager
         let keys_to_query = Object.fromEntries(
             Object.keys(this.sources).map( (cite_prefix) => [cite_prefix, []] )
         );
-        for (const c of citations) {
+        let process_citations = [...citations]
+        while (process_citations.length)
+        {
+            const c = process_citations.pop();
             const {cite_prefix, cite_key} = c;
+
+            //logger.debug(`Citation object is ${JSON.stringify(c)}`);
             
             if (!keys_to_query.hasOwnProperty(cite_prefix)) {
                 throw new Error(
@@ -73,12 +77,24 @@ export class CitationDatabaseManager
                 );
             }
 
-            if (this.cache.get( `${cite_prefix}:${cite_key}` ) !== null) {
-                // we already have an entry for this citation, no need to query it
-                continue;
+            const d = this.cache.get( `${cite_prefix}:${cite_key}` );
+            if (d === null) {
+                keys_to_query[cite_prefix].push( cite_key );
             }
+            // if we already have an entry for this citation, there's no need to
+            // query it.
 
-            keys_to_query[cite_prefix].push( cite_key );
+            // Check if this citation is chained to another citation source; we
+            // might need to process that one, too.
+            if (d.chained) {
+                process_citations.push({
+                    cite_prefix: d.chained.cite_prefix,
+                    cite_key: d.chained.cite_key,
+                    encountered_in: {
+                        what: `Chained from ‘${cite_prefix}:${cite_key}’`,
+                    }
+                });
+            }
         }
 
         // now, run the sources
@@ -102,7 +118,7 @@ export class CitationDatabaseManager
                     parent_chainers_promises.push( source_run_promises[other_cite_prefix] );
                 }
             }
-            if ( ! parent_chainers_promises ) {
+            if ( ! parent_chainers_promises.length ) {
                 // there's no one feeding additional entries to this source, so
                 // we end it right away
                 source.add_query_done();
@@ -138,7 +154,7 @@ export class CitationDatabaseManager
     {
         const cite_id = `${cite_prefix}:${cite_key}`;
 
-        logger.debug(`Storing citation for ‘${cite_prefix}:${cite_key}’ --- ${JSON.stringify(entry_csl_json)}`);
+        logger.debug(`Storing citation for ‘${cite_prefix}:${cite_key}’`); // --- ${JSON.stringify(entry_csl_json)}`);
 
         if (entry_csl_json.chained) {
             const new_cite_prefix = entry_csl_json.chained.cite_prefix;
@@ -152,12 +168,12 @@ export class CitationDatabaseManager
             }
 
             // if it's a chained citation retreival (e.g., arXiv->DOI), then
-            // make sure we add this one to the stuff we need to fetch
-            this.sources[new_cite_prefix].add_fetch( [ new_cite_key ] );
+            // make sure we add this one to the stuff we need to query
+            this.sources[new_cite_prefix].add_query( [ new_cite_key ] );
         }
 
         const entry = Object.assign({}, entry_csl_json, { id: cite_id });
-        logger.debug(`Storing entry ${JSON.stringify(entry)}`);
+        //logger.debug(`Storing entry ${JSON.stringify(entry)}`);
 
         this.cache.put(
             cite_id,

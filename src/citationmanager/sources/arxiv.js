@@ -1,10 +1,7 @@
 import _zoologger from '../../_zoologger.js';
 const logger = _zoologger.child({module: 'zoodb.citationmanager.sources.arxiv'});
 
-
-import fetch from 'node-fetch';
 import FeedParser from 'feedparser';
-
 
 import { CitationSourceBase } from './base.js';
 
@@ -15,14 +12,19 @@ export class CitationSourceArxiv extends CitationSourceBase
         options ||= {};
         const chain_to_doi = options.chain_to_doi ?? true;
 
+        const override_options = {
+            chains_to_sources: chain_to_doi ? ['doi'] : [],
+            source_name: 'ArXiv API citation info source',
+        };
+        const default_options = {
+            chunk_query_delay_ms: 3100,
+            cite_prefix: 'arxiv',
+        };
+
         super(
+            override_options,
             options,
-            {
-                chunk_query_delay_ms: 3100,
-                cite_prefix: 'arxiv',
-                source_name: 'ArXiv API citation info source',
-                chains_to_sources: chain_to_doi ? ['doi'] : [],
-            }
+            default_options,
         );
 
         this.chain_to_doi = chain_to_doi;
@@ -45,14 +47,12 @@ export class CitationSourceArxiv extends CitationSourceBase
 
     async run_query_chunk(id_list)
     {
-        let response = await fetch( 'https://export.arxiv.org/api/query', {
+        let response = await this.fetch_url( 'https://export.arxiv.org/api/query', {
             method: 'post',
             body: `max_results=${id_list.length}&id_list=${id_list.join(',')}`,
-            headers: {
+            headers: Object.assign({}, this._get_default_headers(), {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'User-Agent': 'Error Correction Zoo Citations Fetcher 1.0 '
-                    + '(https://errorcorrectionzoo.org/)',
-            },
+            }),
         } );
         if (response.status !== 200) {
             logger.error(result);

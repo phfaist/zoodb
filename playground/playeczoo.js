@@ -14,6 +14,7 @@ const {$$kw, repr} = zoollm;
 import * as zoollmscanner from '../src/zoollm/scanner.js';
 
 import { CitationSourceArxiv } from '../src/citationmanager/sources/arxiv.js';
+import { CitationSourceDoi } from '../src/citationmanager/sources/doi.js';
 import { CitationDatabaseManager } from '../src/citationmanager/index.js';
 
 import jsoncycle from 'cycle/cycle.js';
@@ -141,21 +142,33 @@ scanner.scan_zoo(zoodb);
 logger.info(`List of graphics paths used: ${JSON.stringify(scanner.get_encountered('graphics_paths'))}`);
 logger.info(`Found ${scanner.get_encountered('citations').length} citation instances in total`);
 
-
+logger.debug(`Found ${scanner.get_encountered('citations').filter((c)=>(c.cite_prefix=='arxiv')).length} ‘arxiv:’ citations, ${scanner.get_encountered('citations').filter((c)=>(c.cite_prefix=='doi')).length} ‘doi:’ citations, ${scanner.get_encountered('citations').filter((c)=>(c.cite_prefix=='preset')).length} ‘preset:’ citations, ${scanner.get_encountered('citations').filter((c)=>(c.cite_prefix=='manual')).length} ‘manual:’ citations.`);
 
 
 //
 // Fetch citations!
 //
 let citation_sources = {
-    'arxiv': new CitationSourceArxiv({ chain_to_doi: false }),
+    'arxiv': new CitationSourceArxiv(),
+    'doi': new CitationSourceDoi(),
 };
-let citation_manager = new CitationDatabaseManager(citation_sources);
+//const a = Buffer.from('cGhmYWlzdEBnb'+'WFpbC5jb20=', 'base64').toString();
+const uagent = `ecczoogen-bibliography-build-script/0.1 `
+      + `(https://github.com/errorcorrectionzoo)`;
+
+let citation_manager = new CitationDatabaseManager(
+    citation_sources,
+    {
+        default_user_agent: uagent
+    },
+);
 
 logger.debug("Fetching arxiv citations ...");
-// keep only arxiv citations 'cause I didn't code the other sources for now....
+// keep only arxiv & doi citations 'cause I didn't code the other sources for now....
 await citation_manager.query_citations(
-    scanner.get_encountered('citations').filter( (c) => (c.cite_prefix == 'arxiv') )
+    scanner.get_encountered('citations').filter(
+        (c) => ['arxiv','doi'].includes(c.cite_prefix)
+    )
 );
 // citations database ready
 logger.info("Citation database ready!")

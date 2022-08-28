@@ -1,6 +1,7 @@
 import _zoologger from '../../_zoologger.js';
 const logger = _zoologger.child({module: 'zoodb.citationmanager.sources.base'});
 
+import fetch from 'node-fetch';
 
 
 export function timeout(ms)
@@ -29,12 +30,12 @@ export function timeout(ms)
 
 export class CitationSourceBase
 {
-    constructor(options, default_options)
+    constructor(override_options, options, default_options)
     {
         this.keys_to_query = [];
         this.keys_to_query_remaining = [];
 
-        this.options = Object.assign({}, default_options, options || {});
+        this.options = Object.assign({}, default_options, options || {}, override_options);
 
         this.total_queried = 0;
 
@@ -46,9 +47,9 @@ export class CitationSourceBase
         // to query or if we're done
         this.waiting_poll_timeout_ms = this.options.waiting_poll_timeout_ms || 500;
 
-        this.cite_prefix = options.cite_prefix;
-        this.chains_to_sources = options.chains_to_sources || [];
-        this.source_name = options.source_name || '<unknown source>';
+        this.cite_prefix = this.options.cite_prefix;
+        this.chains_to_sources = this.options.chains_to_sources || [];
+        this.source_name = this.options.source_name || '<unknown source>';
 
         this._query_more_done = false;
 
@@ -85,17 +86,17 @@ export class CitationSourceBase
 
             let last_chunk_query_hrtime = null;
 
-            logger.info(`${this.source_name}: querying citations`);
+            logger.info(`${this.source_name}: querying `
+                        + `${this.keys_to_query_remaining.length} citations`);
             while (true) {
 
-                if ( this.keys_to_query_remaining ) {
+                if (this.keys_to_query_remaining.length) {
 
                     // if applicable, wait before another chunk query call
                     if (this.chunk_query_delay_ms && last_chunk_query_hrtime !== null) {
                         const dt = process.hrtime( last_chunk_query_hrtime );
                         const dt_ms = (1000*dt[0]+dt[1]/1000000);
                         const dt_ms_to_wait = this.chunk_query_delay_ms - dt_ms;
-                        logger.debug(`Last chuck query hrtime is ${last_chunk_query_hrtime}; dt_ms since is ${dt_ms}; still need to wait ${dt_ms_to_wait} ms`);
                         if (dt_ms_to_wait > 0) {
                             await timeout( dt_ms_to_wait );
                         }
@@ -132,6 +133,38 @@ export class CitationSourceBase
             this._running = false;
         }
     }
+
+    // helper: provide default query headers for remote queries
+    _get_default_headers()
+    {
+        let headers = {};
+        if ( this.options.use_user_agent
+             ?? ((this.citation_manager||{}).options||{}).default_use_user_agent
+             ?? true ) {
+            headers['User-Agent'] = this._get_user_agent();
+        }
+        return headers;
+    }
+
+    // helper: provide a User-Agent for remote queries
+    _get_user_agent()
+    {
+        if (this.options.user_agent) {
+            return this.options.user_agent;
+        }
+        if (this.citation_manager && this.citation_manager.options.default_user_agent) {
+            return this.citation_manager.options.default_user_agent;
+        }
+        return 'ZooDB-Citations-Fetcher/0.1 (https://github.com/phfaist/zoodb)';
+    }
+
+    // helper for fetch()
+    fetch_url(url, fetch_options)
+    {
+        logger.debug(`Fetching URL ‘${url}’ ...`);
+        return fetch(url, fetch_options);
+    }
+
 
     // -------------
 
