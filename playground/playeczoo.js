@@ -87,32 +87,32 @@ let zoollmenviron = zoollm.make_zoo_llm_environment();
 // logger.debug("refs database is now ")
 // logger.debug(zoollmenviron.external_ref_resolver.ref_instance_database);
 
-let frag = zoollmenviron.make_fragment(
-    zoodb.objects.code.css.description,
-    $$kw({
-        is_block_level: true,
-        resource_info: new zoollm.ZooLLMResourceInfo(
-            'code', 'css',
-            path.join('codes', zoodb.objects.code.css._zoodb.source_file_path)
-        )
-    })
-);
-let doc = zoollmenviron.make_document(frag.render);
+// let frag = zoollmenviron.make_fragment(
+//     zoodb.objects.code.css.description,
+//     $$kw({
+//         is_block_level: true,
+//         resource_info: new zoollm.ZooLLMResourceInfo(
+//             'code', 'css',
+//             path.join('codes', zoodb.objects.code.css._zoodb.source_file_path)
+//         )
+//     })
+// );
+// let doc = zoollmenviron.make_document(frag.render);
 
-// We'll need this reference. Note we're specifying it after the relevant
-// fragment was parsed, and it still works.
-zoollmenviron.external_ref_resolver.add_ref(
-    zoollm.RefInstance($$kw({
-        ref_type: 'code',
-        ref_label: 'binary_linear',
-        formatted_ref_llm_text: 'Binary \\emph{linear} code',
-        target_href: 'https://errorcorrectionzoo.org/c/binary_linear',
-    }))
-);
+// // We'll need this reference. Note we're specifying it after the relevant
+// // fragment was parsed, and it still works.
+// zoollmenviron.external_ref_resolver.add_ref(
+//     zoollm.RefInstance($$kw({
+//         ref_type: 'code',
+//         ref_label: 'binary_linear',
+//         formatted_ref_llm_text: 'Binary \\emph{linear} code',
+//         target_href: 'https://errorcorrectionzoo.org/c/binary_linear',
+//     }))
+// );
 
-let [render_result, render_context] = doc.render( new zoollm.ZooHtmlFragmentRenderer() );
-logger.info("Rendered HTML: ");
-logger.info(render_result);
+// let [render_result, render_context] = doc.render( new zoollm.ZooHtmlFragmentRenderer() );
+// logger.info("Rendered HTML: ");
+// logger.info(render_result);
 
 
 // -----------------------------------------------------------------------------
@@ -148,6 +148,38 @@ logger.debug(`Found ${scanner.get_encountered('citations').filter((c)=>(c.cite_p
 
 
 //
+// Add ref targets
+//
+for (const [codeid,codeobj] of Object.entries(zoodb.objects.code)) {
+    zoollmenviron.external_ref_resolver.add_ref(
+        zoollm.RefInstance($$kw({
+            ref_type: 'code',
+            ref_label: codeid,
+            formatted_ref_llm_text: codeobj.name.llm_text,
+            target_href: `https://errorcorrectionzoo.org/c/${codeid}`,
+        }))
+    );
+}
+for (const encountered_referenceable of scanner.get_encountered('referenceables')) {
+    const { referenceable_info, encountered_in } = encountered_referenceable;
+    for (const lbl of referenceable_info.labels) {
+        const [ref_type, ref_label] = lbl;
+        console.log(`lbl = ${JSON.stringify(lbl)}; ref_type=${ref_type}, ref_label=${ref_label}`);
+        zoollmenviron.external_ref_resolver.add_ref(
+            zoollm.RefInstance($$kw({
+                ref_type: ref_type,
+                ref_label: ref_label,
+                formatted_ref_llm_text: referenceable_info.formatted_ref_llm_text,
+                // TODO, need to track on which page a referenceable is placed
+                // --- done via eleventy?
+                target_href: `#??????`,
+            }))
+        );
+    }
+}
+
+
+//
 // Fetch citations!
 //
 let citation_sources = {
@@ -158,7 +190,6 @@ let citation_sources = {
         bibliography_file: 'playground/bibpreset.yaml'
     }),
 };
-//const a = Buffer.from('cGhmYWlzdEBnb'+'WFpbC5jb20=', 'base64').toString();
 const uagent = `ecczoogen-bibliography-build-script/0.1 `
       + `(https://github.com/errorcorrectionzoo)`;
 
@@ -175,6 +206,35 @@ await citation_manager.query_citations(
 );
 // citations database ready
 logger.info("Citation database ready!")
+
+
+
+//
+// Now render some code information
+//
+
+let doc = zoollmenviron.make_document(
+    (render_context) => {
+        const css = zoodb.objects.code.css;
+        return `
+<h2>Description</h2>
+${css.description.render(render_context)}
+<h2>Protection</h2>
+${css.protection.render(render_context)}
+`;
+    } );
+let [render_result, render_context] = doc.render( new zoollm.ZooHtmlFragmentRenderer() );
+logger.info("Rendered HTML: ");
+logger.info(render_result);
+
+
+
+
+
+
+
+
+
 
 // finish printing out tasks etc.
 setTimeout(() => { console.log("Timeout done!"); }, 1500);

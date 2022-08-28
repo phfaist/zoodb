@@ -342,12 +342,19 @@ export class ZooDbDataLoader
     }
     parse_file_data(file_contents, objectconfig, root_path, rel_path)
     {
-        if ( /\.ya?ml$/i.test(rel_path) ) {
-            return jsyaml.load( file_contents );
-        } else if ( /\.json$/i.test(rel_path) ) {
-            return JSON.parse( file_contents );
-        } else {
-            throw new Error(`Unknown file type for path ‘${path}’`);
+        try {
+            if ( /\.ya?ml$/i.test(rel_path) ) {
+                return jsyaml.load( file_contents );
+            } else if ( /\.json$/i.test(rel_path) ) {
+                return JSON.parse( file_contents );
+            } else {
+                throw new Error(`Unknown file type for path ‘${path}’`);
+            }
+        } catch (err) {
+            logger.error(
+                `Parse error in ‘${rel_path}’: ${err}`
+            );
+            throw err;
         }
     }
 

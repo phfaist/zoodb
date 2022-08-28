@@ -106,6 +106,9 @@ export class ExternalRefResolver
     add_ref(ref_instance)
     {
         const {ref_type, ref_label} = ref_instance;
+        if ( typeof ref_type == 'undefined' || !ref_label) {
+            throw new Error(`Invalid ref_type:ref_label pair ‘${ref_type}:${ref_label}’`);
+        }
         if (!this.ref_instance_database.hasOwnProperty(ref_type)) {
             if (typeof this.config.ref_types != 'undefined') {
                 throw new Error(
@@ -119,7 +122,7 @@ export class ExternalRefResolver
         if (this.ref_instance_database[ref_type].hasOwnProperty(ref_label)) {
             throw new Error(
                 `Ref target ‘${ref_type}:${ref_label}’ already exists in ref instance `
-                + `database (‘${this.ref_instance_database[ref_type][ref_label]}’)`
+                + `database (‘${JSON.stringify(this.ref_instance_database[ref_type][ref_label])}’)`
             );
         }
         this.ref_instance_database[ref_type][ref_label] = ref_instance;
