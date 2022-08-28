@@ -13,7 +13,7 @@ const {$$kw, repr} = zoollm;
 
 import * as zoollmscanner from '../src/zoollm/scanner.js';
 
-import { CitationFetcherArxiv } from '../src/citationmanager/sources/arxiv.js';
+import { CitationSourceArxiv } from '../src/citationmanager/sources/arxiv.js';
 import { CitationDatabaseManager } from '../src/citationmanager/index.js';
 
 import jsoncycle from 'cycle/cycle.js';
@@ -147,14 +147,14 @@ logger.info(`Found ${scanner.get_encountered('citations').length} citation insta
 //
 // Fetch citations!
 //
-let citation_fetchers = {
-    'arxiv': new CitationFetcherArxiv({ chain_to_doi: false }),
+let citation_sources = {
+    'arxiv': new CitationSourceArxiv({ chain_to_doi: false }),
 };
-let citation_manager = new CitationDatabaseManager(citation_fetchers);
+let citation_manager = new CitationDatabaseManager(citation_sources);
 
 logger.debug("Fetching arxiv citations ...");
-// keep only arxiv citations 'cause I didn't code the other fetchers for now....
-await citation_manager.fetch_citations(
+// keep only arxiv citations 'cause I didn't code the other sources for now....
+await citation_manager.query_citations(
     scanner.get_encountered('citations').filter( (c) => (c.cite_prefix == 'arxiv') )
 );
 // citations database ready

@@ -6,9 +6,9 @@ import fetch from 'node-fetch';
 import FeedParser from 'feedparser';
 
 
-import { CitationFetcherBase } from './base.js';
+import { CitationSourceBase } from './base.js';
 
-export class CitationFetcherArxiv extends CitationFetcherBase
+export class CitationSourceArxiv extends CitationSourceBase
 {
     constructor(options)
     {
@@ -18,10 +18,10 @@ export class CitationFetcherArxiv extends CitationFetcherBase
         super(
             options,
             {
-                chunk_fetch_delay_ms: 3100,
+                chunk_query_delay_ms: 3100,
                 cite_prefix: 'arxiv',
-                fetcher_name: 'ArXiv API citation info fetcher',
-                chains_to_fetchers: chain_to_doi ? ['doi'] : [],
+                source_name: 'ArXiv API citation info source',
+                chains_to_sources: chain_to_doi ? ['doi'] : [],
             }
         );
 
@@ -29,21 +29,21 @@ export class CitationFetcherArxiv extends CitationFetcherBase
         this.data_for_versionless_arxivid = {};
     }
 
-    add_fetch(to_fetch)
+    add_query(ids)
     {
-        super.add_fetch(to_fetch);
+        super.add_query(ids);
 
         Object.assign(
             this.data_for_versionless_arxivid,
             Object.fromEntries(
-                to_fetch.filter( (id) => ! /v\d+$/i.test(id) )
+                ids.filter( (id) => ! /v\d+$/i.test(id) )
                     .map( (id) => [id, []] )
             )
         );
 
     }
 
-    async fetch_chunk(id_list)
+    async run_query_chunk(id_list)
     {
         let response = await fetch( 'https://export.arxiv.org/api/query', {
             method: 'post',
@@ -139,7 +139,7 @@ export class CitationFetcherArxiv extends CitationFetcherBase
 
         // check if we were meant to look up the entry by ID with or without
         // version number
-        if ( this.to_fetch.includes(arxivid_with_version) ) {
+        if ( this.keys_to_query.includes(arxivid_with_version) ) {
             // definitly store this entry directly, since this specific version
             // was requested.
             //
@@ -176,7 +176,7 @@ export class CitationFetcherArxiv extends CitationFetcherBase
         }
     }
 
-    fetcher_finalize_run()
+    source_finalize_run()
     {
         logger.debug(`Finalizing arXiv citation entries’`);
 
