@@ -8,6 +8,7 @@
   "private": true,
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
+    "citeproc": "^2.4.62",
     "cycle": "^1.0.3",
     "feedparser": "^2.2.10",
     "glob": "^8.0.3",

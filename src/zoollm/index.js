@@ -122,7 +122,8 @@ export class ExternalRefResolver
         if (this.ref_instance_database[ref_type].hasOwnProperty(ref_label)) {
             throw new Error(
                 `Ref target ‘${ref_type}:${ref_label}’ already exists in ref instance `
-                + `database (‘${JSON.stringify(this.ref_instance_database[ref_type][ref_label])}’)`
+                + `database `
+                + `(‘${JSON.stringify(this.ref_instance_database[ref_type][ref_label])}’)`
             );
         }
         this.ref_instance_database[ref_type][ref_label] = ref_instance;
@@ -152,7 +153,7 @@ export class CitationsProvider
 {
     constructor()
     {
-        this.citations_database = {}
+        this.citations_database = {};
     }
 
     add_citation(cite_prefix, cite_key, full_citation_llm_text)

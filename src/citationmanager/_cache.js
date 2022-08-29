@@ -11,7 +11,7 @@
 // - removed the setTimeout() events.  Timeouts are only used when saving and
 //   re-loading cache.
 //
-// - added the has() method
+// - added the has() and get_full_cache() method
 //
 
 'use strict';
@@ -103,6 +103,10 @@ function Cache () {
       var data = _cache[key];
       return (typeof data != 'undefined' && (isNaN(data.expire) || data.expire >= Date.now()));
   };
+
+  this.get_full_cache = function (key) {
+      return Object.assign({}, _cache);
+  }
 
   this.get = function(key) {
     var data = _cache[key];

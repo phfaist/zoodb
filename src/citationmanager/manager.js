@@ -61,6 +61,39 @@ export class CitationDatabaseManager
         fs.writeFileSync(this.cache_file, this.cache.exportJson());
     }
 
+    get_citation_by_id(id)
+    {
+        let new_id = id;
+        let cite_obj;
+        while (true) {
+            // logger.debug(`get_citation_by_id() -> cache get ${JSON.stringify(id)}`);
+            cite_obj = this.cache.get(new_id);
+            if ( ! cite_obj.chained ) {
+                if (cite_obj.id != id) {
+                    // as a result of chained objects, the last object's id
+                    // field does not match the queried ID.  So fix it
+                    return Object.assign({}, cite_obj, {id: id});
+                }
+                return cite_obj;
+            }
+            // chain!
+            new_id = `${cite_obj.chained.cite_prefix}:${cite_obj.chained.cite_key}`;
+
+            // logger.debug(`   --> chained to ${id} (via ${JSON.stringify(cite_obj)})`);
+        }
+    }
+
+    get_citation(cite_prefix, cite_key)
+    {
+        const id = `${cite_prefix}:${cite_key}`;
+        return this.get_citation_by_id(id);
+    }
+
+    keys()
+    {
+        return this.cache.keys();
+    }
+
     async query_citations(citations)
     {
         // group citations by (lowercase) cite_prefix

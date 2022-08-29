@@ -19,6 +19,9 @@ import { CitationSourceManual } from '../src/citationmanager/sources/manual.js';
 import { CitationSourceBibliographyFile } from '../src/citationmanager/sources/bibliographyfile.js';
 import { CitationDatabaseManager } from '../src/citationmanager/index.js';
 
+import CSL from 'citeproc';
+//import { Driver } from '@citeproc-rs/wasm'; -- hmmm not sure how to make this work
+
 import jsoncycle from 'cycle/cycle.js';
 
 
@@ -209,6 +212,190 @@ await citation_manager.query_citations(
 logger.info("Citation database ready!")
 
 
+//
+// Create bibliography and populate the citation provider
+//
+let citeprocSys = {
+    retrieveLocale: (lang) => {
+        const locale_file = `playground/locale-${lang}.xml`;
+        try {
+            return fs.readFileSync(locale_file).toString();
+        } catch (err) {
+            logger.error(`Locale ‘${lang}’ not found.`);
+            return false;
+        }
+    },
+    retrieveItem: (id) => {
+        const obj = citation_manager.get_citation_by_id(id);
+        console.log('Retrieved citation for', id, ', got:', obj);
+        if (!obj) {
+            throw new Error(`No citation found for ‘${id}’ in internal database!`);
+        }
+        return obj;
+    }
+};
+
+
+
+const llm_escape_chars = {
+    '\\': '\\textbackslash',
+    '%': '\\%',
+    '#': '\\#',
+    '&': '\\&',
+    '$': '\\$',
+    '{': '\\{',
+    '}': '\\}',
+};
+
+CSL.Output.Formats.llm = {
+    //
+    // text_escape: Format-specific function for escaping text destined
+    // for output.  Takes the text to be escaped as sole argument.  Function
+    // will be run only once across each portion of text to be escaped, it
+    // need not be idempotent.
+    //
+    "text_escape": function (text) {
+        // Numeric entities, in case the output is processed as
+        // xml in an environment in which HTML named entities are
+        // not declared.
+        if (!text) {
+            text = "";
+        }
+
+        text = text.replaceAll( /[\\%#&${}]/g , (match) => llm_escape_chars[match] );
+
+        return text;
+    },
+    "bibstart": "",
+    "bibend": "",
+    "@font-style/italic": "\\textit{%%STRING%%}",
+    "@font-style/oblique": "\\textit{%%STRING%%}",
+    "@font-style/normal": "%%STRING%%",
+    "@font-variant/small-caps": "%%STRING%%",
+    "@passthrough/true": CSL.Output.Formatters.passthrough,
+    "@font-variant/normal": "%%STRING%%",
+    "@font-weight/bold": "\\textbf{%%STRING%%}",
+    "@font-weight/normal": "%%STRING%%",
+    "@font-weight/light": false,
+    "@text-decoration/none": "%%STRING%%",
+    "@text-decoration/underline": "%%STRING%%",
+    "@vertical-align/sup": "\({}^{\\text{%%STRING%%}}\)",
+    "@vertical-align/sub": "\({}_{\\text{%%STRING%%}}\)",
+    "@vertical-align/baseline": "%%STRING%%",
+    "@strip-periods/true": CSL.Output.Formatters.passthrough,
+    "@strip-periods/false": CSL.Output.Formatters.passthrough,
+    "@quotes/true": function (state, str) {
+        if ("undefined" === typeof str) {
+            return state.getTerm("open-quote");
+        }
+        return state.getTerm("open-quote") + str + state.getTerm("close-quote");
+    },
+    "@quotes/inner": function (state, str) {
+        if ("undefined" === typeof str) {
+            //
+            // Mostly right by being wrong (for apostrophes)
+            //
+            return "\u2019";
+        }
+        return state.getTerm("open-inner-quote") + str + state.getTerm("close-inner-quote");
+    },
+    "@quotes/false": false,
+    "@cite/entry": function (state, str) {
+        return state.sys.wrapCitationEntry(str, this.item_id, this.locator_txt,
+                                           this.suffix_txt);
+    },
+    "@bibliography/entry": function (state, str) {
+        // Test for this.item_id to add decorations to
+        // bibliography output of individual entries.
+        //
+        // Full item content can be obtained from
+        // state.registry.registry[id].ref, using
+        // CSL variable keys.
+        //
+        // Example:
+        //
+        //   print(state.registry.registry[this.item_id].ref["title"]);
+        //
+        // At present, for parallel citations, only the
+        // id of the master item is supplied on this.item_id.
+        var insert = "";
+        if (state.sys.embedBibliographyEntry) {
+            insert = state.sys.embedBibliographyEntry(this.item_id) + "\n";
+        }
+        //return "  <div class=\"csl-entry\">" + str + "</div>\n" + insert;
+        return str + '\n' + insert;
+    },
+    "@display/block": function (state, str) {
+        return str; //"\n\n    <div class=\"csl-block\">" + str + "</div>\n";
+    },
+    "@display/left-margin": function (state, str) {
+        return str; // "\n    <div class=\"csl-left-margin\">" + str + "</div>";
+    },
+    "@display/right-inline": function (state, str) {
+        return str; // "<div class=\"csl-right-inline\">" + str + "</div>\n  ";
+    },
+    "@display/indent": function (state, str) {
+        return str; // "<div class=\"csl-indent\">" + str + "</div>\n  ";
+    },
+    "@showid/true": function (state, str, cslid) {
+        return str;
+    },
+    "@URL/true": function (state, str) {
+        return "\\url{" + str + "}";
+    },
+    "@DOI/true": function (state, str) {
+        var doiurl = str;
+        if (!str.match(/^https?:\/\//)) {
+            doiurl = "https://doi.org/" + str;
+        }
+        return "\\href{" + doiurl + "}{DOI}";
+    }
+};
+
+
+
+
+const cslfn = 'eczoo-bib-style.csl';
+
+let cslstyle = fs.readFileSync(`playground/${cslfn}`).toString();
+
+let cite_processor = new CSL.Engine(citeprocSys, cslstyle);
+cite_processor.setOutputFormat('llm');
+
+for (const cid of citation_manager.keys() )
+{
+    // split(':',2) will also split at second semicolumn, just not return remaining parts !!
+    const [cite_prefix, ...split_rest] = cid.split(':');
+    const cite_key = split_rest.join(':'); 
+    const obj = citation_manager.get_citation_by_id(cid);
+
+    if (obj._formatted_llm_text) {
+        zoollmenviron.external_citations_provider.add_citation(
+            cite_prefix, cite_key, obj._formatted_llm_text
+        );
+        continue;
+    }
+
+    //console.log(`C: processing ${cite_prefix}:${cite_key} == ${JSON.stringify(cid)}`, cid);
+
+    console.log('updateItems', [cid]);
+    cite_processor.updateItems( [ cid ] );
+    const c_result = cite_processor.makeBibliography();
+    //console.log(cid, 'c_result=', c_result);
+
+    const result_html = c_result[1].toString();
+
+    if (!result_html) {
+        throw new Error(`Could not obtain HTML citation for ‘${cid}’`);
+    }
+
+    //
+    zoollmenviron.external_citations_provider.add_citation(
+        cite_prefix, cite_key,
+        '\\begin{verbatimtext}' + result_html.trim() + '\\end{verbatimtext}\n'
+    );
+}
+
 
 //
 // Now render some code information
@@ -218,15 +405,20 @@ let doc = zoollmenviron.make_document(
     (render_context) => {
         const css = zoodb.objects.code.css;
         return `
+<h1>${css.name.render(render_context)} ${css.introduced.render(render_context)}</h1>
 <h2>Description</h2>
 ${css.description.render(render_context)}
 <h2>Protection</h2>
 ${css.protection.render(render_context)}
 `;
     } );
-let [render_result, render_context] = doc.render( new zoollm.ZooHtmlFragmentRenderer() );
+let [rendered_html, render_context] = doc.render( new zoollm.ZooHtmlFragmentRenderer() );
+rendered_html += `
+<h2>References</h2>
+${render_context.feature_render_manager('endnotes').render_endnotes()}
+`
 logger.info("Rendered HTML: ");
-logger.info(render_result);
+logger.info(rendered_html);
 
 
 
