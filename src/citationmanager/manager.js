@@ -65,6 +65,7 @@ export class CitationDatabaseManager
     {
         let new_id = id;
         let cite_obj;
+        let set_properties_chained = {};
         while (true) {
             // logger.debug(`get_citation_by_id() -> cache get ${JSON.stringify(id)}`);
             cite_obj = this.cache.get(new_id);
@@ -72,12 +73,15 @@ export class CitationDatabaseManager
                 if (cite_obj.id != id) {
                     // as a result of chained objects, the last object's id
                     // field does not match the queried ID.  So fix it
-                    return Object.assign({}, cite_obj, {id: id});
+                    return Object.assign({}, cite_obj, set_properties_chained, {id: id});
                 }
                 return cite_obj;
             }
             // chain!
             new_id = `${cite_obj.chained.cite_prefix}:${cite_obj.chained.cite_key}`;
+
+            // keep track of any new properties that we need to set on the chained object
+            Object.assign(set_properties_chained, cite_obj.chained.set_properties || {});
 
             // logger.debug(`   --> chained to ${id} (via ${JSON.stringify(cite_obj)})`);
         }

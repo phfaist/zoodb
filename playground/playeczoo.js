@@ -186,7 +186,7 @@ for (const encountered_referenceable of scanner.get_encountered('referenceables'
 //
 let citation_sources = {
     'arxiv': new CitationSourceArxiv({
-        override_arxiv_dois_file: 'playground/biboverridearxivdois.yaml',
+        override_arxiv_dois_file: 'playground/overridearxivdois.yaml',
     }),
     'doi': new CitationSourceDoi(),
     'manual': new CitationSourceManual(),
@@ -227,7 +227,7 @@ let citeprocSys = {
     },
     retrieveItem: (id) => {
         const obj = citation_manager.get_citation_by_id(id);
-        console.log('Retrieved citation for', id, ', got:', obj);
+        //console.log('Retrieved citation for', id, ', got:', obj);
         if (!obj) {
             throw new Error(`No citation found for ‘${id}’ in internal database!`);
         }
@@ -262,7 +262,28 @@ CSL.Output.Formats.llm = {
             text = "";
         }
 
-        text = text.replaceAll( /[\\%#&${}]/g , (match) => llm_escape_chars[match] );
+        if (!text.strip()) {
+            // only whitespace -- don't process it further
+            return text;
+        }
+        
+        // attempt to parse as LLM, just in case it works and in this case let's
+        // use it!
+        try {
+            zoollmenviron.make_fragment(
+                text,
+                $$kw({
+                    is_block_level: false,
+                    standalone_mode: true
+                })
+            );
+            // valid LLM --- keep `text` like this!
+        } catch (err) {
+            // not valid LLM
+            //text = text.replaceAll( /[\\%#&${}]/g , (match) => llm_escape_chars[match] );
+            text = `\\begin{verbatimtext}${text}\\end{verbatimtext}`;
+            console.log('escaped text = ', text);
+        }
 
         return text;
     },
@@ -362,6 +383,8 @@ let cslstyle = fs.readFileSync(`playground/${cslfn}`).toString();
 let cite_processor = new CSL.Engine(citeprocSys, cslstyle);
 cite_processor.setOutputFormat('llm');
 
+const add_cite_links = { 'arxiv': true, 'doi': true, 'url': 'only-if-no-other-link' };
+
 for (const cid of citation_manager.keys() )
 {
     // split(':',2) will also split at second semicolumn, just not return remaining parts !!
@@ -378,21 +401,39 @@ for (const cid of citation_manager.keys() )
 
     //console.log(`C: processing ${cite_prefix}:${cite_key} == ${JSON.stringify(cid)}`, cid);
 
-    console.log('updateItems', [cid]);
+    //console.log('updateItems', [cid]);
     cite_processor.updateItems( [ cid ] );
     const c_result = cite_processor.makeBibliography();
     //console.log(cid, 'c_result=', c_result);
 
-    const result_html = c_result[1].toString();
+    let result_llm = c_result[1].toString();
 
-    if (!result_html) {
-        throw new Error(`Could not obtain HTML citation for ‘${cid}’`);
+    if (!result_llm) {
+        throw new Error(`Could not CSL-compile citation text for ‘${cid}’`);
+    }
+
+    // maybe add links?
+    let has_link = false;
+    if (add_cite_links.arxiv && obj.arxivid) {
+        result_llm += ` \\href{https://arxiv.org/abs/${obj.arxivid}}{${obj.arxivid}}`;
+        has_link = true;
+    }
+    const doi = obj.doi || obj.DOI;
+    if (add_cite_links.doi && doi) {
+        const doiurl = `https://doi.org/${encodeURIComponent(doi)}`;
+        result_llm += ` \\href{${doiurl}}{DOI}`;
+        has_link = true;
+    }
+    const url = obj.url || obj.URL;
+    if (url && (add_cite_links.url
+                || (add_cite_links == 'only-if-no-other-link' && !has_link))) {
+        result_llm += ` \\href{${url}}{URL}`
     }
 
     //
     zoollmenviron.external_citations_provider.add_citation(
         cite_prefix, cite_key,
-        '\\begin{verbatimtext}' + result_html.trim() + '\\end{verbatimtext}\n'
+        result_llm.trim(),
     );
 }
 

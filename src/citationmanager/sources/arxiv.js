@@ -53,12 +53,12 @@ export class CitationSourceArxiv extends CitationSourceBase
 
     }
 
-    source_finalize_run()
+    source_initialize_run()
     {
         if (this.override_arxiv_dois_file) {
             Object.assign(
                 this.override_arxiv_dois,
-                jsyaml.load(fs.fileReadSync(this.override_arxiv_dois_file))
+                jsyaml.load(fs.readFileSync(this.override_arxiv_dois_file))
             );
         }
     }
@@ -160,7 +160,7 @@ export class CitationSourceArxiv extends CitationSourceBase
                 ]],
             },
             doi: doi,
-            arxiv_id: arxivid,
+            arxivid: arxivid,
             arxiv_version_number: arxivversionnum,
         };
 
@@ -194,7 +194,7 @@ export class CitationSourceArxiv extends CitationSourceBase
             this.citation_manager.store_citation_chained(
                 this.cite_prefix, arxividkey,
                 'doi', citeprocjsond.doi,
-                { arxiv: arxividkey }
+                { arxivid: arxividkey }
             );
         } else {
             this.citation_manager.store_citation(
