@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-08-29 15:23:29
+/* 000001 */ // Transcrypt'ed from Python, 2022-09-01 16:23:01
 /* 000006 */ var logging = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000021 */ import {EndnoteCategory} from './llm.feature.endnotes.js';
@@ -11,7 +11,7 @@
 /* 000009 */ import * as latexnodes_nodes from './pylatexenc.latexnodes.nodes.js';
 /* 000006 */ import * as __module_logging__ from './logging.js';
 /* 000006 */ __nest__ (logging, '', __module_logging__);
-/* 000006 */ export {fmthelpers, latexnodes_nodes, ParsedArgumentsInfo, latexnodes_parsers, LLMMacroSpecBase, Feature, LLMArgumentSpec, EndnoteCategory};
+/* 000006 */ export {LLMArgumentSpec, LLMMacroSpecBase, ParsedArgumentsInfo, latexnodes_nodes, EndnoteCategory, fmthelpers, latexnodes_parsers, Feature};
 /* 000001 */ var __name__ = 'llm.feature.cite';
 /* 000007 */ export var logger = (function () {
 /* 000007 */ 	var __accu0__ = logging;
@@ -451,17 +451,23 @@
 /* 000291 */ 					}) ());
 /* 000291 */ 				}) ();
 /* 000291 */ 			}
-/* 000299 */ 			var cite_content_list_of_nodes = __call__ (__iadd__, null, cite_content_list_of_nodes, __call__ (list, null, show_inline_content_llm.nodes));
-/* 000300 */ 			if (__t__ (optional_cite_extra_nodelist !== null)) {
-/* 000301 */ 				(function () {
-/* 000301 */ 					var __accu0__ = cite_content_list_of_nodes;
-/* 000302 */ 					return __call__ (__accu0__.append, __accu0__, (function () {
-/* 000302 */ 						var __accu1__ = node.latex_walker;
-/* 000302 */ 						return __call__ (__accu1__.make_node, __accu1__, latexnodes_nodes.LatexCharsNode, __kwargtrans__ ({chars: cite_mgr.feature.citation_optional_text_separator, pos: node.pos, pos_end: node.pos_end, parsing_state: node.parsing_state}));
-/* 000302 */ 					}) ());
-/* 000302 */ 				}) ();
-/* 000310 */ 				var cite_content_list_of_nodes = __call__ (__iadd__, null, cite_content_list_of_nodes, __call__ (list, null, optional_cite_extra_nodelist));
-/* 000310 */ 			}
+/* 000300 */ 			(function () {
+/* 000300 */ 				var __accu0__ = cite_content_list_of_nodes;
+/* 000300 */ 				return __call__ (__accu0__.extend, __accu0__, __call__ (list, null, show_inline_content_llm.nodes));
+/* 000300 */ 			}) ();
+/* 000301 */ 			if (__t__ (optional_cite_extra_nodelist !== null)) {
+/* 000302 */ 				(function () {
+/* 000302 */ 					var __accu0__ = cite_content_list_of_nodes;
+/* 000303 */ 					return __call__ (__accu0__.append, __accu0__, (function () {
+/* 000303 */ 						var __accu1__ = node.latex_walker;
+/* 000303 */ 						return __call__ (__accu1__.make_node, __accu1__, latexnodes_nodes.LatexCharsNode, __kwargtrans__ ({chars: cite_mgr.feature.citation_optional_text_separator, pos: node.pos, pos_end: node.pos_end, parsing_state: node.parsing_state}));
+/* 000303 */ 					}) ());
+/* 000303 */ 				}) ();
+/* 000312 */ 				(function () {
+/* 000312 */ 					var __accu0__ = cite_content_list_of_nodes;
+/* 000312 */ 					return __call__ (__accu0__.extend, __accu0__, __call__ (list, null, optional_cite_extra_nodelist));
+/* 000312 */ 				}) ();
+/* 000312 */ 			}
 /* 000313 */ 			if (__t__ (__getitem__ (citation_delimiters, 1) !== null)) {
 /* 000314 */ 				(function () {
 /* 000314 */ 					var __accu0__ = cite_content_list_of_nodes;

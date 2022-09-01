@@ -6,6 +6,8 @@ import path from 'path'; // path.join()
 import {$$kw, repr} from 'llm-js/py.js';
 export {$$kw, repr};
 
+import { ParsingStateDelta } from 'llm-js/pylatexenc.latexnodes.js';
+
 import * as llmstd from 'llm-js/llm.llmstd.js';
 import * as llm_feature from 'llm-js/llm.feature.js';
 import * as llm_feature_headings from 'llm-js/llm.feature.headings.js';
@@ -246,47 +248,47 @@ function prep_llm_environ_features(zoollm_options)
 {
     zoollm_options ||= zoollm_default_options();
 
-    let _futurethis = {};
+    let props = {};
 
-    _futurethis.external_citations_provider =
+    props.external_citations_provider =
         zoollm_options.external_citations_provider || new CitationsProvider;
-    _futurethis.external_ref_resolver =
+    props.external_ref_resolver =
         zoollm_options.external_ref_resolver
         || new ExternalRefResolver(zoollm_options.external_ref_resolver_config);
     
-    _futurethis.graphics_collection =
+    props.graphics_collection =
         zoollm_options.graphics_collection || new FeatureZooGraphicsCollection();
 
 
-    _futurethis.feature_headings = new llm_feature_headings.FeatureHeadings(
+    props.feature_headings = new llm_feature_headings.FeatureHeadings(
         $$kw({section_commands_by_level:
               zoollm_options.heading_section_commands_by_level}),
     )
-    _futurethis.feature_refs = new llm_feature_refs.FeatureRefs(
-        $$kw({external_ref_resolvers: [_futurethis.external_ref_resolver]}),
+    props.feature_refs = new llm_feature_refs.FeatureRefs(
+        $$kw({external_ref_resolvers: [props.external_ref_resolver]}),
     )
 
-    _futurethis.feature_endnotes = new llm_feature_endnotes.FeatureEndnotes(
+    props.feature_endnotes = new llm_feature_endnotes.FeatureEndnotes(
         $$kw({categories: zoollm_options.endnote_categories})
     )
     
-    _futurethis.feature_citations = new llm_feature_cite.FeatureExternalPrefixedCitations(
-        $$kw({ external_citations_provider: _futurethis.external_citations_provider,
+    props.feature_citations = new llm_feature_cite.FeatureExternalPrefixedCitations(
+        $$kw({ external_citations_provider: props.external_citations_provider,
                counter_formatter: zoollm_options.citation_counter_formatter,
                citation_delimiters: zoollm_options.citation_delimiters, })
     )
 
-    _futurethis.feature_floats = new llm_feature_floats.FeatureFloatsIncludeGraphicsOnly(
+    props.feature_floats = new llm_feature_floats.FeatureFloatsIncludeGraphicsOnly(
         $$kw({float_types: zoollm_options.float_types})
     )
 
-    _futurethis.feature_defterm = new llm_feature_defterm.FeatureDefTerm()
-    _futurethis.feature_defterm.render_defterm_with_term =
+    props.feature_defterm = new llm_feature_defterm.FeatureDefTerm()
+    props.feature_defterm.render_defterm_with_term =
         zoollm_options.defterm_render_defterm_with_term;
-    _futurethis.feature_defterm.render_defterm_with_term_suffix =
+    props.feature_defterm.render_defterm_with_term_suffix =
         zoollm_options.defterm_render_defterm_with_term_suffix;
 
-    return _futurethis;
+    return props;
 }
 
 
@@ -309,17 +311,34 @@ export function make_zoo_llm_environment(zoollm_options)
         _feature_props.graphics_collection,
     ];
 
+    const parsing_mode_deltas = {
+        // /// not sure how useful this is ...
+        // 'safer-latexier': ParsingStateDelta( $$kw({
+        //     set_attributes: {
+        //         enable_comments: false,
+        //         latex_inline_math_delimiters: [['$','$'], ['\\(', '\\)']],
+        //         forbidden_characters: '',
+        //     },
+        // }) ),
+
+        // enable \begin{raw:html}...\end{raw:html},
+        // \begin{raw:latex}...\end{raw:latex}, etc. TODO
+        'enable-raw': ParsingStateDelta(
+            // ...
+        ),
+    };
+
     const zoollm_environ = llmstd.LLMStandardEnvironment(
         $$kw({
-            features: features
+            features: features,
+            parsing_mode_deltas: parsing_mode_deltas,
         })
     );
     
     // copy all properties from _feature_props. to the new object
-    Object.entries(_feature_props).forEach( (pair) => {
-        const [prop, value] = pair;
+    for (const [prop, value] of Object.entries(_feature_props)) {
         zoollm_environ[prop] = value;
-    } );
+    }
 
     return zoollm_environ;
 }

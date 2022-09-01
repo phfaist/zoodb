@@ -25,6 +25,7 @@ import CSL from 'citeproc';
 import jsoncycle from 'cycle/cycle.js';
 
 
+
 const eczoo_data_dir = process.env.ECZOO_DATA_DIR;
 if (!eczoo_data_dir) {
     throw new Error("Please define process environment variable $ECZOO_DATA_DIR");
@@ -154,6 +155,7 @@ logger.debug(`Found ${scanner.get_encountered('citations').filter((c)=>(c.cite_p
 // Add ref targets
 //
 for (const [codeid,codeobj] of Object.entries(zoodb.objects.code)) {
+    logger.debug(`Adding ref for code ‘${codeid}’`);
     zoollmenviron.external_ref_resolver.add_ref(
         zoollm.RefInstance($$kw({
             ref_type: 'code',
@@ -270,20 +272,44 @@ CSL.Output.Formats.llm = {
         // attempt to parse as LLM, just in case it works and in this case let's
         // use it!
         try {
+            // do some transformations that will hopefully turn the given text
+            // into valid LLM?
+            
+            const transform_mml_to_tex = (chunk) => {
+                // really too simple ... basically a cheap conversion to text... :/
+                return chunk.replace(/\s*\<.*?\>\s*/g, '');
+            };
+            text = text.replace(/<mml:math.*?<\/\s*mml:math>/g, transform_mml_to_tex);
+
+            // fix lone '%' signs not preceded by a \ (maybe fixme: will misparse '\\%' ...)
+            text = text.replace(/([^\\])%/g, '$1\\%');
+
+            // change inline math $...$ -> \(...\)
+            text = text.replace(/\$(.*?)\$/g, '\\($1\\)');
+
             zoollmenviron.make_fragment(
                 text,
                 $$kw({
                     is_block_level: false,
-                    standalone_mode: true
-                })
+                    standalone_mode: true,
+                    silent: true,
+                    // -- would only work if we could recompose the compiled
+                    // -- nodes into valid strict LLM text --- ### wait, try again
+                    // parsing_mode: 'safer-latexier',
+                    // tolerant_parsing: true,
+                }),
             );
-            // valid LLM --- keep `text` like this!
+            // valid LLM --- keep text directly
         } catch (err) {
             // not valid LLM
             //text = text.replaceAll( /[\\%#&${}]/g , (match) => llm_escape_chars[match] );
             text = `\\begin{verbatimtext}${text}\\end{verbatimtext}`;
             console.log('escaped text = ', text);
         }
+
+        // if (text.length > 20) {
+        //     console.log(`[debug] text = `, text);
+        // }
 
         return text;
     },
