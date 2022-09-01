@@ -33,7 +33,9 @@ export class CitationSourceManual extends CitationSourceBase
             this.citation_manager.store_citation(
                 this.cite_prefix, key,
                 {
-                    _formatted_llm_text: key
+                    _ready_formatted: {
+                        llm: key
+                    }
                 }
             );
         }

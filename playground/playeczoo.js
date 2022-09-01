@@ -12,6 +12,9 @@ import * as zoollm from '../src/zoollm/index.js';
 const {$$kw, repr} = zoollm;
 
 import * as zoollmscanner from '../src/zoollm/scanner.js';
+import { CitationCompiler, install_csl_llm_output_format }
+    from '../src/zoollm/citationcompiler.js';
+
 
 import { CitationSourceArxiv } from '../src/citationmanager/sources/arxiv.js';
 import { CitationSourceDoi } from '../src/citationmanager/sources/doi.js';
@@ -19,8 +22,6 @@ import { CitationSourceManual } from '../src/citationmanager/sources/manual.js';
 import { CitationSourceBibliographyFile } from '../src/citationmanager/sources/bibliographyfile.js';
 import { CitationDatabaseManager } from '../src/citationmanager/index.js';
 
-import CSL from 'citeproc';
-//import { Driver } from '@citeproc-rs/wasm'; -- hmmm not sure how to make this work
 
 import jsoncycle from 'cycle/cycle.js';
 
@@ -214,254 +215,23 @@ await citation_manager.query_citations(
 logger.info("Citation database ready!")
 
 
-//
-// Create bibliography and populate the citation provider
-//
-let citeprocSys = {
-    retrieveLocale: (lang) => {
-        const locale_file = `playground/locale-${lang}.xml`;
-        try {
-            return fs.readFileSync(locale_file).toString();
-        } catch (err) {
-            logger.error(`Locale ‘${lang}’ not found.`);
-            return false;
-        }
-    },
-    retrieveItem: (id) => {
-        const obj = citation_manager.get_citation_by_id(id);
-        //console.log('Retrieved citation for', id, ', got:', obj);
-        if (!obj) {
-            throw new Error(`No citation found for ‘${id}’ in internal database!`);
-        }
-        return obj;
-    }
-};
-
-
-
-const llm_escape_chars = {
-    '\\': '\\textbackslash',
-    '%': '\\%',
-    '#': '\\#',
-    '&': '\\&',
-    '$': '\\$',
-    '{': '\\{',
-    '}': '\\}',
-};
-
-CSL.Output.Formats.llm = {
-    //
-    // text_escape: Format-specific function for escaping text destined
-    // for output.  Takes the text to be escaped as sole argument.  Function
-    // will be run only once across each portion of text to be escaped, it
-    // need not be idempotent.
-    //
-    "text_escape": function (text) {
-        // Numeric entities, in case the output is processed as
-        // xml in an environment in which HTML named entities are
-        // not declared.
-        if (!text) {
-            text = "";
-        }
-
-        if (!text.strip()) {
-            // only whitespace -- don't process it further
-            return text;
-        }
-        
-        // attempt to parse as LLM, just in case it works and in this case let's
-        // use it!
-        try {
-            // do some transformations that will hopefully turn the given text
-            // into valid LLM?
-            
-            const transform_mml_to_tex = (chunk) => {
-                // really too simple ... basically a cheap conversion to text... :/
-                return chunk.replace(/\s*\<.*?\>\s*/g, '');
-            };
-            text = text.replace(/<mml:math.*?<\/\s*mml:math>/g, transform_mml_to_tex);
-
-            // fix lone '%' signs not preceded by a \ (maybe fixme: will misparse '\\%' ...)
-            text = text.replace(/([^\\])%/g, '$1\\%');
-
-            // change inline math $...$ -> \(...\)
-            text = text.replace(/\$(.*?)\$/g, '\\($1\\)');
-
-            zoollmenviron.make_fragment(
-                text,
-                $$kw({
-                    is_block_level: false,
-                    standalone_mode: true,
-                    silent: true,
-                    // -- would only work if we could recompose the compiled
-                    // -- nodes into valid strict LLM text --- ### wait, try again
-                    // parsing_mode: 'safer-latexier',
-                    // tolerant_parsing: true,
-                }),
-            );
-            // valid LLM --- keep text directly
-        } catch (err) {
-            // not valid LLM
-            //text = text.replaceAll( /[\\%#&${}]/g , (match) => llm_escape_chars[match] );
-            text = `\\begin{verbatimtext}${text}\\end{verbatimtext}`;
-            console.log('escaped text = ', text);
-        }
-
-        // if (text.length > 20) {
-        //     console.log(`[debug] text = `, text);
-        // }
-
-        return text;
-    },
-    "bibstart": "",
-    "bibend": "",
-    "@font-style/italic": "\\textit{%%STRING%%}",
-    "@font-style/oblique": "\\textit{%%STRING%%}",
-    "@font-style/normal": "%%STRING%%",
-    "@font-variant/small-caps": "%%STRING%%",
-    "@passthrough/true": CSL.Output.Formatters.passthrough,
-    "@font-variant/normal": "%%STRING%%",
-    "@font-weight/bold": "\\textbf{%%STRING%%}",
-    "@font-weight/normal": "%%STRING%%",
-    "@font-weight/light": false,
-    "@text-decoration/none": "%%STRING%%",
-    "@text-decoration/underline": "%%STRING%%",
-    "@vertical-align/sup": "\({}^{\\text{%%STRING%%}}\)",
-    "@vertical-align/sub": "\({}_{\\text{%%STRING%%}}\)",
-    "@vertical-align/baseline": "%%STRING%%",
-    "@strip-periods/true": CSL.Output.Formatters.passthrough,
-    "@strip-periods/false": CSL.Output.Formatters.passthrough,
-    "@quotes/true": function (state, str) {
-        if ("undefined" === typeof str) {
-            return state.getTerm("open-quote");
-        }
-        return state.getTerm("open-quote") + str + state.getTerm("close-quote");
-    },
-    "@quotes/inner": function (state, str) {
-        if ("undefined" === typeof str) {
-            //
-            // Mostly right by being wrong (for apostrophes)
-            //
-            return "\u2019";
-        }
-        return state.getTerm("open-inner-quote") + str + state.getTerm("close-inner-quote");
-    },
-    "@quotes/false": false,
-    "@cite/entry": function (state, str) {
-        return state.sys.wrapCitationEntry(str, this.item_id, this.locator_txt,
-                                           this.suffix_txt);
-    },
-    "@bibliography/entry": function (state, str) {
-        // Test for this.item_id to add decorations to
-        // bibliography output of individual entries.
-        //
-        // Full item content can be obtained from
-        // state.registry.registry[id].ref, using
-        // CSL variable keys.
-        //
-        // Example:
-        //
-        //   print(state.registry.registry[this.item_id].ref["title"]);
-        //
-        // At present, for parallel citations, only the
-        // id of the master item is supplied on this.item_id.
-        var insert = "";
-        if (state.sys.embedBibliographyEntry) {
-            insert = state.sys.embedBibliographyEntry(this.item_id) + "\n";
-        }
-        //return "  <div class=\"csl-entry\">" + str + "</div>\n" + insert;
-        return str + '\n' + insert;
-    },
-    "@display/block": function (state, str) {
-        return str; //"\n\n    <div class=\"csl-block\">" + str + "</div>\n";
-    },
-    "@display/left-margin": function (state, str) {
-        return str; // "\n    <div class=\"csl-left-margin\">" + str + "</div>";
-    },
-    "@display/right-inline": function (state, str) {
-        return str; // "<div class=\"csl-right-inline\">" + str + "</div>\n  ";
-    },
-    "@display/indent": function (state, str) {
-        return str; // "<div class=\"csl-indent\">" + str + "</div>\n  ";
-    },
-    "@showid/true": function (state, str, cslid) {
-        return str;
-    },
-    "@URL/true": function (state, str) {
-        return "\\url{" + str + "}";
-    },
-    "@DOI/true": function (state, str) {
-        var doiurl = str;
-        if (!str.match(/^https?:\/\//)) {
-            doiurl = "https://doi.org/" + str;
-        }
-        return "\\href{" + doiurl + "}{DOI}";
-    }
-};
-
-
 
 
 const cslfn = 'eczoo-bib-style.csl';
 
-let cslstyle = fs.readFileSync(`playground/${cslfn}`).toString();
+let csl_style = fs.readFileSync(`playground/${cslfn}`).toString();
 
-let cite_processor = new CSL.Engine(citeprocSys, cslstyle);
-cite_processor.setOutputFormat('llm');
 
-const add_cite_links = { 'arxiv': true, 'doi': true, 'url': 'only-if-no-other-link' };
+install_csl_llm_output_format(zoollmenviron)
 
-for (const cid of citation_manager.keys() )
-{
-    // split(':',2) will also split at second semicolumn, just not return remaining parts !!
-    const [cite_prefix, ...split_rest] = cid.split(':');
-    const cite_key = split_rest.join(':'); 
-    const obj = citation_manager.get_citation_by_id(cid);
+let citecompiler = new CitationCompiler({
+    citation_manager: citation_manager,
+    compile_citations: scanner.get_encountered('citations'),
+    csl_style: csl_style,
+});
 
-    if (obj._formatted_llm_text) {
-        zoollmenviron.external_citations_provider.add_citation(
-            cite_prefix, cite_key, obj._formatted_llm_text
-        );
-        continue;
-    }
+citecompiler.compile_citations_to_provider( zoollmenviron.external_citations_provider );
 
-    //console.log(`C: processing ${cite_prefix}:${cite_key} == ${JSON.stringify(cid)}`, cid);
-
-    //console.log('updateItems', [cid]);
-    cite_processor.updateItems( [ cid ] );
-    const c_result = cite_processor.makeBibliography();
-    //console.log(cid, 'c_result=', c_result);
-
-    let result_llm = c_result[1].toString();
-
-    if (!result_llm) {
-        throw new Error(`Could not CSL-compile citation text for ‘${cid}’`);
-    }
-
-    // maybe add links?
-    let has_link = false;
-    if (add_cite_links.arxiv && obj.arxivid) {
-        result_llm += ` \\href{https://arxiv.org/abs/${obj.arxivid}}{${obj.arxivid}}`;
-        has_link = true;
-    }
-    const doi = obj.doi || obj.DOI;
-    if (add_cite_links.doi && doi) {
-        const doiurl = `https://doi.org/${encodeURIComponent(doi)}`;
-        result_llm += ` \\href{${doiurl}}{DOI}`;
-        has_link = true;
-    }
-    const url = obj.url || obj.URL;
-    if (url && (add_cite_links.url
-                || (add_cite_links == 'only-if-no-other-link' && !has_link))) {
-        result_llm += ` \\href{${url}}{URL}`
-    }
-
-    //
-    zoollmenviron.external_citations_provider.add_citation(
-        cite_prefix, cite_key,
-        result_llm.trim(),
-    );
-}
 
 
 //
