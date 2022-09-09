@@ -22,6 +22,8 @@ import { CitationSourceBibliographyFile } from '../src/citationmanager/sources/b
 
 import { FileResourceRetriever } from '../src/resourcecollector/file.js';
 
+import { LLMGraphicsResourceProcessor } from '../src/resourcecollector/llmgraphicsprocessor.js';
+
 import { ZooLLMZooProcessor } from '../src/zoollm/zooprocessor.js';
 
 import jsoncycle from 'cycle/cycle.js';
@@ -223,7 +225,10 @@ let zoo_llm_processor = new ZooLLMZooProcessor({
                 source_directory: eczoo_data_dir,
                 target_directory: './_output_resource_graphics_files/',
                 extensions: [ '', '.svg', '.png', '.jpeg', '.jpg' ],
-            })
+            }),
+        },
+        resource_processors: {
+            'graphics_path': new LLMGraphicsResourceProcessor(),
         },
     }
 });

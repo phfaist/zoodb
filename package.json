@@ -18,6 +18,8 @@
     "llm-js": "link:./llm-js-src/llm-js",
     "node-fetch": "^3.2.10",
     "pino": "^8.4.2",
-    "pino-pretty": "^9.0.1"
+    "pino-pretty": "^9.0.1",
+    "sax": "^1.2.4",
+    "stream-parser": "^0.3.1"
   }
 }
