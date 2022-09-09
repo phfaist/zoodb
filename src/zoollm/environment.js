@@ -163,6 +163,9 @@ export class FeatureZooGraphicsCollection extends llm_feature.Feature
 
         // expose static property as instance properties, too
         this.feature_name = this.constructor.feature_name;
+
+        // can set a src_url resolver for generation-time url resolution
+        this.src_url_resolver = null;
     }
 
     add_graphics(source_path, graphics_resource)
@@ -196,7 +199,17 @@ export class FeatureZooGraphicsCollection extends llm_feature.Feature
             );
         }
 
-        return this.graphics_collection[source_path];
+        const graphics_resource = this.graphics_collection[source_path];
+
+        if (!graphics_resource.src_url && this.src_url_resolver) {
+            return GraphicsResource($$kw(
+                Object.assign({}, graphics_resource.asdict(), {
+                    src_url: this.src_url_resolver(graphics_resource),
+                })
+            ));
+        }
+
+        return graphics_resource;
     }
 };
 

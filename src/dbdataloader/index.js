@@ -393,7 +393,7 @@ export class ZooDbDataLoader
 
         obj._zoodb = {
             id: obj[objectconfig.schema._zoo_primarykey],
-            source_file_path: rel_path,
+            source_file_path: path.join(objectconfig.data_src_path, rel_path),
         };
     }
 };

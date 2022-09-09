@@ -53,9 +53,15 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
     {
         super()
         this.encountered = {
+            // citation prefixes & keys for which we'll probably have to fetch
+            // info & format full citations
             'citations': [],
-            'graphics_paths': [],
-            'refs': [],
+
+            // resources that might need to be collected & pacakged along with
+            // output
+            'resources': [],
+            
+            // items that can be referenced from elsewhere in the zoo
             'referenceables': [],
         }
     }
@@ -98,23 +104,13 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
 
     visit_macro_node(node)
     {
-        if (node.hasOwnProperty('llmarg_graphics_path'))
-        {
-            // it's a graphics node, e.g., \includegraphics
-            const graphics_options_value = node.llmarg_graphics_options_value;
-            const graphics_path = node.llmarg_graphics_path;
+        this._visit_callable(node)
 
-            this.encountered['graphics_paths'].append(
-                {
-                    image_filename: graphics_path,
-                    encountered_in: {
-                        resource_info: node.latex_walker.resource_info,
-                        what: node.latex_walker.what,
-                    },
-                }
-            );
-        }
+        super.visit_macro_node(node)
+    }
 
+    _visit_callable(node)
+    {
         if (node.hasOwnProperty('llmarg_cite_items'))
         {
             // it's a citation node with citations to track
@@ -133,13 +129,22 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
             } );
         }
 
-        this._visit_check_referenceable(node)
+        if (node.hasOwnProperty('llm_resources'))
+        {
+            // this node depends on external resources that might need to be
+            // collected and packaged along with the output
+            const resources = node.llm_resources;
+            for (const resource of resources) {
+                this.encountered['resources'].append( {
+                    ...resource,
+                    encountered_in: {
+                        resource_info: node.latex_walker.resource_info,
+                        what: node.latex_walker.what,
+                    },
+                } );
+            }
+        }
 
-        super.visit_macro_node(node)
-    }
-
-    _visit_check_referenceable(node)
-    {
         if (node.hasOwnProperty('llm_referenceable_info'))
         {
             // it's something referenceable, like a defterm or a section heading
@@ -158,7 +163,7 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
 
     visit_environment_node(node)
     {
-        this._visit_check_referenceable(node);
+        this._visit_callable(node);
 
         super.visit_environment_node(node);
     }

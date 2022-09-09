@@ -1,3 +1,5 @@
+import path from 'path';
+
 import _zoologger from '../_zoologger.js';
 const logger = _zoologger.child({module: 'zoollm.zooprocessor'});
 
@@ -11,6 +13,7 @@ import * as zoollmscanner from './scanner.js';
 import { CitationCompiler, install_csl_llm_output_format } from './citationcompiler.js';
 
 import { CitationDatabaseManager } from '../citationmanager/index.js';
+import { ResourceCollector } from '../resourcecollector/index.js';
 
 
 
@@ -53,6 +56,12 @@ export class ZooLLMZooProcessor
         install_csl_llm_output_format(this.zoo_llm_environment);
 
         this.citation_manager = null;
+
+        //
+        // Resource collector, e.g. for graphics
+        //
+        this.resource_collector = this.options.resource_collector ||
+            new ResourceCollector(this.options.resource_collector_options);
     }
 
     async process_zoo()
@@ -75,6 +84,8 @@ export class ZooLLMZooProcessor
 
         await this.setup_fetch_citations();
         await this.setup_compile_citations();
+
+        await this.setup_collect_resources();
 
         logger.info("Zoo LLM processing done");
     }
@@ -172,5 +183,49 @@ export class ZooLLMZooProcessor
         );
     }
 
+
+
+    async setup_collect_resources()
+    {
+        const encountered_resources = this.scanner.get_encountered('resources');
+
+        let collect_promises = [];
+
+        for (const resource of encountered_resources) {
+
+            // console.log('resource = ', resource);
+
+            const source_directory =
+                  resource.encountered_in.resource_info.get_source_directory();
+
+            logger.debug(
+                `Collecting resource of type ‘${resource.resource_type}’ with source `
+                + `type ‘${resource.resource_source_type}’ and source `
+                + `‘${resource.resource_source}’; calling item's source_directory is `
+                + `‘${source_directory}’`
+            );
+
+            let source;
+            if (resource.resource_source_type == 'file' && resource.encountered_in) {
+                source = path.join(
+                    source_directory,
+                    resource.resource_source,
+                );
+            } else {
+                source = resource.resource_source;
+            }
+
+            collect_promises.push(
+                this.resource_collector.collect(
+                    resource.resource_type,
+                    source
+                )
+            );
+        }
+
+        await Promise.all(collect_promises);
+
+        await this.resource_collector.finish();
+    }
 
 };

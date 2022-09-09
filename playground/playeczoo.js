@@ -20,6 +20,8 @@ import { CitationSourceManual } from '../src/citationmanager/sources/manual.js';
 import { CitationSourceBibliographyFile } from '../src/citationmanager/sources/bibliographyfile.js';
 //import { CitationDatabaseManager } from '../src/citationmanager/index.js';
 
+import { FileResourceRetriever } from '../src/resourcecollector/file.js';
+
 import { ZooLLMZooProcessor } from '../src/zoollm/zooprocessor.js';
 
 import jsoncycle from 'cycle/cycle.js';
@@ -97,7 +99,7 @@ let zoollmenviron = zoollm.make_zoo_llm_environment();
 //         is_block_level: true,
 //         resource_info: new zoollm.ZooLLMResourceInfo(
 //             'code', 'css',
-//             path.join('codes', zoodb.objects.code.css._zoodb.source_file_path)
+//             zoodb.objects.code.css._zoodb.source_file_path
 //         )
 //     })
 // );
@@ -215,6 +217,15 @@ let zoo_llm_processor = new ZooLLMZooProcessor({
             + `(https://github.com/errorcorrectionzoo)`,
         csl_style: csl_style,
     },
+    resource_collector_options: {
+        resource_retrievers: {
+            'graphics_path': new FileResourceRetriever({
+                source_directory: eczoo_data_dir,
+                target_directory: './_output_resource_graphics_files/',
+                extensions: [ '', '.svg', '.png', '.jpeg', '.jpg' ],
+            })
+        },
+    }
 });
 
 await zoo_llm_processor.process_zoo();
