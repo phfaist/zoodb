@@ -12,6 +12,7 @@
     "cycle": "^1.0.3",
     "feedparser": "^2.2.10",
     "glob": "^8.0.3",
+    "hash.js": "^1.1.7",
     "js-yaml": "^4.1.0",
     "jsonschema": "^1.4.1",
     "llm-js": "link:./llm-js-src/llm-js",

@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-09-01 16:23:01
+/* 000001 */ // Transcrypt'ed from Python, 2022-09-09 15:10:10
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
@@ -11,7 +11,7 @@
 /* 000007 */ __nest__ (logging, '', __module_logging__);
 /* 000006 */ import * as __module_re__ from './re.js';
 /* 000006 */ __nest__ (re, '', __module_re__);
-/* 000006 */ export {LLMArgumentSpec, LLMMacroSpecBase, ParsedArgumentsInfo, fmthelpers, Feature};
+/* 000006 */ export {fmthelpers, ParsedArgumentsInfo, LLMMacroSpecBase, Feature, LLMArgumentSpec};
 /* 000001 */ var __name__ = 'llm.feature.endnotes';
 /* 000008 */ export var logger = (function () {
 /* 000008 */ 	var __accu0__ = logging;
@@ -239,7 +239,7 @@
 /* 000120 */ 		self.ref_label = ref_label;
 /* 000121 */ 		self._fields = tuple (['category_name', 'number', 'formatted_counter_value_llm', 'content_nodelist', 'ref_label_prefix', 'ref_label']);
 /* 000121 */ 	});},
-/* 000124 */ 	get __repr__ () {return __get__ (this, function (self) {
+/* 000124 */ 	get asdict () {return __get__ (this, function (self) {
 /* 000124 */ 		if (arguments.length) {
 /* 000124 */ 			var __ilastarg0__ = arguments.length - 1;
 /* 000124 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -254,477 +254,504 @@
 /* 000124 */ 		else {
 /* 000124 */ 		}
 /* 000125 */ 		return (function () {
-/* 000125 */ 			var __accu0__ = '{}({})';
-/* 000127 */ 			return __call__ (__accu0__.format, __accu0__, self.__class__.__name__, (function () {
-/* 000127 */ 				var __accu1__ = ', ';
-/* 000127 */ 				return __call__ (__accu1__.join, __accu1__, (function () {
-/* 000127 */ 					var __accu2__ = [];
-/* 000127 */ 					var __iterable0__ = self._fields;
-/* 000127 */ 					for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000127 */ 						var k = __getitem__ (__iterable0__, __index0__);
-/* 000127 */ 						(function () {
-/* 000127 */ 							var __accu3__ = __accu2__;
-/* 000127 */ 							return __call__ (__accu3__.append, __accu3__, '{}={}'.format (k, __call__ (getattr, null, self, k)));
-/* 000127 */ 						}) ();
+/* 000125 */ 			var __accu0__ = [];
+/* 000125 */ 			var __iterable0__ = self._fields;
+/* 000125 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000125 */ 				var k = __getitem__ (__iterable0__, __index0__);
+/* 000125 */ 				(function () {
+/* 000125 */ 					var __accu1__ = __accu0__;
+/* 000125 */ 					return __call__ (__accu1__.append, __accu1__, [k, __call__ (getattr, null, self, k)]);
+/* 000125 */ 				}) ();
+/* 000125 */ 			}
+/* 000125 */ 			return dict (__accu0__);
+/* 000125 */ 		}) ();
+/* 000125 */ 	});},
+/* 000127 */ 	get __repr__ () {return __get__ (this, function (self) {
+/* 000127 */ 		if (arguments.length) {
+/* 000127 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000127 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000127 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000127 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000127 */ 					switch (__attrib0__) {
+/* 000127 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
 /* 000127 */ 					}
-/* 000127 */ 					return __accu2__;
-/* 000127 */ 				}) ());
-/* 000127 */ 			}) ());
-/* 000127 */ 		}) ();
-/* 000127 */ 	});}
-/* 000127 */ });
-/* 000133 */ export var FeatureEndnotes =  __class__ ('FeatureEndnotes', [Feature], {
-/* 000133 */ 	__module__: __name__,
-/* 000135 */ 	feature_name: 'endnotes',
-/* 000137 */ 	get __init__ () {return __get__ (this, function (self, categories, render_options) {
-/* 000137 */ 		if (typeof render_options == 'undefined' || (render_options != null && render_options.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000137 */ 			var render_options = null;
-/* 000137 */ 		};
-/* 000137 */ 		if (arguments.length) {
-/* 000137 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000137 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000137 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000137 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000137 */ 					switch (__attrib0__) {
-/* 000137 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000137 */ 						case 'categories': var categories = __allkwargs0__ [__attrib0__]; break;
-/* 000137 */ 						case 'render_options': var render_options = __allkwargs0__ [__attrib0__]; break;
-/* 000137 */ 					}
-/* 000137 */ 				}
-/* 000137 */ 			}
-/* 000137 */ 		}
-/* 000137 */ 		else {
-/* 000137 */ 		}
-/* 000143 */ 		__call__ (__call__ (__super__, null, FeatureEndnotes, '__init__'), null, self);
-/* 000145 */ 		var _mkcatobj = function (x) {
-/* 000145 */ 			if (arguments.length) {
-/* 000145 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000145 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000145 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000145 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000145 */ 						switch (__attrib0__) {
-/* 000145 */ 							case 'x': var x = __allkwargs0__ [__attrib0__]; break;
-/* 000145 */ 						}
-/* 000145 */ 					}
-/* 000145 */ 				}
-/* 000145 */ 			}
-/* 000145 */ 			else {
-/* 000145 */ 			}
-/* 000146 */ 			if (__t__ (__call__ (isinstance, null, x, EndnoteCategory))) {
-/* 000147 */ 				return x;
-/* 000147 */ 			}
-/* 000148 */ 			return __call__ (EndnoteCategory, null, __kwargtrans__ (x));
-/* 000148 */ 		};
-/* 000150 */ 		if (__t__ (!__t__ ((categories)))) {
-/* 000151 */ 			var categories = [];
-/* 000151 */ 		}
-/* 000153 */ 		self.base_categories = (function () {
-/* 000153 */ 			var __accu0__ = [];
-/* 000153 */ 			var __iterable0__ = categories;
-/* 000153 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000155 */ 				var x = __getitem__ (__iterable0__, __index0__);
-/* 000155 */ 				(function () {
-/* 000155 */ 					var __accu1__ = __accu0__;
-/* 000154 */ 					return __call__ (__accu1__.append, __accu1__, __call__ (_mkcatobj, null, x));
-/* 000154 */ 				}) ();
-/* 000154 */ 			}
-/* 000154 */ 			return __accu0__;
-/* 000154 */ 		}) ();
-/* 000158 */ 		self.default_render_options = (__t__ (render_options) ? render_options : dict ({}));
-/* 000158 */ 	});},
-/* 000160 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
-/* 000160 */ 		if (arguments.length) {
-/* 000160 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000160 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000160 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000160 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000160 */ 					switch (__attrib0__) {
-/* 000160 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000160 */ 					}
-/* 000160 */ 				}
-/* 000160 */ 			}
-/* 000160 */ 		}
-/* 000160 */ 		else {
-/* 000160 */ 		}
-/* 000162 */ 		var macros = [];
-/* 000163 */ 		var __iterable0__ = self.base_categories;
-/* 000163 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000163 */ 			var encat = __getitem__ (__iterable0__, __index0__);
-/* 000164 */ 			if (__t__ (encat.endnote_command)) {
-/* 000165 */ 				(function () {
-/* 000165 */ 					var __accu0__ = macros;
-/* 000166 */ 					return __call__ (__accu0__.append, __accu0__, __call__ (EndnoteMacro, null, encat.endnote_command, __kwargtrans__ ({endnote_category_name: encat.category_name})));
-/* 000166 */ 				}) ();
-/* 000166 */ 			}
-/* 000166 */ 		}
-/* 000172 */ 		return __call__ (dict, null, __kwargtrans__ ({macros: macros}));
-/* 000174 */ 	});},
-/* 000174 */ 	DocumentManager: __class__ ('DocumentManager', [Feature.DocumentManager], {
-/* 000174 */ 		__module__: __name__,
-/* 000175 */ 		get initialize () {return __get__ (this, function (self) {
-/* 000175 */ 			if (arguments.length) {
-/* 000175 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000175 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000175 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000175 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000175 */ 						switch (__attrib0__) {
-/* 000175 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000175 */ 						}
-/* 000175 */ 					}
-/* 000175 */ 				}
-/* 000175 */ 			}
-/* 000175 */ 			else {
-/* 000175 */ 			}
-/* 000176 */ 			self.categories = __call__ (list, null, self.feature.base_categories);
-/* 000177 */ 			self.categories_by_name = (function () {
-/* 000177 */ 				var __accu0__ = [];
-/* 000177 */ 				var __iterable0__ = self.categories;
-/* 000177 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000178 */ 					var c = __getitem__ (__iterable0__, __index0__);
-/* 000178 */ 					(function () {
-/* 000178 */ 						var __accu1__ = __accu0__;
-/* 000178 */ 						return __call__ (__accu1__.append, __accu1__, [c.category_name, c]);
-/* 000178 */ 					}) ();
+/* 000127 */ 				}
+/* 000127 */ 			}
+/* 000127 */ 		}
+/* 000127 */ 		else {
+/* 000127 */ 		}
+/* 000128 */ 		return (function () {
+/* 000128 */ 			var __accu0__ = '{}({})';
+/* 000130 */ 			return __call__ (__accu0__.format, __accu0__, self.__class__.__name__, (function () {
+/* 000130 */ 				var __accu1__ = ', ';
+/* 000130 */ 				return __call__ (__accu1__.join, __accu1__, (function () {
+/* 000130 */ 					var __accu2__ = [];
+/* 000130 */ 					var __iterable0__ = self._fields;
+/* 000130 */ 					for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000130 */ 						var k = __getitem__ (__iterable0__, __index0__);
+/* 000130 */ 						(function () {
+/* 000130 */ 							var __accu3__ = __accu2__;
+/* 000130 */ 							return __call__ (__accu3__.append, __accu3__, '{}={}'.format (k, __call__ (getattr, null, self, k)));
+/* 000130 */ 						}) ();
+/* 000130 */ 					}
+/* 000130 */ 					return __accu2__;
+/* 000130 */ 				}) ());
+/* 000130 */ 			}) ());
+/* 000130 */ 		}) ();
+/* 000130 */ 	});}
+/* 000130 */ });
+/* 000136 */ export var FeatureEndnotes =  __class__ ('FeatureEndnotes', [Feature], {
+/* 000136 */ 	__module__: __name__,
+/* 000138 */ 	feature_name: 'endnotes',
+/* 000140 */ 	get __init__ () {return __get__ (this, function (self, categories, render_options) {
+/* 000140 */ 		if (typeof render_options == 'undefined' || (render_options != null && render_options.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000140 */ 			var render_options = null;
+/* 000140 */ 		};
+/* 000140 */ 		if (arguments.length) {
+/* 000140 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000140 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000140 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000140 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000140 */ 					switch (__attrib0__) {
+/* 000140 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000140 */ 						case 'categories': var categories = __allkwargs0__ [__attrib0__]; break;
+/* 000140 */ 						case 'render_options': var render_options = __allkwargs0__ [__attrib0__]; break;
+/* 000140 */ 					}
+/* 000140 */ 				}
+/* 000140 */ 			}
+/* 000140 */ 		}
+/* 000140 */ 		else {
+/* 000140 */ 		}
+/* 000146 */ 		__call__ (__call__ (__super__, null, FeatureEndnotes, '__init__'), null, self);
+/* 000148 */ 		var _mkcatobj = function (x) {
+/* 000148 */ 			if (arguments.length) {
+/* 000148 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000148 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000148 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000148 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000148 */ 						switch (__attrib0__) {
+/* 000148 */ 							case 'x': var x = __allkwargs0__ [__attrib0__]; break;
+/* 000148 */ 						}
+/* 000148 */ 					}
+/* 000148 */ 				}
+/* 000148 */ 			}
+/* 000148 */ 			else {
+/* 000148 */ 			}
+/* 000149 */ 			if (__t__ (__call__ (isinstance, null, x, EndnoteCategory))) {
+/* 000150 */ 				return x;
+/* 000150 */ 			}
+/* 000151 */ 			return __call__ (EndnoteCategory, null, __kwargtrans__ (x));
+/* 000151 */ 		};
+/* 000153 */ 		if (__t__ (!__t__ ((categories)))) {
+/* 000154 */ 			var categories = [];
+/* 000154 */ 		}
+/* 000156 */ 		self.base_categories = (function () {
+/* 000156 */ 			var __accu0__ = [];
+/* 000156 */ 			var __iterable0__ = categories;
+/* 000156 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000158 */ 				var x = __getitem__ (__iterable0__, __index0__);
+/* 000158 */ 				(function () {
+/* 000158 */ 					var __accu1__ = __accu0__;
+/* 000157 */ 					return __call__ (__accu1__.append, __accu1__, __call__ (_mkcatobj, null, x));
+/* 000157 */ 				}) ();
+/* 000157 */ 			}
+/* 000157 */ 			return __accu0__;
+/* 000157 */ 		}) ();
+/* 000161 */ 		self.default_render_options = (__t__ (render_options) ? render_options : dict ({}));
+/* 000161 */ 	});},
+/* 000163 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
+/* 000163 */ 		if (arguments.length) {
+/* 000163 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000163 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000163 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000163 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000163 */ 					switch (__attrib0__) {
+/* 000163 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000163 */ 					}
+/* 000163 */ 				}
+/* 000163 */ 			}
+/* 000163 */ 		}
+/* 000163 */ 		else {
+/* 000163 */ 		}
+/* 000165 */ 		var macros = [];
+/* 000166 */ 		var __iterable0__ = self.base_categories;
+/* 000166 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000166 */ 			var encat = __getitem__ (__iterable0__, __index0__);
+/* 000167 */ 			if (__t__ (encat.endnote_command)) {
+/* 000168 */ 				(function () {
+/* 000168 */ 					var __accu0__ = macros;
+/* 000169 */ 					return __call__ (__accu0__.append, __accu0__, __call__ (EndnoteMacro, null, encat.endnote_command, __kwargtrans__ ({endnote_category_name: encat.category_name})));
+/* 000169 */ 				}) ();
+/* 000169 */ 			}
+/* 000169 */ 		}
+/* 000175 */ 		return __call__ (dict, null, __kwargtrans__ ({macros: macros}));
+/* 000177 */ 	});},
+/* 000177 */ 	DocumentManager: __class__ ('DocumentManager', [Feature.DocumentManager], {
+/* 000177 */ 		__module__: __name__,
+/* 000178 */ 		get initialize () {return __get__ (this, function (self) {
+/* 000178 */ 			if (arguments.length) {
+/* 000178 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000178 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000178 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000178 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000178 */ 						switch (__attrib0__) {
+/* 000178 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000178 */ 						}
+/* 000178 */ 					}
 /* 000178 */ 				}
-/* 000178 */ 				return dict (__accu0__);
-/* 000178 */ 			}) ();
-/* 000178 */ 		});},
-/* 000181 */ 		get add_endnote_category () {return __get__ (this, function (self, endnote_category) {
-/* 000181 */ 			if (arguments.length) {
-/* 000181 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000181 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000181 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000181 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000181 */ 						switch (__attrib0__) {
-/* 000181 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000181 */ 							case 'endnote_category': var endnote_category = __allkwargs0__ [__attrib0__]; break;
-/* 000181 */ 						}
-/* 000181 */ 					}
+/* 000178 */ 			}
+/* 000178 */ 			else {
+/* 000178 */ 			}
+/* 000179 */ 			self.categories = __call__ (list, null, self.feature.base_categories);
+/* 000180 */ 			self.categories_by_name = (function () {
+/* 000180 */ 				var __accu0__ = [];
+/* 000180 */ 				var __iterable0__ = self.categories;
+/* 000180 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000181 */ 					var c = __getitem__ (__iterable0__, __index0__);
+/* 000181 */ 					(function () {
+/* 000181 */ 						var __accu1__ = __accu0__;
+/* 000181 */ 						return __call__ (__accu1__.append, __accu1__, [c.category_name, c]);
+/* 000181 */ 					}) ();
 /* 000181 */ 				}
-/* 000181 */ 			}
-/* 000181 */ 			else {
-/* 000181 */ 			}
-/* 000182 */ 			if (__t__ (__in__ (endnote_category.category_name, self.categories_by_name))) {
-/* 000183 */ 				var __except0__ = __call__ (ValueError, null, 'Endnote category ‘{}’ is already a registered endnote category'.format (endnote_category.category_name));
-/* 000183 */ 				__except0__.__cause__ = null;
-/* 000183 */ 				throw __except0__;
-/* 000183 */ 			}
-/* 000187 */ 			(function () {
-/* 000187 */ 				var __accu0__ = self.categories;
-/* 000187 */ 				return __call__ (__accu0__.append, __accu0__, endnote_category);
-/* 000187 */ 			}) ();
-/* 000188 */ 			__setitem__ (self.categories_by_name, endnote_category.category_name, endnote_category);
-/* 000188 */ 		});}
-/* 000190 */ 	}),
-/* 000190 */ 	RenderManager: __class__ ('RenderManager', [Feature.RenderManager], {
-/* 000190 */ 		__module__: __name__,
-/* 000192 */ 		get initialize () {return __get__ (this, function (self) {
-/* 000192 */ 			if (arguments.length) {
-/* 000192 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000192 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000192 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000192 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000192 */ 						switch (__attrib0__) {
-/* 000192 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000192 */ 						}
-/* 000192 */ 					}
-/* 000192 */ 				}
-/* 000192 */ 			}
-/* 000192 */ 			else {
-/* 000192 */ 			}
-/* 000193 */ 			self.endnotes = (function () {
-/* 000193 */ 				var __accu0__ = [];
-/* 000193 */ 				var __iterable0__ = self.feature_document_manager.categories;
-/* 000193 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000195 */ 					var c = __getitem__ (__iterable0__, __index0__);
-/* 000195 */ 					(function () {
-/* 000195 */ 						var __accu1__ = __accu0__;
-/* 000195 */ 						return __call__ (__accu1__.append, __accu1__, [c.category_name, []]);
-/* 000195 */ 					}) ();
+/* 000181 */ 				return dict (__accu0__);
+/* 000181 */ 			}) ();
+/* 000181 */ 		});},
+/* 000184 */ 		get add_endnote_category () {return __get__ (this, function (self, endnote_category) {
+/* 000184 */ 			if (arguments.length) {
+/* 000184 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000184 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000184 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000184 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000184 */ 						switch (__attrib0__) {
+/* 000184 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000184 */ 							case 'endnote_category': var endnote_category = __allkwargs0__ [__attrib0__]; break;
+/* 000184 */ 						}
+/* 000184 */ 					}
+/* 000184 */ 				}
+/* 000184 */ 			}
+/* 000184 */ 			else {
+/* 000184 */ 			}
+/* 000185 */ 			if (__t__ (__in__ (endnote_category.category_name, self.categories_by_name))) {
+/* 000186 */ 				var __except0__ = __call__ (ValueError, null, 'Endnote category ‘{}’ is already a registered endnote category'.format (endnote_category.category_name));
+/* 000186 */ 				__except0__.__cause__ = null;
+/* 000186 */ 				throw __except0__;
+/* 000186 */ 			}
+/* 000190 */ 			(function () {
+/* 000190 */ 				var __accu0__ = self.categories;
+/* 000190 */ 				return __call__ (__accu0__.append, __accu0__, endnote_category);
+/* 000190 */ 			}) ();
+/* 000191 */ 			__setitem__ (self.categories_by_name, endnote_category.category_name, endnote_category);
+/* 000191 */ 		});}
+/* 000193 */ 	}),
+/* 000193 */ 	RenderManager: __class__ ('RenderManager', [Feature.RenderManager], {
+/* 000193 */ 		__module__: __name__,
+/* 000195 */ 		get initialize () {return __get__ (this, function (self) {
+/* 000195 */ 			if (arguments.length) {
+/* 000195 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000195 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000195 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000195 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000195 */ 						switch (__attrib0__) {
+/* 000195 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000195 */ 						}
+/* 000195 */ 					}
 /* 000195 */ 				}
-/* 000195 */ 				return dict (__accu0__);
-/* 000195 */ 			}) ();
-/* 000197 */ 			self.endnote_counters = (function () {
-/* 000197 */ 				var __accu0__ = [];
-/* 000197 */ 				var __iterable0__ = self.feature_document_manager.categories;
-/* 000197 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000199 */ 					var c = __getitem__ (__iterable0__, __index0__);
-/* 000199 */ 					(function () {
-/* 000199 */ 						var __accu1__ = __accu0__;
-/* 000199 */ 						return __call__ (__accu1__.append, __accu1__, [c.category_name, 1]);
-/* 000199 */ 					}) ();
-/* 000199 */ 				}
-/* 000199 */ 				return dict (__accu0__);
-/* 000199 */ 			}) ();
-/* 000201 */ 			self.endnote_instances = dict ({});
-/* 000201 */ 		});},
-/* 000203 */ 		get add_endnote () {return __get__ (this, function (self, category_name, content_nodelist) {
-/* 000203 */ 			var ref_label_prefix = null;
-/* 000203 */ 			var ref_label = null;
-/* 000203 */ 			if (arguments.length) {
-/* 000203 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000203 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000203 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000203 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000203 */ 						switch (__attrib0__) {
-/* 000203 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000203 */ 							case 'category_name': var category_name = __allkwargs0__ [__attrib0__]; break;
-/* 000203 */ 							case 'content_nodelist': var content_nodelist = __allkwargs0__ [__attrib0__]; break;
-/* 000203 */ 							case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000203 */ 							case 'ref_label_prefix': var ref_label_prefix = __allkwargs0__ [__attrib0__]; break;
-/* 000203 */ 							case 'ref_label': var ref_label = __allkwargs0__ [__attrib0__]; break;
-/* 000203 */ 						}
-/* 000203 */ 					}
-/* 000203 */ 				}
-/* 000203 */ 			}
-/* 000203 */ 			else {
-/* 000203 */ 			}
-/* 000206 */ 			var node_id = (function () {
-/* 000206 */ 				var __accu0__ = self;
-/* 000206 */ 				return __call__ (__accu0__.get_node_id, __accu0__, node);
-/* 000206 */ 			}) ();
-/* 000208 */ 			if (__t__ (__in__ (node_id, self.endnote_instances))) {
-/* 000210 */ 				return __getitem__ (self.endnote_instances, node_id);
-/* 000210 */ 			}
-/* 000212 */ 			var endnote_category_info = __getitem__ (self.feature_document_manager.categories_by_name, category_name);
-/* 000214 */ 			var fmtcounter = endnote_category_info.counter_formatter;
-/* 000215 */ 			var number = __getitem__ (self.endnote_counters, category_name);
-/* 000216 */ 			__setitem__ (self.endnote_counters, category_name, __call__ (__iadd__, null, __getitem__ (self.endnote_counters, category_name), 1));
-/* 000218 */ 			var fmtvalue_llm_text = __call__ (fmtcounter, null, number);
-/* 000219 */ 			var fmtvalue_llm = (function () {
-/* 000219 */ 				var __accu0__ = self.render_context.doc.environment;
-/* 000219 */ 				return __call__ (__accu0__.make_fragment, __accu0__, fmtvalue_llm_text, __kwargtrans__ ({is_block_level: false, what: '{} counter'.format (category_name)}));
-/* 000219 */ 			}) ();
-/* 000225 */ 			var endnote = __call__ (EndnoteInstance, null, __kwargtrans__ ({category_name: category_name, number: number, formatted_counter_value_llm: fmtvalue_llm, content_nodelist: content_nodelist, ref_label_prefix: ref_label_prefix, ref_label: ref_label}));
-/* 000233 */ 			(function () {
-/* 000233 */ 				var __accu0__ = __getitem__ (self.endnotes, category_name);
-/* 000233 */ 				return __call__ (__accu0__.append, __accu0__, endnote);
-/* 000233 */ 			}) ();
-/* 000235 */ 			if (__t__ (node_id !== null)) {
-/* 000236 */ 				__setitem__ (self.endnote_instances, node_id, endnote);
-/* 000236 */ 			}
-/* 000238 */ 			return endnote;
-/* 000238 */ 		});},
-/* 000240 */ 		get render_endnote_mark () {return __get__ (this, function (self, endnote) {
-/* 000240 */ 			if (arguments.length) {
-/* 000240 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000240 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000240 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000240 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000240 */ 						switch (__attrib0__) {
-/* 000240 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000240 */ 							case 'endnote': var endnote = __allkwargs0__ [__attrib0__]; break;
-/* 000240 */ 						}
-/* 000240 */ 					}
-/* 000240 */ 				}
-/* 000240 */ 			}
-/* 000240 */ 			else {
-/* 000240 */ 			}
-/* 000241 */ 			var endnote_link_href = '#{}-{}'.format (endnote.category_name, endnote.number);
-/* 000242 */ 			var fmtvalue_llm = endnote.formatted_counter_value_llm;
-/* 000243 */ 			return (function () {
-/* 000243 */ 				var __accu0__ = self.render_context.fragment_renderer;
-/* 000243 */ 				return __call__ (__accu0__.render_link, __accu0__, 'endnote', endnote_link_href, __kwargtrans__ ({display_nodelist: fmtvalue_llm.nodes, render_context: self.render_context, annotations: ['endnote', endnote.category_name]}));
-/* 000243 */ 			}) ();
-/* 000243 */ 		});},
-/* 000252 */ 		get render_endnotes_category () {return __get__ (this, function (self, category_name) {
-/* 000252 */ 			if (arguments.length) {
-/* 000252 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000252 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000252 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000252 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000252 */ 						switch (__attrib0__) {
-/* 000252 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000252 */ 							case 'category_name': var category_name = __allkwargs0__ [__attrib0__]; break;
-/* 000252 */ 						}
-/* 000252 */ 					}
-/* 000252 */ 				}
-/* 000252 */ 			}
-/* 000252 */ 			else {
-/* 000252 */ 			}
-/* 000254 */ 			var render_context = self.render_context;
-/* 000255 */ 			var fragment_renderer = render_context.fragment_renderer;
-/* 000257 */ 			if (__t__ (__call__ (hasattr, null, category_name, 'category_name'))) {
-/* 000258 */ 				var encat = category_name;
-/* 000259 */ 				var category_name = encat.category_name;
-/* 000259 */ 			}
-/* 000263 */ 			var the_endnotes_enumeration_counter_formatter = function (n) {
-/* 000263 */ 				if (arguments.length) {
-/* 000263 */ 					var __ilastarg0__ = arguments.length - 1;
-/* 000263 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000263 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000263 */ 						for (var __attrib0__ in __allkwargs0__) {
-/* 000263 */ 							switch (__attrib0__) {
-/* 000263 */ 								case 'n': var n = __allkwargs0__ [__attrib0__]; break;
-/* 000263 */ 							}
-/* 000263 */ 						}
-/* 000263 */ 					}
-/* 000263 */ 				}
-/* 000263 */ 				else {
-/* 000263 */ 				}
-/* 000264 */ 				var endnote = __getitem__ (__getitem__ (self.endnotes, category_name), __sub__ (n, 1));
-/* 000265 */ 				var fmtvalue_llm = endnote.formatted_counter_value_llm;
-/* 000266 */ 				return fmtvalue_llm.nodes;
-/* 000266 */ 			};
-/* 000268 */ 			var the_target_id_generator_fn = function (n) {
-/* 000268 */ 				if (arguments.length) {
-/* 000268 */ 					var __ilastarg0__ = arguments.length - 1;
-/* 000268 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000268 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000268 */ 						for (var __attrib0__ in __allkwargs0__) {
-/* 000268 */ 							switch (__attrib0__) {
-/* 000268 */ 								case 'n': var n = __allkwargs0__ [__attrib0__]; break;
-/* 000268 */ 							}
-/* 000268 */ 						}
-/* 000268 */ 					}
-/* 000268 */ 				}
-/* 000268 */ 				else {
-/* 000268 */ 				}
-/* 000269 */ 				return '{}-{}'.format (category_name, n);
+/* 000195 */ 			}
+/* 000195 */ 			else {
+/* 000195 */ 			}
+/* 000196 */ 			self.endnotes = (function () {
+/* 000196 */ 				var __accu0__ = [];
+/* 000196 */ 				var __iterable0__ = self.feature_document_manager.categories;
+/* 000196 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000198 */ 					var c = __getitem__ (__iterable0__, __index0__);
+/* 000198 */ 					(function () {
+/* 000198 */ 						var __accu1__ = __accu0__;
+/* 000198 */ 						return __call__ (__accu1__.append, __accu1__, [c.category_name, []]);
+/* 000198 */ 					}) ();
+/* 000198 */ 				}
+/* 000198 */ 				return dict (__accu0__);
+/* 000198 */ 			}) ();
+/* 000200 */ 			self.endnote_counters = (function () {
+/* 000200 */ 				var __accu0__ = [];
+/* 000200 */ 				var __iterable0__ = self.feature_document_manager.categories;
+/* 000200 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000202 */ 					var c = __getitem__ (__iterable0__, __index0__);
+/* 000202 */ 					(function () {
+/* 000202 */ 						var __accu1__ = __accu0__;
+/* 000202 */ 						return __call__ (__accu1__.append, __accu1__, [c.category_name, 1]);
+/* 000202 */ 					}) ();
+/* 000202 */ 				}
+/* 000202 */ 				return dict (__accu0__);
+/* 000202 */ 			}) ();
+/* 000204 */ 			self.endnote_instances = dict ({});
+/* 000204 */ 		});},
+/* 000206 */ 		get add_endnote () {return __get__ (this, function (self, category_name, content_nodelist) {
+/* 000206 */ 			var ref_label_prefix = null;
+/* 000206 */ 			var ref_label = null;
+/* 000206 */ 			if (arguments.length) {
+/* 000206 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000206 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000206 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000206 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000206 */ 						switch (__attrib0__) {
+/* 000206 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000206 */ 							case 'category_name': var category_name = __allkwargs0__ [__attrib0__]; break;
+/* 000206 */ 							case 'content_nodelist': var content_nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 000206 */ 							case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000206 */ 							case 'ref_label_prefix': var ref_label_prefix = __allkwargs0__ [__attrib0__]; break;
+/* 000206 */ 							case 'ref_label': var ref_label = __allkwargs0__ [__attrib0__]; break;
+/* 000206 */ 						}
+/* 000206 */ 					}
+/* 000206 */ 				}
+/* 000206 */ 			}
+/* 000206 */ 			else {
+/* 000206 */ 			}
+/* 000209 */ 			var node_id = (function () {
+/* 000209 */ 				var __accu0__ = self;
+/* 000209 */ 				return __call__ (__accu0__.get_node_id, __accu0__, node);
+/* 000209 */ 			}) ();
+/* 000211 */ 			if (__t__ (__in__ (node_id, self.endnote_instances))) {
+/* 000213 */ 				return __getitem__ (self.endnote_instances, node_id);
+/* 000213 */ 			}
+/* 000215 */ 			var endnote_category_info = __getitem__ (self.feature_document_manager.categories_by_name, category_name);
+/* 000217 */ 			var fmtcounter = endnote_category_info.counter_formatter;
+/* 000218 */ 			var number = __getitem__ (self.endnote_counters, category_name);
+/* 000219 */ 			__setitem__ (self.endnote_counters, category_name, __call__ (__iadd__, null, __getitem__ (self.endnote_counters, category_name), 1));
+/* 000221 */ 			var fmtvalue_llm_text = __call__ (fmtcounter, null, number);
+/* 000222 */ 			var fmtvalue_llm = (function () {
+/* 000222 */ 				var __accu0__ = self.render_context.doc.environment;
+/* 000222 */ 				return __call__ (__accu0__.make_fragment, __accu0__, fmtvalue_llm_text, __kwargtrans__ ({is_block_level: false, what: '{} counter'.format (category_name)}));
+/* 000222 */ 			}) ();
+/* 000228 */ 			var endnote = __call__ (EndnoteInstance, null, __kwargtrans__ ({category_name: category_name, number: number, formatted_counter_value_llm: fmtvalue_llm, content_nodelist: content_nodelist, ref_label_prefix: ref_label_prefix, ref_label: ref_label}));
+/* 000236 */ 			(function () {
+/* 000236 */ 				var __accu0__ = __getitem__ (self.endnotes, category_name);
+/* 000236 */ 				return __call__ (__accu0__.append, __accu0__, endnote);
+/* 000236 */ 			}) ();
+/* 000238 */ 			if (__t__ (node_id !== null)) {
+/* 000239 */ 				__setitem__ (self.endnote_instances, node_id, endnote);
+/* 000239 */ 			}
+/* 000241 */ 			return endnote;
+/* 000241 */ 		});},
+/* 000243 */ 		get render_endnote_mark () {return __get__ (this, function (self, endnote) {
+/* 000243 */ 			if (arguments.length) {
+/* 000243 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000243 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000243 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000243 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000243 */ 						switch (__attrib0__) {
+/* 000243 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000243 */ 							case 'endnote': var endnote = __allkwargs0__ [__attrib0__]; break;
+/* 000243 */ 						}
+/* 000243 */ 					}
+/* 000243 */ 				}
+/* 000243 */ 			}
+/* 000243 */ 			else {
+/* 000243 */ 			}
+/* 000244 */ 			var endnote_link_href = '#{}-{}'.format (endnote.category_name, endnote.number);
+/* 000245 */ 			var fmtvalue_llm = endnote.formatted_counter_value_llm;
+/* 000246 */ 			return (function () {
+/* 000246 */ 				var __accu0__ = self.render_context.fragment_renderer;
+/* 000246 */ 				return __call__ (__accu0__.render_link, __accu0__, 'endnote', endnote_link_href, __kwargtrans__ ({display_nodelist: fmtvalue_llm.nodes, render_context: self.render_context, annotations: ['endnote', endnote.category_name]}));
+/* 000246 */ 			}) ();
+/* 000246 */ 		});},
+/* 000255 */ 		get render_endnotes_category () {return __get__ (this, function (self, category_name) {
+/* 000255 */ 			if (arguments.length) {
+/* 000255 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000255 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000255 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000255 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000255 */ 						switch (__attrib0__) {
+/* 000255 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000255 */ 							case 'category_name': var category_name = __allkwargs0__ [__attrib0__]; break;
+/* 000255 */ 						}
+/* 000255 */ 					}
+/* 000255 */ 				}
+/* 000255 */ 			}
+/* 000255 */ 			else {
+/* 000255 */ 			}
+/* 000257 */ 			var render_context = self.render_context;
+/* 000258 */ 			var fragment_renderer = render_context.fragment_renderer;
+/* 000260 */ 			if (__t__ (__call__ (hasattr, null, category_name, 'category_name'))) {
+/* 000261 */ 				var encat = category_name;
+/* 000262 */ 				var category_name = encat.category_name;
+/* 000262 */ 			}
+/* 000266 */ 			var the_endnotes_enumeration_counter_formatter = function (n) {
+/* 000266 */ 				if (arguments.length) {
+/* 000266 */ 					var __ilastarg0__ = arguments.length - 1;
+/* 000266 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000266 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000266 */ 						for (var __attrib0__ in __allkwargs0__) {
+/* 000266 */ 							switch (__attrib0__) {
+/* 000266 */ 								case 'n': var n = __allkwargs0__ [__attrib0__]; break;
+/* 000266 */ 							}
+/* 000266 */ 						}
+/* 000266 */ 					}
+/* 000266 */ 				}
+/* 000266 */ 				else {
+/* 000266 */ 				}
+/* 000267 */ 				var endnote = __getitem__ (__getitem__ (self.endnotes, category_name), __sub__ (n, 1));
+/* 000268 */ 				var fmtvalue_llm = endnote.formatted_counter_value_llm;
+/* 000269 */ 				return fmtvalue_llm.nodes;
 /* 000269 */ 			};
-/* 000275 */ 			var iterable_of_content_endnotes = (function () {
-/* 000275 */ 				var __accu0__ = [];
-/* 000275 */ 				var __iterable0__ = __getitem__ (self.endnotes, category_name);
-/* 000275 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000277 */ 					var en = __getitem__ (__iterable0__, __index0__);
-/* 000277 */ 					(function () {
-/* 000277 */ 						var __accu1__ = __accu0__;
-/* 000277 */ 						return __call__ (__accu1__.append, __accu1__, en.content_nodelist);
-/* 000277 */ 					}) ();
-/* 000277 */ 				}
-/* 000277 */ 				return __accu0__;
-/* 000277 */ 			}) ();
-/* 000280 */ 			return (function () {
-/* 000280 */ 				var __accu0__ = fragment_renderer;
-/* 000280 */ 				return __call__ (__accu0__.render_enumeration, __accu0__, iterable_of_content_endnotes, __kwargtrans__ ({counter_formatter: the_endnotes_enumeration_counter_formatter, target_id_generator: the_target_id_generator_fn, render_context: self.render_context, annotations: [__add__ (category_name, '-list')]}));
+/* 000271 */ 			var the_target_id_generator_fn = function (n) {
+/* 000271 */ 				if (arguments.length) {
+/* 000271 */ 					var __ilastarg0__ = arguments.length - 1;
+/* 000271 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000271 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000271 */ 						for (var __attrib0__ in __allkwargs0__) {
+/* 000271 */ 							switch (__attrib0__) {
+/* 000271 */ 								case 'n': var n = __allkwargs0__ [__attrib0__]; break;
+/* 000271 */ 							}
+/* 000271 */ 						}
+/* 000271 */ 					}
+/* 000271 */ 				}
+/* 000271 */ 				else {
+/* 000271 */ 				}
+/* 000272 */ 				return '{}-{}'.format (category_name, n);
+/* 000272 */ 			};
+/* 000278 */ 			var iterable_of_content_endnotes = (function () {
+/* 000278 */ 				var __accu0__ = [];
+/* 000278 */ 				var __iterable0__ = __getitem__ (self.endnotes, category_name);
+/* 000278 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000280 */ 					var en = __getitem__ (__iterable0__, __index0__);
+/* 000280 */ 					(function () {
+/* 000280 */ 						var __accu1__ = __accu0__;
+/* 000280 */ 						return __call__ (__accu1__.append, __accu1__, en.content_nodelist);
+/* 000280 */ 					}) ();
+/* 000280 */ 				}
+/* 000280 */ 				return __accu0__;
 /* 000280 */ 			}) ();
-/* 000280 */ 		});},
-/* 000289 */ 		get render_endnotes () {return __get__ (this, function (self, target_id, annotations, include_headings_at_level, set_headings_target_ids, endnotes_heading_title, endnotes_heading_level) {
-/* 000289 */ 			if (typeof target_id == 'undefined' || (target_id != null && target_id.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000289 */ 				var target_id = 'endnotes';
-/* 000289 */ 			};
-/* 000289 */ 			if (typeof annotations == 'undefined' || (annotations != null && annotations.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000289 */ 				var annotations = null;
-/* 000289 */ 			};
-/* 000289 */ 			if (typeof include_headings_at_level == 'undefined' || (include_headings_at_level != null && include_headings_at_level.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000289 */ 				var include_headings_at_level = null;
-/* 000289 */ 			};
-/* 000289 */ 			if (typeof set_headings_target_ids == 'undefined' || (set_headings_target_ids != null && set_headings_target_ids.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000289 */ 				var set_headings_target_ids = null;
-/* 000289 */ 			};
-/* 000289 */ 			if (typeof endnotes_heading_title == 'undefined' || (endnotes_heading_title != null && endnotes_heading_title.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000289 */ 				var endnotes_heading_title = null;
-/* 000289 */ 			};
-/* 000289 */ 			if (typeof endnotes_heading_level == 'undefined' || (endnotes_heading_level != null && endnotes_heading_level.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000289 */ 				var endnotes_heading_level = null;
-/* 000289 */ 			};
-/* 000289 */ 			if (arguments.length) {
-/* 000289 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000289 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000289 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000289 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000289 */ 						switch (__attrib0__) {
-/* 000289 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000289 */ 							case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
-/* 000289 */ 							case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
-/* 000289 */ 							case 'include_headings_at_level': var include_headings_at_level = __allkwargs0__ [__attrib0__]; break;
-/* 000289 */ 							case 'set_headings_target_ids': var set_headings_target_ids = __allkwargs0__ [__attrib0__]; break;
-/* 000289 */ 							case 'endnotes_heading_title': var endnotes_heading_title = __allkwargs0__ [__attrib0__]; break;
-/* 000289 */ 							case 'endnotes_heading_level': var endnotes_heading_level = __allkwargs0__ [__attrib0__]; break;
-/* 000289 */ 						}
-/* 000289 */ 					}
-/* 000289 */ 				}
-/* 000289 */ 			}
-/* 000289 */ 			else {
-/* 000289 */ 			}
-/* 000298 */ 			if (__t__ (include_headings_at_level === null)) {
-/* 000300 */ 				var include_heaings_at_level = (function () {
-/* 000300 */ 					var __accu0__ = self.feature.default_render_options;
-/* 000300 */ 					return __call__ (__accu0__.py_get, __accu0__, 'include_heaings_at_level', null);
-/* 000300 */ 				}) ();
-/* 000300 */ 			}
-/* 000301 */ 			if (__t__ (set_headings_target_ids === null)) {
-/* 000303 */ 				var set_headings_target_ids = (function () {
+/* 000283 */ 			return (function () {
+/* 000283 */ 				var __accu0__ = fragment_renderer;
+/* 000283 */ 				return __call__ (__accu0__.render_enumeration, __accu0__, iterable_of_content_endnotes, __kwargtrans__ ({counter_formatter: the_endnotes_enumeration_counter_formatter, target_id_generator: the_target_id_generator_fn, render_context: self.render_context, annotations: [__add__ (category_name, '-list')]}));
+/* 000283 */ 			}) ();
+/* 000283 */ 		});},
+/* 000292 */ 		get render_endnotes () {return __get__ (this, function (self, target_id, annotations, include_headings_at_level, set_headings_target_ids, endnotes_heading_title, endnotes_heading_level) {
+/* 000292 */ 			if (typeof target_id == 'undefined' || (target_id != null && target_id.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000292 */ 				var target_id = 'endnotes';
+/* 000292 */ 			};
+/* 000292 */ 			if (typeof annotations == 'undefined' || (annotations != null && annotations.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000292 */ 				var annotations = null;
+/* 000292 */ 			};
+/* 000292 */ 			if (typeof include_headings_at_level == 'undefined' || (include_headings_at_level != null && include_headings_at_level.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000292 */ 				var include_headings_at_level = null;
+/* 000292 */ 			};
+/* 000292 */ 			if (typeof set_headings_target_ids == 'undefined' || (set_headings_target_ids != null && set_headings_target_ids.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000292 */ 				var set_headings_target_ids = null;
+/* 000292 */ 			};
+/* 000292 */ 			if (typeof endnotes_heading_title == 'undefined' || (endnotes_heading_title != null && endnotes_heading_title.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000292 */ 				var endnotes_heading_title = null;
+/* 000292 */ 			};
+/* 000292 */ 			if (typeof endnotes_heading_level == 'undefined' || (endnotes_heading_level != null && endnotes_heading_level.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000292 */ 				var endnotes_heading_level = null;
+/* 000292 */ 			};
+/* 000292 */ 			if (arguments.length) {
+/* 000292 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000292 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000292 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000292 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000292 */ 						switch (__attrib0__) {
+/* 000292 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000292 */ 							case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
+/* 000292 */ 							case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
+/* 000292 */ 							case 'include_headings_at_level': var include_headings_at_level = __allkwargs0__ [__attrib0__]; break;
+/* 000292 */ 							case 'set_headings_target_ids': var set_headings_target_ids = __allkwargs0__ [__attrib0__]; break;
+/* 000292 */ 							case 'endnotes_heading_title': var endnotes_heading_title = __allkwargs0__ [__attrib0__]; break;
+/* 000292 */ 							case 'endnotes_heading_level': var endnotes_heading_level = __allkwargs0__ [__attrib0__]; break;
+/* 000292 */ 						}
+/* 000292 */ 					}
+/* 000292 */ 				}
+/* 000292 */ 			}
+/* 000292 */ 			else {
+/* 000292 */ 			}
+/* 000301 */ 			if (__t__ (include_headings_at_level === null)) {
+/* 000303 */ 				var include_heaings_at_level = (function () {
 /* 000303 */ 					var __accu0__ = self.feature.default_render_options;
-/* 000303 */ 					return __call__ (__accu0__.py_get, __accu0__, 'set_headings_target_ids', false);
+/* 000303 */ 					return __call__ (__accu0__.py_get, __accu0__, 'include_heaings_at_level', null);
 /* 000303 */ 				}) ();
 /* 000303 */ 			}
-/* 000304 */ 			if (__t__ (endnotes_heading_title === null)) {
-/* 000306 */ 				var endnotes_heading_title = (function () {
+/* 000304 */ 			if (__t__ (set_headings_target_ids === null)) {
+/* 000306 */ 				var set_headings_target_ids = (function () {
 /* 000306 */ 					var __accu0__ = self.feature.default_render_options;
-/* 000306 */ 					return __call__ (__accu0__.py_get, __accu0__, 'endnotes_heading_title', null);
+/* 000306 */ 					return __call__ (__accu0__.py_get, __accu0__, 'set_headings_target_ids', false);
 /* 000306 */ 				}) ();
 /* 000306 */ 			}
-/* 000307 */ 			if (__t__ (endnotes_heading_level === null)) {
-/* 000309 */ 				var endnotes_heading_level = (function () {
+/* 000307 */ 			if (__t__ (endnotes_heading_title === null)) {
+/* 000309 */ 				var endnotes_heading_title = (function () {
 /* 000309 */ 					var __accu0__ = self.feature.default_render_options;
-/* 000309 */ 					return __call__ (__accu0__.py_get, __accu0__, 'endnotes_heading_level', 1);
+/* 000309 */ 					return __call__ (__accu0__.py_get, __accu0__, 'endnotes_heading_title', null);
 /* 000309 */ 				}) ();
 /* 000309 */ 			}
-/* 000312 */ 			var render_context = self.render_context;
-/* 000313 */ 			var fragment_renderer = render_context.fragment_renderer;
-/* 000315 */ 			var has_endnotes = false;
-/* 000317 */ 			var blocks = [];
-/* 000318 */ 			var __iterable0__ = self.feature_document_manager.categories;
-/* 000318 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000318 */ 				var encat = __getitem__ (__iterable0__, __index0__);
-/* 000319 */ 				if (__t__ (!__t__ ((__call__ (len, null, __getitem__ (self.endnotes, encat.category_name)))))) {
-/* 000319 */ 					continue;
-/* 000319 */ 				}
-/* 000323 */ 				var has_endnotes = true;
-/* 000325 */ 				if (__t__ (include_headings_at_level !== null)) {
-/* 000326 */ 					var heading_nodelist = (function () {
-/* 000326 */ 						var __accu0__ = self.render_context.doc.environment;
-/* 000326 */ 						return __call__ (__accu0__.make_fragment, __accu0__, encat.heading_title, __kwargtrans__ ({is_block_level: false, what: '{} heading title'.format (encat.category_name)}));
-/* 000326 */ 					}) ();
-/* 000331 */ 					var heading_target_id = null;
-/* 000332 */ 					if (__t__ (set_headings_target_ids)) {
-/* 000333 */ 						var heading_target_id = '{}-{}'.format (target_id, encat.category_name);
-/* 000333 */ 					}
-/* 000334 */ 					(function () {
-/* 000334 */ 						var __accu0__ = blocks;
-/* 000335 */ 						return __call__ (__accu0__.append, __accu0__, (function () {
-/* 000335 */ 							var __accu1__ = fragment_renderer;
-/* 000335 */ 							return __call__ (__accu1__.render_heading, __accu1__, heading_nodelist.nodes, __kwargtrans__ ({render_context: self.render_context, heading_level: include_headings_at_level, target_id: heading_target_id}));
-/* 000335 */ 						}) ());
-/* 000335 */ 					}) ();
-/* 000335 */ 				}
-/* 000342 */ 				(function () {
-/* 000342 */ 					var __accu0__ = blocks;
-/* 000343 */ 					return __call__ (__accu0__.append, __accu0__, (function () {
-/* 000343 */ 						var __accu1__ = self;
-/* 000343 */ 						return __call__ (__accu1__.render_endnotes_category, __accu1__, encat);
-/* 000343 */ 					}) ());
-/* 000343 */ 				}) ();
-/* 000343 */ 			}
-/* 000346 */ 			if (__t__ (!__t__ ((has_endnotes)))) {
-/* 000347 */ 				return (function () {
-/* 000347 */ 					var __accu0__ = fragment_renderer;
-/* 000347 */ 					return __call__ (__accu0__.render_nothing, __accu0__, __kwargtrans__ ({annotations: ['no-endnotes']}));
-/* 000347 */ 				}) ();
-/* 000347 */ 			}
-/* 000351 */ 			if (__t__ (endnotes_heading_title !== null)) {
-/* 000353 */ 				var heading_title_nodelist = (function () {
-/* 000353 */ 					var __accu0__ = self.render_context.doc.environment;
-/* 000353 */ 					return __call__ (__accu0__.make_fragment, __accu0__, endnotes_heading_title, __kwargtrans__ ({is_block_level: false, what: 'endnotes heading title'.format ()}));
-/* 000353 */ 				}) ();
-/* 000358 */ 				(function () {
-/* 000358 */ 					var __accu0__ = blocks;
-/* 000360 */ 					return __call__ (__accu0__.insert, __accu0__, 0, (function () {
-/* 000360 */ 						var __accu1__ = fragment_renderer;
-/* 000360 */ 						return __call__ (__accu1__.render_heading, __accu1__, heading_title_nodelist.nodes, __kwargtrans__ ({render_context: self.render_context, heading_level: endnotes_heading_level}));
-/* 000360 */ 					}) ());
-/* 000360 */ 				}) ();
-/* 000360 */ 			}
-/* 000368 */ 			return (function () {
-/* 000368 */ 				var __accu0__ = fragment_renderer;
-/* 000369 */ 				return __call__ (__accu0__.render_semantic_block, __accu0__, (function () {
-/* 000369 */ 					var __accu1__ = fragment_renderer;
-/* 000369 */ 					return __call__ (__accu1__.render_join_blocks, __accu1__, blocks);
-/* 000369 */ 				}) (), __kwargtrans__ ({role: 'endnotes', annotations: annotations, target_id: target_id}));
-/* 000369 */ 			}) ();
-/* 000369 */ 		});}
-/* 000369 */ 	})
-/* 000369 */ });
+/* 000310 */ 			if (__t__ (endnotes_heading_level === null)) {
+/* 000312 */ 				var endnotes_heading_level = (function () {
+/* 000312 */ 					var __accu0__ = self.feature.default_render_options;
+/* 000312 */ 					return __call__ (__accu0__.py_get, __accu0__, 'endnotes_heading_level', 1);
+/* 000312 */ 				}) ();
+/* 000312 */ 			}
+/* 000315 */ 			var render_context = self.render_context;
+/* 000316 */ 			var fragment_renderer = render_context.fragment_renderer;
+/* 000318 */ 			var has_endnotes = false;
+/* 000320 */ 			var blocks = [];
+/* 000321 */ 			var __iterable0__ = self.feature_document_manager.categories;
+/* 000321 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000321 */ 				var encat = __getitem__ (__iterable0__, __index0__);
+/* 000322 */ 				if (__t__ (!__t__ ((__call__ (len, null, __getitem__ (self.endnotes, encat.category_name)))))) {
+/* 000322 */ 					continue;
+/* 000322 */ 				}
+/* 000326 */ 				var has_endnotes = true;
+/* 000328 */ 				if (__t__ (include_headings_at_level !== null)) {
+/* 000329 */ 					var heading_nodelist = (function () {
+/* 000329 */ 						var __accu0__ = self.render_context.doc.environment;
+/* 000329 */ 						return __call__ (__accu0__.make_fragment, __accu0__, encat.heading_title, __kwargtrans__ ({is_block_level: false, what: '{} heading title'.format (encat.category_name)}));
+/* 000329 */ 					}) ();
+/* 000334 */ 					var heading_target_id = null;
+/* 000335 */ 					if (__t__ (set_headings_target_ids)) {
+/* 000336 */ 						var heading_target_id = '{}-{}'.format (target_id, encat.category_name);
+/* 000336 */ 					}
+/* 000337 */ 					(function () {
+/* 000337 */ 						var __accu0__ = blocks;
+/* 000338 */ 						return __call__ (__accu0__.append, __accu0__, (function () {
+/* 000338 */ 							var __accu1__ = fragment_renderer;
+/* 000338 */ 							return __call__ (__accu1__.render_heading, __accu1__, heading_nodelist.nodes, __kwargtrans__ ({render_context: self.render_context, heading_level: include_headings_at_level, target_id: heading_target_id}));
+/* 000338 */ 						}) ());
+/* 000338 */ 					}) ();
+/* 000338 */ 				}
+/* 000345 */ 				(function () {
+/* 000345 */ 					var __accu0__ = blocks;
+/* 000346 */ 					return __call__ (__accu0__.append, __accu0__, (function () {
+/* 000346 */ 						var __accu1__ = self;
+/* 000346 */ 						return __call__ (__accu1__.render_endnotes_category, __accu1__, encat);
+/* 000346 */ 					}) ());
+/* 000346 */ 				}) ();
+/* 000346 */ 			}
+/* 000349 */ 			if (__t__ (!__t__ ((has_endnotes)))) {
+/* 000350 */ 				return (function () {
+/* 000350 */ 					var __accu0__ = fragment_renderer;
+/* 000350 */ 					return __call__ (__accu0__.render_nothing, __accu0__, __kwargtrans__ ({annotations: ['no-endnotes']}));
+/* 000350 */ 				}) ();
+/* 000350 */ 			}
+/* 000354 */ 			if (__t__ (endnotes_heading_title !== null)) {
+/* 000356 */ 				var heading_title_nodelist = (function () {
+/* 000356 */ 					var __accu0__ = self.render_context.doc.environment;
+/* 000356 */ 					return __call__ (__accu0__.make_fragment, __accu0__, endnotes_heading_title, __kwargtrans__ ({is_block_level: false, what: 'endnotes heading title'.format ()}));
+/* 000356 */ 				}) ();
+/* 000361 */ 				(function () {
+/* 000361 */ 					var __accu0__ = blocks;
+/* 000363 */ 					return __call__ (__accu0__.insert, __accu0__, 0, (function () {
+/* 000363 */ 						var __accu1__ = fragment_renderer;
+/* 000363 */ 						return __call__ (__accu1__.render_heading, __accu1__, heading_title_nodelist.nodes, __kwargtrans__ ({render_context: self.render_context, heading_level: endnotes_heading_level}));
+/* 000363 */ 					}) ());
+/* 000363 */ 				}) ();
+/* 000363 */ 			}
+/* 000371 */ 			return (function () {
+/* 000371 */ 				var __accu0__ = fragment_renderer;
+/* 000372 */ 				return __call__ (__accu0__.render_semantic_block, __accu0__, (function () {
+/* 000372 */ 					var __accu1__ = fragment_renderer;
+/* 000372 */ 					return __call__ (__accu1__.render_join_blocks, __accu1__, blocks);
+/* 000372 */ 				}) (), __kwargtrans__ ({role: 'endnotes', annotations: annotations, target_id: target_id}));
+/* 000372 */ 			}) ();
+/* 000372 */ 		});}
+/* 000372 */ 	})
+/* 000372 */ });
 /* 000006 */ 
 //# sourceMappingURL=llm.feature.endnotes.map

@@ -57,6 +57,10 @@ function escape_html(x)
 
 export function install_csl_llm_output_format(zoollmenviron)
 {
+    if (CSL.Output.Formats.hasOwnProperty('llm')) {
+        // LLM format already exists, not re-installing it
+        return;
+    }
 
     //
     // Add support for generating citations in LLM format via citeproc-js -->

@@ -6,22 +6,21 @@ import _zoologger from '../src/_zoologger.js';
 const logger = _zoologger.child({module: 'play'});
 
 import * as zoodbrelations from '../src/dbprocessors/relations.js';
-import * as zoodbllmcontent from '../src/dbprocessors/llmcontent.js';
 
 import * as zoollm from '../src/zoollm/index.js';
 const {$$kw, repr} = zoollm;
 
-import * as zoollmscanner from '../src/zoollm/scanner.js';
-import { CitationCompiler, install_csl_llm_output_format }
-    from '../src/zoollm/citationcompiler.js';
-
+// import * as zoollmscanner from '../src/zoollm/scanner.js';
+// import { CitationCompiler, install_csl_llm_output_format }
+//     from '../src/zoollm/citationcompiler.js';
 
 import { CitationSourceArxiv } from '../src/citationmanager/sources/arxiv.js';
 import { CitationSourceDoi } from '../src/citationmanager/sources/doi.js';
 import { CitationSourceManual } from '../src/citationmanager/sources/manual.js';
 import { CitationSourceBibliographyFile } from '../src/citationmanager/sources/bibliographyfile.js';
-import { CitationDatabaseManager } from '../src/citationmanager/index.js';
+//import { CitationDatabaseManager } from '../src/citationmanager/index.js';
 
+import { ZooLLMZooProcessor } from '../src/zoollm/zooprocessor.js';
 
 import jsoncycle from 'cycle/cycle.js';
 
@@ -122,116 +121,115 @@ let zoollmenviron = zoollm.make_zoo_llm_environment();
 
 // -----------------------------------------------------------------------------
 
+// //
+// // Compile all LLM content!
+// //
+// {
+//     let zoo_relations_populator = new zoodbllmcontent.LLMContentCompiler(
+//         zoodb,
+//         {
+//             llm_environment: zoollmenviron
+//         }
+//     );
+//     logger.info("Populating zoo LLM content ...");
+//     await zoo_relations_populator.compile_all_zoo();
+//     logger.info("Zoo LLM content populated!");
+// }
+
+// // logger.debug("Now, for instance, we have steane.name = "
+// //              + repr(zoodb.objects.code.steane.name));
+
+// //
+// // Scan LLM content in the zoo
+// //
+// const scanner = new zoollmscanner.ZooLLMScanner();
+// scanner.scan_zoo(zoodb);
+
+// logger.info(`List of graphics paths used: ${JSON.stringify(scanner.get_encountered('graphics_paths'))}`);
+// logger.info(`Found ${scanner.get_encountered('citations').length} citation instances in total`);
+
+// logger.debug(`Found ${scanner.get_encountered('citations').filter((c)=>(c.cite_prefix=='arxiv')).length} ‘arxiv:’ citations, ${scanner.get_encountered('citations').filter((c)=>(c.cite_prefix=='doi')).length} ‘doi:’ citations, ${scanner.get_encountered('citations').filter((c)=>(c.cite_prefix=='preset')).length} ‘preset:’ citations, ${scanner.get_encountered('citations').filter((c)=>(c.cite_prefix=='manual')).length} ‘manual:’ citations.`);
+
+
+// //
+// // Add ref targets
+// //
+// for (const [codeid,codeobj] of Object.entries(zoodb.objects.code)) {
+//     logger.debug(`Adding ref for code ‘${codeid}’`);
+//     zoollmenviron.external_ref_resolver.add_ref(
+//         zoollm.RefInstance($$kw({
+//             ref_type: 'code',
+//             ref_label: codeid,
+//             formatted_ref_llm_text: codeobj.name.llm_text,
+//             target_href: `https://errorcorrectionzoo.org/c/${codeid}`,
+//         }))
+//     );
+// }
+// for (const encountered_referenceable of scanner.get_encountered('referenceables')) {
+//     const { referenceable_info, encountered_in } = encountered_referenceable;
+//     for (const lbl of referenceable_info.labels) {
+//         const [ref_type, ref_label] = lbl;
+//         zoollmenviron.external_ref_resolver.add_ref(
+//             zoollm.RefInstance($$kw({
+//                 ref_type: ref_type,
+//                 ref_label: ref_label,
+//                 formatted_ref_llm_text: referenceable_info.formatted_ref_llm_text,
+//                 // TODO, need to track on which page a referenceable is placed
+//                 // --- done via eleventy?
+//                 target_href: `#??????`,
+//             }))
+//         );
+//     }
+// }
+
+
+
 //
-// Compile all LLM content!
+// Process all Zoo LLM Content. Fetch citations, resolve some references, etc.
 //
-{
-    let zoo_relations_populator = new zoodbllmcontent.LLMContentCompiler(
-        zoodb,
-        {
-            llm_environment: zoollmenviron
-        }
-    );
-    logger.info("Populating zoo LLM content ...");
-    await zoo_relations_populator.compile_all_zoo();
-    logger.info("Zoo LLM content populated!");
-}
-
-// logger.debug("Now, for instance, we have steane.name = "
-//              + repr(zoodb.objects.code.steane.name));
-
-//
-// Scan LLM content in the zoo
-//
-const scanner = new zoollmscanner.ZooLLMScanner();
-scanner.scan_zoo(zoodb);
-
-logger.info(`List of graphics paths used: ${JSON.stringify(scanner.get_encountered('graphics_paths'))}`);
-logger.info(`Found ${scanner.get_encountered('citations').length} citation instances in total`);
-
-logger.debug(`Found ${scanner.get_encountered('citations').filter((c)=>(c.cite_prefix=='arxiv')).length} ‘arxiv:’ citations, ${scanner.get_encountered('citations').filter((c)=>(c.cite_prefix=='doi')).length} ‘doi:’ citations, ${scanner.get_encountered('citations').filter((c)=>(c.cite_prefix=='preset')).length} ‘preset:’ citations, ${scanner.get_encountered('citations').filter((c)=>(c.cite_prefix=='manual')).length} ‘manual:’ citations.`);
-
-
-//
-// Add ref targets
-//
-for (const [codeid,codeobj] of Object.entries(zoodb.objects.code)) {
-    logger.debug(`Adding ref for code ‘${codeid}’`);
-    zoollmenviron.external_ref_resolver.add_ref(
-        zoollm.RefInstance($$kw({
-            ref_type: 'code',
-            ref_label: codeid,
-            formatted_ref_llm_text: codeobj.name.llm_text,
-            target_href: `https://errorcorrectionzoo.org/c/${codeid}`,
-        }))
-    );
-}
-for (const encountered_referenceable of scanner.get_encountered('referenceables')) {
-    const { referenceable_info, encountered_in } = encountered_referenceable;
-    for (const lbl of referenceable_info.labels) {
-        const [ref_type, ref_label] = lbl;
-        zoollmenviron.external_ref_resolver.add_ref(
-            zoollm.RefInstance($$kw({
-                ref_type: ref_type,
-                ref_label: ref_label,
-                formatted_ref_llm_text: referenceable_info.formatted_ref_llm_text,
-                // TODO, need to track on which page a referenceable is placed
-                // --- done via eleventy?
-                target_href: `#??????`,
-            }))
-        );
-    }
-}
-
-
-//
-// Fetch citations!
-//
-let citation_sources = {
-    'arxiv': new CitationSourceArxiv({
-        override_arxiv_dois_file: 'playground/overridearxivdois.yaml',
-    }),
-    'doi': new CitationSourceDoi(),
-    'manual': new CitationSourceManual(),
-    'preset': new CitationSourceBibliographyFile({
-        bibliography_file: 'playground/bibpreset.yaml'
-    }),
-};
-const uagent = `ecczoogen-bibliography-build-script/0.1 `
-      + `(https://github.com/errorcorrectionzoo)`;
-
-let citation_manager = new CitationDatabaseManager(
-    citation_sources,
-    {
-        default_user_agent: uagent
-    },
-);
-
-logger.debug("Fetching citations ...");
-await citation_manager.query_citations(
-    scanner.get_encountered('citations')
-);
-// citations database ready
-logger.info("Citation database ready!")
-
-
-
 
 const cslfn = 'eczoo-bib-style.csl';
-
 let csl_style = fs.readFileSync(`playground/${cslfn}`).toString();
 
 
-install_csl_llm_output_format(zoollmenviron)
-
-let citecompiler = new CitationCompiler({
-    citation_manager: citation_manager,
-    compile_citations: scanner.get_encountered('citations'),
-    csl_style: csl_style,
+let zoo_llm_processor = new ZooLLMZooProcessor({
+    zoodb: zoodb,
+    zoo_llm_environment: zoollmenviron,
+    refs: {
+        code: {
+            formatted_ref_llm_text_fn: (codeid, code) => code.name.llm_text,
+        },
+    },
+    citations: {
+        sources: {
+            arxiv: new CitationSourceArxiv({
+                override_arxiv_dois_file: 'playground/overridearxivdois.yaml',
+            }),
+            doi: new CitationSourceDoi(),
+            manual: new CitationSourceManual(),
+            preset: new CitationSourceBibliographyFile({
+                bibliography_file: 'playground/bibpreset.yaml'
+            }),
+        },
+        default_user_agent: `ecczoogen-bibliography-build-script/0.1 `
+            + `(https://github.com/errorcorrectionzoo)`,
+        csl_style: csl_style,
+    },
 });
 
-citecompiler.compile_citations_to_provider( zoollmenviron.external_citations_provider );
+await zoo_llm_processor.process_zoo();
 
+
+// target_href resolver
+zoollmenviron.external_ref_resolver.target_href_resolver = (ref_instance) => {
+    if (ref_instance.target_href) {
+        return ref_instance.target_href;
+    }
+    if (ref_instance.ref_type == 'code') {
+        return `https://errorcorrectionzoo.org/c/${ref_instance.ref_label}`;
+    }
+    return `javascript:alert("link not available");`;
+};
 
 
 //
