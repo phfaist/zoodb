@@ -10,6 +10,7 @@
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
     "citeproc": "^2.4.62",
     "cycle": "^1.0.3",
+    "exif-parser": "^0.1.12",
     "feedparser": "^2.2.10",
     "glob": "^8.0.3",
     "hash.js": "^1.1.7",

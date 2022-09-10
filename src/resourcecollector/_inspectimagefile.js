@@ -1,7 +1,12 @@
+import fs from 'fs';
+import path from 'path';
 import stream from 'stream';
+
 import stream_parser from 'stream-parser';
 
 import sax from 'sax';
+
+import exif_parser from 'exif-parser';
 
 import _zoologger from '../_zoologger.js';
 const logger = _zoologger.child({module: 'zoodb.resourcecollector._inspectimagefile'});
@@ -15,7 +20,11 @@ function dpiround(dpi) {
 }
 
 
-// -----------------------------------------------------------------------------
+
+// =============================================================================
+// PNG
+// =============================================================================
+
 //
 // adapted some bits from
 // https://github.com/nodeca/probe-image-size/blob/master/lib/parse_stream/png.js
@@ -148,7 +157,7 @@ export async function parse_png_metadata(stream, options={})
     if (mp.unit_is_meters) {
         if (mp.x_ppu != mp.y_ppu) {
             logger.warning(`horizontal and vertical resolutions differ in ‘${options.what}’ `
-                           `— image is likely to appear distorted`);
+                           `— image might appear distorted`);
         }
         //we want dpi = dots_per_meter * (meter / inch), with (meter/inch)=0.0254
         x_dpi = dpiround(mp.x_ppu * 0.0254);
@@ -172,8 +181,91 @@ export async function parse_png_metadata(stream, options={})
 }
 
 
+// =============================================================================
+// EXIF: JPEG/TIFF
+// =============================================================================
 
-// -----------------------------------------------------------------------------
+
+
+class ReadBytesStream extends stream.Writable
+{
+    constructor()
+    {
+        super();
+        // install the stream-parser methods here
+        stream_parser(this);
+    }
+
+    read(num_bytes) {
+        return new Promise( (resolve, reject) => {
+            this.on('error', (err) => reject(err));
+            this._bytes(num_bytes, (data) => {
+                resolve(data);
+            });
+        });
+    }
+}
+
+async function get_stream_head(stream, num_bytes)
+{
+    const head_streamer = new ReadBytesStream();
+    const promise = head_streamer.read(num_bytes);
+    stream.pipe(head_streamer);
+    return await promise;
+}
+
+export async function parse_exif_metadata(stream, options={})
+{
+    // cf. https://github.com/bwindels/exif-parser#creating-a-parser, looks like
+    // fetching 65635 bytes of data is sufficient to get the exif header
+    const head_data = await get_stream_head(stream, 65635);
+    let parser = exif_parser.create(head_data);
+    let result = null;
+    try {
+        result = parser.parse();
+    } catch (err) {
+        logger.error(`Error parsing EXIF data in ‘${options.what}’: ${err}`);
+        throw err;
+    }
+    const tags = result.tags;
+    // console.log('tags = ', tags);
+
+    const {width, height} = result.getImageSize();
+    const pixel_dimensions = [ width, height ];
+
+    const x_dpi = tags.XResolution,
+          y_dpi = tags.YResolution;
+
+    if (x_dpi != y_dpi) {
+        logger.warning(`horizontal and vertical resolutions differ in ‘${options.what}’ `
+                       `— image might appear distorted`);
+    }
+
+    const dpi = x_dpi;
+
+    return {
+        graphics_type: 'raster',
+        pixel_dimensions,
+        dpi,
+        physical_dimensions: [
+            pixel_dimensions[0]*72/x_dpi,
+            pixel_dimensions[1]*72/y_dpi,
+        ]
+    };
+
+    throw new Error(`Finish writing me!`);
+}
+
+
+
+
+
+
+
+// =============================================================================
+// SVG
+// =============================================================================
+
 
 
 const _pt_per_u = {
@@ -272,3 +364,50 @@ export async function parse_svg_metadata(stream, options)
         'physical_dimensions': [ width_pt, height_pt ]
     };
 }
+
+
+
+
+// =============================================================================
+// Dispatchers
+// =============================================================================
+
+const parser_ext_dispatchers = {
+    // png
+    '.png': parse_png_metadata,
+
+    // svg
+    '.svg': parse_svg_metadata,
+
+    // exif
+    '.jpg': parse_exif_metadata,
+    '.jpeg': parse_exif_metadata,
+    '.tiff': parse_exif_metadata,
+};
+
+
+export async function parse_image_metadata(filename)
+{
+    const ext = path.extname(filename);
+
+    const parser_fn = parser_ext_dispatchers[ext];
+
+    if ( parser_fn == null ) { // null or undefined
+        const allowed_exts =
+              Object.keys(parser_ext_dispatchers).map( (e) => `“${e}”` ).join(', ');
+        throw new Error(
+            `File type ‘${filename}’'s extension ‘${ext}’ is not recognized, `
+            + `expected one of ${allowed_exts}`
+        );
+    }
+
+    let stream = fs.createReadStream(filename);
+    stream.on('error', (err) => { console.error(`Error (${filename}) -- `, err); });
+    try {
+        return await parser_fn(stream, { what: filename });
+    } finally {
+        stream.close();
+    }
+}
+
+        

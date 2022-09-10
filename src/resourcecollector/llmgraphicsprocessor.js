@@ -1,11 +1,10 @@
-import fs from 'fs';
 
 import _zoologger from '../_zoologger.js';
 const logger = _zoologger.child({module: 'zoodb.resourcecollector.llmgraphicsprocessor'});
 
 import { GraphicsResource, $$kw } from '../zoollm/index.js';
 
-import { parse_png_metadata, parse_svg_metadata } from './_inspectimagefile.js';
+import { parse_image_metadata } from './_inspectimagefile.js';
 
 
 const graphics_type_by_format = {
@@ -24,16 +23,32 @@ export class LLMGraphicsResourceProcessor
 
         // Global scaling factor to set on all vector formats.  This number is
         // what you need such that 10pt Source Sans Pro in SVG (at 96dpi per
-        // spec) appears the same size as on a webpage with 16px-sized text
+        // spec) appears the same size as on a webpage with 16px-sized text.
+        // Adjust in options to your liking.
         this.global_vector_scale = options.global_vector_scale ?? 1.28;
+
+        // similar option for raster graphics.  We probably won't have to scale these.
+        this.global_raster_scale = options.global_raster_scale ?? null;
 
         this.zoo_llm_environment = options.zoo_llm_environment;
     }
 
     async process(target_info, source)
     {
-        const grdata = await get_graphics_resource_data(target_info.full_source_path);
+        let grdata = await parse_image_metadata(target_info.full_source_path);
         //logger.debug(`DEBUG - got grdata = ${JSON.stringify(grdata)}`);
+
+        if (grdata.graphics_type == 'vector' && this.global_vector_scale) {
+            Object.assign(grdata, {
+                physical_dimensions:
+                    grdata.physical_dimensions.map( (dim) => dim * this.global_vector_scale )
+            });
+        } else if (grdata.graphics_type == 'raster' && this.global_raster_scale) {
+            Object.assign(grdata, {
+                physical_dimensions:
+                    grdata.physical_dimensions.map( (dim) => dim * this.global_raster_scale )
+            });
+        }
 
         const graphics_resource =
               GraphicsResource(target_info.target_name ?? null, $$kw( grdata ));
@@ -49,21 +64,4 @@ export class LLMGraphicsResourceProcessor
 
 
 
-async function get_graphics_resource_data(fname)
-{
-    let stream = fs.createReadStream(fname);
-    stream.on('error', (err)=>{ console.error(`Error (${fname}) -- `, err); });
-    try {
-        if (fname.endsWith('.png')) {
-            return await parse_png_metadata(stream, { what: fname });
-        }
-        if (fname.endsWith('.svg')) {
-            return await parse_svg_metadata(stream, { what: fname });
-        }
-        throw new Error(
-            `File type ‘${fname}’ is not yet supported, currently only PNG and SVG`
-        );
-    } finally {
-        stream.close();
-    }
-}
+
