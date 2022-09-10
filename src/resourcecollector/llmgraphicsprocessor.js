@@ -27,13 +27,23 @@ export class LLMGraphicsResourceProcessor
         // spec) appears the same size as on a webpage with 16px-sized text
         this.global_vector_scale = options.global_vector_scale ?? 1.28;
 
+        this.zoo_llm_environment = options.zoo_llm_environment;
     }
 
     async process(target_info, source)
     {
         const grdata = await get_graphics_resource_data(target_info.full_source_path);
         //logger.debug(`DEBUG - got grdata = ${JSON.stringify(grdata)}`);
-        return GraphicsResource(target_info.target_name ?? null, $$kw( grdata ));
+
+        const graphics_resource =
+              GraphicsResource(target_info.target_name ?? null, $$kw( grdata ));
+
+        this.zoo_llm_environment.graphics_collection.add_graphics(
+            source,
+            graphics_resource
+        );
+
+        return { graphics_resource };
     }
 };
 

@@ -161,6 +161,7 @@ export async function parse_png_metadata(stream, options={})
     }
     const dpi = x_dpi; // need to pick one :/
     return {
+        graphics_type: 'raster',
         pixel_dimensions,
         dpi,
         physical_dimensions: [
@@ -267,7 +268,7 @@ export async function parse_svg_metadata(stream, options)
     const height_pt = height_dimension_u * _pt_per_u[height_unit];
 
     return {
-        'type': 'vector',
+        'graphics_type': 'vector',
         'physical_dimensions': [ width_pt, height_pt ]
     };
 }

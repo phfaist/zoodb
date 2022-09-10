@@ -1,5 +1,7 @@
+import path from 'path';
 
 import {$$kw, repr} from 'llm-js/py.js';
+import {__class__, __super__, __get__} from 'llm-js/org.transcrypt.__runtime__.js';
 
 import { ParsingStateDelta } from 'llm-js/pylatexenc.latexnodes.js';
 
@@ -149,69 +151,105 @@ export class CitationsProvider
 };
 
 
-export class FeatureZooGraphicsCollection extends llm_feature.Feature
-{
-    static feature_name = 'graphics_resource_provider';
-
-    constructor()
+// we need to define this class the Transcrypt way because we want to inherit a
+// Python-transcrypted class
+export const FeatureZooGraphicsCollection = __class__(
+    'FeatureZooGraphicsCollection', // class name
+    [ llm_feature.Feature ], // base classes
     {
-        super();
+        // static members
 
-        // mapping of source paths (w.r.t. user-defined fixed reference dir) to
-        // final (relative or absolute) URLs to use
-        this.graphics_collection = {};
+ 	__module__: 'zoodb.zoollm.environment',
 
-        // expose static property as instance properties, too
-        this.feature_name = this.constructor.feature_name;
+        // static member - nested class definition
+        RenderManager:  __class__(
+            'RenderManager', // class name
+            [ llm_feature.Feature.RenderManager ], // base classes
+            {
+                // static members
+                get get_graphics_resource () {return __get__(this, function
+                (self, graphics_path, resource_info) {
+                    
+                    const feature = self.feature;
 
-        // can set a src_url resolver for generation-time url resolution
-        this.src_url_resolver = null;
+                    //
+                    // compose full source path using the resource_info
+                    //
+                    const source_path = path.join(resource_info.get_source_directory(),
+                                                  graphics_path);
+                    if (!feature.graphics_collection.hasOwnProperty(source_path)) {
+                        throw new Error(
+                            `No such graphics ‘${source_path}’ (‘${graphics_path}’ `
+                            + `relative to ${resource_info})`
+                        );
+                    }
+
+                    const graphics_resource = feature.graphics_collection[source_path];
+
+                    console.log(`Got graphics_resource = `, graphics_resource);
+
+                    if (!feature.src_url_resolver != null) {
+                        return GraphicsResource($$kw(
+                            Object.assign({}, graphics_resource.asdict(), {
+                                src_url: feature.src_url_resolver(graphics_resource),
+                            })
+                        ));
+                    }
+
+                    return graphics_resource;
+                });},
+
+            }
+        ), // RenderManager
+
+
+        // constructor.  I'm not sure why we need the getters etc.
+ 	get __init__ () {return __get__ (this, function
+        (self) {
+
+            // call superclass constructor
+            __super__(FeatureZooGraphicsCollection, '__init__')(self);
+
+            // mapping of source paths (w.r.t. user-defined fixed reference dir) to
+            // final (relative or absolute) URLs to use
+            self.graphics_collection = {};
+
+            // set the feature name
+            self.feature_name = 'graphics_resource_provider';
+
+            // can set a src_url resolver for generation-time url resolution
+            self.src_url_resolver = null;
+
+              //console.log("FeatureZooGraphicsCollection constructor.  self = ", self);
+        });},
+
+        // methods
+
+        get add_graphics () {return __get__(this, function
+        (self, source_path, graphics_resource) {
+            if (self.graphics_collection.hasOwnProperty(source_path)) {
+                throw new Error(
+                    `Graphics collection already has a graphics resource registered `
+                    + ` for path ‘${source_path}’ (registered target `
+                    + `‘${self.graphics_collection[source_path].src_url}’, new target `
+                    + `‘${graphics_resource.src_url}’)`
+                );
+            }
+
+            self.graphics_collection[source_path] = graphics_resource;
+        });},
+
+        get set_collection () {return __get__(this, function
+        (self, collection) {
+
+            Object.entries(collection).forEach( (grobjpair) => {
+                const [source_path, graphics_resource] = grobjpair;
+                self.add_graphics(source_path, graphics_resource);
+            } );
+        }); },
+
     }
-
-    add_graphics(source_path, graphics_resource)
-    {
-        if (this.graphics_collection.hasOwnProperty(source_path)) {
-            throw new Error(`Graphics collection already has a graphics registered for path `
-                            + `‘${source_path}’ (registered target `
-                            + `‘${this.graphics_collection[source_path].url}’, new target `
-                            + `‘${graphics_resource.url}’)`);
-        }
-
-        this.graphics_collection[source_path] = graphics_resource;
-    }
-
-    set_collection(collection)
-    {
-        Object.entries(collection).forEach( (grobjpair) => {
-            const [source_path, graphics_resource] = grobjpair;
-            this.add_graphics(source_path, graphics_resource);
-        } );
-    }
-
-
-    get_graphics_resource(graphics_path, resource_info)
-    {
-        // compose full source path using the resource_info
-        const source_path = path.join(resource_info.source_path, graphics_path);
-        if (!this.graphics_collection.hasOwnProperty(source_path)) {
-            throw new Error(
-                `No such graphics ‘${graphics_path}’ relative to ${resource_info}`
-            );
-        }
-
-        const graphics_resource = this.graphics_collection[source_path];
-
-        if (!graphics_resource.src_url && this.src_url_resolver) {
-            return GraphicsResource($$kw(
-                Object.assign({}, graphics_resource.asdict(), {
-                    src_url: this.src_url_resolver(graphics_resource),
-                })
-            ));
-        }
-
-        return graphics_resource;
-    }
-};
+);
 
 
 

@@ -189,8 +189,6 @@ export class ZooLLMZooProcessor
     {
         const encountered_resources = this.scanner.get_encountered('resources');
 
-        let collect_promises = [];
-
         for (const resource of encountered_resources) {
 
             // console.log('resource = ', resource);
@@ -215,15 +213,11 @@ export class ZooLLMZooProcessor
                 source = resource.resource_source;
             }
 
-            collect_promises.push(
-                this.resource_collector.collect(
-                    resource.resource_type,
-                    source
-                )
+            await this.resource_collector.collect(
+                resource.resource_type,
+                source
             );
         }
-
-        await Promise.all(collect_promises);
 
         await this.resource_collector.finish();
     }

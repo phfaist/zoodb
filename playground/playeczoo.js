@@ -223,18 +223,24 @@ let zoo_llm_processor = new ZooLLMZooProcessor({
         resource_retrievers: {
             'graphics_path': new FileResourceRetriever({
                 source_directory: eczoo_data_dir,
+                copy_to_target_directory: true,
                 target_directory: './_output_resource_graphics_files/',
                 extensions: [ '', '.svg', '.png', '.jpeg', '.jpg' ],
             }),
         },
         resource_processors: {
-            'graphics_path': new LLMGraphicsResourceProcessor(),
+            'graphics_path': new LLMGraphicsResourceProcessor({
+                zoo_llm_environment: zoollmenviron
+            }),
         },
     }
 });
 
 await zoo_llm_processor.process_zoo();
 
+zoollmenviron.graphics_collection.src_url_resolver = (graphics_resource) => {
+    return path.join('./_output_resource_graphics_files/', graphics_resource.src_url);
+};
 
 // target_href resolver
 zoollmenviron.external_ref_resolver.target_href_resolver = (ref_instance) => {
@@ -254,13 +260,13 @@ zoollmenviron.external_ref_resolver.target_href_resolver = (ref_instance) => {
 
 let doc = zoollmenviron.make_document(
     (render_context) => {
-        const css = zoodb.objects.code.css;
+        const thecode = zoodb.objects.code.testcode;//zoodb.objects.code.css;
         return `
-<h1>${css.name.render(render_context)} ${css.introduced.render(render_context)}</h1>
+<h1>${thecode.name.render(render_context)} ${thecode.introduced.render(render_context)}</h1>
 <h2>Description</h2>
-${css.description.render(render_context)}
+${thecode.description.render(render_context)}
 <h2>Protection</h2>
-${css.protection.render(render_context)}
+${thecode.protection.render(render_context)}
 `;
     } );
 let [rendered_html, render_context] = doc.render( new zoollm.ZooHtmlFragmentRenderer() );

@@ -39,13 +39,13 @@ export class FileResourceRetriever
     async resolve(source)
     {
         for (const extension of this.extensions) {
-            const full_source_name = source + extension;
-            const full_source_path = path.resolve(this.source_directory, full_source_name);
+            const resolved_source = source + extension;
+            const full_source_path = path.resolve(this.source_directory, resolved_source);
             try {
                 await fsPromises.access( full_source_path );
                 // file exists!
                 logger.debug(`located ‘${source}’ at ‘${full_source_path}’`);
-                return { full_source_name: full_source_name,
+                return { resolved_source: resolved_source,
                          full_source_path: full_source_path };
             } catch (err) {
                 // file does not exist, try next extension
@@ -56,7 +56,7 @@ export class FileResourceRetriever
         throw new Error(`Failed to resolve source path ‘${source}’`);
     }
 
-    async retrieve(source)
+    async retrieve(resolved_info, source)
     {
         if (this.mkdir_promise) {
             await this.mkdir_promise;
@@ -64,10 +64,10 @@ export class FileResourceRetriever
         }
 
         // Find the file. We might have to try different extensions, for instance.
-        const {full_source_name, full_source_path} = await this.resolve(source);
+        const {resolved_source, full_source_path} = resolved_info;
         
         const target_name = this.rename_file_template(
-            new FilePropertiesAccessor(full_source_name, full_source_path)
+            new FilePropertiesAccessor(resolved_source, full_source_path)
         );
 
         const target_full_path = path.resolve(this.target_directory, target_name);
@@ -79,7 +79,7 @@ export class FileResourceRetriever
         }
 
         return {
-            full_source_name: full_source_name,
+            resolved_source: resolved_source,
             full_source_path: full_source_path,
             target_name: target_name,
             target_full_path: target_full_path,
@@ -94,20 +94,20 @@ export class FileResourceRetriever
 
 class FilePropertiesAccessor
 {
-    constructor(full_source_name, full_source_path)
+    constructor(resolved_source, full_source_path)
     {
-        this.full_source_name = full_source_name;
+        this.resolved_source = resolved_source;
         this.full_source_path = full_source_path;
     }
 
     basename()
     {
-        return path.basename(this.full_source_name);
+        return path.basename(this.resolved_source);
     }
 
     extname()
     {
-        return path.extname(this.full_source_name);
+        return path.extname(this.resolved_source);
     }
 
     lowerext()
@@ -117,7 +117,7 @@ class FilePropertiesAccessor
 
     dirname()
     {
-        return path.dirname(this.full_source_name);
+        return path.dirname(this.resolved_source);
     }
 
     // hash the actual file contents
