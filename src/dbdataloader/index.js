@@ -76,7 +76,7 @@ export class ZooDbDataLoader
         // set defaults in config
         this.config.object_defaults.file_name_match ||= /\.(ya?ml|json)$/i;
         this.config.object_defaults.ignore_file_name_match
-            ||= /^(.*\~|.*\.bak|\.DS_Store|\.gitignore)$/i;
+            ||= /^(.*\~|.*\.bak|\.DS_Store|\.git.*)$/i;
         this.config.object_defaults.load_objects ||=  (d) => [ d ] ;
         this.config.object_defaults.expected_msg ||=
             `File name matching ‘/${this.config.object_defaults.file_name_match.source}/`
@@ -98,6 +98,9 @@ export class ZooDbDataLoader
         // simplify schema_root URL (e.g., remove x/y/../z -> x/z, will be
         // needed to compare when to add our custom extension)
         this.config.schemas.schema_root = new URL(this.config.schemas.schema_root).href;
+        if (!this.config.schemas.schema_root.endsWith('/')) {
+            throw new Error("Please include trailing slash in schemas.schema_root")
+        }
 
         this.schema_validator = new jsonschema.Validator();
         this.schema_ref_parser = new $RefParser();
@@ -113,8 +116,8 @@ export class ZooDbDataLoader
             canRead(file) { return true; },
             read(file) {
                 try {
-                    // debug(`file.url = ${file.url}, `
-                    //              +`schema_root = ${_config.schemas.schema_root}`);
+                    debug(`file.url = ${file.url}, `
+                          +`schema_root = ${_config.schemas.schema_root}`);
 
                     let url = file.url;
                     if (url.startsWith('file://') &&
@@ -128,7 +131,7 @@ export class ZooDbDataLoader
                     let full_url =
                         new URL(url, _config.schemas.schema_root).href;
 
-                    // debug(`full_url = ${full_url} (from url=${url})`);
+                    debug(`full_url = ${full_url} (from url=${url})`);
 
                     if (full_url.startsWith(_config.schemas.schema_root) &&
                         ! full_url.endsWith(_config.schemas.schema_add_extension) ) {
@@ -142,7 +145,7 @@ export class ZooDbDataLoader
                     const protocol = (new URL(newfile.url)).protocol;
 
                     debug(`Resolved schema URL ${file.url} → ${newfile.url} `
-                                 + `extension=${newfile.extension} protocol=${protocol}`);
+                          + `extension=${newfile.extension} protocol=${protocol}`);
                     
                     if ( protocol == 'file:' ) { 
                         return json_refparser_resolver_file.read(newfile);
@@ -207,6 +210,9 @@ export class ZooDbDataLoader
 
         let schema_path = path.posix.join(this.config.schemas.schema_rel_path, schema_name);
         schema_path = new URL(schema_path, this.config.schemas.schema_root).href;
+
+        debug(`Requesting schema for ‘${schema_name}’ → path=‘${schema_path}’`);
+
         const schema = await this.schema_ref_parser.dereference(
             schema_path,
             {

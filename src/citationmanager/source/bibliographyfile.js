@@ -28,35 +28,40 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
             default_options,
         );
 
-        this.bibliography_file = this.options.bibliography_file;
-        if (!this.bibliography_file) {
-            throw new Error(`You need to specify option {bibliography_file: ...}`);
+        this.bibliography_files = this.options.bibliography_files;
+        if (this.bibliography_files == null) { // undefined or null
+            throw new Error(`You need to specify option {bibliography_files: ...}`);
         }
-        if (this.bibliography_file.startsWith('http://')
-            || this.bibliography_file.startsWith('https://')
-            || this.bibliography_file.startsWith('file://'))
-        {
-            this.bibliography_file_url = this.bibliography_file;
-        } else {
-            this.bibliography_file_url = `file://${path.resolve(this.bibliography_file)}`;
-        }
+        this.bibliography_files_url = this.bibliography_files.map( (bibfile) => {
+            if (bibfile.startsWith('http://')
+                || bibfile.startsWith('https://')
+                || bibfile.startsWith('file://')) {
+                return bibfile;
+            } else {
+                return `file://${path.resolve(bibfile)}`;
+            }
+        } );
         this.bibdata = {};
     }
 
     source_initialize_run()
     {
-        // load bibliography file to memory
-        const bib_data_contents = this.fetch_url( this.bibliography_file_url );
-        if ( /\.ya?ml$/i.test(this.bibliography_file) ) {
-            this.bibdata = jsyaml.load( bib_data_contents );
-        } else {
-            this.bibdata = JSON.parse( bib_data_contents );
+        this.bibdata = {};
+        
+        for (const bib_file_url of this.bibliography_files_url) {
+
+            let newbibdata = {};
+
+            // load bibliography file to memory
+            const bib_data_contents = this.fetch_url( bib_file_url );
+            if ( /\.ya?ml$/i.test( bib_file_url ) ) {
+                newbibdata = jsyaml.load( bib_data_contents );
+            } else {
+                newbibdata = JSON.parse( bib_data_contents );
+            }
+
+            Object.assign(this.bibdata, newbibdata);
         }
-        // if ( /\.json$/i.test(this.bibliography_file) ) {
-        // try to parse as JSON by default
-        // this.bibdata = JSON.parse( bib_data_contents );
-        // } else {
-        //     throw new Error(`Unknown file type for path ‘${path}’`);
     }
 
     async run_query_chunk(id_list)
@@ -65,7 +70,8 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
             const d = this.bibdata[key];
             if (typeof d == 'undefined' || d === null || !d) {
                 throw new Error(
-                    `No such citation key ‘${key}’ in ‘${this.bibliography_file}’ `
+                    `No such citation key ‘${key}’ in `
+                    + `‘${this.bibliography_files.join('’,‘')}’ `
                     + `(for prefix ‘{this.cite_prefix}’)`
                 );
             }

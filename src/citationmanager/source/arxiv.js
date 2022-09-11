@@ -59,6 +59,7 @@ export class CitationSourceArxiv extends CitationSourceBase
         if (this.override_arxiv_dois_file) {
             Object.assign(
                 this.override_arxiv_dois,
+                // should work with both YAML & JSON given that JSON is a YAML subset
                 jsyaml.load(fs.readFileSync(this.override_arxiv_dois_file))
             );
         }

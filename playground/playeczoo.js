@@ -214,7 +214,7 @@ let zoo_llm_processor = new ZooLLMZooProcessor({
             doi: new CitationSourceDoi(),
             manual: new CitationSourceManual(),
             preset: new CitationSourceBibliographyFile({
-                bibliography_file: 'playground/bibpreset.yaml'
+                bibliography_files: ['playground/bibpreset.yaml',],
             }),
         },
         default_user_agent: `ecczoogen-bibliography-build-script/0.1 `
