@@ -114,11 +114,13 @@ export class ZooLLMZooProcessor
             for (const [objid,obj] of Object.entries(objectsdb)) {
                 debug(`Adding ref for ${object_type} ‘${objid}’`);
 
+                const formatted_ref_llm_text = formatted_ref_llm_text_fn(objid, obj);
+
                 this.zoo_llm_environment.external_ref_resolver.add_ref(
                     zoollm.RefInstance($$kw({
                         ref_type: object_type,
                         ref_label: objid,
-                        formatted_ref_llm_text: formatted_ref_llm_text_fn,
+                        formatted_ref_llm_text: formatted_ref_llm_text,
                         // target_href needs to be set later on.
                         target_href: null,
                     }))
