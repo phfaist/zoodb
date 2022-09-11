@@ -1,4 +1,7 @@
 
+import {$$kw, repr} from '#llm-js/py.js';
+import {__class__, __super__, __get__} from '#llm-js/org.transcrypt.__runtime__.js';
+
 
 import * as llm_fragmentrenderer_html from '#llm-js/llm.fragmentrenderer.html.js'; 
 import * as llm_fragmentrenderer_text from '#llm-js/llm.fragmentrenderer.text.js';
@@ -12,21 +15,41 @@ function _is_local_url(urlstring)
 }
 
 
-export class ZooHtmlFragmentRenderer extends llm_fragmentrenderer_html.HtmlFragmentRenderer
-{
 
-    static use_link_target_blank(urlstring)
+
+// we need to define these classes the Transcrypt way because we want to inherit
+// a Python-transcrypted class
+
+export const ZooHtmlFragmentRenderer = __class__(
+    'ZooHtmlFragmentRenderer', // class name
+    [ llm_fragmentrenderer_html.HtmlFragmentRenderer ], // base classes
     {
-        return ! _is_local_url(urlstring);
+        // static members
+
+        inline_heading_add_space: false,
+
+        html_blocks_joiner: "",
+
+        // methods
+
+        get use_link_target_blank () {return __get__(this, function
+        (self, urlstring)
+        {
+            return ! _is_local_url(urlstring);
+        });},
+
     }
+);
 
-    static inline_heading_add_space = false;
+export const ZooTextFragmentRenderer = __class__(
+    'ZooTextFragmentRenderer', // class name
+    [ llm_fragmentrenderer_text.TextFragmentRenderer ], // base classes
+    {
+        // static members
 
-    static html_blocks_joiner = "::BLOCKJOINER::";
-}
+        display_href_urls: false,
 
-
-
-// llm_fragmentrenderer_text.TextFragmentRenderer
+    }
+);
 
 
