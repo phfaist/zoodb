@@ -9,17 +9,20 @@ export class ResourceCollector
     {
         options ||= {};
 
+        this.resource_types = options.resource_types;
         this.resource_retrievers = options.resource_retrievers || {};
         this.resource_processors = options.resource_processors || {};
 
-        this.resource_types = Object.keys(this.resource_retrievers);
-
         this.collected_resources = Object.fromEntries(
+            this.resource_types.map( (resource_type) => [ resource_type, {} ] )
+        );
+        this.collected_resources_aliases = Object.fromEntries(
             this.resource_types.map( (resource_type) => [ resource_type, {} ] )
         );
 
         this.collect_working = false;
     }
+
 
     //
     // NOTE: collect() calls need to be awaited and shouldn't run
@@ -31,14 +34,19 @@ export class ResourceCollector
         if (this.collect_working) {
             throw new Error(`Please chain collect() calls and don't call them simultanously!`);
         }
-
         this.collect_working = true;
         try {
-
             debug(`Resource collector — collecting ${resource_type} : ‘${source}’`);
 
-            if (this.collected_resources[resource_type] &&
-                this.collected_resources[resource_type].hasOwnProperty(source)) {
+            if (!this.resource_types.includes(resource_type)) {
+                throw new Error(
+                    `Invalid resource type ‘${resource_type}’, not included `
+                    + `in options.resource_types`
+                );
+            }
+
+            if (this.collected_resources[resource_type].hasOwnProperty(source)
+               || this.collected_resources_aliases[resource_type].hasOwnProperty(source)) {
                 // already collected
                 debug(`... already collected.`);
                 return;
@@ -50,35 +58,40 @@ export class ResourceCollector
 
             const { resolved_source } = resolved_info;
 
+            const do_register_the_alias = () => {
+                this.collected_resources_aliases[resource_type][source] = {
+                    source,
+                    resolved_source,
+                    resolved_info,
+                };
+            };
+
             if (this.collected_resources[resource_type] &&
                 this.collected_resources[resource_type].hasOwnProperty(resolved_source)) {
-                // already collected, only need to register second source
-                this.collected_resources[resource_type][source] = Object.assign(
-                    {},
-                    this.collected_resources[resource_type][resolved_source],
-                    {
-                        source,
-                        resolved_source,
-                        resolved_info,
-                    }
-                );
+                // already collected, only need to register the alias source
+                do_register_the_alias();
+                debug(`... registered ‘${source}’ as alias to already `
+                      + `collected ‘${resolved_source}’.`);
                 return;
             }
 
             const target_info = await resource_retriever.retrieve(resolved_info, source);
 
-            const resource_processor = this.resource_processors[resource_type];
-            const processed_info =
-                  resource_processor
-                  ? await resource_processor.process(target_info, source)
-                  : {};
+            let processed_info = {};
+            const resource_processors = this.resource_processors[resource_type] ?? [];
+            for (const resource_processor of resource_processors) {
+                // run this processor
+                const new_processed_info =
+                      await resource_processor.process(target_info, source);
+                // merge any processed_info properties
+                Object.assign(processed_info, new_processed_info);
+            }
 
             const resource_data = {
                 target_info,
                 processed_info,
                 resolved_info,
                 source: resolved_source,
-                resolved_source: null, // null = not an alias
             };
 
             this.collected_resources[resource_type][resolved_source] = resource_data;
@@ -87,16 +100,7 @@ export class ResourceCollector
 
             if (resolved_source != source) {
                 // register resource for original source name, too
-                this.collected_resources[resource_type][source] = Object.assign(
-                    {},
-                    resource_data,
-                    {
-                        source,
-                        resolved_source,
-                        resolved_info,
-                    }
-                );
-
+                do_register_the_alias();
                 debug(`... also stored info as ${source}.`);
             }
 
@@ -106,8 +110,12 @@ export class ResourceCollector
 
     }
 
-    get_target_info(resource_type, source)
+    get_resource_data(resource_type, source)
     {
+        const alias_info = this.colected_resources_aliases[resource_type][source];
+        if (alias_info != null) { // not undefined or null
+            source = alias_info.resolved_source;
+        }
         return this.collected_resources[resource_type][source];
     }
 

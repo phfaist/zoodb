@@ -222,6 +222,7 @@ let zoo_llm_processor = new ZooLLMZooProcessor({
         csl_style: csl_style,
     },
     resource_collector_options: {
+        resource_types: [ 'graphics_path' ],
         resource_retrievers: {
             'graphics_path': new FileResourceRetriever({
                 source_directory: eczoo_data_dir,
@@ -231,9 +232,11 @@ let zoo_llm_processor = new ZooLLMZooProcessor({
             }),
         },
         resource_processors: {
-            'graphics_path': new LLMGraphicsResourceProcessor({
-                zoo_llm_environment: zoollmenviron
-            }),
+            'graphics_path': [
+                new LLMGraphicsResourceProcessor({
+                    zoo_llm_environment: zoollmenviron
+                }),
+            ],
         },
     }
 });
