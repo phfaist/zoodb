@@ -122,7 +122,7 @@ export class ZooDbDataLoader
         this.config.object_defaults.file_name_match ||= /\.(ya?ml|json)$/i;
         this.config.object_defaults.ignore_file_name_match
             ||= get_default_ignore_file_name_match(
-                options.resource_file_extensions ?? default_resource_file_extensions
+                this.config.resource_file_extensions ?? default_resource_file_extensions
             );
         this.config.object_defaults.load_objects ||=  (d) => [ d ] ;
         this.config.object_defaults.expected_msg ||=
