@@ -76,8 +76,8 @@ export class ResourceCollector
             const resource_data = {
                 target_info,
                 processed_info,
-                source,
                 resolved_info,
+                source: resolved_source,
                 resolved_source: null, // null = not an alias
             };
 
