@@ -1,12 +1,12 @@
 import path from 'path';
 
-import _zoologger from '../_zoologger.js';
-const logger = _zoologger.child({module: 'zoollm.zooprocessor'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.zoollm.zooprocessor');
 
 import * as zoollm from './index.js';
 const {$$kw, repr} = zoollm;
 
-import * as zoodbllmcontent from '../dbprocessors/llmcontent.js';
+import * as zoodbllmcontent from '../dbprocessor/llmcontent.js';
 
 import * as zoollmscanner from './scanner.js';
 
@@ -66,7 +66,7 @@ export class ZooLLMZooProcessor
 
     async process_zoo()
     {
-        logger.info("Compiling all zoo LLM content ...");
+        debug("Compiling all zoo LLM content ...");
 
         let zoo_relations_populator = new zoodbllmcontent.LLMContentCompiler(
             this.zoodb,
@@ -75,7 +75,7 @@ export class ZooLLMZooProcessor
             }
         );
         await zoo_relations_populator.compile_all_zoo();
-        //logger.info("Zoo LLM content populated!");
+        //debug("Zoo LLM content populated!");
 
         this.scanner = new zoollmscanner.ZooLLMScanner();
         this.scanner.scan_zoo(this.zoodb);
@@ -87,7 +87,7 @@ export class ZooLLMZooProcessor
 
         await this.setup_collect_resources();
 
-        logger.info("Zoo LLM processing done");
+        debug("Zoo LLM processing done");
     }
 
     async setup_ref_targets()
@@ -112,7 +112,7 @@ export class ZooLLMZooProcessor
             ;
 
             for (const [objid,obj] of Object.entries(objectsdb)) {
-                logger.debug(`Adding ref for ${object_type} ‘${objid}’`);
+                debug(`Adding ref for ${object_type} ‘${objid}’`);
 
                 this.zoo_llm_environment.external_ref_resolver.add_ref(
                     zoollm.RefInstance($$kw({
@@ -150,7 +150,7 @@ export class ZooLLMZooProcessor
 
     async setup_fetch_citations()
     {
-        logger.debug("Fetching citations ...");
+        debug("Fetching citations ...");
 
         this.citation_manager = new CitationDatabaseManager(
             this.options.citations.sources,
@@ -164,7 +164,7 @@ export class ZooLLMZooProcessor
         await this.citation_manager.query_citations( encountered_citations );
 
         // citations database ready
-        logger.debug("Citation database ready!")
+        debug("Citation database ready!")
     }
 
 
@@ -196,7 +196,7 @@ export class ZooLLMZooProcessor
             const source_directory =
                   resource.encountered_in.resource_info.get_source_directory();
 
-            logger.debug(
+            debug(
                 `Collecting resource of type ‘${resource.resource_type}’ with source `
                 + `type ‘${resource.resource_source_type}’ and source `
                 + `‘${resource.resource_source}’; calling item's source_directory is `

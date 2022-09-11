@@ -1,5 +1,5 @@
-import _zoologger from '../_zoologger.js';
-let logger = _zoologger.child({module:'zoodb.dbprocessors.llmcontent'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.dbprocessor.llmcontent');
 
 import { iter_object_fields_recursive } from '../util/objectinspector.js';
 import { ZooLLMResourceInfo, $$kw } from '../zoollm/index.js';
@@ -49,7 +49,7 @@ export class LLMContentCompiler
                 })
             );
         } catch (err) {
-            logger.error(
+            console.error(
                 `Error while compiling LLM content for ${resource_info} `
                 + `— field ‘${fieldname}’: ` + err
             );
@@ -65,7 +65,7 @@ export class LLMContentCompiler
             if (fieldschema._llm) {
                 // this is an LLM field !
 
-                // logger.debug(
+                // debug(
                 //     `Compiling ${object_type} ${objid}'s LLM field ${fieldname}: `
                 //     + `‘${fieldvalue}’`
                 // );

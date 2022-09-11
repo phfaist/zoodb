@@ -1,5 +1,5 @@
-import _zoologger from '../../_zoologger.js';
-const logger = _zoologger.child({module: 'zoodb.citationmanager.sources.doi'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.citationmanager.source.doi');
 
 
 import { CitationSourceBase } from './base.js';
@@ -43,7 +43,7 @@ export class CitationSourceDoi extends CitationSourceBase
             }),
         } );
         if (response.status !== 200) {
-            logger.error(result);
+            console.error(result);
             throw new Error('Fetching DOI citation - bad status code.');
         }
 

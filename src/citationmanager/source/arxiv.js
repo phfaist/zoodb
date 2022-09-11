@@ -4,8 +4,9 @@ import jsyaml from 'js-yaml';
 
 import FeedParser from 'feedparser';
 
-import _zoologger from '../../_zoologger.js';
-const logger = _zoologger.child({module: 'zoodb.citationmanager.sources.arxiv'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.citationmanager.source.arxiv');
+
 
 import { CitationSourceBase } from './base.js';
 
@@ -65,7 +66,7 @@ export class CitationSourceArxiv extends CitationSourceBase
 
     async run_query_chunk(id_list)
     {
-        // logger.debug(`Running arXiv.org API query for a chunk of ${id_list.length} IDs`);
+        // debug(`Running arXiv.org API query for a chunk of ${id_list.length} IDs`);
 
         let response = await this.fetch_url( 'https://export.arxiv.org/api/query', {
             method: 'post',
@@ -75,7 +76,7 @@ export class CitationSourceArxiv extends CitationSourceBase
             }),
         } );
         if (response.status !== 200) {
-            logger.error(result);
+            console.error(result);
             throw new Error('Fetching arXiv.org API, bad status code.');
         }
 
@@ -84,11 +85,11 @@ export class CitationSourceArxiv extends CitationSourceBase
         await new Promise( (resolve, reject) => {
             let feedparser = new FeedParser();
             feedparser.on('error', (err) => {
-                logger.error(`Error parsing arXiv API's response: ${err}`);
+                console.error(`Error parsing arXiv API's response: ${err}`);
                 reject("Error parsing arXiv API's response");
             });
             feedparser.on('end', () => {
-                logger.debug('done parsing this chunk from arXiv API');
+                debug('done parsing this chunk from arXiv API');
                 resolve();
             });
             feedparser.on('readable', function () { // not arrow function, need 'this'
@@ -135,7 +136,7 @@ export class CitationSourceArxiv extends CitationSourceBase
         const author_names = author.map( (authorobj) => authorobj.name['#'] );
         const author_csl = author_names.map( (author_name) => ({name: author_name}) );
 
-        logger.debug(`Got arXiv entry for ‘${arxivid}’: `
+        debug(`Got arXiv entry for ‘${arxivid}’: `
                      + `“${author_names.join(', ')}; ${title}”`);
         
         let doi = null;
@@ -205,13 +206,13 @@ export class CitationSourceArxiv extends CitationSourceBase
 
     source_finalize_run()
     {
-        logger.debug(`Finalizing arXiv citation entries’`);
+        debug(`Finalizing arXiv citation entries’`);
 
         for (const [arxivid,versionslist]
              of Object.entries(this.data_for_versionless_arxivid))
         {
             if (!versionslist || !versionslist.length) {
-                logger.error(
+                console.error(
                     `No arXiv data received for arXiv id ‘${arxivid}’, what happened?!?`
                 );
                 throw new Error(`No arXiv data found for ‘${arxivid}’`);

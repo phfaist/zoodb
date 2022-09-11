@@ -1,30 +1,32 @@
 import fs from 'fs';
 import path from 'path';
 
-import * as zoodbdataloader from '../src/dbdataloader/index.js';
-import _zoologger from '../src/_zoologger.js';
-const logger = _zoologger.child({module: 'play'});
+import * as zoodbdataloader from '@phfaist/zoodb/dbdataloader';
 
-import * as zoodbrelations from '../src/dbprocessors/relations.js';
+const logger = {
+    debug: (...args) => { console.log(...args); },
+    info: (...args) => { console.log(...args); },
+};
 
-import * as zoollm from '../src/zoollm/index.js';
+import * as zoodbrelations from '@phfaist/zoodb/dbprocessor/relations';
+
+import * as zoollm from '@phfaist/zoodb/zoollm';
 const {$$kw, repr} = zoollm;
 
-// import * as zoollmscanner from '../src/zoollm/scanner.js';
+// import * as zoollmscanner from '@phfaist/zoodb/zoollm/scanner.js';
 // import { CitationCompiler, install_csl_llm_output_format }
-//     from '../src/zoollm/citationcompiler.js';
+//     from '@phfaist/zoodb/zoollm/citationcompiler.js';
 
-import { CitationSourceArxiv } from '../src/citationmanager/sources/arxiv.js';
-import { CitationSourceDoi } from '../src/citationmanager/sources/doi.js';
-import { CitationSourceManual } from '../src/citationmanager/sources/manual.js';
-import { CitationSourceBibliographyFile } from '../src/citationmanager/sources/bibliographyfile.js';
-//import { CitationDatabaseManager } from '../src/citationmanager/index.js';
+import { CitationSourceArxiv } from '@phfaist/zoodb/citationmanager/source/arxiv';
+import { CitationSourceDoi } from '@phfaist/zoodb/citationmanager/source/doi';
+import { CitationSourceManual } from '@phfaist/zoodb/citationmanager/source/manual';
+import { CitationSourceBibliographyFile } from '@phfaist/zoodb/citationmanager/source/bibliographyfile';
 
-import { FileResourceRetriever } from '../src/resourcecollector/file.js';
+import { FileResourceRetriever } from '@phfaist/zoodb/resourcecollector/retriever/file';
 
-import { LLMGraphicsResourceProcessor } from '../src/resourcecollector/llmgraphicsprocessor.js';
+import { LLMGraphicsResourceProcessor } from '@phfaist/zoodb/resourcecollector/processor/llmgraphicsprocessor';
 
-import { ZooLLMZooProcessor } from '../src/zoollm/zooprocessor.js';
+import { ZooLLMZooProcessor } from '@phfaist/zoodb/zoollm/zooprocessor';
 
 import jsoncycle from 'cycle/cycle.js';
 

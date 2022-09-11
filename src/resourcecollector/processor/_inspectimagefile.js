@@ -8,8 +8,8 @@ import sax from 'sax';
 
 import exif_parser from 'exif-parser';
 
-import _zoologger from '../_zoologger.js';
-const logger = _zoologger.child({module: 'zoodb.resourcecollector._inspectimagefile'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.resourcecollector.processor._inspectimagefile');
 
 
 
@@ -77,7 +77,7 @@ class PngMetaDataParser extends stream.Writable
 
     parse() {
         // start by reading the magic beginning of the file
-        //logger.debug("Starting to parse the PNG file");
+        //debug("Starting to parse the PNG file");
         this._read_magic();
         return this.parse_promise;
     }
@@ -101,7 +101,7 @@ class PngMetaDataParser extends stream.Writable
     read_png_chunk_start(data) {
         const chunk_len = data.readUInt32BE(0);
         const chunk_type = arr2str(data.slice(4,8));
-        //logger.debug(`Got PNG chunk ‘${chunk_type}’ of length ${chunk_len}`);
+        //debug(`Got PNG chunk ‘${chunk_type}’ of length ${chunk_len}`);
         const handler = this.chunk_types_handlers[chunk_type];
         if (handler == null) { // not null or undefined
             this._skipBytes(chunk_len+4, this._read_next_chunk);
@@ -156,15 +156,15 @@ export async function parse_png_metadata(stream, options={})
     let x_dpi, y_dpi;
     if (mp.unit_is_meters) {
         if (mp.x_ppu != mp.y_ppu) {
-            logger.warning(`horizontal and vertical resolutions differ in ‘${options.what}’ `
-                           `— image might appear distorted`);
+            console.error(`horizontal and vertical resolutions differ in ‘${options.what}’ `
+                          `— image might appear distorted`);
         }
         //we want dpi = dots_per_meter * (meter / inch), with (meter/inch)=0.0254
         x_dpi = dpiround(mp.x_ppu * 0.0254);
         y_dpi = dpiround(mp.y_ppu * 0.0254);
     } else {
         // unknown units -- assume 96dpi along the X axis.
-        logger.warning(`Unknown units in ‘${options.what}’ — will assume 96 dpi`);
+        console.error(`Unknown units in ‘${options.what}’ — will assume 96 dpi`);
         x_dpi = 96;
         y_dpi = 96;
     }
@@ -224,7 +224,7 @@ export async function parse_exif_metadata(stream, options={})
     try {
         result = parser.parse();
     } catch (err) {
-        logger.error(`Error parsing EXIF data in ‘${options.what}’: ${err}`);
+        console.error(`Error parsing EXIF data in ‘${options.what}’: ${err}`);
         throw err;
     }
     const tags = result.tags;
@@ -237,8 +237,8 @@ export async function parse_exif_metadata(stream, options={})
           y_dpi = tags.YResolution;
 
     if (x_dpi != y_dpi) {
-        logger.warning(`horizontal and vertical resolutions differ in ‘${options.what}’ `
-                       `— image might appear distorted`);
+        console.error(`horizontal and vertical resolutions differ in ‘${options.what}’ `
+                      `— image might appear distorted`);
     }
 
     const dpi = x_dpi;

@@ -1,5 +1,5 @@
-import _zoologger from '../_zoologger.js';
-let logger = _zoologger.child({module:'zoodb.dbprocessors.relations'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.dbprocessor.relations');
 
 
 import {getfield, setfield, iterfield, concatlistfield, get_field_schema}
@@ -216,7 +216,7 @@ export class RelationsPopulator
         object_types.forEach(
             (object_type) => {
 
-                logger.debug(`Processing relations for ${object_type} object relations`);
+                debug(`Processing relations for ${object_type} object relations`);
 
                 if (!this.relations[object_type]) {
                     return;
@@ -228,7 +228,7 @@ export class RelationsPopulator
 
                 let objectsdict = zoodb.objects[object_type];
                 
-                // logger.debug(`Processing ${object_type}'s relations: `
+                // debug(`Processing ${object_type}'s relations: `
                 //              +`${JSON.stringify(schema_zoo_relations)}`);
 
                 Object.values(objectsdict).forEach(

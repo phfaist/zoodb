@@ -9,11 +9,11 @@ import $RefParser from "@apidevtools/json-schema-ref-parser";
 import json_refparser_resolver_http from "@apidevtools/json-schema-ref-parser/lib/resolvers/http.js";
 import json_refparser_resolver_file from "@apidevtools/json-schema-ref-parser/lib/resolvers/file.js";
 
-import { ZooDb } from '../zoodb.js';
+import { ZooDb } from '../_zoodb.js';
 
 
-import _zoologger from '../_zoologger.js';
-let logger = _zoologger.child({module:'zoodb.dbdataloader'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.dbdataloader');
 
 
 
@@ -113,7 +113,7 @@ export class ZooDbDataLoader
             canRead(file) { return true; },
             read(file) {
                 try {
-                    // logger.debug(`file.url = ${file.url}, `
+                    // debug(`file.url = ${file.url}, `
                     //              +`schema_root = ${_config.schemas.schema_root}`);
 
                     let url = file.url;
@@ -128,7 +128,7 @@ export class ZooDbDataLoader
                     let full_url =
                         new URL(url, _config.schemas.schema_root).href;
 
-                    // logger.debug(`full_url = ${full_url} (from url=${url})`);
+                    // debug(`full_url = ${full_url} (from url=${url})`);
 
                     if (full_url.startsWith(_config.schemas.schema_root) &&
                         ! full_url.endsWith(_config.schemas.schema_add_extension) ) {
@@ -141,7 +141,7 @@ export class ZooDbDataLoader
                     };
                     const protocol = (new URL(newfile.url)).protocol;
 
-                    logger.debug(`Resolved schema URL ${file.url} → ${newfile.url} `
+                    debug(`Resolved schema URL ${file.url} → ${newfile.url} `
                                  + `extension=${newfile.extension} protocol=${protocol}`);
                     
                     if ( protocol == 'file:' ) { 
@@ -150,7 +150,7 @@ export class ZooDbDataLoader
                         return json_refparser_resolver_http.read(newfile);
                     }
                 } catch (err) {
-                    logger.error(`Error reading ${file.url}: ${err}`);
+                    console.error(`Error reading ${file.url}: ${err}`);
                     throw err;
                 }
             }
@@ -164,7 +164,7 @@ export class ZooDbDataLoader
     // returns promise (as if async)
     async load()
     {
-        logger.info(`Loading Zoo from ‘${this.config.root_data_dir}’ ...`);
+        debug(`Loading Zoo from ‘${this.config.root_data_dir}’ ...`);
 
         const objects_promises = Object.values(this.config.objects).map(
             async (objectconfig) => {
@@ -172,11 +172,11 @@ export class ZooDbDataLoader
             }
         );
 
-        // logger.debug(`load() objects_promises = ${objects_promises}`);
+        // debug(`load() objects_promises = ${objects_promises}`);
 
         return await Promise.all(objects_promises).then( (objects_results) => {
             // results = [ (objectname1, d1), (objectname2, d2), ... ]
-            // logger.debug(
+            // debug(
             //     `load() -> got final objects_results=${JSON.stringify(objects_results)}`
             // );
             const dbdata = {
@@ -194,7 +194,7 @@ export class ZooDbDataLoader
                 //
                 objects: Object.fromEntries( objects_results ),
             };
-            //logger.debug(`load() -> got final data=${JSON.stringify(dbdata)}`);
+            //debug(`load() -> got final data=${JSON.stringify(dbdata)}`);
             return new ZooDb(dbdata);
         } );
     }
@@ -223,7 +223,7 @@ export class ZooDbDataLoader
 
     async _load_objects_of_type(objectconfig)
     {
-        logger.debug(`Loading objects of type ${objectconfig.objectname} ...`);
+        debug(`Loading objects of type ${objectconfig.objectname} ...`);
 
         const schema_name = objectconfig.schema_name;
         const schema = await this.get_schema_by_name(schema_name);
@@ -237,13 +237,13 @@ export class ZooDbDataLoader
 
         const loaded_objects = await this.walk_src_files(objectconfig);
 
-        //logger.debug(`_load_objects_of_type() [${objectconfig.objectname}] --> loaded_objects = ${JSON.stringify(loaded_objects)}`);
+        //debug(`_load_objects_of_type() [${objectconfig.objectname}] --> loaded_objects = ${JSON.stringify(loaded_objects)}`);
 
         let d = {};
 
         loaded_objects.forEach( (o) => {
             const [objid, obj] = o;
-            //logger.debug(`Got object: objid=${objid}, obj=${JSON.stringify(obj)}`);
+            //debug(`Got object: objid=${objid}, obj=${JSON.stringify(obj)}`);
             if (d.hasOwnProperty(objid)) {
                 throw new Error(
                     `ID ‘${objid}’ was assigned to multiple objects, in `
@@ -254,7 +254,7 @@ export class ZooDbDataLoader
             d[objid] = obj;
         } );
 
-        //logger.debug(`_load_objects_of_type() [${objectconfig.objectname}] --> ${JSON.stringify(d)}`);
+        //debug(`_load_objects_of_type() [${objectconfig.objectname}] --> ${JSON.stringify(d)}`);
 
         return [objectconfig.objectname, d];
     }
@@ -271,7 +271,7 @@ export class ZooDbDataLoader
     /// value returned in a length-1 array.
     async walk(root_path, dir_callback, file_callback)
     {
-        logger.debug(`walk(), root_path=‘${root_path}’`);
+        debug(`walk(), root_path=‘${root_path}’`);
         // heavily inspired by
         // https://git.rootprojects.org/root/walk.js/src/branch/main/walk.js
         const do_walk_dir = async (rel_path, dirent) => {
@@ -281,7 +281,7 @@ export class ZooDbDataLoader
                 console.assert(result instanceof Array, result);
                 return result;
             }
-            //logger.debug(`Walking ‘${root_path}’ → directory ${rel_path}`);
+            //debug(`Walking ‘${root_path}’ → directory ${rel_path}`);
             dir_callback(root_path, rel_path, dirent);
             const pathname = path.join(root_path, rel_path);
             const direntries = fs.readdirSync(pathname, { withFileTypes: true });
@@ -304,16 +304,16 @@ export class ZooDbDataLoader
         const fullsrcpath = path.join(this.config.root_data_dir, objectconfig.data_src_path);
 
         const dir_callback = (root_path, rel_path, dirent) => {
-            logger.debug(`Looking for ${objectconfig.objectname} objects in ‘${rel_path}’ ...`);
+            debug(`Looking for ${objectconfig.objectname} objects in ‘${rel_path}’ ...`);
         };
         const file_callback = async (root_path, rel_path, dirent) => {
             const filename = dirent.name;
             if ( objectconfig.file_name_match.test( filename ) ) {
                 // is data file, collect it!
-                //logger.debug(`Loading data from ‘${rel_path}’ ...`);
+                //debug(`Loading data from ‘${rel_path}’ ...`);
                 return await this.parse_file_into_objects( root_path, rel_path, objectconfig );
             } else if ( objectconfig.ignore_file_name_match.test( filename ) ) {
-                logger.debug(`Ignored file ‘${filename}’`);
+                debug(`Ignored file ‘${filename}’`);
                 return [];
             } else {
                 throw new Error(
@@ -351,7 +351,7 @@ export class ZooDbDataLoader
                 throw new Error(`Unknown file type for path ‘${path}’`);
             }
         } catch (err) {
-            logger.error(
+            console.error(
                 `Parse error in ‘${rel_path}’: ${err}`
             );
             throw err;
@@ -366,7 +366,7 @@ export class ZooDbDataLoader
 
         let objects_data = objectconfig.load_objects( file_data );
 
-        logger.debug(`Loaded ${objects_data.length} ${objectconfig.objectname} object(s) `
+        debug(`Loaded ${objects_data.length} ${objectconfig.objectname} object(s) `
                      +`from ‘${path.join(objectconfig.data_src_path,rel_path)}’`);
 
         // add _object field:
@@ -388,7 +388,7 @@ export class ZooDbDataLoader
                 +`*** ${ validation_result.errors.join("\n*** ") }\n`
             );
         }
-        //logger.debug(`Validated ${JSON.stringify(obj)} against `
+        //debug(`Validated ${JSON.stringify(obj)} against `
         //             +`${JSON.stringify(objectconfig.schema)}`);
 
         obj._zoodb = {

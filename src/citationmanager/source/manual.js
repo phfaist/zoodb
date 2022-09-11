@@ -1,5 +1,5 @@
-import _zoologger from '../../_zoologger.js';
-const logger = _zoologger.child({module: 'zoodb.citationmanager.sources.manual'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.citationmanager.source.manual');
 
 
 import { CitationSourceBase } from './base.js';

@@ -1,8 +1,8 @@
 
-import _zoologger from '../_zoologger.js';
-const logger = _zoologger.child({module: 'zoodb.resourcecollector.llmgraphicsprocessor'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.resourcecollector.processor.llmgraphicsprocessor');
 
-import { GraphicsResource, $$kw } from '../zoollm/index.js';
+import { GraphicsResource, $$kw } from '../../zoollm/index.js';
 
 import { parse_image_metadata } from './_inspectimagefile.js';
 
@@ -36,7 +36,7 @@ export class LLMGraphicsResourceProcessor
     async process(target_info, source)
     {
         let grdata = await parse_image_metadata(target_info.full_source_path);
-        //logger.debug(`DEBUG - got grdata = ${JSON.stringify(grdata)}`);
+        //debug(`DEBUG - got grdata = ${JSON.stringify(grdata)}`);
 
         if (grdata.graphics_type == 'vector' && this.global_vector_scale) {
             Object.assign(grdata, {

@@ -1,5 +1,9 @@
 import path from 'path';
 
+import debug_module from 'debug';
+const debug = debug_module('zoodb.zoollm._environment');
+
+
 import {$$kw, repr} from 'llm-js/py.js';
 import {__class__, __super__, __get__} from 'llm-js/org.transcrypt.__runtime__.js';
 
@@ -186,7 +190,7 @@ export const FeatureZooGraphicsCollection = __class__(
 
                     const graphics_resource = feature.graphics_collection[source_path];
 
-                    console.log(`Got graphics_resource = `, graphics_resource);
+                    debug(`Got graphics_resource = `, graphics_resource);
 
                     if (!feature.src_url_resolver != null) {
                         return GraphicsResource($$kw(
@@ -220,7 +224,7 @@ export const FeatureZooGraphicsCollection = __class__(
             // can set a src_url resolver for generation-time url resolution
             self.src_url_resolver = null;
 
-              //console.log("FeatureZooGraphicsCollection constructor.  self = ", self);
+              //debug("FeatureZooGraphicsCollection constructor.  self = ", self);
         });},
 
         // methods

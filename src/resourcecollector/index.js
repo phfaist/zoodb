@@ -1,5 +1,5 @@
-import _zoologger from '../_zoologger.js';
-const logger = _zoologger.child({module: 'zoodb.resourcecollector'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.resourcecollector');
 
 
 
@@ -35,12 +35,12 @@ export class ResourceCollector
         this.collect_working = true;
         try {
 
-            logger.debug(`Resource collector — collecting ${resource_type} : ‘${source}’`);
+            debug(`Resource collector — collecting ${resource_type} : ‘${source}’`);
 
             if (this.collected_resources[resource_type] &&
                 this.collected_resources[resource_type].hasOwnProperty(source)) {
                 // already collected
-                logger.debug(`... already collected.`);
+                debug(`... already collected.`);
                 return;
             }
 
@@ -81,7 +81,7 @@ export class ResourceCollector
 
             this.collected_resources[resource_type][resolved_source] = resource_data;
 
-            logger.debug(`... collected ${resolved_source}.`);
+            debug(`... collected ${resolved_source}.`);
 
             if (resolved_source != source) {
                 // register resource for original source name, too
@@ -94,7 +94,7 @@ export class ResourceCollector
                     }
                 );
 
-                logger.debug(`... also stored info as ${source}.`);
+                debug(`... also stored info as ${source}.`);
             }
 
         } finally {

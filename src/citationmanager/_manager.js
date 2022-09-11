@@ -1,5 +1,5 @@
-import _zoologger from '../_zoologger.js';
-const logger = _zoologger.child({module: 'zoodb.citationmanager.manager'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.citationmanager');
 
 
 import fs from 'fs';
@@ -40,8 +40,8 @@ export class CitationDatabaseManager
 
         this.load_cache();
 
-        logger.debug(`Citation database will be regularly saved back to the `
-                     + `cache file ‘${this.cache_file}’`);
+        debug(`Citation database will be regularly saved back to the `
+              + `cache file ‘${this.cache_file}’`);
     }
 
     load_cache()
@@ -49,14 +49,14 @@ export class CitationDatabaseManager
         if ( fs.existsSync(this.cache_file) ) {
             const json_data = fs.readFileSync(this.cache_file);
             this.cache.importJson(json_data);
-            logger.debug(`Loaded citations cache from ‘${this.cache_file}’ `
-                         + `(${this.cache.size()} items)`);
+            debug(`Loaded citations cache from ‘${this.cache_file}’ `
+                  + `(${this.cache.size()} items)`);
         }
     }
 
     save_cache()
     {
-        // logger.debug(`Saving database to cache file ‘${this.cache_file}’`);
+        // debug(`Saving database to cache file ‘${this.cache_file}’`);
         // to this.cache_file
         fs.writeFileSync(this.cache_file, this.cache.exportJson());
     }
@@ -67,7 +67,7 @@ export class CitationDatabaseManager
         let cite_obj;
         let set_properties_chained = {};
         while (true) {
-            // logger.debug(`get_citation_by_id() -> cache get ${JSON.stringify(id)}`);
+            // debug(`get_citation_by_id() -> cache get ${JSON.stringify(id)}`);
             cite_obj = this.cache.get(new_id);
             if ( ! cite_obj.chained ) {
                 if (cite_obj.id != id) {
@@ -83,7 +83,7 @@ export class CitationDatabaseManager
             // keep track of any new properties that we need to set on the chained object
             Object.assign(set_properties_chained, cite_obj.chained.set_properties || {});
 
-            // logger.debug(`   --> chained to ${id} (via ${JSON.stringify(cite_obj)})`);
+            // debug(`   --> chained to ${id} (via ${JSON.stringify(cite_obj)})`);
         }
     }
 
@@ -111,7 +111,7 @@ export class CitationDatabaseManager
             const c = process_citations.pop();
             const {cite_prefix, cite_key} = c;
 
-            //logger.debug(`Citation object is ${JSON.stringify(c)}`);
+            //debug(`Citation object is ${JSON.stringify(c)}`);
             
             if (!keys_to_query.hasOwnProperty(cite_prefix)) {
                 throw new Error(
@@ -197,7 +197,7 @@ export class CitationDatabaseManager
     {
         const cite_id = `${cite_prefix}:${cite_key}`;
 
-        logger.debug(`Storing citation for ‘${cite_prefix}:${cite_key}’`);
+        debug(`Storing citation for ‘${cite_prefix}:${cite_key}’`);
 
         if (entry_csl_json.chained) {
             const new_cite_prefix = entry_csl_json.chained.cite_prefix;
@@ -216,7 +216,7 @@ export class CitationDatabaseManager
         }
 
         const entry = Object.assign({}, entry_csl_json, { id: cite_id });
-        //logger.debug(`Storing entry ${JSON.stringify(entry)}`);
+        //debug(`Storing entry ${JSON.stringify(entry)}`);
 
         this.cache.put(
             cite_id,

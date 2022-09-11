@@ -6,8 +6,8 @@ import path from 'path';
 import sha256 from 'hash.js/lib/hash/sha/256.js';
 
 
-import _zoologger from '../_zoologger.js';
-const logger = _zoologger.child({module: 'zoodb.resourcecollector.copyfile'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.resourcecollector.retriever.file');
 
 
 
@@ -44,12 +44,12 @@ export class FileResourceRetriever
             try {
                 await fsPromises.access( full_source_path );
                 // file exists!
-                logger.debug(`located ‘${source}’ at ‘${full_source_path}’`);
+                debug(`located ‘${source}’ at ‘${full_source_path}’`);
                 return { resolved_source: resolved_source,
                          full_source_path: full_source_path };
             } catch (err) {
                 // file does not exist, try next extension
-                logger.debug(`resolving ‘${source}’, tried ‘${full_source_path}’`);
+                debug(`resolving ‘${source}’, tried ‘${full_source_path}’`);
                 continue
             }
         }

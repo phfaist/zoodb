@@ -1,5 +1,5 @@
-import _zoologger from '../_zoologger.js';
-const logger = _zoologger.child({module: 'zoodb.zoollm.citationcompiler'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.zoollm.citationcompiler');
 
 import * as zoollm from './index.js';
 const {$$kw, repr} = zoollm;
@@ -115,7 +115,7 @@ export function install_csl_llm_output_format(zoollmenviron)
                 );
                 // `text` is valid LLM --- keep text directly
             } catch (err) {
-                logger.debug(`Invalid LLM: ${JSON.stringify(text)}: ${err}`);
+                debug(`Invalid LLM: ${JSON.stringify(text)}: ${err}`);
                 // not valid LLM -- escape anything suspicious and use that
                 text = escape_llm(text);
                 //text = `\\begin{verbatimtext}${text}\\end{verbatimtext}`;

@@ -1,5 +1,5 @@
-import _zoologger from '../../_zoologger.js';
-const logger = _zoologger.child({module: 'zoodb.citationmanager.sources.base'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.citationmanager.sources.base');
 
 import fs from 'fs';
 import fetch from 'node-fetch';
@@ -78,7 +78,7 @@ export class CitationSourceBase
     async run()
     {
         if (this._running) {
-            logger.debug(`Call to run() ignored as citation source is already run()ning`);
+            debug(`Call to run() ignored as citation source is already run()ning`);
             return;
         }
         try {
@@ -88,8 +88,8 @@ export class CitationSourceBase
 
             let last_chunk_query_hrtime = null;
 
-            logger.info(`${this.source_name}: there are `
-                        + `${this.keys_to_query_remaining.length} citation(s) to query`);
+            debug(`${this.source_name}: there are `
+                  + `${this.keys_to_query_remaining.length} citation(s) to query`);
             while (true) {
 
                 if (this.keys_to_query_remaining.length) {
@@ -113,10 +113,8 @@ export class CitationSourceBase
 
                     // bookkeeping & logging
                     this.total_queried += ids.length;
-                    logger.info(
-                        `${this.source_name}: `
-                        + `${this.total_queried}/${this.keys_to_query.length}`
-                    );
+                    debug(`${this.source_name}: `
+                          + `${this.total_queried}/${this.keys_to_query.length}`);
                 }
 
                 if (this.keys_to_query_remaining.length == 0) {
@@ -163,7 +161,7 @@ export class CitationSourceBase
     // helper for fetch()
     fetch_url(url, fetch_options)
     {
-        logger.debug(`Fetching URL ‘${url}’ ...`);
+        debug(`Fetching URL ‘${url}’ ...`);
         if (url.startsWith('file://')) {
             // a local file.
             const urlobj = new URL(url);

@@ -2,8 +2,8 @@ import path from 'path';
 
 import jsyaml from 'js-yaml';
 
-import _zoologger from '../../_zoologger.js';
-const logger = _zoologger.child({module: 'zoodb.citationmanager.sources.bibliographyfile'});
+import debug_module from 'debug';
+const debug = debug_module('zoodb.citationmanager.source.bibliographyfile');
 
 import { CitationSourceBase } from './base.js';
 

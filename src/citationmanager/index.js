@@ -1,2 +1,2 @@
-import { CitationDatabaseManager } from './manager.js';
+import { CitationDatabaseManager } from './_manager.js';
 export { CitationDatabaseManager };
