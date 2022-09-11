@@ -190,7 +190,7 @@ export const FeatureZooGraphicsCollection = __class__(
 
                     const graphics_resource = feature.graphics_collection[source_path];
 
-                    debug(`Got graphics_resource = `, graphics_resource);
+                    //debug(`Got graphics_resource = `, graphics_resource);
 
                     if (!feature.src_url_resolver != null) {
                         return GraphicsResource($$kw(

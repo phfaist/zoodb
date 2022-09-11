@@ -256,9 +256,19 @@ zoollmenviron.external_ref_resolver.target_href_resolver = (ref_instance) => {
 };
 
 
+
 //
 // Now render some code information
 //
+
+// simple standalone text rendering?
+
+logger.debug(
+    "Simple standalone text rendering: ‘%s’",
+    zoodb.objects.code.testcode.name.render_standalone(new zoollm.ZooTextFragmentRenderer())
+);
+
+// full html rendering?
 
 let doc = zoollmenviron.make_document(
     (render_context) => {
