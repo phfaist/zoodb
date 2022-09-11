@@ -1,5 +1,5 @@
-import * as latexnodes_nodes from 'llm-js/pylatexenc.latexnodes.nodes.js';
-import {LLMFragment} from 'llm-js/llm.llmfragment.js';
+import * as latexnodes_nodes from '#llm-js/pylatexenc.latexnodes.nodes.js';
+import {LLMFragment} from '#llm-js/llm.llmfragment.js';
 
 //import {getfield, setfield, concatlistfield, get_field_schema} from '../util/getfield.js';
 import {iter_object_fields_recursive} from '../util/objectinspector.js';

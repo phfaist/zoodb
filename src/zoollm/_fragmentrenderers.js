@@ -1,7 +1,7 @@
 
 
-import * as llm_fragmentrenderer_html from 'llm-js/llm.fragmentrenderer.html.js'; 
-import * as llm_fragmentrenderer_text from 'llm-js/llm.fragmentrenderer.text.js';
+import * as llm_fragmentrenderer_html from '#llm-js/llm.fragmentrenderer.html.js'; 
+import * as llm_fragmentrenderer_text from '#llm-js/llm.fragmentrenderer.text.js';
 
 
 

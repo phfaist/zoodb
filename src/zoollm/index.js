@@ -1,7 +1,7 @@
 
 
 // provide $$kw({...}) and repr() to importers
-export {$$kw, repr} from 'llm-js/py.js';
+export {$$kw, repr} from '#llm-js/py.js';
 
 
 // ZooLLMResourceInfo
