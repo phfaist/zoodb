@@ -57,8 +57,9 @@ export class ResourceCollector
                     {},
                     this.collected_resources[resource_type][resolved_source],
                     {
-                        resolved_source: resolved_source,
-                        resolved_info: resolved_info,
+                        source,
+                        resolved_source,
+                        resolved_info,
                     }
                 );
                 return;
@@ -90,8 +91,9 @@ export class ResourceCollector
                     {},
                     resource_data,
                     {
-                        resolved_source: resolved_source,
-                        resolved_info: resolved_info,
+                        source,
+                        resolved_source,
+                        resolved_info,
                     }
                 );
 
