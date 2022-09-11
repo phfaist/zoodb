@@ -114,6 +114,7 @@ export function install_csl_llm_output_format(zoollmenviron)
                     }),
                 );
                 // `text` is valid LLM --- keep text directly
+                //debug(`citation text chunk is valid LLM: ${JSON.stringify(text)}`);
             } catch (err) {
                 debug(`Invalid LLM: ${JSON.stringify(text)}: ${err}`);
                 // not valid LLM -- escape anything suspicious and use that
@@ -141,8 +142,8 @@ export function install_csl_llm_output_format(zoollmenviron)
         "@font-weight/light": false,
         "@text-decoration/none": "%%STRING%%",
         "@text-decoration/underline": "%%STRING%%",
-        "@vertical-align/sup": "\({}^{\\text{%%STRING%%}}\)",
-        "@vertical-align/sub": "\({}_{\\text{%%STRING%%}}\)",
+        "@vertical-align/sup": "\\({}^{\\text{%%STRING%%}}\\)",
+        "@vertical-align/sub": "\\({}_{\\text{%%STRING%%}}\\)",
         "@vertical-align/baseline": "%%STRING%%",
         "@strip-periods/true": CSL.Output.Formatters.passthrough,
         "@strip-periods/false": CSL.Output.Formatters.passthrough,
