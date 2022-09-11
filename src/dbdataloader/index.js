@@ -17,6 +17,51 @@ const debug = debug_module('zoodb.dbdataloader');
 
 
 
+
+
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
+
+const default_resource_file_extensions = [
+    ".svg",
+    ".tex",
+    ".pdf",
+    ".xcf",
+    ".ai",
+    ".indd",
+    ".afdesign",
+    ".afpub",
+    ".png",
+    ".jpeg",
+    ".jpg"
+];
+
+
+function get_default_ignore_file_name_match(resource_file_extensions) {
+    const pattern = (
+        '('
+        // ---
+        // backup files / desktop services
+        + '^\\.DS_Store|\\~|\\.bak|\\.bkp|'
+        // .git, .gitignore, .gitattributes, .gitmodules, etc.
+        + '^\\.git.*|'
+        // any latex temporary files lying around
+        + '\\.dvi|\\.aux|\\.log|\\.fdb_latexmk|\\.fls|'
+        // external resources!
+        + resource_file_extensions.map( (ext) => escapeRegExp(ext) ).join('|')
+        // ---
+        + ')$'
+    );
+    return new RegExp(pattern, 'i'); // ignore upper/lower case in patterns
+}
+
+
+
+
 /*
 const zoodbdataloader = new ZooDbDataLoader({
     objects: {
@@ -76,7 +121,9 @@ export class ZooDbDataLoader
         // set defaults in config
         this.config.object_defaults.file_name_match ||= /\.(ya?ml|json)$/i;
         this.config.object_defaults.ignore_file_name_match
-            ||= /^(.*\~|.*\.bak|\.DS_Store|\.git.*)$/i;
+            ||= get_default_ignore_file_name_match(
+                options.resource_file_extensions ?? default_resource_file_extensions
+            );
         this.config.object_defaults.load_objects ||=  (d) => [ d ] ;
         this.config.object_defaults.expected_msg ||=
             `File name matching ‘/${this.config.object_defaults.file_name_match.source}/`

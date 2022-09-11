@@ -53,3 +53,8 @@ export const ZooTextFragmentRenderer = __class__(
 );
 
 
+export function render_text_standalone(fragment)
+{
+    const text_renderer = new zoollm.ZooTextFragmentRenderer();
+    return fragment.render_standalone(text_renderer);
+}

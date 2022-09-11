@@ -243,12 +243,12 @@ let zoo_llm_processor = new ZooLLMZooProcessor({
 
 await zoo_llm_processor.process_zoo();
 
-zoollmenviron.graphics_collection.src_url_resolver = (graphics_resource) => {
+zoollmenviron.graphics_collection.src_url_resolver = (graphics_resource, render_context) => {
     return path.join('./_output_resource_graphics_files/', graphics_resource.src_url);
 };
 
 // target_href resolver
-zoollmenviron.external_ref_resolver.target_href_resolver = (ref_instance) => {
+zoollmenviron.external_ref_resolver.target_href_resolver = (ref_instance, render_context) => {
     if (ref_instance.target_href) {
         return ref_instance.target_href;
     }
