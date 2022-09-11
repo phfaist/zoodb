@@ -81,7 +81,7 @@ export class ExternalRefResolver
         this.ref_instance_database[ref_type][ref_label] = ref_instance;
     }
     
-    get_ref(ref_type, ref_label, resource_info)
+    get_ref(ref_type, ref_label, resource_info, render_context)
     {
         if (!this.ref_instance_database.hasOwnProperty(ref_type)) {
             throw new Error(
@@ -101,7 +101,7 @@ export class ExternalRefResolver
         if (this.target_href_resolver) {
             return RefInstance( $$kw(
                 Object.assign({}, ref_instance.asdict(), {
-                    target_href: this.target_href_resolver(ref_instance)
+                    target_href: this.target_href_resolver(ref_instance, render_context)
                 })
             ) );
         }
