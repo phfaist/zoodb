@@ -27,6 +27,7 @@ export const SectionCommandSpec = llm_feature_headings.FeatureHeadings.SectionCo
 
 export const EndnoteCategory = llm_feature_endnotes.EndnoteCategory;
 
+export const ReferenceableInfo = llm_feature_refs.ReferenceableInfo;
 export const RefInstance = llm_feature_refs.RefInstance;
 
 export const FloatType = llm_feature_floats.FloatType;
