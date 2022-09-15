@@ -98,6 +98,7 @@ export class ZooLLMZooProcessor
     
     async setup_ref_targets_objects()
     {
+        debug('setting up ref targets for objects ...');
         for (const [object_type, objectsdb] of Object.entries(this.zoodb.objects)) {
 
             const optionsrefs = Object.assign(
@@ -112,7 +113,7 @@ export class ZooLLMZooProcessor
             ;
 
             for (const [objid,obj] of Object.entries(objectsdb)) {
-                debug(`Adding ref for ${object_type} ‘${objid}’`);
+                //debug(`Adding ref for ${object_type} ‘${objid}’`);
 
                 const formatted_ref_llm_text = formatted_ref_llm_text_fn(objid, obj);
 
@@ -132,11 +133,16 @@ export class ZooLLMZooProcessor
 
     async setup_ref_targets_referenceables()
     {
-        for (const encountered_referenceable
-             of this.scanner.get_encountered('referenceables')) {
+        debug('setting up ref targets for referenceables ...');
+
+        const referenceables = this.scanner.get_encountered('referenceables');
+
+        for (const encountered_referenceable of referenceables) {
             const { referenceable_info, encountered_in } = encountered_referenceable;
+            debug(`\treferenceable: ${repr(referenceable_info)}`);
             for (const lbl of referenceable_info.labels) {
                 const [ref_type, ref_label] = lbl;
+                debug(`\t\tlabel: ${ref_type}:${ref_label}`);
                 this.zoo_llm_environment.external_ref_resolver.add_ref(
                     zoollm.RefInstance($$kw({
                         ref_type: ref_type,
@@ -172,6 +178,8 @@ export class ZooLLMZooProcessor
 
     async setup_compile_citations()
     {
+        debug('Compiling citations ...');
+
         const csl_style = this.options.citations.csl_style;
 
         let citecompiler = new CitationCompiler({
@@ -189,6 +197,8 @@ export class ZooLLMZooProcessor
 
     async setup_collect_resources()
     {
+        debug('Collecting external resources ...');
+
         const encountered_resources = this.scanner.get_encountered('resources');
 
         for (const resource of encountered_resources) {

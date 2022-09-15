@@ -75,10 +75,11 @@ export class ExternalRefResolver
         if (this.ref_instance_database[ref_type].hasOwnProperty(ref_label)) {
             throw new Error(
                 `Ref target ‘${ref_type}:${ref_label}’ already exists in ref instance `
-                + `database `
-                + `(‘${JSON.stringify(this.ref_instance_database[ref_type][ref_label])}’)`
+                + `database, found `
+                + `${JSON.stringify(this.ref_instance_database[ref_type][ref_label])}`
             );
         }
+        debug(`adding ref: ${ref_type}:${ref_label}`); // -> `, ref_instance);
         this.ref_instance_database[ref_type][ref_label] = ref_instance;
     }
     

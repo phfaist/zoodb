@@ -1,3 +1,7 @@
+import debug_module from 'debug';
+const debug = debug_module('zoodb.zoollm.scanner');
+
+import {$$kw, repr} from '#llm-js/py.js';
 import * as latexnodes_nodes from '#llm-js/pylatexenc.latexnodes.nodes.js';
 import {LLMFragment} from '#llm-js/llm.llmfragment.js';
 
@@ -7,8 +11,9 @@ import {iter_object_fields_recursive} from '../util/objectinspector.js';
 
 
 
-// --- since it doesn't look like we can inherit a Transcrypt-ed class,
-// we'll provide all necessary definitions here directly: ---
+// --- since it doesn't look like we can inherit a Transcrypt-ed class using
+// JavaScript classes, we'll replicate all necessary definitions here directly:
+// ---
 class LatexNodesVisitorJS
 {
     constructor() { }
@@ -46,37 +51,59 @@ class LatexNodesVisitorJS
 };
 
 
+const make_scanned_types_empty = () => ({
+    // citation prefixes & keys for which we'll probably have to fetch
+    // info & format full citations
+    'citations': [],
+
+    // resources that might need to be collected & pacakged along with
+    // output
+    'resources': [],
+    
+    // items that can be referenced from elsewhere in the zoo
+    'referenceables': [],
+});
+
+
 // extends latexnodes_nodes.LatexNodesVisitor
 export class ZooLLMScanner extends LatexNodesVisitorJS
 {
-    constructor()
+    constructor(options)
     {
-        super()
-        this.encountered = {
-            // citation prefixes & keys for which we'll probably have to fetch
-            // info & format full citations
-            'citations': [],
+        super();
 
-            // resources that might need to be collected & pacakged along with
-            // output
-            'resources': [],
-            
-            // items that can be referenced from elsewhere in the zoo
-            'referenceables': [],
-        }
+        this.encountered = make_scanned_types_empty();
+
+        // store encountered items also by object type & object id (found from
+        // resource_info), so that we can easily see what items are defined in a
+        // specific object
+        this.encountered_by_object = {};
     }
 
-    get_encountered(scanned_type)
+    get_encountered(scanned_type, {object_type, object_id} = {})
     {
-        if (!this.encountered.hasOwnProperty(scanned_type)) {
+        let encountered;
+        if (object_type != null) { // not null or undefined
+            encountered = ( this.encountered_by_object[object_type]
+                            ?? {} )[object_id]; // maybe undefined
+        } else {
+            encountered = this.encountered;
+        }
+
+        if (encountered == null) { // null or undefined
+            return [];
+        }
+
+        if (!encountered.hasOwnProperty(scanned_type)) {
             throw new Error(`No such scanned type ‘${scanned_type}’`);
         }
-        return this.encountered[scanned_type];
+        return encountered[scanned_type];
     }
 
-    get_encountered_referenceables_by_reftype(ref_type)
+    get_encountered_referenceables_by_reftype(ref_type, {object_type, object_id} = {})
     {
-        const encountered_referenceables = this.get_encountered('referenceables');
+        const encountered_referenceables =
+              this.get_encountered('referenceables', {object_type, object_id});
 
         return encountered_referenceables.reduce(
             (referenceables_by_reftype, encountered_referenceable) => {
@@ -102,6 +129,36 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
 
     // ---
 
+    _register_encountered(scanned_type, encountered_info)
+    {
+        this.encountered[scanned_type].push( encountered_info );
+
+        if (encountered_info.encountered_in != null
+            && encountered_info.encountered_in.resource_info != null) {
+
+            const {object_type, object_id} = encountered_info.encountered_in.resource_info;
+            if (!this.encountered_by_object[object_type]) {
+                this.encountered_by_object[object_type] = {};
+            }
+            if (!this.encountered_by_object[object_type][object_id]) {
+                this.encountered_by_object[object_type][object_id] =
+                    make_scanned_types_empty();
+            }
+            this.encountered_by_object[object_type][object_id][scanned_type]
+                .push( encountered_info );
+        }
+
+        // // DEBUGB DEBUG !!
+        // if (scanned_type == 'referenceables') {
+        //     debug(`We've encountered a referenceable !  we now have `
+        //           + `this.encountered = %O and this.encountered_by_object = %O`,
+        //           this.encountered,
+        //           this.encountered_by_object);
+        // }
+    }
+
+    // ---
+
     visit_macro_node(node)
     {
         this._visit_callable(node)
@@ -111,21 +168,20 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
 
     _visit_callable(node)
     {
+        //debug(`Visiting callable node ${repr(node)}`);
         if (node.hasOwnProperty('llmarg_cite_items'))
         {
             // it's a citation node with citations to track
             node.llmarg_cite_items.forEach( (cite_item) => {
                 const [cite_prefix, cite_key] = cite_item;
-                this.encountered['citations'].append(
-                    {
-                        cite_prefix: cite_prefix,
-                        cite_key: cite_key,
-                        encountered_in: {
-                            resource_info: node.latex_walker.resource_info,
-                            what: node.latex_walker.what,
-                        }
+                this._register_encountered('citations', {
+                    cite_prefix: cite_prefix,
+                    cite_key: cite_key,
+                    encountered_in: {
+                        resource_info: node.latex_walker.resource_info,
+                        what: node.latex_walker.what,
                     }
-                );
+                });
             } );
         }
 
@@ -135,7 +191,7 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
             // collected and packaged along with the output
             const resources = node.llm_resources;
             for (const resource of resources) {
-                this.encountered['resources'].append( {
+                this._register_encountered('resources', {
                     ...resource,
                     encountered_in: {
                         resource_info: node.latex_walker.resource_info,
@@ -148,16 +204,18 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
         if (node.hasOwnProperty('llm_referenceable_info'))
         {
             // it's something referenceable, like a defterm or a section heading
-            const referenceable = node.llm_referenceable_info;
-            this.encountered['referenceables'].append(
-                {
-                    referenceable_info: node.llm_referenceable_info,
-                    encountered_in: {
-                        resource_info: node.latex_walker.resource_info,
-                        what: node.latex_walker.what,
-                    }
+            const referenceable_info = node.llm_referenceable_info;
+
+            debug(`Found referenceable in node=${repr(node)}: labels=`, referenceable_info.labels);
+            // `formatted_ref_llm_text = ${referenceable_info.formatted_ref_llm_text.llm_text || referenceable_info.formatted_ref_llm_text}`);
+
+            this._register_encountered('referenceables', {
+                referenceable_info: referenceable_info,
+                encountered_in: {
+                    resource_info: node.latex_walker.resource_info,
+                    what: node.latex_walker.what,
                 }
-            );
+            } );
         }
     }
 
@@ -168,9 +226,9 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
         super.visit_environment_node(node);
     }
 
-    scan_object_with_schema(obj, schema, what=undefined)
+    scan_object_with_schema(schema, what=undefined)
     {
-        visitor_scan_object(this, obj, schema, what);
+        visitor_scan_object(this, object, schema, what);
     }
 
     scan_zoo(zoodbdata, options=undefined)
@@ -183,8 +241,12 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
 
 export function visitor_scan_object(visitor, obj, schema, what=undefined)
 {
+    debug(`Scanning object's LLM content (${what})`);
+
     for (const {fieldname, fieldvalue, fieldschema}
          of iter_object_fields_recursive(obj, schema)) {
+
+        //debug(`\tfield: ${fieldname}`);
 
         if (fieldschema._llm) {
             if ( ! fieldvalue instanceof LLMFragment ) {
