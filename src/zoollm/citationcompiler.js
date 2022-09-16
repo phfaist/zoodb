@@ -4,6 +4,8 @@ const debug = debug_module('zoodb.zoollm.citationcompiler');
 import * as zoollm from './index.js';
 const {$$kw, repr} = zoollm;
 
+import { split_prefix_label } from '../util/index.js';
+
 
 import CSL from 'citeproc';
 
@@ -314,6 +316,8 @@ export class CitationCompiler
               ?? (this.citation_manager.keys().map(_split_to_cite_prefix_key))
         ;
 
+        //debug(`compile_citations:`, compile_citations);
+
         //console.log(`Will compile citations for ${JSON.stringify(compile_citations)}`);
 
         let cite_processor = new CSL.Engine(this.citeproc_sys_object, this.csl_style);
@@ -330,7 +334,6 @@ export class CitationCompiler
                 continue;
             }
             seen_ids.add(citeid);
-
 
             const obj = this.citation_manager.get_citation_by_id(citeid);
 
@@ -405,13 +408,8 @@ function _compose_id_from_cite_prefix_key(cite_prefix, cite_key)
 
 function _split_to_cite_prefix_key(id)
 {
-    const idx = id.indexOf(':');
-    if (idx == -1) {
-        // not found
-        return { cite_prefix: null, cite_key: id };
-    }
-    return { cite_prefix: id.slice(0,idx),
-             cite_key: id.slice(idx+1) };
+    return [cite_prefix, cite_key] = split_prefix_label(id);
+    return {cite_prefix, cite_key};
 }
 
 

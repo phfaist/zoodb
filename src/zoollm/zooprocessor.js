@@ -95,6 +95,15 @@ export class ZooLLMZooProcessor
         await this.setup_ref_targets_objects();
         await this.setup_ref_targets_referenceables();
     }
+
+    get_object_target_href(object_type, object_id)
+    {
+        // create an URL target for where we should link to the given object.
+        // Remember that target_href's can still be adjusted at a later stage by
+        // setting a target_href_resolver in the zoo llm environment's
+        // external_ref_resolver instance.
+        return `zoodbobjectref:///${object_type}:${object_id}`;
+    }
     
     async setup_ref_targets_objects()
     {
@@ -122,8 +131,8 @@ export class ZooLLMZooProcessor
                         ref_type: object_type,
                         ref_label: objid,
                         formatted_ref_llm_text: formatted_ref_llm_text,
-                        // target_href needs to be set later on.
-                        target_href: null,
+                        // target_href might need to be adjusted later on.
+                        target_href: this.get_object_target_href(object_type, objid),
                     }))
                 );
             }
@@ -139,7 +148,15 @@ export class ZooLLMZooProcessor
 
         for (const encountered_referenceable of referenceables) {
             const { referenceable_info, encountered_in } = encountered_referenceable;
-            debug(`\treferenceable: ${repr(referenceable_info)}`);
+            let target_href = null;
+            if (encountered_in && encountered_in.resource_info
+                && encountered_in.resource_info.object_type) {
+                const { object_type, object_id } = encountered_in.resource_info;
+                target_href =
+                    this.get_object_target_href(object_type, object_id)
+                    + '#' + referenceable_info.get_target_id() ;
+            }
+            debug(`\treferenceable: ${repr(referenceable_info)}  -> ${target_href}`);
             for (const lbl of referenceable_info.labels) {
                 const [ref_type, ref_label] = lbl;
                 debug(`\t\tlabel: ${ref_type}:${ref_label}`);
@@ -148,8 +165,8 @@ export class ZooLLMZooProcessor
                         ref_type: ref_type,
                         ref_label: ref_label,
                         formatted_ref_llm_text: referenceable_info.formatted_ref_llm_text,
-                        // target_href needs to be set later on.
-                        target_href: null,
+                        // target_href will need to be adjusted later on.
+                        target_href: target_href,
                     }))
                 );
             }
@@ -169,7 +186,7 @@ export class ZooLLMZooProcessor
 
         const encountered_citations = this.scanner.get_encountered('citations');
 
-        await this.citation_manager.query_citations( encountered_citations );
+        await this.citation_manager.retrieve_citations( encountered_citations );
 
         // citations database ready
         debug("Citation database ready!")

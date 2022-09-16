@@ -19,7 +19,7 @@ export class CitationDatabaseManager
      *
      * - cache_file
      *
-     * - cache_entry_duration_ms
+     * - cache_entry_default_duration_ms
      *
      * - default_use_user_agent, default_user_agent
      */
@@ -35,7 +35,8 @@ export class CitationDatabaseManager
         }
 
         this.cache_file = this.options.cache_file || 'downloaded_citationinfo_cache.json';
-        this.cache_entry_duration_ms = this.options.cache_entry_duration_ms || 30*one_day;
+        this.cache_entry_default_duration_ms =
+            this.options.cache_entry_default_duration_ms || 30*one_day;
         this.cache = new Cache();
 
         this.load_cache();
@@ -69,6 +70,9 @@ export class CitationDatabaseManager
         while (true) {
             // debug(`get_citation_by_id() -> cache get ${JSON.stringify(id)}`);
             cite_obj = this.cache.get(new_id);
+            if (cite_obj === null) {
+                throw new Error(`Item ${cite_obj} not found in citations cache`);
+            }
             if ( ! cite_obj.chained ) {
                 if (cite_obj.id != id) {
                     // as a result of chained objects, the last object's id
@@ -98,11 +102,11 @@ export class CitationDatabaseManager
         return this.cache.keys();
     }
 
-    async query_citations(citations)
+    async retrieve_citations(citations)
     {
         // group citations by (lowercase) cite_prefix
 
-        let keys_to_query = Object.fromEntries(
+        let keys_to_retrieve = Object.fromEntries(
             Object.keys(this.sources).map( (cite_prefix) => [cite_prefix, new Set()] )
         );
         let process_citations = [...citations];
@@ -113,7 +117,7 @@ export class CitationDatabaseManager
 
             //debug(`Citation object is ${JSON.stringify(c)}`);
             
-            if (!keys_to_query.hasOwnProperty(cite_prefix)) {
+            if (!keys_to_retrieve.hasOwnProperty(cite_prefix)) {
                 throw new Error(
                     `No source registered for cite prefix ‘${cite_prefix}’ `
                     `(citation encountered in ${c.encountered_in.what})`
@@ -122,10 +126,10 @@ export class CitationDatabaseManager
 
             const d = this.cache.get( `${cite_prefix}:${cite_key}` );
             if (d === null) {
-                keys_to_query[cite_prefix].add( cite_key );
+                keys_to_retrieve[cite_prefix].add( cite_key );
             }
             // if we already have an entry for this citation, there's no need to
-            // query it.
+            // retrieve it.
 
             // Check if this citation is chained to another citation source; we
             // might need to process that one, too.
@@ -146,7 +150,7 @@ export class CitationDatabaseManager
 
         for (const [cite_prefix, source] of Object.entries(this.sources))
         {
-            source.add_query( Array.from(keys_to_query[cite_prefix]) );
+            source.add_retrieve( Array.from(keys_to_retrieve[cite_prefix]) );
             source_run_promises[cite_prefix] = source.run();
         }
 
@@ -164,10 +168,10 @@ export class CitationDatabaseManager
             if ( ! parent_chainers_promises.length ) {
                 // there's no one feeding additional entries to this source, so
                 // we end it right away
-                source.add_query_done();
+                source.add_retrieve_done();
             } else {
                 Promise.all( parent_chainers_promises ).then( () => {
-                    source.add_query_done();
+                    source.add_retrieve_done();
                 } );
             }
         }
@@ -193,7 +197,7 @@ export class CitationDatabaseManager
         );
     }
 
-    store_citation(cite_prefix, cite_key, entry_csl_json)
+    store_citation(cite_prefix, cite_key, entry_csl_json, {cache_duration_ms}={})
     {
         const cite_id = `${cite_prefix}:${cite_key}`;
 
@@ -211,8 +215,13 @@ export class CitationDatabaseManager
             }
 
             // if it's a chained citation retreival (e.g., arXiv->DOI), then
-            // make sure we add this one to the stuff we need to query
-            this.sources[new_cite_prefix].add_query( [ new_cite_key ] );
+            // make we retrieve the chained citation info one as well (unless we
+            // happen to already have it in cache)
+            const chained_citation_obj =
+                  this.cache.get( `${new_cite_prefix}:${new_cite_key}` );
+            if (chained_citation_obj == null) {
+                this.sources[new_cite_prefix].add_retrieve( [ new_cite_key ] );
+            }
         }
 
         const entry = Object.assign({}, entry_csl_json, { id: cite_id });
@@ -221,7 +230,7 @@ export class CitationDatabaseManager
         this.cache.put(
             cite_id,
             entry,
-            this.cache_entry_duration_ms
+            cache_duration_ms ?? this.cache_entry_default_duration_ms
         );
 
         // save cache at each store

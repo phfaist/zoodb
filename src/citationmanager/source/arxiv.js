@@ -4,6 +4,8 @@ import jsyaml from 'js-yaml';
 
 import FeedParser from 'feedparser';
 
+import { parseFullName } from 'parse-full-name';
+
 import debug_module from 'debug';
 const debug = debug_module('zoodb.citationmanager.source.arxiv');
 
@@ -23,8 +25,9 @@ export class CitationSourceArxiv extends CitationSourceBase
             source_name: 'ArXiv API citation info source',
         };
         const default_options = {
-            chunk_query_delay_ms: 3100,
+            chunk_retrieve_delay_ms: 3100,
             cite_prefix: 'arxiv',
+            cache_duration_ms: 10 * 24*3600*1000, // 10 days for arXiv entries by default
         };
 
         super(
@@ -40,9 +43,9 @@ export class CitationSourceArxiv extends CitationSourceBase
         this.override_arxiv_dois = this.options.override_arxiv_dois || {};
     }
 
-    add_query(ids)
+    add_retrieve(ids)
     {
-        super.add_query(ids);
+        super.add_retrieve(ids);
 
         Object.assign(
             this.data_for_versionless_arxivid,
@@ -65,9 +68,9 @@ export class CitationSourceArxiv extends CitationSourceBase
         }
     }
 
-    async run_query_chunk(id_list)
+    async run_retrieve_chunk(id_list)
     {
-        // debug(`Running arXiv.org API query for a chunk of ${id_list.length} IDs`);
+        debug(`Running arXiv.org API retrieve for a chunk of ${id_list.length} IDs`);
 
         let response = await this.fetch_url( 'https://export.arxiv.org/api/query', {
             method: 'post',
@@ -77,8 +80,8 @@ export class CitationSourceArxiv extends CitationSourceBase
             }),
         } );
         if (response.status !== 200) {
-            console.error(result);
-            throw new Error('Fetching arXiv.org API, bad status code.');
+            console.error(response);
+            throw new Error(`Fetching arXiv.org API, bad status code ${response.status}.`);
         }
 
         let _articles = [];
@@ -110,6 +113,21 @@ export class CitationSourceArxiv extends CitationSourceBase
         }
     }
 
+    get_author_csl(author_name)
+    {
+        const parts = parseFullName(author_name, 'all');
+        let authorobj = {};
+        authorobj.given = parts.first || '';
+        if (parts.middle) {
+            authorobj.given += ' ' + parts.middle;
+        }
+        authorobj.family = parts.last || '';
+        if (parts.suffix) {
+            authorobj.family += ' ' + parts.suffix;
+        }
+        return authorobj;
+    }
+
     handle_arxiv_article_response(atom_article)
     {
         const arxivurl = atom_article['atom:id']['#'];
@@ -135,7 +153,9 @@ export class CitationSourceArxiv extends CitationSourceBase
         }
 
         const author_names = author.map( (authorobj) => authorobj.name['#'] );
-        const author_csl = author_names.map( (author_name) => ({name: author_name}) );
+        const author_csl = author_names.map(
+            (author_name) => this.get_author_csl(author_name)
+        );
 
         debug(`Got arXiv entry for ‘${arxivid}’: `
                      + `“${author_names.join(', ')}; ${title}”`);
@@ -168,7 +188,7 @@ export class CitationSourceArxiv extends CitationSourceBase
 
         // check if we were meant to look up the entry by ID with or without
         // version number
-        if ( this.keys_to_query.includes(arxivid_with_version) ) {
+        if ( this.keys_to_retrieve.includes(arxivid_with_version) ) {
             // definitly store this entry directly, since this specific version
             // was requested.
             //
@@ -226,7 +246,7 @@ export class CitationSourceArxiv extends CitationSourceBase
                     // "arxiv_version_number === null" only happens if arXiv API
                     // responded with an article whose ID didn't have a version
                     // number -> use that one directly as it is the answer to
-                    // our query!
+                    // our retrieve!
                     if (best.arxiv_version_number === null) {
                         return best;
                     }

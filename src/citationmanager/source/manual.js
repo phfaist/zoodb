@@ -13,7 +13,7 @@ export class CitationSourceManual extends CitationSourceBase
         const override_options = {
             source_name: 'Manual citation info source',
             chunk_size: Infinity,
-            chunk_query_delay_ms: 0,
+            chunk_retrieve_delay_ms: 0,
         };
         const default_options = {
             cite_prefix: 'manual',
@@ -26,7 +26,7 @@ export class CitationSourceManual extends CitationSourceBase
         );
     }
 
-    async run_query_chunk(id_list)
+    async run_retrieve_chunk(id_list)
     {
         for (const key of id_list) {
 
@@ -36,8 +36,15 @@ export class CitationSourceManual extends CitationSourceBase
                     _ready_formatted: {
                         llm: key
                     }
+                },
+                {
+                    // keep in cache only for a short time (so we can e.g. build
+                    // a site), but otherwise trash it so we immediately pick up
+                    // changes
+                    cache_duration_ms: 60*1000,
                 }
             );
+
         }
     }
 

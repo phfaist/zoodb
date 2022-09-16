@@ -33,26 +33,26 @@ export class CitationSourceBase
 {
     constructor(override_options, options, default_options)
     {
-        this.keys_to_query = [];
-        this.keys_to_query_remaining = [];
+        this.keys_to_retrieve = [];
+        this.keys_to_retrieve_remaining = [];
 
         this.options = Object.assign({}, default_options, options || {}, override_options);
 
         this.total_queried = 0;
 
         this.chunk_size = this.options.chunk_size || 512;
-        this.chunk_query_delay_ms = this.options.chunk_query_delay_ms || 1000;
+        this.chunk_retrieve_delay_ms = this.options.chunk_retrieve_delay_ms || 1000;
 
-        // When we queried all the IDs but the _query_more_done flag is not set,
+        // When we queried all the IDs but the _retrieve_more_done flag is not set,
         // we wait this amount of time (ms) before checking if we have new IDs
-        // to query or if we're done
+        // to retrieve or if we're done
         this.waiting_poll_timeout_ms = this.options.waiting_poll_timeout_ms || 500;
 
         this.cite_prefix = this.options.cite_prefix;
         this.chains_to_sources = this.options.chains_to_sources || [];
         this.source_name = this.options.source_name || '<unknown source>';
 
-        this._query_more_done = false;
+        this._retrieve_more_done = false;
 
         this._running = false;
     }
@@ -63,16 +63,16 @@ export class CitationSourceBase
         this.cite_prefix = cite_prefix;
     }
 
-    add_query(ids)
+    add_retrieve(ids)
     {
-        this.keys_to_query.push(...ids);
-        this.keys_to_query_remaining.push(...ids);
-        this._query_more_done = false;
+        this.keys_to_retrieve.push(...ids);
+        this.keys_to_retrieve_remaining.push(...ids);
+        this._retrieve_more_done = false;
     }
 
-    add_query_done()
+    add_retrieve_done()
     {
-        this._query_more_done = true;
+        this._retrieve_more_done = true;
     }
 
     async run()
@@ -86,43 +86,43 @@ export class CitationSourceBase
 
             this.source_initialize_run();
 
-            let last_chunk_query_hrtime = null;
+            let last_chunk_retrieve_hrtime = null;
 
             debug(`${this.source_name}: there are `
-                  + `${this.keys_to_query_remaining.length} citation(s) to query`);
+                  + `${this.keys_to_retrieve_remaining.length} citation(s) to retrieve`);
             while (true) {
 
-                if (this.keys_to_query_remaining.length) {
+                if (this.keys_to_retrieve_remaining.length) {
 
-                    // if applicable, wait before another chunk query call
-                    if (this.chunk_query_delay_ms && last_chunk_query_hrtime !== null) {
-                        const dt = process.hrtime( last_chunk_query_hrtime );
+                    // if applicable, wait before another chunk retrieve call
+                    if (this.chunk_retrieve_delay_ms && last_chunk_retrieve_hrtime !== null) {
+                        const dt = process.hrtime( last_chunk_retrieve_hrtime );
                         const dt_ms = (1000*dt[0]+dt[1]/1000000);
-                        const dt_ms_to_wait = this.chunk_query_delay_ms - dt_ms;
+                        const dt_ms_to_wait = this.chunk_retrieve_delay_ms - dt_ms;
                         if (dt_ms_to_wait > 0) {
                             await timeout( dt_ms_to_wait );
                         }
                     }
 
-                    // create a chunk of IDs to query
-                    const ids = this.keys_to_query_remaining.splice(0, this.chunk_size);
+                    // create a chunk of IDs to retrieve
+                    const ids = this.keys_to_retrieve_remaining.splice(0, this.chunk_size);
 
-                    // query the chunk
-                    last_chunk_query_hrtime = process.hrtime();
-                    await this.run_query_chunk(ids);
+                    // retrieve the chunk
+                    last_chunk_retrieve_hrtime = process.hrtime();
+                    await this.run_retrieve_chunk(ids);
 
                     // bookkeeping & logging
                     this.total_queried += ids.length;
                     debug(`${this.source_name}: `
-                          + `${this.total_queried}/${this.keys_to_query.length}`);
+                          + `${this.total_queried}/${this.keys_to_retrieve.length}`);
                 }
 
-                if (this.keys_to_query_remaining.length == 0) {
-                    if (this._query_more_done) {
+                if (this.keys_to_retrieve_remaining.length == 0) {
+                    if (this._retrieve_more_done) {
                         // we're done!
                         break;
                     }
-                    // check again in 500ms, until we have more entries to query
+                    // check again in 500ms, until we have more entries to retrieve
                     // or until we're actually done
                     await timeout(this.waiting_poll_timeout_ms);
                 }
@@ -134,7 +134,7 @@ export class CitationSourceBase
         }
     }
 
-    // helper: provide default query headers for remote queries
+    // helper: provide default retrieve headers for remote queries
     _get_default_headers()
     {
         let headers = {};
@@ -183,9 +183,9 @@ export class CitationSourceBase
     }
 
     // must be reimplemented
-    async run_query_chunk()
+    async run_retrieve_chunk()
     {
-        throw new Error(`The method run_query_chunk() must be reimplemented by subclasses!`);
+        throw new Error(`The method run_retrieve_chunk() must be reimplemented by subclasses!`);
     }
 
 };

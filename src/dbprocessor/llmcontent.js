@@ -5,6 +5,49 @@ import { iter_object_fields_recursive } from '../util/objectinspector.js';
 import { ZooLLMResourceInfo, $$kw } from '../zoollm/index.js';
 
 
+
+function parse_schema_llm_options(schema)
+{
+    const schema_llm = schema._llm;
+
+    if (!schema_llm) {
+        return {enabled: false, standalone: false};
+    }
+    
+    // check for shortcuts
+    
+    if (schema_llm === 'full' || schema_llm === true) {
+        return { enabled: true, standalone: false };
+    }
+
+    if (schema_llm === 'standalone') {
+        return { enabled: true, standalone: true };
+    }
+
+    // get values from llm schema field
+
+    const {enabled, standalone} = schema_llm;
+
+    return { enabled: enabled ?? false,
+             standalone: standalone ?? false };
+}
+
+
+/**
+ *
+ * Parsing of DB fields follows the schema's _llm field.  The value of this
+ * field can be:
+ *
+ *   - <dict>  --> enable LLM with given options
+ *
+ * A few shortcuts:
+ *   - 'full'          --> parse as full LLM content
+ *   - 'standalone'    --> shortcut for " - { standalone: true }"
+ *
+ * Options can be:
+ *   - enabled: true|false
+ *   - standalone: true|false
+ */
 export class LLMContentCompiler
 {
     constructor(zoodb, config)
@@ -21,9 +64,8 @@ export class LLMContentCompiler
         }
     }
     
-    compile_llm( llm_content, info )
+    compile_llm( llm_content, { object_type, llm_options, object, fieldname } )
     {
-        const { object_type, schema, object, fieldname } = info;
         const object_id = object._zoodb.id;
         const source_file_path = object._zoodb.source_file_path;
 
@@ -32,8 +74,6 @@ export class LLMContentCompiler
             object_id,
             source_file_path,
         );
-
-        const standalone_mode = (schema._llm == 'standalone');
 
         const what = resource_info.toString();
 
@@ -44,7 +84,7 @@ export class LLMContentCompiler
                 llm_content,
                 $$kw({
                     what: what,
-                    standalone_mode: standalone_mode,
+                    standalone_mode: llm_options.standalone,
                     resource_info: resource_info
                 })
             );
@@ -62,7 +102,9 @@ export class LLMContentCompiler
         for (const {fieldname, fieldvalue, fieldschema, parent, parent_index}
              of iter_object_fields_recursive(obj, schema, {provide_parent: true})) {
             
-            if (fieldschema._llm) {
+            const llm_options = parse_schema_llm_options(fieldschema);
+
+            if ( llm_options.enabled ) {
                 // this is an LLM field !
 
                 // debug(
@@ -74,7 +116,7 @@ export class LLMContentCompiler
                     fieldvalue,
                     {
                         object_type: object_type,
-                        schema: fieldschema,
+                        llm_options: llm_options,
                         object: obj,
                         fieldname: fieldname
                     }

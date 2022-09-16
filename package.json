@@ -16,6 +16,7 @@
         "js-yaml": "^4.1.0",
         "jsonschema": "^1.4.1",
         "node-fetch": "^3.2.10",
+        "parse-full-name": "^1.2.6",
         "sax": "^1.2.4",
         "stream-parser": "^0.3.1"
     },
@@ -31,7 +32,8 @@
         "./zoollm": "./src/zoollm/index.js",
         "./zoollm/citationcompiler": "./src/zoollm/citationcompiler.js",
         "./zoollm/scanner": "./src/zoollm/scanner.js",
-        "./zoollm/zooprocessor": "./src/zoollm/zooprocessor.js"
+        "./zoollm/zooprocessor": "./src/zoollm/zooprocessor.js",
+        "./util": "./src/util/index.js"
     },
     "imports": {
         "#llm-js/*": "./llm-js-src/llm-js/*"
