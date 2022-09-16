@@ -183,6 +183,10 @@ function Cache () {
         // Note: JSON doesn't support `NaN`, so convert it to `'NaN'`.
         for (var key in _cache) {
             var record = _cache[key];
+            if (!isNaN(record.expire) && record.expire < Date.now()) {
+                // don't export expired entries
+                continue;
+            }
             plainJsCache[key] = {
                 value: record.value,
                 expire: record.expire || 'NaN',
