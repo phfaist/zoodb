@@ -4,6 +4,7 @@ import * as fsPromises from 'fs/promises';
 import path from 'path';
 
 import sha256 from 'hash.js/lib/hash/sha/256.js';
+import base32Encode from 'base32-encode';
 
 
 import debug_module from 'debug';
@@ -22,7 +23,7 @@ export class FileResourceRetriever
         this.source_directory = options.source_directory || '.';
         this.target_directory = options.target_directory || './_output_file_resources/';
         this.rename_file_template =
-            options.rename_file_template || ( (f) => `r${f.hexhash(16)}${f.lowerext()}` );
+            options.rename_file_template || ( (f) => `fig-${f.b32hash(24)}${f.lowerext()}` );
 
         // don't forget to include the empty string in this list in case you'd
         // like to support the situation where the source already specifies the
@@ -120,12 +121,42 @@ class FilePropertiesAccessor
         return path.dirname(this.resolved_source);
     }
 
+    binary_hash()
+    {
+        return sha256().update( fs.readFileSync(this.full_source_path) ).digest();
+    }
+
     // hash the actual file contents
     hexhash(len)
     {
         const res = sha256().update( fs.readFileSync(this.full_source_path) ).digest('hex');
-        if ( typeof len != 'undefined' ) {
-            return res.slice(len);
+        if (len) {
+            return res.slice(0, len);
+        }
+        return res;
+    }
+    B32HASH(len)
+    {
+        const arr = Uint8Array.from(this.binary_hash());
+        const res = base32Encode(arr, 'Crockford', { padding: false });
+        if (len) {
+            return res.slice(0, len);
+        }
+        return res;
+    }
+    b32hash(len)
+    {
+        return this.B32HASH(len).toLowerCase();
+    }
+    b64hash(len)
+    {
+        const arr = this.binary_hash();
+        const strbinary = arr.reduce((res, c) => res + String.fromCharCode(c), '')
+        let res = btoa(strbinary);
+        // replace /+ by other friendlier chars
+        res = res.replace('/', '_').replace('+', '-');
+        if (len) {
+            return res.slice(0, len);
         }
         return res;
     }

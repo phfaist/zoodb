@@ -10,6 +10,14 @@ import {iter_object_fields_recursive} from '../util/objectinspector.js';
 
 
 
+function _abbrev(s, {length}={length:80})
+{
+    if (s.length <= length) {
+        return s;
+    }
+    return s.slice(0, length-3) + '…';
+}
+
 
 // --- since it doesn't look like we can inherit a Transcrypt-ed class using
 // JavaScript classes, we'll replicate all necessary definitions here directly:
@@ -198,7 +206,7 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
             // it's something referenceable, like a defterm or a section heading
             const referenceable_info = node.llm_referenceable_info;
 
-            debug(`Found referenceable in node=${repr(node)}: labels=`,
+            debug(`Found referenceable in node=${_abbrev(repr(node))}: labels=`,
                   referenceable_info.labels);
 
             this._register_encountered('referenceables', {
