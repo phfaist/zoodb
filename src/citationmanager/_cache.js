@@ -29,7 +29,7 @@ function Cache () {
       console.log('caching: %s = %j (@%s)', key, value, time);
     }
 
-    if (typeof time !== 'undefined' && (typeof time !== 'number' || isNaN(time) || time <= 0)) {
+    if (typeof time !== 'undefined' && (typeof time !== 'number' || isNaN(time) || time < 0)) {
       throw new Error('Cache timeout must be a positive number');
     }
     //   else if (typeof timeoutCallback !== 'undefined' && typeof timeoutCallback !== 'function') {
@@ -68,9 +68,9 @@ function Cache () {
     var oldRecord = _cache[key];
     if (oldRecord) {
       // clearTimeout(oldRecord.timeout);
-      if (!isNaN(oldRecord.expire) && oldRecord.expire < Date.now()) {
-        canDelete = false;
-      }
+      // if (!isNaN(oldRecord.expire) && oldRecord.expire < Date.now()) {
+      //   canDelete = false;
+      // }
     } else {
       canDelete = false;
     }
@@ -101,7 +101,7 @@ function Cache () {
 
   this.has = function(key) {
       var data = _cache[key];
-      return (typeof data != 'undefined' && (isNaN(data.expire) || data.expire >= Date.now()));
+      return (typeof data != 'undefined'); // && (isNaN(data.expire) || data.expire >= Date.now()));
   };
 
   this.get_full_cache = function (key) {
@@ -111,19 +111,40 @@ function Cache () {
   this.get = function(key) {
     var data = _cache[key];
     if (typeof data != "undefined") {
-      if (isNaN(data.expire) || data.expire >= Date.now()) {
+      //
+      // Items never expire in get() calls, because we want items to still be in
+      // the cache when we need them after fetching them while the zoo is being
+      // processed!  Expired items are purged either upon load/save or upon
+      // explicit call of purge_expired().
+      //
+      // if (isNaN(data.expire) || data.expire >= Date.now()) {
         if (_debug) _hitCount++;
         return data.value;
-      } else {
-        // free some space
-        if (_debug) _missCount++;
-        _size--;
-        delete _cache[key];
-      }
+      // } else {
+      //   // free some space
+      //   if (_debug) _missCount++;
+      //   _size--;
+      //   delete _cache[key];
+      // }
     } else if (_debug) {
       _missCount++;
     }
     return null;
+  };
+
+  this.purge_expired = function() {
+    let to_remove = [];
+    for (const [key,data] of Object.entries(_cache)) {
+      if (!isNaN(data.expire) && data.expire < Date.now()) {
+        // Item has expired, remove it.  (But let's not alter the object while
+        // we're still iterating over it, just to be safe.)
+        to_remove.push(key);
+      }
+    }
+    _size -= to_remove.length;
+    for (const k of to_remove) {
+      delete _cache[k];
+    }
   };
 
   this.size = function() {

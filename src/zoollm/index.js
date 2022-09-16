@@ -14,6 +14,13 @@ export * from './_resourceinfo.js';
 export * from './_environment.js';
 
 
+//
+// Easily dump and reload compiled LLM to/from data/JSON
+//
+export { LLMDataDumper, LLMDataLoader } from '#llm-js/llm.llmdump.js';
+
+
+
 // ZooHtmlFragmentRenderer
 export * from './_fragmentrenderers.js';
 

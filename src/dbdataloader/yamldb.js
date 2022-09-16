@@ -9,9 +9,6 @@ import $RefParser from "@apidevtools/json-schema-ref-parser";
 import json_refparser_resolver_http from "@apidevtools/json-schema-ref-parser/lib/resolvers/http.js";
 import json_refparser_resolver_file from "@apidevtools/json-schema-ref-parser/lib/resolvers/file.js";
 
-import { ZooDb } from '../_zoodb.js';
-
-
 import debug_module from 'debug';
 const debug = debug_module('zoodb.dbdataloader');
 
@@ -245,7 +242,7 @@ export class ZooDbDataLoader
                 objects: Object.fromEntries( objects_results ),
             };
             //debug(`load() -> got final data=${JSON.stringify(dbdata)}`);
-            return new ZooDb(dbdata);
+            return dbdata;
         } );
     }
 

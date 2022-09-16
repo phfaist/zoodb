@@ -1,9 +1,10 @@
 import debug_module from 'debug';
 const debug = debug_module('zoodb.dbprocessor.llmcontent');
 
-import { iter_object_fields_recursive } from '../util/objectinspector.js';
-import { ZooLLMResourceInfo, $$kw } from '../zoollm/index.js';
+import { ZooDbProcessorBase } from './base.js';
 
+import { iter_object_fields_recursive } from '../util/objectinspector.js';
+import { ZooLLMResourceInfo, $$kw, LLMDataDumper } from '../zoollm/index.js';
 
 
 function parse_schema_llm_options(schema)
@@ -35,7 +36,7 @@ function parse_schema_llm_options(schema)
 
 /**
  *
- * Parsing of DB fields follows the schema's _llm field.  The value of this
+ * Parsing of DB fields follows the schema's _llm field.  The value of that
  * field can be:
  *
  *   - <dict>  --> enable LLM with given options
@@ -47,23 +48,47 @@ function parse_schema_llm_options(schema)
  * Options can be:
  *   - enabled: true|false
  *   - standalone: true|false
+ *
  */
-export class LLMContentCompiler
+export class LLMSimpleContentCompiler extends ZooDbProcessorBase
 {
-    constructor(zoodb, config)
+    constructor(config)
     {
-        this.zoodb = zoodb;
+        super();
         this.config = Object.assign({}, config);
 
-        this.config.object_types ||= this.zoodb.object_types;
         if (!this.config.llm_environment) {
             throw new Error(
                 `You need to specify the config field ‘llm_environment’ for `
                 + `LLMContentCompiler!`
             );
         }
+
+        this.config.content_scanner ??= null;
     }
-    
+
+    initialize_zoo()
+    {
+        this.config.object_types ??= this.zoodb.object_types;
+    }
+
+    process_zoo()
+    {
+        if (this.zoodb == null) {
+            throw new Error(`No zoodb set!`);
+        }
+
+        let promises = [];
+        for (const object_type of this.config.object_types) {
+            const schema = this.zoodb.schema(object_type);
+            for (const [objid, obj] of Object.entries(this.zoodb.objects[object_type])) {
+                this.compile_object(object_type, objid, obj, schema);
+            }
+        }
+    }
+
+    // ----
+
     compile_llm( llm_content, { object_type, llm_options, object, fieldname } )
     {
         const object_id = object._zoodb.id;
@@ -79,13 +104,14 @@ export class LLMContentCompiler
 
         llm_content = llm_content || '';
 
+        let fragment = null;
         try {
-            return this.config.llm_environment.make_fragment(
+            fragment = this.config.llm_environment.make_fragment(
                 llm_content,
                 $$kw({
-                    what: what,
                     standalone_mode: llm_options.standalone,
-                    resource_info: resource_info
+                    resource_info: resource_info,
+                    what: what,
                 })
             );
         } catch (err) {
@@ -95,10 +121,18 @@ export class LLMContentCompiler
             );
             throw err;
         }
+
+        if (this.config.content_scanner != null) {
+            this.config.content_scanner.scan_fragment(fragment);
+        }
+
+        return fragment;
     }
 
     compile_object(object_type, objid, obj, schema)
     {
+        obj._zoodb.llm_fields = [];
+
         for (const {fieldname, fieldvalue, fieldschema, parent, parent_index}
              of iter_object_fields_recursive(obj, schema, {provide_parent: true})) {
             
@@ -112,6 +146,9 @@ export class LLMContentCompiler
                 //     + `‘${fieldvalue}’`
                 // );
 
+                // register this field as having LLM content
+                obj._zoodb.llm_fields.push(fieldname);
+
                 parent[parent_index] = this.compile_llm(
                     fieldvalue,
                     {
@@ -124,17 +161,6 @@ export class LLMContentCompiler
 
             }
 
-        }
-    }
-
-    compile_all_zoo()
-    {
-        let promises = [];
-        for (const object_type of this.config.object_types) {
-            const schema = this.zoodb.schema(object_type);
-            for (const [objid, obj] of Object.entries(this.zoodb.objects[object_type])) {
-                this.compile_object(object_type, objid, obj, schema);
-            }
         }
     }
 

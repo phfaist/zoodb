@@ -1,26 +1,29 @@
 import path from 'path';
 
 import debug_module from 'debug';
-const debug = debug_module('zoodb.zoollm.zooprocessor');
+const debug = debug_module('zoodb.dbprocessor.llmprocessor');
 
-import * as zoollm from './index.js';
+import * as zoollm from '../zoollm/index.js';
 const {$$kw, repr} = zoollm;
 
-import * as zoodbllmcontent from '../dbprocessor/llmcontent.js';
+import { ZooDbProcessorBase } from './base.js';
+import { LLMSimpleContentCompiler } from './llmsimplecontent.js';
 
-import * as zoollmscanner from './scanner.js';
+import { ZooLLMScanner } from '../zoollm/scanner.js';
 
-import { CitationCompiler, install_csl_llm_output_format } from './citationcompiler.js';
+import { CitationCompiler, install_csl_llm_output_format } from '../zoollm/citationcompiler.js';
 
 import { CitationDatabaseManager } from '../citationmanager/index.js';
 import { ResourceCollector } from '../resourcecollector/index.js';
 
 
 
-export class ZooLLMZooProcessor
+export class ZooLLMProcessor extends ZooDbProcessorBase
 {
     constructor(options)
     {
+        super();
+
         //
         // fix some options & defaults
         //
@@ -32,30 +35,40 @@ export class ZooLLMZooProcessor
         this.options.citations.sources ||= {};
         this.options.citations.default_user_agent ||= null;
 
-        //
-        // The ZooDb object
-        //
-        this.zoodb = this.options.zoodb;
-        if (!this.zoodb) {
-            throw new Error(`No zoodb object provided`);
-        }
-
         this.zoo_llm_environment = this.options.zoo_llm_environment;
         if (!this.zoo_llm_environment) {
             throw new Error(`No zoo_llm_environment object provided`);
         }
 
         //
-        // Scanner object will be created when necessary
+        // Scanner object
         //
-        this.scanner = null;
+        this.scanner = new ZooLLMScanner();
+
+        //
+        // Compile individual LLM fields in the database
+        //
+        this.llm_simple_content_compiler = new LLMSimpleContentCompiler(
+            {
+                llm_environment: this.zoo_llm_environment,
+                content_scanner: this.scanner
+            }
+        );
 
         //
         // Set up some citations related stuff
         //
-        install_csl_llm_output_format(this.zoo_llm_environment);
+        this.citation_manager = new CitationDatabaseManager(
+            this.options.citations.sources,
+            {
+                default_user_agent: this.options.citations.default_user_agent
+            },
+        );
 
-        this.citation_manager = null;
+        //
+        // So that we can compile citations
+        //
+        install_csl_llm_output_format(this.zoo_llm_environment);
 
         //
         // Resource collector, e.g. for graphics
@@ -64,37 +77,41 @@ export class ZooLLMZooProcessor
             new ResourceCollector(this.options.resource_collector_options);
     }
 
+    install_zoo(zoodb)
+    {
+        super.install_zoo(zoodb);
+        this.llm_simple_content_compiler.install_zoo(zoodb);
+    }
+
+    initialize_zoo(zoodb)
+    {
+        this.llm_simple_content_compiler.initialize_zoo(zoodb);
+    }
+
     async process_zoo()
     {
+        if (this.zoodb == null) {
+            throw new Error(`No zoodb object provided!`);
+        }
+
         debug("Compiling all zoo LLM content ...");
 
-        let zoo_relations_populator = new zoodbllmcontent.LLMContentCompiler(
-            this.zoodb,
-            {
-                llm_environment: this.zoo_llm_environment
-            }
-        );
-        await zoo_relations_populator.compile_all_zoo();
+        await this.llm_simple_content_compiler.process_zoo(); // process simple LLM fields
         //debug("Zoo LLM content populated!");
 
-        this.scanner = new zoollmscanner.ZooLLMScanner();
-        this.scanner.scan_zoo(this.zoodb);
+        await this.process_ref_targets_objects();
+        await this.process_ref_targets_referenceables();
 
-        await this.setup_ref_targets();
+        await this.process_fetch_citations();
+        await this.process_compile_citations();
 
-        await this.setup_fetch_citations();
-        await this.setup_compile_citations();
-
-        await this.setup_collect_resources();
+        await this.process_collect_resources();
 
         debug("Zoo LLM processing done");
     }
 
-    async setup_ref_targets()
-    {
-        await this.setup_ref_targets_objects();
-        await this.setup_ref_targets_referenceables();
-    }
+    // ---
+
 
     get_object_target_href(object_type, object_id)
     {
@@ -105,7 +122,7 @@ export class ZooLLMZooProcessor
         return `zoodbobjectref:///${object_type}:${object_id}`;
     }
     
-    async setup_ref_targets_objects()
+    async process_ref_targets_objects()
     {
         debug('setting up ref targets for objects ...');
         for (const [object_type, objectsdb] of Object.entries(this.zoodb.objects)) {
@@ -140,7 +157,7 @@ export class ZooLLMZooProcessor
         }
     }
 
-    async setup_ref_targets_referenceables()
+    async process_ref_targets_referenceables()
     {
         debug('setting up ref targets for referenceables ...');
 
@@ -173,18 +190,15 @@ export class ZooLLMZooProcessor
         }
     }
 
-    async setup_fetch_citations()
+    async process_fetch_citations()
     {
         debug("Fetching citations ...");
 
-        this.citation_manager = new CitationDatabaseManager(
-            this.options.citations.sources,
-            {
-                default_user_agent: this.options.citations.default_user_agent
-            },
-        );
-
         const encountered_citations = this.scanner.get_encountered('citations');
+
+        // make sure we purge any entries from earlier possible zoo processings
+        // (which is still to be implemented)
+        this.citation_manager.purge_expired();
 
         await this.citation_manager.retrieve_citations( encountered_citations );
 
@@ -193,7 +207,7 @@ export class ZooLLMZooProcessor
     }
 
 
-    async setup_compile_citations()
+    async process_compile_citations()
     {
         debug('Compiling citations ...');
 
@@ -211,8 +225,7 @@ export class ZooLLMZooProcessor
     }
 
 
-
-    async setup_collect_resources()
+    async process_collect_resources()
     {
         debug('Collecting external resources ...');
 

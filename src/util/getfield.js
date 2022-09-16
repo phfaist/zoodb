@@ -20,47 +20,6 @@ export function get_field_schema(schema, field)
     return (schema.properties || {})[tail_part]; // can be undefined
 }
 
-// function add_field_schema(schema, field, fieldschema)
-// {
-//     if (typeof schema == 'undefined') {
-//         throw new Error("add_field_schema(): schema is undefined!");
-//     }
-
-//     const parts = field.split('.');
-//     const tail_part = parts.pop();
-//     for (const part of parts) {
-//         if (part == '[]' && schema.type == 'array') {
-//             schema = Object.assign({}, schema.items || {});
-//         }
-//         if (schema.type != 'object') {
-//             throw new Error(`add_field_schema(): cannot access ‘${part}’ of non-object `
-//                             +`type ‘${schema}’`);
-//         }
-//         if (!schema.properties || !schema.properties[part]) {
-//             schema.properties[part] = {
-//                 type: 'object',
-//                 additionalProperties: false,
-//                 properties: {}
-//             };
-//         } else {
-//             // detach in case this sub-schema was itself referenced from somewhere else
-//             schema.properties[part] = Object.assign({}, schema.properties[part]);
-//         }
-//         schema = schema.properties[part];
-//     }
-//     if (schema.type != 'object') {
-//         throw new Error(
-//             `add_field_schema(): field ‘${parts.join('.')}’ is not of object type`
-//         );
-//     }
-//     if (schema.properties[tail_part]) {
-//         throw new Error(
-//             `add_field_schema(): field ‘${field}’ is already defined in schema`
-//         );
-//     }
-//     schema.properties[tail_part] = fieldschema;
-// }
-
 
 // field can contain xyz.[].zz and [] are arrays that will be iterated over
 export function *  iterfield(obj, field)

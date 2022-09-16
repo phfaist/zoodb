@@ -21,10 +21,10 @@
         "stream-parser": "^0.3.1"
     },
     "exports": {
-        ".": "./src/zoodb/index.js",
+        ".": "./src/index.js",
         "./citationmanager": "./src/citationmanager/index.js",
         "./citationmanager/source/*": "./src/citationmanager/source/*.js",
-        "./dbdataloader": "./src/dbdataloader/index.js",
+        "./dbdataloader/*": "./src/dbdataloader/*.js",
         "./dbprocessor/*": "./src/dbprocessor/*.js",
         "./resourcecollector": "./src/resourcecollector/index.js",
         "./resourcecollector/retriever/*": "./src/resourcecollector/retriever/*.js",
@@ -32,7 +32,6 @@
         "./zoollm": "./src/zoollm/index.js",
         "./zoollm/citationcompiler": "./src/zoollm/citationcompiler.js",
         "./zoollm/scanner": "./src/zoollm/scanner.js",
-        "./zoollm/zooprocessor": "./src/zoollm/zooprocessor.js",
         "./util": "./src/util/index.js"
     },
     "imports": {

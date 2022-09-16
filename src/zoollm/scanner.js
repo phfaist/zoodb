@@ -147,14 +147,6 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
             this.encountered_by_object[object_type][object_id][scanned_type]
                 .push( encountered_info );
         }
-
-        // // DEBUGB DEBUG !!
-        // if (scanned_type == 'referenceables') {
-        //     debug(`We've encountered a referenceable !  we now have `
-        //           + `this.encountered = %O and this.encountered_by_object = %O`,
-        //           this.encountered,
-        //           this.encountered_by_object);
-        // }
     }
 
     // ---
@@ -206,8 +198,8 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
             // it's something referenceable, like a defterm or a section heading
             const referenceable_info = node.llm_referenceable_info;
 
-            debug(`Found referenceable in node=${repr(node)}: labels=`, referenceable_info.labels);
-            // `formatted_ref_llm_text = ${referenceable_info.formatted_ref_llm_text.llm_text || referenceable_info.formatted_ref_llm_text}`);
+            debug(`Found referenceable in node=${repr(node)}: labels=`,
+                  referenceable_info.labels);
 
             this._register_encountered('referenceables', {
                 referenceable_info: referenceable_info,
@@ -224,6 +216,11 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
         this._visit_callable(node);
 
         super.visit_environment_node(node);
+    }
+
+    scan_fragment(fragment, what=undefined)
+    {
+        fragment.start_node_visitor(this);
     }
 
     scan_object_with_schema(schema, what=undefined)

@@ -1,9 +1,10 @@
 import debug_module from 'debug';
 const debug = debug_module('zoodb.dbprocessor.relations');
 
-
 import {getfield, setfield, iterfield, concatlistfield, get_field_schema}
     from '../util/getfield.js';
+
+import { ZooDbProcessorBase } from './base.js';
 
 // -----------------------------------------------
 
@@ -145,15 +146,21 @@ class ZooRelation
 // -----------------------------------------------
 
 
-export class RelationsPopulator
+export class RelationsPopulator extends ZooDbProcessorBase
 {
-    constructor(zoodb, config)
+    constructor(config)
     {
-        this.zoodb = zoodb;
-        this.config = config || {};
+        super();
 
-        this.config.object_types ||= this.zoodb.object_types;
+        this.config = config ?? {};
+        this.relations = null;
+    }
 
+    initialize_zoo()
+    {
+        this.config.object_types ??= this.zoodb.object_types;
+
+        // get all the relation objects.
         this.relations = Object.fromEntries(
             this.config.object_types.map( (object_type) => {
                 const rels = (this.zoodb.schema(object_type)._zoo_relations || []).map(
@@ -163,45 +170,18 @@ export class RelationsPopulator
                 return [object_type, rels];
             } )
         );
+
+        this.check_all_clean_fields();
     }
 
-    check_all_clean_fields()
-    {
-        const all_relations_computed_fields = {};
 
-        Object.entries(this.relations).forEach( (pair) => {
-            const [object_type, relations] = pair;
-            relations.forEach( (relation) => {
-                const computed_fields = relation.get_computed_fields();
-                for (const [fld_object_type, fld_infos] of Object.entries(computed_fields)) {
-                    all_relations_computed_fields[fld_object_type] =
-                        ( all_relations_computed_fields[fld_object_type] || [] )
-                        .concat( fld_infos );
-                }
-            } );
-        } );
-        
-        for (const [otype, ofields] of Object.entries(all_relations_computed_fields)) {
-            for (const object of Object.values(this.zoodb.objects[otype])) {
-
-                for (const fldinfo of ofields) {
-                    for (const value of iterfield(object, fldinfo.fieldname)) {
-                        if (typeof value != 'undefined') {
-                            throw new Error(
-                                `${otype} object's ‘${fldinfo.fieldname}’ field should not `
-                                    + `be specified manually (got ${JSON.stringify(value)}). `
-                                    + fldinfo.msg
-                            );
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    populate_relations()
+    process_zoo()
     {
         let zoodb = this.zoodb;
+
+        // let's clear all of our relation fields so we can re-build them all
+        this.clear_all_relation_fields();
+
         const object_types = this.config.object_types;
 
         if (!this.relations) {
@@ -242,7 +222,61 @@ export class RelationsPopulator
                 );
             }
         );
-    };
+    }
+
+    // ---
+
+    clear_all_relation_fields()
+    {
+        const clear_field = ({object_type, object, computed_relation_fieldinfo, value}) => {
+            setfield(object, computed_relation_fieldinfo.fieldname, () => undefined);
+        };
+        this.check_all_clean_fields({ action: clear_field });
+    }
+
+    check_all_clean_fields({ action } = {})
+    {
+        if (action == null) { // null or undefined
+            action = ({object_type, object, computed_relation_fieldinfo, value}) => {
+                throw new Error(
+                    `${object_type} object's ‘${computed_relation_fieldinfo.fieldname}’ `
+                    + `field should not be specified manually (got ${JSON.stringify(value)}). `
+                    + computed_relation_fieldinfo.msg
+                );
+            };
+        }
+
+        const all_relations_computed_fields = {};
+
+        Object.entries(this.relations).forEach( (pair) => {
+            const [object_type, relations] = pair;
+            relations.forEach( (relation) => {
+                const computed_fields = relation.get_computed_fields();
+                for (const [fld_object_type, fld_infos] of Object.entries(computed_fields)) {
+                    all_relations_computed_fields[fld_object_type] =
+                        ( all_relations_computed_fields[fld_object_type] || [] )
+                        .concat( fld_infos );
+                }
+            } );
+        } );
+        
+        for (const [object_type, ofields] of Object.entries(all_relations_computed_fields)) {
+            for (const object of Object.values(this.zoodb.objects[object_type])) {
+
+                for (const computed_relation_fieldinfo of ofields) {
+                    const { fieldname } = computed_relation_fieldinfo;
+                    for (const value of iterfield(object, fieldname)) {
+                        if (typeof value != 'undefined') {
+                            action({ object_type, object, computed_relation_fieldinfo, value });
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+
 
 };
 

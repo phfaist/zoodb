@@ -38,10 +38,9 @@ export class CitationSourceManual extends CitationSourceBase
                     }
                 },
                 {
-                    // keep in cache only for a short time (so we can e.g. build
-                    // a site), but otherwise trash it so we immediately pick up
-                    // changes
-                    cache_duration_ms: 60*1000,
+                    // do not keep in cache (it will stay though long enough for
+                    // the zoo to be built)
+                    cache_duration_ms: 0,
                 }
             );
 

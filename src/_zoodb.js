@@ -1,9 +1,15 @@
 
+
 export class ZooDb
 {
-    constructor(db)
+    constructor({ processors, })
     {
-        this.load_data(db);
+        this.processors = processors ?? [];
+        this.processors_initialized = false;
+
+        for (const processor of this.processors) {
+            processor.install_zoo(this);
+        }
     }
 
     schema(object_type)
@@ -21,12 +27,17 @@ export class ZooDb
     get schemas() { return this.db.schemas; }
     get objects() { return this.db.objects; }
 
+    // ---
+
     data_dump()
     {
-        return this.db;
+        let data = this.db;
+        for (const processor of this.processors) {
+            data = processor.process_data_dump(data);
+        }
     }
     
-    load_data(db)
+    async load_data(db)
     {
         if (!db || typeof db.schemas != 'object' || typeof db.objects != 'object') {
             throw new Error(
@@ -38,7 +49,7 @@ export class ZooDb
         // Ensure that each object type has a schema.  (It's fine though if
         // there are additional schemas with no associated object types.)
         for (const object_type in db.objects) {
-            if (!db.schemas.hasOwnProperty(object_type)) {
+            if (db.schemas[object_type] == null) {
                 throw new Error(
                     `Zoo DB data does not have schema for objects of type ‘${object_type}’`
                 );
@@ -47,6 +58,16 @@ export class ZooDb
 
         this.db = Object.assign({}, db)
         this._object_types = Object.keys(db.objects);
+
+        if (!this.processors_initialized) {
+            this.processors_initialized = true;
+            for (const processor of this.processors) {
+                await processor.initialize_zoo();
+            }
+        }
+        for (const processor of this.processors) {
+            await processor.process_zoo();
+        }
     }
 };
 
