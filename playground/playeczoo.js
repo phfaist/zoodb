@@ -43,7 +43,7 @@ if (!eczoo_schema_dir) {
 
 
 
-const loader = new zoodbdataloader.ZooDbDataLoader({
+const loader = new zoodbdataloader.YamlDbZooDataLoader({
     objects: {
         code: {
             schema_name: 'ecc',

@@ -105,7 +105,7 @@ const dbdata = zoodbdataloader.load();
 */
 
 
-export class ZooDbDataLoader
+export class YamlDbZooDataLoader
 {
 
     constructor(config)

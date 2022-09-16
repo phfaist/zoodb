@@ -87,13 +87,13 @@ export class ExternalRefResolver
     {
         if (!this.ref_instance_database.hasOwnProperty(ref_type)) {
             throw new Error(
-                `No reference information stored for unknown ref type ‘${ref_type}’ `
+                `Invalid reference, unknown reference prefix ‘${ref_type}’ `
                 + `in request for ‘${ref_type}:${ref_label}’ in ${resource_info}`
             );
         }
         if (!this.ref_instance_database[ref_type].hasOwnProperty(ref_label)) {
             throw new Error(
-                `No reference information stored for ${ref_type} label ‘${ref_label}’ `
+                `Invalid reference ‘${ref_type}:${ref_label}’ `
                 + `in ${resource_info}`
             );
         }
