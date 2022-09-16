@@ -195,12 +195,13 @@ export const FeatureZooGraphicsCollection = __class__(
                     //debug(`Got graphics_resource = `, graphics_resource);
 
                     if (!feature.src_url_resolver != null) {
-                        const src_url = feature.src_url_resolver(
+                        const { src_url, srcset } = feature.src_url_resolver(
                             graphics_resource,
                             self.render_context
                         );
                         return GraphicsResource($$kw(
-                            Object.assign({}, graphics_resource.asdict(), { src_url, })
+                            Object.assign({}, graphics_resource.asdict(),
+                                          { src_url, srcset, })
                         ));
                     }
 
