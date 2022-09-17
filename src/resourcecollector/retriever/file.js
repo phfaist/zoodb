@@ -101,9 +101,19 @@ class FilePropertiesAccessor
         this.full_source_path = full_source_path;
     }
 
+    fullname()
+    {
+        return this.resolved_source;
+    }
+
     basename()
     {
         return path.basename(this.resolved_source);
+    }
+
+    basenameshort()
+    {
+        return path.basename(this.resolved_source, this.extname());
     }
 
     extname()
