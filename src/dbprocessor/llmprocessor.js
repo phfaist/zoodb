@@ -99,6 +99,11 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
         await this.llm_simple_content_compiler.process_zoo(); // process simple LLM fields
         //debug("Zoo LLM content populated!");
 
+        this.zoo_llm_environment.external_ref_resolver.clear_all_refs();
+
+        // doesn't clear the downloaded citation cache, only the stored compiled citation
+        this.zoo_llm_environment.external_citations_provider.clear_citations();
+
         await this.process_ref_targets_objects();
         await this.process_ref_targets_referenceables();
 
@@ -108,6 +113,17 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
         await this.process_collect_resources();
 
         debug("Zoo LLM processing done");
+    }
+
+    async prepare_zoo_update_objects(db_objects)
+    {
+        await this.llm_simple_content_compiler.prepare_zoo_update_objects(db_objects);
+    }
+
+    async process_zoo_update_objects(db_objects)
+    {
+        // simply re-process the full zoo.
+        await this.process_zoo();
     }
 
     // ---
@@ -197,7 +213,6 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
         const encountered_citations = this.scanner.get_encountered('citations');
 
         // make sure we purge any entries from earlier possible zoo processings
-        // (which is still to be implemented)
         this.citation_manager.purge_expired();
 
         await this.citation_manager.retrieve_citations( encountered_citations );

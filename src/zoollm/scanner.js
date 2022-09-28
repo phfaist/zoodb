@@ -159,6 +159,33 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
 
     // ---
 
+    unregister_all_from_object(object_type, object_id)
+    {
+        //debug(`Unregistering all encountered items from ‘${object_type}:${object_id}’`);
+
+        // traverse this.encountered and remove all matching stored information
+        for (const scanned_type of Object.keys(this.encountered)) {
+            let j = 0;
+            while (j < this.encountered[scanned_type].length) {
+                const encountered_info = this.encountered[scanned_type][j];
+                const {object_type: this_object_type, object_id: this_object_id} =
+                      encountered_info.encountered_in.resource_info;
+                //debug(`... testing ${j} ‘${this_object_type}:${this_object_id}’ ?`, encountered_info);
+                if (object_type === this_object_type && object_id === this_object_id) {
+                    // remove from array
+                    this.encountered[scanned_type].splice(j, 1);
+                    //debug(`... removed `, encountered_info);
+                } else {
+                    ++j;
+                }
+            }
+        }
+        // remove also from this.encountered_by_object
+        delete this.encountered_by_object[object_type][object_id];
+    }
+
+    // ---
+
     visit_macro_node(node)
     {
         this._visit_callable(node)

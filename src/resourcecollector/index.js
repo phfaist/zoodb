@@ -23,7 +23,6 @@ export class ResourceCollector
         this.collect_working = false;
     }
 
-
     //
     // NOTE: collect() calls need to be awaited and shouldn't run
     // simultaneously!  (e.g. resources corresponding to different source

@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-09-17 11:08:49
+/* 000001 */ // Transcrypt'ed from Python, 2022-09-29 00:22:15
 /* 000006 */ var html = {};
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
@@ -990,11 +990,124 @@
 /* 000567 */ 			var __accu0__ = self;
 /* 000567 */ 			return __call__ (__accu0__.generate_open_tag, __accu0__, 'img', __kwargtrans__ ({attrs: imgattrs}));
 /* 000567 */ 		}) ();
-/* 000567 */ 	});}
-/* 000567 */ });
-/* 000573 */ export var _rx_delayed_markers = (function () {
-/* 000573 */ 	var __accu0__ = re;
-/* 000573 */ 	return __call__ (__accu0__.compile, __accu0__, '<LLM:DLYD:(?P<key>\\d+)\\s*/>');
-/* 000573 */ }) ();
+/* 000567 */ 	});},
+/* 000570 */ 	get render_cells () {return __get__ (this, function (self, cells_model, render_context, target_id) {
+/* 000570 */ 		if (typeof target_id == 'undefined' || (target_id != null && target_id.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000570 */ 			var target_id = null;
+/* 000570 */ 		};
+/* 000570 */ 		if (arguments.length) {
+/* 000570 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000570 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000570 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000570 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000570 */ 					switch (__attrib0__) {
+/* 000570 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000570 */ 						case 'cells_model': var cells_model = __allkwargs0__ [__attrib0__]; break;
+/* 000570 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000570 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
+/* 000570 */ 					}
+/* 000570 */ 				}
+/* 000570 */ 			}
+/* 000570 */ 		}
+/* 000570 */ 		else {
+/* 000570 */ 		}
+/* 000572 */ 		var data_items = [];
+/* 000573 */ 		var row_j = 0;
+/* 000574 */ 		while (__t__ (__lt__ (row_j, __call__ (len, null, cells_model.grid_data)))) {
+/* 000575 */ 			var row_items = [];
+/* 000576 */ 			var col_j = 0;
+/* 000577 */ 			while (__t__ (__lt__ (col_j, __call__ (len, null, __getitem__ (cells_model.grid_data, row_j))))) {
+/* 000579 */ 				var grid_cell_data = __getitem__ (__getitem__ (cells_model.grid_data, row_j), col_j);
+/* 000581 */ 				if (__t__ (__t__ (grid_cell_data === null) || __getitem__ (grid_cell_data, 'cell') === null)) {
+/* 000584 */ 					(function () {
+/* 000584 */ 						var __accu0__ = row_items;
+/* 000584 */ 						return __call__ (__accu0__.append, __accu0__, (function () {
+/* 000584 */ 							var __accu1__ = self;
+/* 000584 */ 							return __call__ (__accu1__.wrap_in_tag, __accu1__, 'td', '', __kwargtrans__ ({class_names: ['cell-empty']}));
+/* 000584 */ 						}) ());
+/* 000584 */ 					}) ();
+/* 000589 */ 					var col_j = __call__ (__iadd__, null, col_j, 1);
+/* 000589 */ 					continue;
+/* 000589 */ 				}
+/* 000592 */ 				if (__t__ (__getitem__ (grid_cell_data, 'is_topleft'))) {
+/* 000594 */ 					var cell = __getitem__ (grid_cell_data, 'cell');
+/* 000595 */ 					var rendered_cell_contents = (function () {
+/* 000595 */ 						var __accu0__ = self;
+/* 000595 */ 						return __call__ (__accu0__.render_nodelist, __accu0__, cell.content_nodes, __kwargtrans__ ({render_context: render_context}));
+/* 000595 */ 					}) ();
+/* 000599 */ 					var clsnames = __add__ (['cell'], (function () {
+/* 000599 */ 						var __accu0__ = [];
+/* 000599 */ 						var __iterable0__ = cell.styles;
+/* 000599 */ 						for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000599 */ 							var sty = __getitem__ (__iterable0__, __index0__);
+/* 000599 */ 							(function () {
+/* 000599 */ 								var __accu1__ = __accu0__;
+/* 000599 */ 								return __call__ (__accu1__.append, __accu1__, 'cellstyle-{}'.format (sty));
+/* 000599 */ 							}) ();
+/* 000599 */ 						}
+/* 000599 */ 						return __accu0__;
+/* 000599 */ 					}) ());
+/* 000600 */ 					var tagname = 'td';
+/* 000601 */ 					if (__t__ (__t__ (__in__ ('H', cell.styles)) || __in__ ('rH', cell.styles))) {
+/* 000602 */ 						var tagname = 'th';
+/* 000602 */ 					}
+/* 000603 */ 					var attrs = dict ({});
+/* 000604 */ 					var cplc = cell.placement;
+/* 000605 */ 					if (__t__ (__ne__ (cplc.col_range.end, __add__ (cplc.col_range.start, 1)))) {
+/* 000608 */ 						__setitem__ (attrs, 'colspan', __call__ (str, null, __sub__ (cplc.col_range.end, cplc.col_range.start)));
+/* 000608 */ 					}
+/* 000609 */ 					if (__t__ (__ne__ (cplc.row_range.end, __add__ (cplc.row_range.start, 1)))) {
+/* 000611 */ 						__setitem__ (attrs, 'rowspan', __call__ (str, null, __sub__ (cplc.row_range.end, cplc.row_range.start)));
+/* 000611 */ 					}
+/* 000612 */ 					(function () {
+/* 000612 */ 						var __accu0__ = row_items;
+/* 000613 */ 						return __call__ (__accu0__.append, __accu0__, (function () {
+/* 000613 */ 							var __accu1__ = self;
+/* 000613 */ 							return __call__ (__accu1__.wrap_in_tag, __accu1__, tagname, rendered_cell_contents, __kwargtrans__ ({attrs: attrs, class_names: clsnames}));
+/* 000613 */ 						}) ());
+/* 000613 */ 					}) ();
+/* 000620 */ 					var col_j = cplc.col_range.end;
+/* 000620 */ 					continue;
+/* 000620 */ 				}
+/* 000625 */ 				var col_j = __call__ (__iadd__, null, col_j, 1);
+/* 000625 */ 			}
+/* 000627 */ 			(function () {
+/* 000627 */ 				var __accu0__ = data_items;
+/* 000627 */ 				return __call__ (__accu0__.append, __accu0__, row_items);
+/* 000627 */ 			}) ();
+/* 000628 */ 			var row_j = __call__ (__iadd__, null, row_j, 1);
+/* 000628 */ 		}
+/* 000630 */ 		var table_attrs = dict ({});
+/* 000631 */ 		if (__t__ (target_id !== null)) {
+/* 000632 */ 			__setitem__ (table_attrs, 'id', target_id);
+/* 000632 */ 		}
+/* 000634 */ 		var s = (function () {
+/* 000634 */ 			var __accu0__ = self;
+/* 000636 */ 			return __call__ (__accu0__.wrap_in_tag, __accu0__, 'table', (function () {
+/* 000636 */ 				var __accu1__ = '';
+/* 000636 */ 				return __call__ (__accu1__.join, __accu1__, (function () {
+/* 000636 */ 					var __accu2__ = [];
+/* 000636 */ 					var __iterable0__ = data_items;
+/* 000636 */ 					for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000638 */ 						var row_items = __getitem__ (__iterable0__, __index0__);
+/* 000638 */ 						(function () {
+/* 000638 */ 							var __accu3__ = __accu2__;
+/* 000637 */ 							return __call__ (__accu3__.append, __accu3__, __add__ (__add__ ('<tr>', (function () {
+/* 000637 */ 								var __accu4__ = '';
+/* 000637 */ 								return __call__ (__accu4__.join, __accu4__, row_items);
+/* 000637 */ 							}) ()), '</tr>'));
+/* 000637 */ 						}) ();
+/* 000637 */ 					}
+/* 000637 */ 					return __accu2__;
+/* 000637 */ 				}) ());
+/* 000637 */ 			}) (), __kwargtrans__ ({attrs: table_attrs, class_names: ['cells']}));
+/* 000637 */ 		}) ();
+/* 000643 */ 		return s;
+/* 000643 */ 	});}
+/* 000643 */ });
+/* 000649 */ export var _rx_delayed_markers = (function () {
+/* 000649 */ 	var __accu0__ = re;
+/* 000649 */ 	return __call__ (__accu0__.compile, __accu0__, '<LLM:DLYD:(?P<key>\\d+)\\s*/>');
+/* 000649 */ }) ();
 /* 000006 */ 
 //# sourceMappingURL=llm.fragmentrenderer.html.map

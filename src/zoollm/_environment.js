@@ -9,6 +9,9 @@ import {__class__, __super__, __get__} from '#llm-js/org.transcrypt.__runtime__.
 
 import { ParsingStateDelta } from '#llm-js/pylatexenc.latexnodes.js';
 
+import { LLMFragment } from '#llm-js/llm.llmfragment.js';
+export { LLMFragment };
+
 import * as llmstd from '#llm-js/llm.llmstd.js';
 
 import * as llm_feature from '#llm-js/llm.feature.js';
@@ -19,8 +22,6 @@ import * as llm_feature_cite from '#llm-js/llm.feature.cite.js';
 import * as llm_feature_floats from '#llm-js/llm.feature.floats.js';
 import * as llm_feature_defterm from '#llm-js/llm.feature.defterm.js';
 import * as llm_feature_graphics from '#llm-js/llm.feature.graphics.js';
-
-
 
 
 export const SectionCommandSpec = llm_feature_headings.FeatureHeadings.SectionCommandSpec;
@@ -46,6 +47,13 @@ export class ExternalRefResolver
         this.options = options || {};
         // e.g., options = { ref_types: [ 'code', 'term', 'topic' ] }
 
+        this.clear_all_refs();
+
+        this.target_href_resolver = null;
+    }
+
+    clear_all_refs()
+    {
         this.ref_instance_database = {};
         if (this.options.ref_types) {
             this.options.ref_types.forEach( (ref_type) => {
@@ -53,7 +61,7 @@ export class ExternalRefResolver
             } );
         }
 
-        this.target_href_resolver = null;
+        //debug(`cleared all refs, this.ref_instance_database =`, this.ref_instance_database);
     }
 
     add_ref(ref_instance)
@@ -81,6 +89,8 @@ export class ExternalRefResolver
         }
         debug(`adding ref: ${ref_type}:${ref_label}`); // -> `, ref_instance);
         this.ref_instance_database[ref_type][ref_label] = ref_instance;
+
+        //debug(`added ref, ref_instance_database =`, this.ref_instance_database);
     }
     
     get_ref(ref_type, ref_label, resource_info, render_context)
@@ -120,6 +130,11 @@ export class ExternalRefResolver
 export class CitationsProvider
 {
     constructor()
+    {
+        this.clear_citations();
+    }
+
+    clear_citations()
     {
         this.citations_database = {};
     }
@@ -290,8 +305,14 @@ export function zoollm_default_options(footnote_counter_formatter='alph')
         figure_filename_extensions: [ '', '.svg', '.png', '.jpg', '.jpeg' ],
 
         float_types: [
-            FloatType('figure', 'Figure', $$kw({counter_formatter: 'Roman'})),
-            FloatType('table', 'Table', $$kw({counter_formatter: 'Roman'})),
+            FloatType('figure', 'Figure', $$kw({
+                counter_formatter: 'Roman',
+                content_handlers: ['includegraphics']
+            })),
+            FloatType('table', 'Table', $$kw({
+                counter_formatter: 'Roman',
+                content_handlers: ['cells', 'includegraphics']
+            })),
         ],
 
         defterm_render_defterm_with_term: true,
@@ -336,7 +357,7 @@ function prep_llm_environ_features(zoollm_options)
                citation_delimiters: zoollm_options.citation_delimiters, })
     )
 
-    props.feature_floats = new llm_feature_floats.FeatureFloatsIncludeGraphicsOnly(
+    props.feature_floats = new llm_feature_floats.FeatureFloats(
         $$kw({float_types: zoollm_options.float_types})
     )
 

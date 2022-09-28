@@ -85,7 +85,7 @@ const zoodbdataloader = new ZooDbDataLoader({
         data_src_path: 'contributors/contributorsdb.yml',
         // load each root key in the file as a separate object, save key as 'contributorid' field
         load_objects:
-            (d) => Object.entries(d).map( (k, v) => Object.extend({}, {contributorid: k}) ),
+            (d) => Object.entries(d).map( (k, v) => Object.extend({}, v, {contributorid: k}) ),
       }
     },
     root_data_dir: '/path/to/data/files/root/',
@@ -125,19 +125,18 @@ export class YamlDbZooDataLoader
         this.config.object_defaults.expected_msg ||=
             `File name matching ‘/${this.config.object_defaults.file_name_match.source}/`
             +`${this.config.object_defaults.file_name_match.flags}’`;
-        Object.entries(this.config.objects).forEach(
-            (objpair) => {
-                let [objectname, objectconfig] = objpair;
-                objectconfig.objectname = objectname;
-                objectconfig.schema_name ||= objectname;
-                objectconfig.data_src_path ||= objectname + 's'; // 'code' -> 'codes/'
-                objectconfig.file_name_match ||= this.config.object_defaults.file_name_match;
-                objectconfig.ignore_file_name_match ||=
-                    this.config.object_defaults.ignore_file_name_match;
-                objectconfig.expected_msg ||= this.config.object_defaults.expected_msg;
-                objectconfig.load_objects ||= this.config.object_defaults.load_objects;
-            }
-        );
+
+        for (let [object_type, objectconfig] of Object.entries(this.config.objects))
+        {
+            objectconfig.object_type = object_type;
+            objectconfig.schema_name ||= object_type;
+            objectconfig.data_src_path ||= object_type + 's'; // 'code' -> 'codes/'
+            objectconfig.file_name_match ||= this.config.object_defaults.file_name_match;
+            objectconfig.ignore_file_name_match ||=
+                this.config.object_defaults.ignore_file_name_match;
+            objectconfig.expected_msg ||= this.config.object_defaults.expected_msg;
+            objectconfig.load_objects ||= this.config.object_defaults.load_objects;
+        }
 
         // simplify schema_root URL (e.g., remove x/y/../z -> x/z, will be
         // needed to compare when to add our custom extension)
@@ -208,31 +207,75 @@ export class YamlDbZooDataLoader
     // methods to load zoo data
     // -------------------------------------------
 
-    // returns promise (as if async)
     async load()
     {
         debug(`Loading Zoo from ‘${this.config.root_data_dir}’ ...`);
 
-        const objects_promises = Object.values(this.config.objects).map(
-            async (objectconfig) => {
-                return await this._load_objects_of_type(objectconfig);
+        const { dbdata, reload_info } = await this.reload();
+
+        return dbdata;
+    }
+
+    async reload(dbdata)
+    {
+        debug(`(Re-)Loading Zoo from ‘${this.config.root_data_dir}’ ...`);
+        
+        dbdata ??= {
+            objects: {},
+        };
+
+        let existing_dbdata_info = {
+            dbdata: dbdata,
+            source_modification_tokens: {},
+            objects_by_source: {},
+            reloaded_objects: Object.fromEntries(Object.keys(this.config.objects).map(
+                (object_type) => [object_type, {}]
+            )),
+        };
+        if (dbdata.objects != null && Object.keys(dbdata.objects).length) {
+            for (const [object_type, objects_db] of Object.entries(dbdata.objects)) {
+                for (const [object_id, object] of Object.entries(objects_db)) {
+                    const { source_file_path, source_file_modification_token } = object._zoodb;
+                    existing_dbdata_info.objects_by_source[source_file_path] ??= {};
+                    existing_dbdata_info.objects_by_source[source_file_path][object_type] ??= [];
+                    existing_dbdata_info.objects_by_source[source_file_path][object_type].push(
+                        [object_id, object]
+                    );
+                    existing_dbdata_info.source_modification_tokens[source_file_path] ??=
+                        source_file_modification_token;
+                    if (existing_dbdata_info.source_modification_tokens[source_file_path]
+                        != source_file_modification_token) {
+                        throw new Error(
+                            `Inconsistency in provided existing zoo dbdata, source file `
+                            + `${source_file_path} has conflicting modification tokens `
+                            + `${existing_dbdata_info.source_modification_tokens[source_file_path]}`
+                            + `${source_file_modification_token} in different objects`
+                        );
+                    }
+                }
             }
-        );
+            // debug(`reload(): existing_dbdata_info is `, existing_dbdata_info);
+            // debug(`reload(): sample is `,
+            //       existing_dbdata_info.objects_by_source['codes/CSS.yml'].code);
+        }
 
-        // debug(`load() objects_promises = ${objects_promises}`);
+        const objects_results = await Promise.all( Object.values(this.config.objects).map(
+            async (objectconfig) => {
+                const obj_results =
+                      await this._load_objects_of_type(objectconfig, existing_dbdata_info);
+                // debug(`reload() object_type ‘${objectconfig.object_type}’ ->`, obj_results);
+                return obj_results;
+            }
+        ) );
 
-        return await Promise.all(objects_promises).then( (objects_results) => {
-            // results = [ (objectname1, d1), (objectname2, d2), ... ]
-            // debug(
-            //     `load() -> got final objects_results=${JSON.stringify(objects_results)}`
-            // );
-            const dbdata = {
+        return {
+            dbdata: {
                 //
                 // Provide all the schema objects (might contain circular refs!):
                 //
                 schemas: Object.fromEntries(
                     Object.values(this.config.objects).map( (objectconfig) => {
-                        return [objectconfig.objectname,
+                        return [objectconfig.object_type,
                                 this.schemas_by_name[objectconfig.schema_name]];
                     } )
                 ),
@@ -240,11 +283,18 @@ export class YamlDbZooDataLoader
                 // Provide all the object data:
                 //
                 objects: Object.fromEntries( objects_results ),
-            };
-            //debug(`load() -> got final data=${JSON.stringify(dbdata)}`);
-            return dbdata;
-        } );
+
+            },
+            //
+            // Information about which objects were reloaded since last run
+            //
+            reload_info: {
+                reloaded_objects: existing_dbdata_info.reloaded_objects,
+            }
+        };
     }
+
+
 
     async get_schema_by_name(schema_name)
     {
@@ -271,9 +321,9 @@ export class YamlDbZooDataLoader
         return schema;
     }
 
-    async _load_objects_of_type(objectconfig)
+    async _load_objects_of_type(objectconfig, existing_dbdata_info)
     {
-        debug(`Loading objects of type ${objectconfig.objectname} ...`);
+        debug(`Loading objects of type ${objectconfig.object_type} ...`);
 
         const schema_name = objectconfig.schema_name;
         const schema = await this.get_schema_by_name(schema_name);
@@ -285,28 +335,26 @@ export class YamlDbZooDataLoader
         // const loaded_objects = [ ['aid',{ a: 'b', c: 'd' }],
         //                          ['bid',{ e: 'f', g: 'h' }] ];
 
-        const loaded_objects = await this.walk_src_files(objectconfig);
-
-        //debug(`_load_objects_of_type() [${objectconfig.objectname}] --> loaded_objects = ${JSON.stringify(loaded_objects)}`);
+        const loaded_objects_pair_with_id =
+              await this.walk_src_files(objectconfig, existing_dbdata_info);
 
         let d = {};
 
-        loaded_objects.forEach( (o) => {
-            const [objid, obj] = o;
+        for (const [objid, obj] of loaded_objects_pair_with_id) {
             //debug(`Got object: objid=${objid}, obj=${JSON.stringify(obj)}`);
             if (d.hasOwnProperty(objid)) {
                 throw new Error(
                     `ID ‘${objid}’ was assigned to multiple objects, in `
-                    +`files ‘${d[objid]._zoodb.source_file_path}’ and `
-                    +`‘${obj._zoodb.source_file_path}’`
+                    + `files ‘${d[objid]._zoodb.source_file_path}’ and `
+                    + `‘${obj._zoodb.source_file_path}’`
                 );
             }
             d[objid] = obj;
-        } );
+        }
 
-        //debug(`_load_objects_of_type() [${objectconfig.objectname}] --> ${JSON.stringify(d)}`);
+        //debug(`_load_objects_of_type() [${objectconfig.object_type}] --> ${JSON.stringify(d)}`);
 
-        return [objectconfig.objectname, d];
+        return [objectconfig.object_type, d];
     }
 
     /// Recursively explores the given directory `root_path` and calls
@@ -349,19 +397,21 @@ export class YamlDbZooDataLoader
         return await do_walk_dir('', dirent);
     }
 
-    async walk_src_files(objectconfig)
+    async walk_src_files(objectconfig, existing_dbdata_info)
     {
         const fullsrcpath = path.join(this.config.root_data_dir, objectconfig.data_src_path);
 
         const dir_callback = (root_path, rel_path, dirent) => {
-            debug(`Looking for ${objectconfig.objectname} objects in ‘${rel_path}’ ...`);
+            debug(`Looking for ${objectconfig.object_type} objects in ‘${rel_path}’ ...`);
         };
         const file_callback = async (root_path, rel_path, dirent) => {
             const filename = dirent.name;
             if ( objectconfig.file_name_match.test( filename ) ) {
                 // is data file, collect it!
                 //debug(`Loading data from ‘${rel_path}’ ...`);
-                return await this.parse_file_into_objects( root_path, rel_path, objectconfig );
+                return await this.parse_file_into_objects(
+                    root_path, rel_path, objectconfig, existing_dbdata_info
+                );
             } else if ( objectconfig.ignore_file_name_match.test( filename ) ) {
                 debug(`Ignored file ‘${filename}’`);
                 return [];
@@ -383,6 +433,12 @@ export class YamlDbZooDataLoader
                 file_callback
             )
         );
+    }
+
+    get_file_modification_token(root_path, rel_path)
+    {
+        const fullpath = path.join(root_path, rel_path);
+        return fs.statSync(fullpath).mtimeMs;
     }
 
     read_file_contents(root_path, rel_path)
@@ -408,33 +464,63 @@ export class YamlDbZooDataLoader
         }
     }
 
-    async parse_file_into_objects(root_path, rel_path, objectconfig)
+    async parse_file_into_objects(root_path, rel_path, objectconfig, existing_dbdata_info)
     {
+        const { object_type } = objectconfig;
+        const source_file_path = path.join(objectconfig.data_src_path, rel_path);
+        const source_file_modification_token =
+              this.get_file_modification_token(root_path, rel_path);
+
+        if (source_file_path in existing_dbdata_info.objects_by_source
+            && object_type in existing_dbdata_info.objects_by_source[source_file_path]) {
+            // We already have data loaded from this source file.  Let's check
+            // if we can keep the objects we've already seen or if the file has
+            // been modified since.
+            const old_modification_token =
+                  existing_dbdata_info.source_modification_tokens[source_file_path];
+            if (old_modification_token === source_file_modification_token) {
+                // same token, file hasn't changed
+
+                let objects_data =
+                    existing_dbdata_info.objects_by_source[source_file_path][object_type];
+
+                return objects_data;
+            }
+        }
+
         const file_contents = this.read_file_contents(root_path, rel_path);
         const file_data = this.parse_file_data( file_contents, objectconfig,
                                                 root_path, rel_path );
 
         let objects_data = objectconfig.load_objects( file_data );
 
-        debug(`Loaded ${objects_data.length} ${objectconfig.objectname} object(s) `
-                     +`from ‘${path.join(objectconfig.data_src_path,rel_path)}’`);
+        debug(`Loaded ${objects_data.length} ${objectconfig.object_type} object(s) `
+              +`from ‘${path.join(objectconfig.data_src_path,rel_path)}’`);
 
-        // add _object field:
-        objects_data.forEach( (obj) => {
-            this.finalize_object(obj, objectconfig, root_path, rel_path);
-        } );
+        // validate & add _zoodb field:
+        for (let obj of objects_data) {
+            this.finalize_object(
+                obj, objectconfig,
+                {root_path, rel_path, source_file_path, source_file_modification_token}
+            );
+
+            existing_dbdata_info.reloaded_objects[objectconfig.object_type][obj._zoodb.id] = obj;
+        }
+
+        // debug(`objects_data = `, objects_data);
 
         return objects_data.map( (obj) => [ obj._zoodb.id, obj ] );
     }
 
-    finalize_object(obj, objectconfig, root_path, rel_path)
+    finalize_object(obj, objectconfig,
+                    {root_path, rel_path, source_file_path, source_file_modification_token})
     {
         // validate according to the JSON schema
         const validation_result = this.schema_validator.validate(obj, objectconfig.schema);
         if (!validation_result.valid) {
             throw new Error(
-                `Invalid ${objectconfig.objectname} object data in `
-                +`‘${path.join(objectconfig.data_src_path,rel_path)}’:\n\n`
+                `Invalid ${objectconfig.object_type} object data in `
+                +`‘${source_file_path}’:\n\n`
                 +`*** ${ validation_result.errors.join("\n*** ") }\n`
             );
         }
@@ -443,8 +529,14 @@ export class YamlDbZooDataLoader
 
         obj._zoodb = {
             id: obj[objectconfig.schema._zoo_primarykey],
-            source_file_path: path.join(objectconfig.data_src_path, rel_path),
+            source_file_path: source_file_path,
+            source_file_modification_token: source_file_modification_token,
         };
+
+        debug(`Finalized object, _zoodb -> ${JSON.stringify(obj._zoodb)}`);
     }
+
+
 };
+
 

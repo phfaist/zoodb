@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-09-17 11:08:48
+/* 000001 */ // Transcrypt'ed from Python, 2022-09-29 00:22:14
 /* 000038 */ var logging = {};
 /* 000038 */ var unique_object_id = {};
 /* 000038 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
@@ -40,7 +40,7 @@
 /* 000087 */ export var fn_unique_object_id = unique_object_id.fn_unique_object_id;
 /* 000095 */ export var ParsingState =  __class__ ('ParsingState', [object], {
 /* 000095 */ 	__module__: __name__,
-/* 000223 */ 	_fields: tuple (['s', 'latex_context', 'in_math_mode', 'math_mode_delimiter', 'latex_group_delimiters', 'latex_inline_math_delimiters', 'latex_display_math_delimiters', 'enable_double_newline_paragraphs', 'enable_macros', 'enable_environments', 'enable_comments', 'enable_groups', 'enable_specials', 'enable_math', 'macro_alpha_chars', 'macro_escape_char', 'comment_char', 'forbidden_characters']),
+/* 000223 */ 	_fields: tuple (['s', 'latex_context', 'in_math_mode', 'math_mode_delimiter', 'latex_group_delimiters', 'latex_inline_math_delimiters', 'latex_display_math_delimiters', 'enable_double_newline_paragraphs', 'enable_macros', 'enable_environments', 'enable_comments', 'enable_groups', 'enable_specials', 'enable_math', 'macro_alpha_chars', 'macro_escape_char', 'comment_start', 'forbidden_characters']),
 /* 000244 */ 	get __init__ () {return __get__ (this, function (self) {
 /* 000244 */ 		var kwargs = dict ();
 /* 000244 */ 		if (arguments.length) {
@@ -72,7 +72,7 @@
 /* 000253 */ 			return __call__ (__accu0__.finalize_state, __accu0__);
 /* 000253 */ 		}) ();
 /* 000253 */ 	});},
-/* 000256 */ 	get set_fields () {return __get__ (this, function (self, s, latex_context, in_math_mode, math_mode_delimiter, latex_group_delimiters, latex_inline_math_delimiters, latex_display_math_delimiters, enable_double_newline_paragraphs, enable_macros, enable_environments, enable_comments, enable_groups, enable_specials, enable_math, macro_alpha_chars, macro_escape_char, comment_char, forbidden_characters) {
+/* 000256 */ 	get set_fields () {return __get__ (this, function (self, s, latex_context, in_math_mode, math_mode_delimiter, latex_group_delimiters, latex_inline_math_delimiters, latex_display_math_delimiters, enable_double_newline_paragraphs, enable_macros, enable_environments, enable_comments, enable_groups, enable_specials, enable_math, macro_alpha_chars, macro_escape_char, comment_start, forbidden_characters) {
 /* 000256 */ 		if (typeof s == 'undefined' || (s != null && s.hasOwnProperty ("__kwargtrans__"))) {;
 /* 000256 */ 			var s = null;
 /* 000256 */ 		};
@@ -121,8 +121,8 @@
 /* 000256 */ 		if (typeof macro_escape_char == 'undefined' || (macro_escape_char != null && macro_escape_char.hasOwnProperty ("__kwargtrans__"))) {;
 /* 000256 */ 			var macro_escape_char = '\\';
 /* 000256 */ 		};
-/* 000256 */ 		if (typeof comment_char == 'undefined' || (comment_char != null && comment_char.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000256 */ 			var comment_char = '%';
+/* 000256 */ 		if (typeof comment_start == 'undefined' || (comment_start != null && comment_start.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000256 */ 			var comment_start = '%';
 /* 000256 */ 		};
 /* 000256 */ 		if (typeof forbidden_characters == 'undefined' || (forbidden_characters != null && forbidden_characters.hasOwnProperty ("__kwargtrans__"))) {;
 /* 000256 */ 			var forbidden_characters = '';
@@ -150,7 +150,7 @@
 /* 000256 */ 						case 'enable_math': var enable_math = __allkwargs0__ [__attrib0__]; break;
 /* 000256 */ 						case 'macro_alpha_chars': var macro_alpha_chars = __allkwargs0__ [__attrib0__]; break;
 /* 000256 */ 						case 'macro_escape_char': var macro_escape_char = __allkwargs0__ [__attrib0__]; break;
-/* 000256 */ 						case 'comment_char': var comment_char = __allkwargs0__ [__attrib0__]; break;
+/* 000256 */ 						case 'comment_start': var comment_start = __allkwargs0__ [__attrib0__]; break;
 /* 000256 */ 						case 'forbidden_characters': var forbidden_characters = __allkwargs0__ [__attrib0__]; break;
 /* 000256 */ 					}
 /* 000256 */ 				}
@@ -181,7 +181,7 @@
 /* 000312 */ 		self.enable_math = enable_math;
 /* 000313 */ 		self.macro_alpha_chars = macro_alpha_chars;
 /* 000317 */ 		self.macro_escape_char = macro_escape_char;
-/* 000318 */ 		self.comment_char = comment_char;
+/* 000318 */ 		self.comment_start = comment_start;
 /* 000320 */ 		self.forbidden_characters = forbidden_characters;
 /* 000320 */ 	});},
 /* 000323 */ 	get _finalize_state_latex_group_delimiters_info () {return __get__ (this, function (self, parent, kwargs) {

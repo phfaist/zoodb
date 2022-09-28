@@ -1,3 +1,5 @@
+import debug_module from 'debug';
+const debug = debug_module('zoodb._zoodb');
 
 
 export class ZooDb
@@ -56,6 +58,8 @@ export class ZooDb
             }
         }
 
+        //debug('load_data(): db = ', db);
+
         this.db = Object.assign({}, db)
         this._object_types = Object.keys(db.objects);
 
@@ -69,5 +73,34 @@ export class ZooDb
             await processor.process_zoo();
         }
     }
+
+    async update_objects(db_objects)
+    {
+        debug(`Updating zoo with db_objects =`, db_objects);
+        debug(`this.db.objects=`, this.db.objects);
+
+        for (const processor of this.processors) {
+            await processor.prepare_zoo_update_objects(db_objects);
+        }
+
+        for (const [object_type, object_db] of Object.entries(db_objects)) {
+            for (const [object_id, object] of Object.entries(object_db)) {
+                // update object
+                this.update_object(this.db.objects[object_type], object_id, object);
+            }
+        }
+
+        for (const processor of this.processors) {
+            await processor.process_zoo_update_objects(db_objects);
+        }
+        
+        debug(`Finally, this.db.objects=`, this.db.objects);
+    }
+
+    update_object(object_db, object_id, new_object)
+    {
+        object_db[object_id] = new_object;
+    }
+
 };
 

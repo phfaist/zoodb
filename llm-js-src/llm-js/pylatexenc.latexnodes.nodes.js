@@ -1,8 +1,8 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-09-17 11:08:47
+/* 000001 */ // Transcrypt'ed from Python, 2022-09-29 00:22:13
 /* 000037 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000038 */ import {ParsedArguments} from './pylatexenc.latexnodes._parsedargs.js';
 /* 000037 */ import {LatexWalkerParseError} from './pylatexenc.latexnodes._exctypes.js';
-/* 000037 */ export {ParsedArguments, LatexWalkerParseError};
+/* 000037 */ export {LatexWalkerParseError, ParsedArguments};
 /* 000001 */ var __name__ = 'pylatexenc.latexnodes.nodes';
 /* 000042 */ export var _unicode_from_str = (function __lambda__ (x) {
 /* 000042 */ 	if (arguments.length) {
@@ -939,7 +939,7 @@
 /* 000738 */ 			var __accu0__ = kwargs;
 /* 000738 */ 			return __call__ (__accu0__.py_pop, __accu0__, 'pos_end', null);
 /* 000738 */ 		}) ();
-/* 000740 */ 		if (__t__ (kwargs)) {
+/* 000740 */ 		if (__t__ (__call__ (len, null, kwargs))) {
 /* 000742 */ 			var __except0__ = __call__ (ValueError, null, __add__ ('Unexpected keyword arguments to LatexNodeList: ', __call__ (repr, null, kwargs)));
 /* 000742 */ 			__except0__.__cause__ = null;
 /* 000742 */ 			throw __except0__;
@@ -988,78 +988,39 @@
 /* 000761 */ 		return __call__ (py_iter, null, self.nodelist);
 /* 000761 */ 	});},
 /* 000761 */ 	[Symbol.iterator] () {return this.__iter__ ()},
-/* 000763 */ 	get __getitem__ () {return __get__ (this, function (self, index) {
-/* 000763 */ 		if (arguments.length) {
-/* 000763 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000763 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000763 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000763 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000763 */ 					switch (__attrib0__) {
-/* 000763 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000763 */ 						case 'index': var index = __allkwargs0__ [__attrib0__]; break;
-/* 000763 */ 					}
-/* 000763 */ 				}
-/* 000763 */ 			}
-/* 000763 */ 		}
-/* 000763 */ 		else {
-/* 000763 */ 		}
-/* 000765 */ 		if (__t__ (__t__ (__call__ (isinstance, null, index, int)) && __lt__ (index, 0))) {
-/* 000768 */ 			var index = __add__ (__call__ (len, null, self.nodelist), index);
-/* 000768 */ 		}
-/* 000769 */ 		return __getitem__ (self.nodelist, index);
-/* 000769 */ 	});},
-/* 000771 */ 	get __len__ () {return __get__ (this, function (self) {
-/* 000771 */ 		if (arguments.length) {
-/* 000771 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000771 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000771 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000771 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000771 */ 					switch (__attrib0__) {
-/* 000771 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000771 */ 					}
-/* 000771 */ 				}
-/* 000771 */ 			}
-/* 000771 */ 		}
-/* 000771 */ 		else {
-/* 000771 */ 		}
-/* 000772 */ 		return __call__ (len, null, self.nodelist);
-/* 000772 */ 	});},
-/* 000775 */ 	get latex_verbatim () {return __get__ (this, function (self) {
-/* 000775 */ 		if (arguments.length) {
-/* 000775 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000775 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000775 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000775 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000775 */ 					switch (__attrib0__) {
-/* 000775 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000775 */ 					}
-/* 000775 */ 				}
-/* 000775 */ 			}
-/* 000775 */ 		}
-/* 000775 */ 		else {
-/* 000775 */ 		}
-/* 000782 */ 		return (function () {
-/* 000782 */ 			var __accu0__ = '';
-/* 000782 */ 			return __call__ (__accu0__.join, __accu0__, (function () {
-/* 000782 */ 				var __accu1__ = [];
-/* 000782 */ 				var __iterable0__ = self.nodelist;
-/* 000782 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000784 */ 					var n = __getitem__ (__iterable0__, __index0__);
-/* 000784 */ 					if (__t__ (n !== null)) {
-/* 000785 */ 						(function () {
-/* 000785 */ 							var __accu2__ = __accu1__;
-/* 000783 */ 							return __call__ (__accu2__.append, __accu2__, (function () {
-/* 000783 */ 								var __accu3__ = n;
-/* 000783 */ 								return __call__ (__accu3__.latex_verbatim, __accu3__);
-/* 000783 */ 							}) ());
-/* 000783 */ 						}) ();
-/* 000783 */ 					}
-/* 000783 */ 				}
-/* 000783 */ 				return __accu1__;
-/* 000783 */ 			}) ());
-/* 000783 */ 		}) ();
-/* 000783 */ 	});},
-/* 000789 */ 	get accept_node_visitor () {return __get__ (this, function (self, visitor) {
+/* 000764 */ 	get __getitem__ () {return __get__ (this, function (self, index) {
+/* 000764 */ 		if (arguments.length) {
+/* 000764 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000764 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000764 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000764 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000764 */ 					switch (__attrib0__) {
+/* 000764 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000764 */ 						case 'index': var index = __allkwargs0__ [__attrib0__]; break;
+/* 000764 */ 					}
+/* 000764 */ 				}
+/* 000764 */ 			}
+/* 000764 */ 		}
+/* 000764 */ 		else {
+/* 000764 */ 		}
+/* 000775 */ 		try {
+/* 000776 */ 			if (__t__ (__eq__ (__call__ (len, null, index), 3))) {
+/* 000777 */ 				var __left0__ = index;
+/* 000777 */ 				var lower = __left0__ [0];
+/* 000777 */ 				var upper = __left0__ [1];
+/* 000777 */ 				var step = __left0__ [2];
+/* 000778 */ 				return __getslice__ (self.nodelist, lower, upper, step);
+/* 000778 */ 			}
+/* 000778 */ 		}
+/* 000778 */ 		catch (__except0__) {
+/* 000780 */ 			// pass;
+/* 000780 */ 		}
+/* 000783 */ 		if (__t__ (__t__ (__call__ (isinstance, null, index, int)) && __lt__ (index, 0))) {
+/* 000784 */ 			var index = __add__ (__call__ (len, null, self.nodelist), index);
+/* 000784 */ 		}
+/* 000786 */ 		return __getitem__ (self.nodelist, index);
+/* 000786 */ 	});},
+/* 000789 */ 	get __len__ () {return __get__ (this, function (self) {
 /* 000789 */ 		if (arguments.length) {
 /* 000789 */ 			var __ilastarg0__ = arguments.length - 1;
 /* 000789 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -1067,706 +1028,1005 @@
 /* 000789 */ 				for (var __attrib0__ in __allkwargs0__) {
 /* 000789 */ 					switch (__attrib0__) {
 /* 000789 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000789 */ 						case 'visitor': var visitor = __allkwargs0__ [__attrib0__]; break;
 /* 000789 */ 					}
 /* 000789 */ 				}
 /* 000789 */ 			}
 /* 000789 */ 		}
 /* 000789 */ 		else {
 /* 000789 */ 		}
-/* 000790 */ 		if (__t__ (self.nodelist !== null)) {
-/* 000791 */ 			var __iterable0__ = self.nodelist;
-/* 000791 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000791 */ 				var node = __getitem__ (__iterable0__, __index0__);
-/* 000792 */ 				if (__t__ (node !== null)) {
-/* 000793 */ 					(function () {
-/* 000793 */ 						var __accu0__ = node;
-/* 000793 */ 						return __call__ (__accu0__.accept_node_visitor, __accu0__, visitor);
-/* 000793 */ 					}) ();
+/* 000790 */ 		return __call__ (len, null, self.nodelist);
+/* 000790 */ 	});},
+/* 000793 */ 	get latex_verbatim () {return __get__ (this, function (self) {
+/* 000793 */ 		if (arguments.length) {
+/* 000793 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000793 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000793 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000793 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000793 */ 					switch (__attrib0__) {
+/* 000793 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000793 */ 					}
 /* 000793 */ 				}
 /* 000793 */ 			}
 /* 000793 */ 		}
-/* 000794 */ 		(function () {
-/* 000794 */ 			var __accu0__ = visitor;
-/* 000794 */ 			return __call__ (__accu0__.visit_node_list, __accu0__, self);
-/* 000794 */ 		}) ();
-/* 000794 */ 	});},
-/* 000797 */ 	get split_at_node () {return __get__ (this, function (self, node_predicate_fn, skip_none, keep_separators, max_split) {
-/* 000797 */ 		if (typeof skip_none == 'undefined' || (skip_none != null && skip_none.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000797 */ 			var skip_none = true;
-/* 000797 */ 		};
-/* 000797 */ 		if (typeof keep_separators == 'undefined' || (keep_separators != null && keep_separators.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000797 */ 			var keep_separators = false;
-/* 000797 */ 		};
-/* 000797 */ 		if (typeof max_split == 'undefined' || (max_split != null && max_split.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000797 */ 			var max_split = null;
-/* 000797 */ 		};
-/* 000797 */ 		if (arguments.length) {
-/* 000797 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000797 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000797 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000797 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000797 */ 					switch (__attrib0__) {
-/* 000797 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000797 */ 						case 'node_predicate_fn': var node_predicate_fn = __allkwargs0__ [__attrib0__]; break;
-/* 000797 */ 						case 'skip_none': var skip_none = __allkwargs0__ [__attrib0__]; break;
-/* 000797 */ 						case 'keep_separators': var keep_separators = __allkwargs0__ [__attrib0__]; break;
-/* 000797 */ 						case 'max_split': var max_split = __allkwargs0__ [__attrib0__]; break;
-/* 000797 */ 					}
-/* 000797 */ 				}
-/* 000797 */ 			}
-/* 000797 */ 		}
-/* 000797 */ 		else {
-/* 000797 */ 		}
-/* 000800 */ 		var nodelists_list = [[]];
-/* 000802 */ 		if (__t__ (__t__ (max_split !== null) && __eq__ (max_split, 0))) {
-/* 000803 */ 			var no_more_splits = true;
-/* 000803 */ 		}
-/* 000804 */ 		else {
-/* 000805 */ 			var no_more_splits = false;
-/* 000805 */ 		}
-/* 000807 */ 		var __iterable0__ = self.nodelist;
-/* 000807 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000807 */ 			var n = __getitem__ (__iterable0__, __index0__);
-/* 000808 */ 			if (__t__ (__t__ (skip_none) && n === null)) {
-/* 000808 */ 				continue;
-/* 000808 */ 			}
-/* 000810 */ 			if (__t__ (__t__ (!__t__ ((no_more_splits))) && __call__ (node_predicate_fn, null, n))) {
-/* 000811 */ 				if (__t__ (keep_separators)) {
-/* 000812 */ 					(function () {
-/* 000812 */ 						var __accu0__ = nodelists_list;
-/* 000812 */ 						return __call__ (__accu0__.append, __accu0__, [n]);
-/* 000812 */ 					}) ();
-/* 000812 */ 				}
-/* 000813 */ 				else {
-/* 000814 */ 					(function () {
-/* 000814 */ 						var __accu0__ = nodelists_list;
-/* 000814 */ 						return __call__ (__accu0__.append, __accu0__, []);
-/* 000814 */ 					}) ();
-/* 000814 */ 				}
-/* 000816 */ 				if (__t__ (__t__ (max_split !== null) && __ge__ (__call__ (len, null, nodelists_list), max_split))) {
-/* 000817 */ 					var no_more_splits = true;
-/* 000817 */ 				}
-/* 000817 */ 			}
-/* 000818 */ 			else {
-/* 000819 */ 				(function () {
-/* 000819 */ 					var __accu0__ = __getitem__ (nodelists_list, __sub__ (__call__ (len, null, nodelists_list), 1));
-/* 000819 */ 					return __call__ (__accu0__.append, __accu0__, n);
-/* 000819 */ 				}) ();
-/* 000819 */ 			}
+/* 000793 */ 		else {
+/* 000793 */ 		}
+/* 000800 */ 		return (function () {
+/* 000800 */ 			var __accu0__ = '';
+/* 000800 */ 			return __call__ (__accu0__.join, __accu0__, (function () {
+/* 000800 */ 				var __accu1__ = [];
+/* 000800 */ 				var __iterable0__ = self.nodelist;
+/* 000800 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000802 */ 					var n = __getitem__ (__iterable0__, __index0__);
+/* 000802 */ 					if (__t__ (n !== null)) {
+/* 000803 */ 						(function () {
+/* 000803 */ 							var __accu2__ = __accu1__;
+/* 000801 */ 							return __call__ (__accu2__.append, __accu2__, (function () {
+/* 000801 */ 								var __accu3__ = n;
+/* 000801 */ 								return __call__ (__accu3__.latex_verbatim, __accu3__);
+/* 000801 */ 							}) ());
+/* 000801 */ 						}) ();
+/* 000801 */ 					}
+/* 000801 */ 				}
+/* 000801 */ 				return __accu1__;
+/* 000801 */ 			}) ());
+/* 000801 */ 		}) ();
+/* 000801 */ 	});},
+/* 000807 */ 	get accept_node_visitor () {return __get__ (this, function (self, visitor) {
+/* 000807 */ 		if (arguments.length) {
+/* 000807 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000807 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000807 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000807 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000807 */ 					switch (__attrib0__) {
+/* 000807 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000807 */ 						case 'visitor': var visitor = __allkwargs0__ [__attrib0__]; break;
+/* 000807 */ 					}
+/* 000807 */ 				}
+/* 000807 */ 			}
+/* 000807 */ 		}
+/* 000807 */ 		else {
+/* 000807 */ 		}
+/* 000808 */ 		if (__t__ (self.nodelist !== null)) {
+/* 000809 */ 			var __iterable0__ = self.nodelist;
+/* 000809 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000809 */ 				var node = __getitem__ (__iterable0__, __index0__);
+/* 000810 */ 				if (__t__ (node !== null)) {
+/* 000811 */ 					(function () {
+/* 000811 */ 						var __accu0__ = node;
+/* 000811 */ 						return __call__ (__accu0__.accept_node_visitor, __accu0__, visitor);
+/* 000811 */ 					}) ();
+/* 000811 */ 				}
+/* 000811 */ 			}
+/* 000811 */ 		}
+/* 000812 */ 		(function () {
+/* 000812 */ 			var __accu0__ = visitor;
+/* 000812 */ 			return __call__ (__accu0__.visit_node_list, __accu0__, self);
+/* 000812 */ 		}) ();
+/* 000812 */ 	});},
+/* 000815 */ 	get filter () {return __get__ (this, function (self, node_predicate_fn, skip_none, skip_comments, skip_whitespace_char_nodes) {
+/* 000815 */ 		if (typeof node_predicate_fn == 'undefined' || (node_predicate_fn != null && node_predicate_fn.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000815 */ 			var node_predicate_fn = null;
+/* 000815 */ 		};
+/* 000815 */ 		if (typeof skip_none == 'undefined' || (skip_none != null && skip_none.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000815 */ 			var skip_none = true;
+/* 000815 */ 		};
+/* 000815 */ 		if (typeof skip_comments == 'undefined' || (skip_comments != null && skip_comments.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000815 */ 			var skip_comments = false;
+/* 000815 */ 		};
+/* 000815 */ 		if (typeof skip_whitespace_char_nodes == 'undefined' || (skip_whitespace_char_nodes != null && skip_whitespace_char_nodes.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000815 */ 			var skip_whitespace_char_nodes = false;
+/* 000815 */ 		};
+/* 000815 */ 		if (arguments.length) {
+/* 000815 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000815 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000815 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000815 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000815 */ 					switch (__attrib0__) {
+/* 000815 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000815 */ 						case 'node_predicate_fn': var node_predicate_fn = __allkwargs0__ [__attrib0__]; break;
+/* 000815 */ 						case 'skip_none': var skip_none = __allkwargs0__ [__attrib0__]; break;
+/* 000815 */ 						case 'skip_comments': var skip_comments = __allkwargs0__ [__attrib0__]; break;
+/* 000815 */ 						case 'skip_whitespace_char_nodes': var skip_whitespace_char_nodes = __allkwargs0__ [__attrib0__]; break;
+/* 000815 */ 					}
+/* 000815 */ 				}
+/* 000815 */ 			}
+/* 000815 */ 		}
+/* 000815 */ 		else {
+/* 000815 */ 		}
+/* 000818 */ 		if (__t__ (self.latex_walker !== null)) {
+/* 000819 */ 			var make_nodelist = self.latex_walker.make_nodelist;
 /* 000819 */ 		}
-/* 000821 */ 		if (__t__ (self.latex_walker !== null)) {
-/* 000822 */ 			var make_latex_node_list = self.latex_walker.make_nodelist;
-/* 000822 */ 		}
-/* 000823 */ 		else {
-/* 000824 */ 			var make_latex_node_list = (function __lambda__ (nl) {
-/* 000824 */ 				var kwargs = dict ();
-/* 000824 */ 				if (arguments.length) {
-/* 000824 */ 					var __ilastarg0__ = arguments.length - 1;
-/* 000824 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000824 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000824 */ 						for (var __attrib0__ in __allkwargs0__) {
-/* 000824 */ 							switch (__attrib0__) {
-/* 000824 */ 								case 'nl': var nl = __allkwargs0__ [__attrib0__]; break;
-/* 000824 */ 								default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000824 */ 							}
-/* 000824 */ 						}
-/* 000824 */ 						delete kwargs.__kwargtrans__;
-/* 000824 */ 					}
-/* 000824 */ 				}
-/* 000824 */ 				else {
-/* 000824 */ 				}
-/* 000824 */ 				return __call__ (LatexNodeList, null, nl, __kwargtrans__ (kwargs));
-/* 000824 */ 			});
-/* 000824 */ 		}
-/* 000826 */ 		return (function () {
-/* 000826 */ 			var __accu0__ = [];
-/* 000826 */ 			var __iterable0__ = nodelists_list;
-/* 000826 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000828 */ 				var nl = __getitem__ (__iterable0__, __index0__);
-/* 000828 */ 				(function () {
-/* 000828 */ 					var __accu1__ = __accu0__;
-/* 000827 */ 					return __call__ (__accu1__.append, __accu1__, __call__ (make_latex_node_list, null, nl, __kwargtrans__ ({parsing_state: self.parsing_state})));
-/* 000827 */ 				}) ();
+/* 000820 */ 		else {
+/* 000821 */ 			var make_nodelist = (function __lambda__ (nl) {
+/* 000821 */ 				var kwargs = dict ();
+/* 000821 */ 				if (arguments.length) {
+/* 000821 */ 					var __ilastarg0__ = arguments.length - 1;
+/* 000821 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000821 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000821 */ 						for (var __attrib0__ in __allkwargs0__) {
+/* 000821 */ 							switch (__attrib0__) {
+/* 000821 */ 								case 'nl': var nl = __allkwargs0__ [__attrib0__]; break;
+/* 000821 */ 								default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000821 */ 							}
+/* 000821 */ 						}
+/* 000821 */ 						delete kwargs.__kwargtrans__;
+/* 000821 */ 					}
+/* 000821 */ 				}
+/* 000821 */ 				else {
+/* 000821 */ 				}
+/* 000821 */ 				return __call__ (LatexNodeList, null, nl, __kwargtrans__ (kwargs));
+/* 000821 */ 			});
+/* 000821 */ 		}
+/* 000823 */ 		var filter_full_predicate_fn = function (n) {
+/* 000823 */ 			if (arguments.length) {
+/* 000823 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000823 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000823 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000823 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000823 */ 						switch (__attrib0__) {
+/* 000823 */ 							case 'n': var n = __allkwargs0__ [__attrib0__]; break;
+/* 000823 */ 						}
+/* 000823 */ 					}
+/* 000823 */ 				}
+/* 000823 */ 			}
+/* 000823 */ 			else {
+/* 000823 */ 			}
+/* 000824 */ 			if (__t__ (__t__ (skip_none) && n === null)) {
+/* 000825 */ 				return false;
+/* 000825 */ 			}
+/* 000826 */ 			if (__t__ (__t__ (skip_comments) && (function () {
+/* 000826 */ 				var __accu0__ = n;
+/* 000826 */ 				return __call__ (__accu0__.isNodeType, __accu0__, LatexCommentNode);
+/* 000826 */ 			}) ())) {
+/* 000827 */ 				return false;
 /* 000827 */ 			}
-/* 000827 */ 			return __accu0__;
-/* 000827 */ 		}) ();
-/* 000827 */ 	});},
-/* 000831 */ 	get split_at_chars () {return __get__ (this, function (self, sep_chars) {
-/* 000831 */ 		if (arguments.length) {
-/* 000831 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000831 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000831 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000831 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000831 */ 					switch (__attrib0__) {
-/* 000831 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000831 */ 						case 'sep_chars': var sep_chars = __allkwargs0__ [__attrib0__]; break;
-/* 000831 */ 					}
-/* 000831 */ 				}
-/* 000831 */ 			}
-/* 000831 */ 		}
-/* 000831 */ 		else {
-/* 000831 */ 		}
-/* 000863 */ 		var split_node_lists = [];
-/* 000865 */ 		if (__t__ (__call__ (callable, null, sep_chars))) {
-/* 000866 */ 			var sep_chars_fn = sep_chars;
-/* 000866 */ 		}
-/* 000867 */ 		else {
-/* 000868 */ 			var sep_chars_fn = (function __lambda__ (chars, sep_chars) {
-/* 000868 */ 				if (typeof sep_chars == 'undefined' || (sep_chars != null && sep_chars.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000868 */ 					var sep_chars = sep_chars;
-/* 000868 */ 				};
-/* 000868 */ 				if (arguments.length) {
-/* 000868 */ 					var __ilastarg0__ = arguments.length - 1;
-/* 000868 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000868 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000868 */ 						for (var __attrib0__ in __allkwargs0__) {
-/* 000868 */ 							switch (__attrib0__) {
-/* 000868 */ 								case 'chars': var chars = __allkwargs0__ [__attrib0__]; break;
-/* 000868 */ 								case 'sep_chars': var sep_chars = __allkwargs0__ [__attrib0__]; break;
-/* 000868 */ 							}
-/* 000868 */ 						}
-/* 000868 */ 					}
+/* 000828 */ 			if (__t__ (__t__ (skip_whitespace_char_nodes) && __t__ ((function () {
+/* 000828 */ 				var __accu0__ = n;
+/* 000828 */ 				return __call__ (__accu0__.isNodeType, __accu0__, LatexCharsNode);
+/* 000829 */ 			}) ()) && __eq__ (__call__ (len, null, (function () {
+/* 000829 */ 				var __accu0__ = n.chars;
+/* 000829 */ 				return __call__ (__accu0__.strip, __accu0__);
+/* 000829 */ 			}) ()), 0))) {
+/* 000830 */ 				return false;
+/* 000830 */ 			}
+/* 000831 */ 			if (__t__ (node_predicate_fn !== null)) {
+/* 000832 */ 				return __call__ (node_predicate_fn, null, n);
+/* 000832 */ 			}
+/* 000833 */ 			return true;
+/* 000833 */ 		};
+/* 000835 */ 		var filtered_nodes = (function () {
+/* 000835 */ 			var __accu0__ = [];
+/* 000835 */ 			var __iterable0__ = self.nodelist;
+/* 000835 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000837 */ 				var n = __getitem__ (__iterable0__, __index0__);
+/* 000838 */ 				if (__t__ (__call__ (filter_full_predicate_fn, null, n))) {
+/* 000838 */ 					(function () {
+/* 000838 */ 						var __accu1__ = __accu0__;
+/* 000838 */ 						return __call__ (__accu1__.append, __accu1__, n);
+/* 000838 */ 					}) ();
+/* 000838 */ 				}
+/* 000838 */ 			}
+/* 000838 */ 			return __accu0__;
+/* 000838 */ 		}) ();
+/* 000847 */ 		return __call__ (make_nodelist, null, filtered_nodes, __kwargtrans__ ({parsing_state: self.parsing_state, pos: (__t__ (__call__ (len, null, filtered_nodes)) ? null : self.pos_end), pos_end: (__t__ (__call__ (len, null, filtered_nodes)) ? null : self.pos_end)}));
+/* 000847 */ 	});},
+/* 000851 */ 	get split_at_node () {return __get__ (this, function (self, node_predicate_fn, skip_none, keep_separators, max_split) {
+/* 000851 */ 		if (typeof skip_none == 'undefined' || (skip_none != null && skip_none.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000851 */ 			var skip_none = true;
+/* 000851 */ 		};
+/* 000851 */ 		if (typeof keep_separators == 'undefined' || (keep_separators != null && keep_separators.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000851 */ 			var keep_separators = false;
+/* 000851 */ 		};
+/* 000851 */ 		if (typeof max_split == 'undefined' || (max_split != null && max_split.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000851 */ 			var max_split = null;
+/* 000851 */ 		};
+/* 000851 */ 		if (arguments.length) {
+/* 000851 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000851 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000851 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000851 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000851 */ 					switch (__attrib0__) {
+/* 000851 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000851 */ 						case 'node_predicate_fn': var node_predicate_fn = __allkwargs0__ [__attrib0__]; break;
+/* 000851 */ 						case 'skip_none': var skip_none = __allkwargs0__ [__attrib0__]; break;
+/* 000851 */ 						case 'keep_separators': var keep_separators = __allkwargs0__ [__attrib0__]; break;
+/* 000851 */ 						case 'max_split': var max_split = __allkwargs0__ [__attrib0__]; break;
+/* 000851 */ 					}
+/* 000851 */ 				}
+/* 000851 */ 			}
+/* 000851 */ 		}
+/* 000851 */ 		else {
+/* 000851 */ 		}
+/* 000854 */ 		var nodelists_list = [[]];
+/* 000856 */ 		if (__t__ (__t__ (max_split !== null) && __eq__ (max_split, 0))) {
+/* 000857 */ 			var no_more_splits = true;
+/* 000857 */ 		}
+/* 000858 */ 		else {
+/* 000859 */ 			var no_more_splits = false;
+/* 000859 */ 		}
+/* 000861 */ 		var __iterable0__ = self.nodelist;
+/* 000861 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000861 */ 			var n = __getitem__ (__iterable0__, __index0__);
+/* 000862 */ 			if (__t__ (__t__ (skip_none) && n === null)) {
+/* 000862 */ 				continue;
+/* 000862 */ 			}
+/* 000864 */ 			if (__t__ (__t__ (!__t__ ((no_more_splits))) && __call__ (node_predicate_fn, null, n))) {
+/* 000865 */ 				if (__t__ (keep_separators)) {
+/* 000866 */ 					(function () {
+/* 000866 */ 						var __accu0__ = nodelists_list;
+/* 000866 */ 						return __call__ (__accu0__.append, __accu0__, [n]);
+/* 000866 */ 					}) ();
+/* 000866 */ 				}
+/* 000867 */ 				else {
+/* 000868 */ 					(function () {
+/* 000868 */ 						var __accu0__ = nodelists_list;
+/* 000868 */ 						return __call__ (__accu0__.append, __accu0__, []);
+/* 000868 */ 					}) ();
 /* 000868 */ 				}
-/* 000868 */ 				else {
-/* 000868 */ 				}
-/* 000868 */ 				return (function () {
-/* 000868 */ 					var __accu0__ = chars;
-/* 000868 */ 					return __call__ (__accu0__.py_split, __accu0__, sep_chars);
-/* 000868 */ 				}) ();
-/* 000868 */ 			});
-/* 000868 */ 		}
-/* 000870 */ 		var lw = self.latex_walker;
-/* 000871 */ 		if (__t__ (lw !== null)) {
-/* 000872 */ 			var make_node = lw.make_node;
-/* 000872 */ 		}
-/* 000873 */ 		else {
-/* 000874 */ 			var make_node = (function __lambda__ (cls) {
-/* 000874 */ 				var kwargs = dict ();
-/* 000874 */ 				if (arguments.length) {
-/* 000874 */ 					var __ilastarg0__ = arguments.length - 1;
-/* 000874 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000874 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000874 */ 						for (var __attrib0__ in __allkwargs0__) {
-/* 000874 */ 							switch (__attrib0__) {
-/* 000874 */ 								case 'cls': var cls = __allkwargs0__ [__attrib0__]; break;
-/* 000874 */ 								default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000874 */ 							}
-/* 000874 */ 						}
-/* 000874 */ 						delete kwargs.__kwargtrans__;
-/* 000874 */ 					}
-/* 000874 */ 				}
-/* 000874 */ 				else {
-/* 000874 */ 				}
-/* 000874 */ 				return __call__ (cls, null, __kwargtrans__ (kwargs));
-/* 000874 */ 			});
-/* 000874 */ 		}
-/* 000876 */ 		var chars_to_node = function (chars, orig_node, rel_pos) {
-/* 000876 */ 			if (arguments.length) {
-/* 000876 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000876 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000876 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000876 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000876 */ 						switch (__attrib0__) {
-/* 000876 */ 							case 'chars': var chars = __allkwargs0__ [__attrib0__]; break;
-/* 000876 */ 							case 'orig_node': var orig_node = __allkwargs0__ [__attrib0__]; break;
-/* 000876 */ 							case 'rel_pos': var rel_pos = __allkwargs0__ [__attrib0__]; break;
-/* 000876 */ 						}
-/* 000876 */ 					}
-/* 000876 */ 				}
-/* 000876 */ 			}
-/* 000876 */ 			else {
-/* 000876 */ 			}
-/* 000877 */ 			var pos = __add__ (orig_node.pos, rel_pos);
-/* 000881 */ 			return __call__ (make_node, null, LatexCharsNode, __kwargtrans__ ({parsing_state: self.parsing_state, pos: pos, pos_end: __add__ (pos, __call__ (len, null, chars)), chars: chars}));
-/* 000881 */ 		};
-/* 000884 */ 		var pending_nodes = [];
-/* 000886 */ 		var __iterable0__ = self.nodelist;
-/* 000886 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000886 */ 			var n = __getitem__ (__iterable0__, __index0__);
-/* 000887 */ 			if (__t__ ((function () {
-/* 000887 */ 				var __accu0__ = n;
-/* 000887 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexwalker.LatexCharsNode);
-/* 000887 */ 			}) ())) {
-/* 000888 */ 				var parts = __call__ (sep_chars_fn, null, n.chars);
-/* 000889 */ 				var rel_pos = 0;
-/* 000890 */ 				if (__t__ (__getitem__ (parts, 0))) {
-/* 000891 */ 					(function () {
-/* 000891 */ 						var __accu0__ = pending_nodes;
-/* 000891 */ 						return __call__ (__accu0__.append, __accu0__, __call__ (chars_to_node, null, __getitem__ (parts, 0), n, 0));
-/* 000891 */ 					}) ();
-/* 000892 */ 					var rel_pos = __call__ (len, null, __getitem__ (parts, 0));
-/* 000893 */ 					var parts = __getslice__ (parts, 1, null, 1);
-/* 000893 */ 				}
-/* 000894 */ 				if (__t__ (!__t__ ((parts)))) {
-/* 000894 */ 					continue;
-/* 000894 */ 				}
-/* 000897 */ 				if (__t__ (pending_nodes)) {
-/* 000898 */ 					(function () {
-/* 000898 */ 						var __accu0__ = split_node_lists;
-/* 000898 */ 						return __call__ (__accu0__.append, __accu0__, pending_nodes);
-/* 000898 */ 					}) ();
-/* 000899 */ 					var pending_nodes = [];
-/* 000899 */ 				}
-/* 000900 */ 				var __iterable1__ = parts;
-/* 000900 */ 				for (var __index1__ = 0; __index1__ < len (__iterable1__); __index1__++) {
-/* 000900 */ 					var p = __getitem__ (__iterable1__, __index1__);
-/* 000901 */ 					(function () {
-/* 000901 */ 						var __accu0__ = split_node_lists;
-/* 000901 */ 						return __call__ (__accu0__.append, __accu0__, [__call__ (chars_to_node, null, p, n, rel_pos)]);
-/* 000901 */ 					}) ();
-/* 000902 */ 					var rel_pos = __call__ (__iadd__, null, rel_pos, __call__ (len, null, p));
-/* 000902 */ 				}
-/* 000902 */ 				continue;
-/* 000902 */ 			}
-/* 000906 */ 			(function () {
-/* 000906 */ 				var __accu0__ = pending_nodes;
-/* 000906 */ 				return __call__ (__accu0__.append, __accu0__, n);
-/* 000906 */ 			}) ();
-/* 000906 */ 		}
-/* 000908 */ 		if (__t__ (pending_nodes)) {
-/* 000909 */ 			(function () {
-/* 000909 */ 				var __accu0__ = split_node_lists;
-/* 000909 */ 				return __call__ (__accu0__.append, __accu0__, pending_nodes);
-/* 000909 */ 			}) ();
-/* 000909 */ 		}
-/* 000911 */ 		return split_node_lists;
-/* 000911 */ 	});},
-/* 000914 */ 	get get_content_as_chars () {return __get__ (this, function (self) {
-/* 000914 */ 		if (arguments.length) {
-/* 000914 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000914 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000914 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000914 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000914 */ 					switch (__attrib0__) {
-/* 000914 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000914 */ 					}
-/* 000914 */ 				}
-/* 000914 */ 			}
-/* 000914 */ 		}
-/* 000914 */ 		else {
-/* 000914 */ 		}
-/* 000929 */ 		return __call__ (_get_content_as_chars, null, self.nodelist);
-/* 000929 */ 	});},
-/* 000933 */ 	get __eq__ () {return __get__ (this, function (self, other) {
-/* 000933 */ 		if (arguments.length) {
-/* 000933 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000933 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000933 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000933 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000933 */ 					switch (__attrib0__) {
-/* 000933 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000933 */ 						case 'other': var other = __allkwargs0__ [__attrib0__]; break;
-/* 000933 */ 					}
-/* 000933 */ 				}
-/* 000933 */ 			}
-/* 000933 */ 		}
-/* 000933 */ 		else {
-/* 000933 */ 		}
-/* 000934 */ 		if (__t__ (__call__ (isinstance, null, other, list))) {
-/* 000935 */ 			return __eq__ (self.nodelist, other);
-/* 000935 */ 		}
-/* 000936 */ 		return __t__ (__eq__ (self.nodelist, other.nodelist)) && __t__ ((__t__ (__t__ (self.pos === null) && other.pos === null) || __eq__ (self.pos, other.pos))) && (__t__ (__t__ (self.pos_end === null) && other.pos_end === null) || __eq__ (self.pos_end, other.pos_end));
-/* 000936 */ 	});},
-/* 000945 */ 	get to_json_object () {return __get__ (this, function (self) {
-/* 000945 */ 		if (arguments.length) {
-/* 000945 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000945 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000945 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000945 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000945 */ 					switch (__attrib0__) {
-/* 000945 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000945 */ 					}
-/* 000945 */ 				}
-/* 000945 */ 			}
-/* 000945 */ 		}
-/* 000945 */ 		else {
-/* 000945 */ 		}
-/* 000946 */ 		return self.nodelist;
-/* 000946 */ 	});},
-/* 000948 */ 	get __repr__ () {return __get__ (this, function (self) {
-/* 000948 */ 		if (arguments.length) {
-/* 000948 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000948 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000948 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000948 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000948 */ 					switch (__attrib0__) {
-/* 000948 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000948 */ 					}
-/* 000948 */ 				}
-/* 000948 */ 			}
-/* 000948 */ 		}
-/* 000948 */ 		else {
-/* 000948 */ 		}
-/* 000949 */ 		return (function () {
-/* 000949 */ 			var __accu0__ = 'LatexNodeList({nodelist!r}, pos={pos!r}, pos_end={pos_end!r})';
-/* 000949 */ 			return __call__ (__accu0__.format, __accu0__, __kwargtrans__ ({nodelist: self.nodelist, pos: self.pos, pos_end: self.pos_end}));
-/* 000949 */ 		}) ();
-/* 000949 */ 	});}
-/* 000949 */ });
-/* 000949 */ Object.defineProperty (LatexNodeList, 'len', property.call (LatexNodeList, LatexNodeList._get_len));;
-/* 000957 */ export var _get_content_as_chars = function (nodelist) {
-/* 000957 */ 	if (arguments.length) {
-/* 000957 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 000957 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000957 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000957 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 000957 */ 				switch (__attrib0__) {
-/* 000957 */ 					case 'nodelist': var nodelist = __allkwargs0__ [__attrib0__]; break;
-/* 000957 */ 				}
+/* 000870 */ 				if (__t__ (__t__ (max_split !== null) && __ge__ (__call__ (len, null, nodelists_list), max_split))) {
+/* 000871 */ 					var no_more_splits = true;
+/* 000871 */ 				}
+/* 000871 */ 			}
+/* 000872 */ 			else {
+/* 000873 */ 				(function () {
+/* 000873 */ 					var __accu0__ = __getitem__ (nodelists_list, __sub__ (__call__ (len, null, nodelists_list), 1));
+/* 000873 */ 					return __call__ (__accu0__.append, __accu0__, n);
+/* 000873 */ 				}) ();
+/* 000873 */ 			}
+/* 000873 */ 		}
+/* 000875 */ 		if (__t__ (self.latex_walker !== null)) {
+/* 000876 */ 			var make_latex_node_list = self.latex_walker.make_nodelist;
+/* 000876 */ 		}
+/* 000877 */ 		else {
+/* 000878 */ 			var make_latex_node_list = (function __lambda__ (nl) {
+/* 000878 */ 				var kwargs = dict ();
+/* 000878 */ 				if (arguments.length) {
+/* 000878 */ 					var __ilastarg0__ = arguments.length - 1;
+/* 000878 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000878 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000878 */ 						for (var __attrib0__ in __allkwargs0__) {
+/* 000878 */ 							switch (__attrib0__) {
+/* 000878 */ 								case 'nl': var nl = __allkwargs0__ [__attrib0__]; break;
+/* 000878 */ 								default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000878 */ 							}
+/* 000878 */ 						}
+/* 000878 */ 						delete kwargs.__kwargtrans__;
+/* 000878 */ 					}
+/* 000878 */ 				}
+/* 000878 */ 				else {
+/* 000878 */ 				}
+/* 000878 */ 				return __call__ (LatexNodeList, null, nl, __kwargtrans__ (kwargs));
+/* 000878 */ 			});
+/* 000878 */ 		}
+/* 000880 */ 		return (function () {
+/* 000880 */ 			var __accu0__ = [];
+/* 000880 */ 			var __iterable0__ = nodelists_list;
+/* 000880 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000882 */ 				var nl = __getitem__ (__iterable0__, __index0__);
+/* 000882 */ 				(function () {
+/* 000882 */ 					var __accu1__ = __accu0__;
+/* 000881 */ 					return __call__ (__accu1__.append, __accu1__, __call__ (make_latex_node_list, null, nl, __kwargtrans__ ({parsing_state: self.parsing_state})));
+/* 000881 */ 				}) ();
+/* 000881 */ 			}
+/* 000881 */ 			return __accu0__;
+/* 000881 */ 		}) ();
+/* 000881 */ 	});},
+/* 000885 */ 	get split_at_chars () {return __get__ (this, function (self, sep_chars, max_split, keep_empty, skip_none) {
+/* 000885 */ 		if (typeof max_split == 'undefined' || (max_split != null && max_split.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000885 */ 			var max_split = null;
+/* 000885 */ 		};
+/* 000885 */ 		if (typeof keep_empty == 'undefined' || (keep_empty != null && keep_empty.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000885 */ 			var keep_empty = false;
+/* 000885 */ 		};
+/* 000885 */ 		if (typeof skip_none == 'undefined' || (skip_none != null && skip_none.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000885 */ 			var skip_none = true;
+/* 000885 */ 		};
+/* 000885 */ 		if (arguments.length) {
+/* 000885 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000885 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000885 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000885 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000885 */ 					switch (__attrib0__) {
+/* 000885 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000885 */ 						case 'sep_chars': var sep_chars = __allkwargs0__ [__attrib0__]; break;
+/* 000885 */ 						case 'max_split': var max_split = __allkwargs0__ [__attrib0__]; break;
+/* 000885 */ 						case 'keep_empty': var keep_empty = __allkwargs0__ [__attrib0__]; break;
+/* 000885 */ 						case 'skip_none': var skip_none = __allkwargs0__ [__attrib0__]; break;
+/* 000885 */ 					}
+/* 000885 */ 				}
+/* 000885 */ 			}
+/* 000885 */ 		}
+/* 000885 */ 		else {
+/* 000885 */ 		}
+/* 000924 */ 		var split_node_lists = [];
+/* 000926 */ 		var get_split_match_start_end = function (m, offset) {
+/* 000926 */ 			if (typeof offset == 'undefined' || (offset != null && offset.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000926 */ 				var offset = 0;
+/* 000926 */ 			};
+/* 000926 */ 			if (arguments.length) {
+/* 000926 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000926 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000926 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000926 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000926 */ 						switch (__attrib0__) {
+/* 000926 */ 							case 'm': var m = __allkwargs0__ [__attrib0__]; break;
+/* 000926 */ 							case 'offset': var offset = __allkwargs0__ [__attrib0__]; break;
+/* 000926 */ 						}
+/* 000926 */ 					}
+/* 000926 */ 				}
+/* 000926 */ 			}
+/* 000926 */ 			else {
+/* 000926 */ 			}
+/* 000927 */ 			if (__t__ (m === null)) {
+/* 000928 */ 				return tuple ([__neg__ (1), null]);
+/* 000928 */ 			}
+/* 000929 */ 			if (__t__ (__t__ (__call__ (hasattr, null, m, 'start')) && __call__ (hasattr, null, m, 'end'))) {
+/* 000930 */ 				return tuple ([__add__ (offset, (function () {
+/* 000930 */ 					var __accu0__ = m;
+/* 000930 */ 					return __call__ (__accu0__.start, __accu0__);
+/* 000930 */ 				}) ()), __add__ (offset, (function () {
+/* 000930 */ 					var __accu0__ = m;
+/* 000930 */ 					return __call__ (__accu0__.end, __accu0__);
+/* 000930 */ 				}) ())]);
+/* 000930 */ 			}
+/* 000931 */ 			if (__t__ (__t__ (!__t__ ((m))) || !__t__ ((__call__ (len, null, m))))) {
+/* 000932 */ 				return tuple ([__neg__ (1), null]);
+/* 000932 */ 			}
+/* 000933 */ 			var __left0__ = m;
+/* 000933 */ 			var start = __left0__ [0];
+/* 000933 */ 			var end = __left0__ [1];
+/* 000934 */ 			if (__t__ (start === null)) {
+/* 000935 */ 				var start = __neg__ (1);
+/* 000935 */ 			}
+/* 000936 */ 			else {
+/* 000937 */ 				var start = __add__ (offset, start);
+/* 000937 */ 			}
+/* 000938 */ 			var end = __add__ (offset, end);
+/* 000939 */ 			return tuple ([start, end]);
+/* 000939 */ 		};
+/* 000941 */ 		var get_next_split = function (chars, pos) {
+/* 000941 */ 			if (arguments.length) {
+/* 000941 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000941 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000941 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000941 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000941 */ 						switch (__attrib0__) {
+/* 000941 */ 							case 'chars': var chars = __allkwargs0__ [__attrib0__]; break;
+/* 000941 */ 							case 'pos': var pos = __allkwargs0__ [__attrib0__]; break;
+/* 000941 */ 						}
+/* 000941 */ 					}
+/* 000941 */ 				}
+/* 000941 */ 			}
+/* 000941 */ 			else {
+/* 000941 */ 			}
+/* 000943 */ 			if (__t__ (__t__ (max_split !== null) && __ge__ (__call__ (len, null, split_node_lists), max_split))) {
+/* 000944 */ 				return tuple ([__neg__ (1), __call__ (len, null, chars)]);
+/* 000944 */ 			}
+/* 000946 */ 			if (__t__ (__call__ (hasattr, null, sep_chars, 'search'))) {
+/* 000952 */ 				var m = (function () {
+/* 000952 */ 					var __accu0__ = sep_chars;
+/* 000952 */ 					return __call__ (__accu0__.search, __accu0__, __getslice__ (chars, pos, null, 1));
+/* 000952 */ 				}) ();
+/* 000953 */ 				return __call__ (get_split_match_start_end, null, m, pos);
+/* 000953 */ 			}
+/* 000955 */ 			if (__t__ (__call__ (callable, null, sep_chars))) {
+/* 000956 */ 				var m = __call__ (sep_chars, null, chars, pos);
+/* 000957 */ 				return __call__ (get_split_match_start_end, null, m);
 /* 000957 */ 			}
-/* 000957 */ 		}
-/* 000957 */ 	}
-/* 000957 */ 	else {
-/* 000957 */ 	}
-/* 000963 */ 	if (__t__ (nodelist === null)) {
-/* 000964 */ 		return '';
-/* 000964 */ 	}
-/* 000966 */ 	var charslist = [];
-/* 000968 */ 	var __iterable0__ = nodelist;
-/* 000968 */ 	for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000968 */ 		var n = __getitem__ (__iterable0__, __index0__);
-/* 000970 */ 		if (__t__ (n === null)) {
-/* 000970 */ 			continue;
-/* 000970 */ 		}
-/* 000973 */ 		if (__t__ ((function () {
-/* 000973 */ 			var __accu0__ = n;
-/* 000973 */ 			return __call__ (__accu0__.isNodeType, __accu0__, LatexCommentNode);
-/* 000973 */ 		}) ())) {
-/* 000973 */ 			continue;
-/* 000973 */ 		}
-/* 000977 */ 		if (__t__ ((function () {
-/* 000977 */ 			var __accu0__ = n;
-/* 000977 */ 			return __call__ (__accu0__.isNodeType, __accu0__, LatexGroupNode);
-/* 000977 */ 		}) ())) {
-/* 000979 */ 			(function () {
-/* 000979 */ 				var __accu0__ = charslist;
-/* 000979 */ 				return __call__ (__accu0__.append, __accu0__, __call__ (_get_content_as_chars, null, n.nodelist));
-/* 000979 */ 			}) ();
-/* 000979 */ 			continue;
-/* 000979 */ 		}
-/* 000982 */ 		if (__t__ ((function () {
-/* 000982 */ 			var __accu0__ = n;
-/* 000982 */ 			return __call__ (__accu0__.isNodeType, __accu0__, LatexCharsNode);
-/* 000982 */ 		}) ())) {
-/* 000983 */ 			(function () {
-/* 000983 */ 				var __accu0__ = charslist;
-/* 000983 */ 				return __call__ (__accu0__.append, __accu0__, n.chars);
-/* 000983 */ 			}) ();
-/* 000983 */ 			continue;
-/* 000983 */ 		}
-/* 000987 */ 		var __except0__ = __call__ (LatexWalkerParseError, null, (function () {
-/* 000987 */ 			var __accu0__ = 'Expected simple characters only, got ‘{}’';
-/* 000987 */ 			return __call__ (__accu0__.format, __accu0__, n.__class__.__name__);
-/* 000987 */ 		}) (), __kwargtrans__ ({pos: n.pos}));
-/* 000987 */ 		__except0__.__cause__ = null;
-/* 000987 */ 		throw __except0__;
-/* 000987 */ 	}
-/* 000991 */ 	return (function () {
-/* 000991 */ 		var __accu0__ = '';
-/* 000991 */ 		return __call__ (__accu0__.join, __accu0__, charslist);
-/* 000991 */ 	}) ();
-/* 000991 */ };
-/* 000998 */ export var _update_posposend_from_nodelist = function (pos, pos_end, nodelist) {
-/* 000998 */ 	if (arguments.length) {
-/* 000998 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 000998 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000998 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000998 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 000998 */ 				switch (__attrib0__) {
-/* 000998 */ 					case 'pos': var pos = __allkwargs0__ [__attrib0__]; break;
-/* 000998 */ 					case 'pos_end': var pos_end = __allkwargs0__ [__attrib0__]; break;
-/* 000998 */ 					case 'nodelist': var nodelist = __allkwargs0__ [__attrib0__]; break;
-/* 000998 */ 				}
-/* 000998 */ 			}
-/* 000998 */ 		}
-/* 000998 */ 	}
-/* 000998 */ 	else {
-/* 000998 */ 	}
-/* 001000 */ 	if (__t__ (pos === null)) {
-/* 001001 */ 		var __break0__ = false;
-/* 001001 */ 		var __iterable0__ = nodelist;
-/* 001001 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 001001 */ 			var n = __getitem__ (__iterable0__, __index0__);
-/* 001002 */ 			if (__t__ (n !== null)) {
-/* 001003 */ 				var pos = n.pos;
-/* 001003 */ 				__break0__ = true;
-/* 001003 */ 				break;
-/* 001003 */ 			}
-/* 001003 */ 		}
-/* 001005 */ 		if (!__break0__) {
-/* 001006 */ 			var pos = null;
-/* 001006 */ 		}
-/* 001006 */ 	}
-/* 001008 */ 	if (__t__ (pos_end === null)) {
-/* 001009 */ 		var __break0__ = false;
-/* 001009 */ 		var __iterable0__ = __call__ (py_reversed, null, nodelist);
-/* 001009 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 001009 */ 			var n = __getitem__ (__iterable0__, __index0__);
-/* 001010 */ 			if (__t__ (n !== null)) {
-/* 001011 */ 				var pos_end = n.pos_end;
-/* 001011 */ 				__break0__ = true;
-/* 001011 */ 				break;
-/* 001011 */ 			}
-/* 001011 */ 		}
-/* 001013 */ 		if (!__break0__) {
-/* 001014 */ 			var pos_end = null;
-/* 001014 */ 		}
-/* 001014 */ 	}
-/* 001016 */ 	return tuple ([pos, pos_end]);
-/* 001016 */ };
-/* 001024 */ export var LatexNodesVisitor =  __class__ ('LatexNodesVisitor', [object], {
-/* 001024 */ 	__module__: __name__,
-/* 001031 */ 	get visit () {return __get__ (this, function (self, node) {
-/* 001031 */ 		if (arguments.length) {
-/* 001031 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001031 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001031 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001031 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001031 */ 					switch (__attrib0__) {
-/* 001031 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 001031 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 001031 */ 					}
-/* 001031 */ 				}
-/* 001031 */ 			}
-/* 001031 */ 		}
-/* 001031 */ 		else {
-/* 001031 */ 		}
-/* 001038 */ 		// pass;
-/* 001038 */ 	});},
-/* 001040 */ 	get visit_chars_node () {return __get__ (this, function (self, node) {
-/* 001040 */ 		if (arguments.length) {
-/* 001040 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001040 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001040 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001040 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001040 */ 					switch (__attrib0__) {
-/* 001040 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 001040 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 001040 */ 					}
-/* 001040 */ 				}
-/* 001040 */ 			}
-/* 001040 */ 		}
-/* 001040 */ 		else {
-/* 001040 */ 		}
-/* 001041 */ 		(function () {
-/* 001041 */ 			var __accu0__ = self;
-/* 001041 */ 			return __call__ (__accu0__.visit, __accu0__, node);
-/* 001041 */ 		}) ();
-/* 001041 */ 	});},
-/* 001043 */ 	get visit_group_node () {return __get__ (this, function (self, node) {
-/* 001043 */ 		if (arguments.length) {
-/* 001043 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001043 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001043 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001043 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001043 */ 					switch (__attrib0__) {
-/* 001043 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 001043 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 001043 */ 					}
-/* 001043 */ 				}
-/* 001043 */ 			}
-/* 001043 */ 		}
-/* 001043 */ 		else {
-/* 001043 */ 		}
-/* 001044 */ 		(function () {
-/* 001044 */ 			var __accu0__ = self;
-/* 001044 */ 			return __call__ (__accu0__.visit, __accu0__, node);
-/* 001044 */ 		}) ();
-/* 001044 */ 	});},
-/* 001046 */ 	get visit_comment_node () {return __get__ (this, function (self, node) {
-/* 001046 */ 		if (arguments.length) {
-/* 001046 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001046 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001046 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001046 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001046 */ 					switch (__attrib0__) {
-/* 001046 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 001046 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 001046 */ 					}
-/* 001046 */ 				}
-/* 001046 */ 			}
-/* 001046 */ 		}
-/* 001046 */ 		else {
-/* 001046 */ 		}
-/* 001047 */ 		(function () {
-/* 001047 */ 			var __accu0__ = self;
-/* 001047 */ 			return __call__ (__accu0__.visit, __accu0__, node);
-/* 001047 */ 		}) ();
-/* 001047 */ 	});},
-/* 001049 */ 	get visit_macro_node () {return __get__ (this, function (self, node) {
-/* 001049 */ 		if (arguments.length) {
-/* 001049 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001049 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001049 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001049 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001049 */ 					switch (__attrib0__) {
-/* 001049 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 001049 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000959 */ 			var idx = (function () {
+/* 000959 */ 				var __accu0__ = chars;
+/* 000959 */ 				return __call__ (__accu0__.find, __accu0__, sep_chars, pos);
+/* 000959 */ 			}) ();
+/* 000960 */ 			if (__t__ (__t__ (idx === null) || __eq__ (idx, __neg__ (1)))) {
+/* 000961 */ 				return tuple ([__neg__ (1), null]);
+/* 000961 */ 			}
+/* 000962 */ 			return tuple ([idx, __add__ (idx, __call__ (len, null, sep_chars))]);
+/* 000962 */ 		};
+/* 000965 */ 		var lw = self.latex_walker;
+/* 000966 */ 		if (__t__ (lw !== null)) {
+/* 000967 */ 			var make_node = lw.make_node;
+/* 000968 */ 			var make_nodelist = lw.make_nodelist;
+/* 000968 */ 		}
+/* 000969 */ 		else {
+/* 000970 */ 			var make_node = (function __lambda__ (cls) {
+/* 000970 */ 				var kwargs = dict ();
+/* 000970 */ 				if (arguments.length) {
+/* 000970 */ 					var __ilastarg0__ = arguments.length - 1;
+/* 000970 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000970 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000970 */ 						for (var __attrib0__ in __allkwargs0__) {
+/* 000970 */ 							switch (__attrib0__) {
+/* 000970 */ 								case 'cls': var cls = __allkwargs0__ [__attrib0__]; break;
+/* 000970 */ 								default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000970 */ 							}
+/* 000970 */ 						}
+/* 000970 */ 						delete kwargs.__kwargtrans__;
+/* 000970 */ 					}
+/* 000970 */ 				}
+/* 000970 */ 				else {
+/* 000970 */ 				}
+/* 000970 */ 				return __call__ (cls, null, __kwargtrans__ (kwargs));
+/* 000970 */ 			});
+/* 000971 */ 			var make_nodelist = (function __lambda__ (nl) {
+/* 000971 */ 				var kwargs = dict ();
+/* 000971 */ 				if (arguments.length) {
+/* 000971 */ 					var __ilastarg0__ = arguments.length - 1;
+/* 000971 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000971 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000971 */ 						for (var __attrib0__ in __allkwargs0__) {
+/* 000971 */ 							switch (__attrib0__) {
+/* 000971 */ 								case 'nl': var nl = __allkwargs0__ [__attrib0__]; break;
+/* 000971 */ 								default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000971 */ 							}
+/* 000971 */ 						}
+/* 000971 */ 						delete kwargs.__kwargtrans__;
+/* 000971 */ 					}
+/* 000971 */ 				}
+/* 000971 */ 				else {
+/* 000971 */ 				}
+/* 000971 */ 				return __call__ (LatexNodeList, null, nl, __kwargtrans__ (kwargs));
+/* 000971 */ 			});
+/* 000971 */ 		}
+/* 000973 */ 		var chars_to_node = function (chars, n, rel_pos, rel_pos_end) {
+/* 000973 */ 			if (arguments.length) {
+/* 000973 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000973 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000973 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000973 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000973 */ 						switch (__attrib0__) {
+/* 000973 */ 							case 'chars': var chars = __allkwargs0__ [__attrib0__]; break;
+/* 000973 */ 							case 'n': var n = __allkwargs0__ [__attrib0__]; break;
+/* 000973 */ 							case 'rel_pos': var rel_pos = __allkwargs0__ [__attrib0__]; break;
+/* 000973 */ 							case 'rel_pos_end': var rel_pos_end = __allkwargs0__ [__attrib0__]; break;
+/* 000973 */ 						}
+/* 000973 */ 					}
+/* 000973 */ 				}
+/* 000973 */ 			}
+/* 000973 */ 			else {
+/* 000973 */ 			}
+/* 000974 */ 			return __call__ (make_node, null, LatexCharsNode, __kwargtrans__ ({parsing_state: self.parsing_state, pos: __add__ (n.pos, rel_pos), pos_end: __add__ (n.pos, rel_pos_end), chars: chars}));
+/* 000974 */ 		};
+/* 000980 */ 		var flush_nodes = function (nodes, pos_end) {
+/* 000980 */ 			if (typeof pos_end == 'undefined' || (pos_end != null && pos_end.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000980 */ 				var pos_end = null;
+/* 000980 */ 			};
+/* 000980 */ 			if (arguments.length) {
+/* 000980 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000980 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000980 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000980 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000980 */ 						switch (__attrib0__) {
+/* 000980 */ 							case 'nodes': var nodes = __allkwargs0__ [__attrib0__]; break;
+/* 000980 */ 							case 'pos_end': var pos_end = __allkwargs0__ [__attrib0__]; break;
+/* 000980 */ 						}
+/* 000980 */ 					}
+/* 000980 */ 				}
+/* 000980 */ 			}
+/* 000980 */ 			else {
+/* 000980 */ 			}
+/* 000984 */ 			var newnodelist = __call__ (make_nodelist, null, nodes, __kwargtrans__ ({parsing_state: self.parsing_state, pos: (__t__ (__call__ (len, null, nodes)) ? null : pos_end), pos_end: pos_end}));
+/* 000987 */ 			(function () {
+/* 000987 */ 				var __accu0__ = split_node_lists;
+/* 000987 */ 				return __call__ (__accu0__.append, __accu0__, newnodelist);
+/* 000987 */ 			}) ();
+/* 000987 */ 		};
+/* 000989 */ 		var pending_nodes = [];
+/* 000991 */ 		var __iterable0__ = self.nodelist;
+/* 000991 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000991 */ 			var n = __getitem__ (__iterable0__, __index0__);
+/* 000993 */ 			if (__t__ (n === null)) {
+/* 000994 */ 				if (__t__ (!__t__ ((skip_none)))) {
+/* 000995 */ 					(function () {
+/* 000995 */ 						var __accu0__ = pending_nodes;
+/* 000995 */ 						return __call__ (__accu0__.append, __accu0__, n);
+/* 000995 */ 					}) ();
+/* 000995 */ 				}
+/* 000995 */ 				continue;
+/* 000995 */ 			}
+/* 000998 */ 			if (__t__ ((function () {
+/* 000998 */ 				var __accu0__ = n;
+/* 000998 */ 				return __call__ (__accu0__.isNodeType, __accu0__, LatexCharsNode);
+/* 000998 */ 			}) ())) {
+/* 001000 */ 				var next_sep_end = 0;
+/* 001002 */ 				while (__t__ (true)) {
+/* 001003 */ 					var prev_sep_end = next_sep_end;
+/* 001004 */ 					var __left0__ = __call__ (get_next_split, null, n.chars, prev_sep_end);
+/* 001004 */ 					var next_sep_idx = __left0__ [0];
+/* 001004 */ 					var next_sep_end = __left0__ [1];
+/* 001006 */ 					if (__t__ (__ne__ (next_sep_idx, __neg__ (1)))) {
+/* 001007 */ 						var p = __getslice__ (n.chars, prev_sep_end, next_sep_idx, 1);
+/* 001008 */ 						if (__t__ (__eq__ (prev_sep_end, 0))) {
+/* 001017 */ 							if (__t__ (__call__ (len, null, p))) {
+/* 001018 */ 								(function () {
+/* 001018 */ 									var __accu0__ = pending_nodes;
+/* 001019 */ 									return __call__ (__accu0__.append, __accu0__, __call__ (chars_to_node, null, p, n, prev_sep_end, next_sep_idx));
+/* 001019 */ 								}) ();
+/* 001019 */ 							}
+/* 001021 */ 							if (__t__ (__t__ (__call__ (len, null, pending_nodes)) || keep_empty)) {
+/* 001022 */ 								__call__ (flush_nodes, null, pending_nodes, __kwargtrans__ ({pos_end: __add__ (n.pos, next_sep_idx)}));
+/* 001022 */ 							}
+/* 001023 */ 							var pending_nodes = [];
+/* 001023 */ 							continue;
+/* 001023 */ 						}
+/* 001025 */ 						else {
+/* 001028 */ 							var thenodes = [];
+/* 001029 */ 							if (__t__ (__call__ (len, null, p))) {
+/* 001031 */ 								var thenodes = [__call__ (chars_to_node, null, p, n, prev_sep_end, next_sep_idx)];
+/* 001031 */ 							}
+/* 001033 */ 							if (__t__ (__t__ (__call__ (len, null, thenodes)) || keep_empty)) {
+/* 001034 */ 								__call__ (flush_nodes, null, thenodes, __kwargtrans__ ({pos_end: __add__ (n.pos, next_sep_idx)}));
+/* 001034 */ 							}
+/* 001034 */ 							continue;
+/* 001034 */ 						}
+/* 001034 */ 					}
+/* 001036 */ 					else {
+/* 001037 */ 						if (__t__ (__eq__ (prev_sep_end, 0))) {
+/* 001041 */ 							(function () {
+/* 001041 */ 								var __accu0__ = pending_nodes;
+/* 001041 */ 								return __call__ (__accu0__.append, __accu0__, n);
+/* 001041 */ 							}) ();
+/* 001041 */ 							break;
+/* 001041 */ 						}
+/* 001043 */ 						else {
+/* 001046 */ 							var p = __getslice__ (n.chars, prev_sep_end, null, 1);
+/* 001047 */ 							if (__t__ (__call__ (len, null, p))) {
+/* 001048 */ 								(function () {
+/* 001048 */ 									var __accu0__ = pending_nodes;
+/* 001049 */ 									return __call__ (__accu0__.append, __accu0__, __call__ (chars_to_node, null, p, n, prev_sep_end, __call__ (len, null, n.chars)));
+/* 001049 */ 								}) ();
+/* 001049 */ 							}
+/* 001049 */ 							break;
+/* 001049 */ 						}
+/* 001049 */ 						break;
 /* 001049 */ 					}
 /* 001049 */ 				}
+/* 001049 */ 				continue;
 /* 001049 */ 			}
-/* 001049 */ 		}
-/* 001049 */ 		else {
-/* 001049 */ 		}
-/* 001050 */ 		(function () {
-/* 001050 */ 			var __accu0__ = self;
-/* 001050 */ 			return __call__ (__accu0__.visit, __accu0__, node);
-/* 001050 */ 		}) ();
-/* 001050 */ 	});},
-/* 001052 */ 	get visit_environment_node () {return __get__ (this, function (self, node) {
-/* 001052 */ 		if (arguments.length) {
-/* 001052 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001052 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001052 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001052 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001052 */ 					switch (__attrib0__) {
-/* 001052 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 001052 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 001052 */ 					}
-/* 001052 */ 				}
-/* 001052 */ 			}
-/* 001052 */ 		}
-/* 001052 */ 		else {
-/* 001052 */ 		}
-/* 001053 */ 		(function () {
-/* 001053 */ 			var __accu0__ = self;
-/* 001053 */ 			return __call__ (__accu0__.visit, __accu0__, node);
-/* 001053 */ 		}) ();
-/* 001053 */ 	});},
-/* 001055 */ 	get visit_specials_node () {return __get__ (this, function (self, node) {
-/* 001055 */ 		if (arguments.length) {
-/* 001055 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001055 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001055 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001055 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001055 */ 					switch (__attrib0__) {
-/* 001055 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 001055 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 001055 */ 					}
-/* 001055 */ 				}
-/* 001055 */ 			}
-/* 001055 */ 		}
-/* 001055 */ 		else {
-/* 001055 */ 		}
-/* 001056 */ 		(function () {
-/* 001056 */ 			var __accu0__ = self;
-/* 001056 */ 			return __call__ (__accu0__.visit, __accu0__, node);
-/* 001056 */ 		}) ();
-/* 001056 */ 	});},
-/* 001058 */ 	get visit_math_node () {return __get__ (this, function (self, node) {
-/* 001058 */ 		if (arguments.length) {
-/* 001058 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001058 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001058 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001058 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001058 */ 					switch (__attrib0__) {
-/* 001058 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 001058 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 001058 */ 					}
-/* 001058 */ 				}
-/* 001058 */ 			}
+/* 001058 */ 			(function () {
+/* 001058 */ 				var __accu0__ = pending_nodes;
+/* 001058 */ 				return __call__ (__accu0__.append, __accu0__, n);
+/* 001058 */ 			}) ();
 /* 001058 */ 		}
-/* 001058 */ 		else {
-/* 001058 */ 		}
-/* 001059 */ 		(function () {
-/* 001059 */ 			var __accu0__ = self;
-/* 001059 */ 			return __call__ (__accu0__.visit, __accu0__, node);
-/* 001059 */ 		}) ();
-/* 001059 */ 	});},
-/* 001061 */ 	get visit_node_list () {return __get__ (this, function (self, nodes) {
-/* 001061 */ 		if (arguments.length) {
-/* 001061 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001061 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001061 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001061 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001061 */ 					switch (__attrib0__) {
-/* 001061 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 001061 */ 						case 'nodes': var nodes = __allkwargs0__ [__attrib0__]; break;
-/* 001061 */ 					}
-/* 001061 */ 				}
-/* 001061 */ 			}
+/* 001060 */ 		if (__t__ (__t__ (pending_nodes) || keep_empty)) {
+/* 001061 */ 			__call__ (flush_nodes, null, pending_nodes, __kwargtrans__ ({pos_end: self.pos_end}));
 /* 001061 */ 		}
-/* 001061 */ 		else {
-/* 001061 */ 		}
-/* 001062 */ 		(function () {
-/* 001062 */ 			var __accu0__ = self;
-/* 001062 */ 			return __call__ (__accu0__.visit, __accu0__, nodes);
-/* 001062 */ 		}) ();
-/* 001062 */ 	});},
-/* 001064 */ 	get visit_parsed_arguments () {return __get__ (this, function (self, parsed_args) {
-/* 001064 */ 		if (arguments.length) {
-/* 001064 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001064 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001064 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001064 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001064 */ 					switch (__attrib0__) {
-/* 001064 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 001064 */ 						case 'parsed_args': var parsed_args = __allkwargs0__ [__attrib0__]; break;
-/* 001064 */ 					}
-/* 001064 */ 				}
-/* 001064 */ 			}
-/* 001064 */ 		}
-/* 001064 */ 		else {
-/* 001064 */ 		}
-/* 001065 */ 		(function () {
-/* 001065 */ 			var __accu0__ = self;
-/* 001065 */ 			return __call__ (__accu0__.visit, __accu0__, parsed_args);
-/* 001065 */ 		}) ();
-/* 001065 */ 	});},
-/* 001068 */ 	get visit_unknown_node () {return __get__ (this, function (self, node) {
-/* 001068 */ 		if (arguments.length) {
-/* 001068 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001068 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001068 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001068 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001068 */ 					switch (__attrib0__) {
-/* 001068 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 001068 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 001068 */ 					}
-/* 001068 */ 				}
-/* 001068 */ 			}
-/* 001068 */ 		}
-/* 001068 */ 		else {
-/* 001068 */ 		}
-/* 001069 */ 		(function () {
-/* 001069 */ 			var __accu0__ = self;
-/* 001069 */ 			return __call__ (__accu0__.visit, __accu0__, node);
-/* 001069 */ 		}) ();
-/* 001069 */ 	});},
-/* 001074 */ 	get start () {return __get__ (this, function (self, node) {
-/* 001074 */ 		if (arguments.length) {
-/* 001074 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001074 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001074 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001074 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001074 */ 					switch (__attrib0__) {
-/* 001074 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 001074 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 001074 */ 					}
-/* 001074 */ 				}
-/* 001074 */ 			}
-/* 001074 */ 		}
-/* 001074 */ 		else {
-/* 001074 */ 		}
-/* 001086 */ 		(function () {
-/* 001086 */ 			var __accu0__ = node;
-/* 001086 */ 			return __call__ (__accu0__.accept_node_visitor, __accu0__, self);
-/* 001086 */ 		}) ();
-/* 001086 */ 	});}
-/* 001086 */ });
-/* 001097 */ export var latex_node_types = [LatexNode, LatexCharsNode, LatexGroupNode, LatexCommentNode, LatexMacroNode, LatexEnvironmentNode, LatexSpecialsNode, LatexMathNode];
-/* 001108 */ export var __all__ = __add__ ((function () {
-/* 001108 */ 	var __accu0__ = [];
-/* 001108 */ 	var __iterable0__ = latex_node_types;
-/* 001108 */ 	for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 001108 */ 		var nc = __getitem__ (__iterable0__, __index0__);
-/* 001108 */ 		(function () {
-/* 001108 */ 			var __accu1__ = __accu0__;
-/* 001108 */ 			return __call__ (__accu1__.append, __accu1__, nc.__name__);
-/* 001108 */ 		}) ();
-/* 001108 */ 	}
-/* 001108 */ 	return __accu0__;
-/* 001108 */ }) (), ['LatexNodeList', 'LatexNodesVisitor']);
+/* 001063 */ 		return split_node_lists;
+/* 001063 */ 	});},
+/* 001067 */ 	get get_content_as_chars () {return __get__ (this, function (self) {
+/* 001067 */ 		if (arguments.length) {
+/* 001067 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001067 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001067 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001067 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001067 */ 					switch (__attrib0__) {
+/* 001067 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001067 */ 					}
+/* 001067 */ 				}
+/* 001067 */ 			}
+/* 001067 */ 		}
+/* 001067 */ 		else {
+/* 001067 */ 		}
+/* 001082 */ 		return __call__ (_get_content_as_chars, null, self.nodelist);
+/* 001082 */ 	});},
+/* 001086 */ 	get __eq__ () {return __get__ (this, function (self, other) {
+/* 001086 */ 		if (arguments.length) {
+/* 001086 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001086 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001086 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001086 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001086 */ 					switch (__attrib0__) {
+/* 001086 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001086 */ 						case 'other': var other = __allkwargs0__ [__attrib0__]; break;
+/* 001086 */ 					}
+/* 001086 */ 				}
+/* 001086 */ 			}
+/* 001086 */ 		}
+/* 001086 */ 		else {
+/* 001086 */ 		}
+/* 001087 */ 		if (__t__ (__call__ (isinstance, null, other, list))) {
+/* 001088 */ 			return __eq__ (self.nodelist, other);
+/* 001088 */ 		}
+/* 001089 */ 		return __t__ (__eq__ (self.nodelist, other.nodelist)) && __t__ ((__t__ (__t__ (self.pos === null) && other.pos === null) || __eq__ (self.pos, other.pos))) && (__t__ (__t__ (self.pos_end === null) && other.pos_end === null) || __eq__ (self.pos_end, other.pos_end));
+/* 001089 */ 	});},
+/* 001098 */ 	get to_json_object () {return __get__ (this, function (self) {
+/* 001098 */ 		if (arguments.length) {
+/* 001098 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001098 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001098 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001098 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001098 */ 					switch (__attrib0__) {
+/* 001098 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001098 */ 					}
+/* 001098 */ 				}
+/* 001098 */ 			}
+/* 001098 */ 		}
+/* 001098 */ 		else {
+/* 001098 */ 		}
+/* 001099 */ 		return self.nodelist;
+/* 001099 */ 	});},
+/* 001101 */ 	get __repr__ () {return __get__ (this, function (self) {
+/* 001101 */ 		if (arguments.length) {
+/* 001101 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001101 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001101 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001101 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001101 */ 					switch (__attrib0__) {
+/* 001101 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001101 */ 					}
+/* 001101 */ 				}
+/* 001101 */ 			}
+/* 001101 */ 		}
+/* 001101 */ 		else {
+/* 001101 */ 		}
+/* 001102 */ 		return (function () {
+/* 001102 */ 			var __accu0__ = 'LatexNodeList({nodelist!r}, pos={pos!r}, pos_end={pos_end!r})';
+/* 001102 */ 			return __call__ (__accu0__.format, __accu0__, __kwargtrans__ ({nodelist: self.nodelist, pos: self.pos, pos_end: self.pos_end}));
+/* 001102 */ 		}) ();
+/* 001102 */ 	});}
+/* 001102 */ });
+/* 001102 */ Object.defineProperty (LatexNodeList, 'len', property.call (LatexNodeList, LatexNodeList._get_len));;
+/* 001110 */ export var _get_content_as_chars = function (nodelist) {
+/* 001110 */ 	if (arguments.length) {
+/* 001110 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001110 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001110 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001110 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001110 */ 				switch (__attrib0__) {
+/* 001110 */ 					case 'nodelist': var nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 001110 */ 				}
+/* 001110 */ 			}
+/* 001110 */ 		}
+/* 001110 */ 	}
+/* 001110 */ 	else {
+/* 001110 */ 	}
+/* 001116 */ 	if (__t__ (nodelist === null)) {
+/* 001117 */ 		return '';
+/* 001117 */ 	}
+/* 001119 */ 	var charslist = [];
+/* 001121 */ 	var __iterable0__ = nodelist;
+/* 001121 */ 	for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 001121 */ 		var n = __getitem__ (__iterable0__, __index0__);
+/* 001123 */ 		if (__t__ (n === null)) {
+/* 001123 */ 			continue;
+/* 001123 */ 		}
+/* 001126 */ 		if (__t__ ((function () {
+/* 001126 */ 			var __accu0__ = n;
+/* 001126 */ 			return __call__ (__accu0__.isNodeType, __accu0__, LatexCommentNode);
+/* 001126 */ 		}) ())) {
+/* 001126 */ 			continue;
+/* 001126 */ 		}
+/* 001130 */ 		if (__t__ ((function () {
+/* 001130 */ 			var __accu0__ = n;
+/* 001130 */ 			return __call__ (__accu0__.isNodeType, __accu0__, LatexGroupNode);
+/* 001130 */ 		}) ())) {
+/* 001132 */ 			(function () {
+/* 001132 */ 				var __accu0__ = charslist;
+/* 001132 */ 				return __call__ (__accu0__.append, __accu0__, __call__ (_get_content_as_chars, null, n.nodelist));
+/* 001132 */ 			}) ();
+/* 001132 */ 			continue;
+/* 001132 */ 		}
+/* 001135 */ 		if (__t__ ((function () {
+/* 001135 */ 			var __accu0__ = n;
+/* 001135 */ 			return __call__ (__accu0__.isNodeType, __accu0__, LatexCharsNode);
+/* 001135 */ 		}) ())) {
+/* 001136 */ 			(function () {
+/* 001136 */ 				var __accu0__ = charslist;
+/* 001136 */ 				return __call__ (__accu0__.append, __accu0__, n.chars);
+/* 001136 */ 			}) ();
+/* 001136 */ 			continue;
+/* 001136 */ 		}
+/* 001140 */ 		var __except0__ = __call__ (LatexWalkerParseError, null, (function () {
+/* 001140 */ 			var __accu0__ = 'Expected simple characters only, got ‘{}’';
+/* 001140 */ 			return __call__ (__accu0__.format, __accu0__, n.__class__.__name__);
+/* 001140 */ 		}) (), __kwargtrans__ ({pos: n.pos}));
+/* 001140 */ 		__except0__.__cause__ = null;
+/* 001140 */ 		throw __except0__;
+/* 001140 */ 	}
+/* 001144 */ 	return (function () {
+/* 001144 */ 		var __accu0__ = '';
+/* 001144 */ 		return __call__ (__accu0__.join, __accu0__, charslist);
+/* 001144 */ 	}) ();
+/* 001144 */ };
+/* 001151 */ export var _update_posposend_from_nodelist = function (pos, pos_end, nodelist) {
+/* 001151 */ 	if (arguments.length) {
+/* 001151 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001151 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001151 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001151 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001151 */ 				switch (__attrib0__) {
+/* 001151 */ 					case 'pos': var pos = __allkwargs0__ [__attrib0__]; break;
+/* 001151 */ 					case 'pos_end': var pos_end = __allkwargs0__ [__attrib0__]; break;
+/* 001151 */ 					case 'nodelist': var nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 001151 */ 				}
+/* 001151 */ 			}
+/* 001151 */ 		}
+/* 001151 */ 	}
+/* 001151 */ 	else {
+/* 001151 */ 	}
+/* 001153 */ 	if (__t__ (pos === null)) {
+/* 001154 */ 		var __break0__ = false;
+/* 001154 */ 		var __iterable0__ = nodelist;
+/* 001154 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 001154 */ 			var n = __getitem__ (__iterable0__, __index0__);
+/* 001155 */ 			if (__t__ (n !== null)) {
+/* 001156 */ 				var pos = n.pos;
+/* 001156 */ 				__break0__ = true;
+/* 001156 */ 				break;
+/* 001156 */ 			}
+/* 001156 */ 		}
+/* 001158 */ 		if (!__break0__) {
+/* 001159 */ 			var pos = null;
+/* 001159 */ 		}
+/* 001159 */ 	}
+/* 001161 */ 	if (__t__ (pos_end === null)) {
+/* 001162 */ 		var __break0__ = false;
+/* 001162 */ 		var __iterable0__ = __call__ (py_reversed, null, nodelist);
+/* 001162 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 001162 */ 			var n = __getitem__ (__iterable0__, __index0__);
+/* 001163 */ 			if (__t__ (n !== null)) {
+/* 001164 */ 				var pos_end = n.pos_end;
+/* 001164 */ 				__break0__ = true;
+/* 001164 */ 				break;
+/* 001164 */ 			}
+/* 001164 */ 		}
+/* 001166 */ 		if (!__break0__) {
+/* 001167 */ 			var pos_end = null;
+/* 001167 */ 		}
+/* 001167 */ 	}
+/* 001169 */ 	return tuple ([pos, pos_end]);
+/* 001169 */ };
+/* 001177 */ export var LatexNodesVisitor =  __class__ ('LatexNodesVisitor', [object], {
+/* 001177 */ 	__module__: __name__,
+/* 001184 */ 	get visit () {return __get__ (this, function (self, node) {
+/* 001184 */ 		if (arguments.length) {
+/* 001184 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001184 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001184 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001184 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001184 */ 					switch (__attrib0__) {
+/* 001184 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001184 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 001184 */ 					}
+/* 001184 */ 				}
+/* 001184 */ 			}
+/* 001184 */ 		}
+/* 001184 */ 		else {
+/* 001184 */ 		}
+/* 001191 */ 		// pass;
+/* 001191 */ 	});},
+/* 001193 */ 	get visit_chars_node () {return __get__ (this, function (self, node) {
+/* 001193 */ 		if (arguments.length) {
+/* 001193 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001193 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001193 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001193 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001193 */ 					switch (__attrib0__) {
+/* 001193 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001193 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 001193 */ 					}
+/* 001193 */ 				}
+/* 001193 */ 			}
+/* 001193 */ 		}
+/* 001193 */ 		else {
+/* 001193 */ 		}
+/* 001194 */ 		(function () {
+/* 001194 */ 			var __accu0__ = self;
+/* 001194 */ 			return __call__ (__accu0__.visit, __accu0__, node);
+/* 001194 */ 		}) ();
+/* 001194 */ 	});},
+/* 001196 */ 	get visit_group_node () {return __get__ (this, function (self, node) {
+/* 001196 */ 		if (arguments.length) {
+/* 001196 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001196 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001196 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001196 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001196 */ 					switch (__attrib0__) {
+/* 001196 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001196 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 001196 */ 					}
+/* 001196 */ 				}
+/* 001196 */ 			}
+/* 001196 */ 		}
+/* 001196 */ 		else {
+/* 001196 */ 		}
+/* 001197 */ 		(function () {
+/* 001197 */ 			var __accu0__ = self;
+/* 001197 */ 			return __call__ (__accu0__.visit, __accu0__, node);
+/* 001197 */ 		}) ();
+/* 001197 */ 	});},
+/* 001199 */ 	get visit_comment_node () {return __get__ (this, function (self, node) {
+/* 001199 */ 		if (arguments.length) {
+/* 001199 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001199 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001199 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001199 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001199 */ 					switch (__attrib0__) {
+/* 001199 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001199 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 001199 */ 					}
+/* 001199 */ 				}
+/* 001199 */ 			}
+/* 001199 */ 		}
+/* 001199 */ 		else {
+/* 001199 */ 		}
+/* 001200 */ 		(function () {
+/* 001200 */ 			var __accu0__ = self;
+/* 001200 */ 			return __call__ (__accu0__.visit, __accu0__, node);
+/* 001200 */ 		}) ();
+/* 001200 */ 	});},
+/* 001202 */ 	get visit_macro_node () {return __get__ (this, function (self, node) {
+/* 001202 */ 		if (arguments.length) {
+/* 001202 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001202 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001202 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001202 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001202 */ 					switch (__attrib0__) {
+/* 001202 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001202 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 001202 */ 					}
+/* 001202 */ 				}
+/* 001202 */ 			}
+/* 001202 */ 		}
+/* 001202 */ 		else {
+/* 001202 */ 		}
+/* 001203 */ 		(function () {
+/* 001203 */ 			var __accu0__ = self;
+/* 001203 */ 			return __call__ (__accu0__.visit, __accu0__, node);
+/* 001203 */ 		}) ();
+/* 001203 */ 	});},
+/* 001205 */ 	get visit_environment_node () {return __get__ (this, function (self, node) {
+/* 001205 */ 		if (arguments.length) {
+/* 001205 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001205 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001205 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001205 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001205 */ 					switch (__attrib0__) {
+/* 001205 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001205 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 001205 */ 					}
+/* 001205 */ 				}
+/* 001205 */ 			}
+/* 001205 */ 		}
+/* 001205 */ 		else {
+/* 001205 */ 		}
+/* 001206 */ 		(function () {
+/* 001206 */ 			var __accu0__ = self;
+/* 001206 */ 			return __call__ (__accu0__.visit, __accu0__, node);
+/* 001206 */ 		}) ();
+/* 001206 */ 	});},
+/* 001208 */ 	get visit_specials_node () {return __get__ (this, function (self, node) {
+/* 001208 */ 		if (arguments.length) {
+/* 001208 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001208 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001208 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001208 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001208 */ 					switch (__attrib0__) {
+/* 001208 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001208 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 001208 */ 					}
+/* 001208 */ 				}
+/* 001208 */ 			}
+/* 001208 */ 		}
+/* 001208 */ 		else {
+/* 001208 */ 		}
+/* 001209 */ 		(function () {
+/* 001209 */ 			var __accu0__ = self;
+/* 001209 */ 			return __call__ (__accu0__.visit, __accu0__, node);
+/* 001209 */ 		}) ();
+/* 001209 */ 	});},
+/* 001211 */ 	get visit_math_node () {return __get__ (this, function (self, node) {
+/* 001211 */ 		if (arguments.length) {
+/* 001211 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001211 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001211 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001211 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001211 */ 					switch (__attrib0__) {
+/* 001211 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001211 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 001211 */ 					}
+/* 001211 */ 				}
+/* 001211 */ 			}
+/* 001211 */ 		}
+/* 001211 */ 		else {
+/* 001211 */ 		}
+/* 001212 */ 		(function () {
+/* 001212 */ 			var __accu0__ = self;
+/* 001212 */ 			return __call__ (__accu0__.visit, __accu0__, node);
+/* 001212 */ 		}) ();
+/* 001212 */ 	});},
+/* 001214 */ 	get visit_node_list () {return __get__ (this, function (self, nodes) {
+/* 001214 */ 		if (arguments.length) {
+/* 001214 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001214 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001214 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001214 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001214 */ 					switch (__attrib0__) {
+/* 001214 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001214 */ 						case 'nodes': var nodes = __allkwargs0__ [__attrib0__]; break;
+/* 001214 */ 					}
+/* 001214 */ 				}
+/* 001214 */ 			}
+/* 001214 */ 		}
+/* 001214 */ 		else {
+/* 001214 */ 		}
+/* 001215 */ 		(function () {
+/* 001215 */ 			var __accu0__ = self;
+/* 001215 */ 			return __call__ (__accu0__.visit, __accu0__, nodes);
+/* 001215 */ 		}) ();
+/* 001215 */ 	});},
+/* 001217 */ 	get visit_parsed_arguments () {return __get__ (this, function (self, parsed_args) {
+/* 001217 */ 		if (arguments.length) {
+/* 001217 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001217 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001217 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001217 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001217 */ 					switch (__attrib0__) {
+/* 001217 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001217 */ 						case 'parsed_args': var parsed_args = __allkwargs0__ [__attrib0__]; break;
+/* 001217 */ 					}
+/* 001217 */ 				}
+/* 001217 */ 			}
+/* 001217 */ 		}
+/* 001217 */ 		else {
+/* 001217 */ 		}
+/* 001218 */ 		(function () {
+/* 001218 */ 			var __accu0__ = self;
+/* 001218 */ 			return __call__ (__accu0__.visit, __accu0__, parsed_args);
+/* 001218 */ 		}) ();
+/* 001218 */ 	});},
+/* 001221 */ 	get visit_unknown_node () {return __get__ (this, function (self, node) {
+/* 001221 */ 		if (arguments.length) {
+/* 001221 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001221 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001221 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001221 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001221 */ 					switch (__attrib0__) {
+/* 001221 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001221 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 001221 */ 					}
+/* 001221 */ 				}
+/* 001221 */ 			}
+/* 001221 */ 		}
+/* 001221 */ 		else {
+/* 001221 */ 		}
+/* 001222 */ 		(function () {
+/* 001222 */ 			var __accu0__ = self;
+/* 001222 */ 			return __call__ (__accu0__.visit, __accu0__, node);
+/* 001222 */ 		}) ();
+/* 001222 */ 	});},
+/* 001227 */ 	get start () {return __get__ (this, function (self, node) {
+/* 001227 */ 		if (arguments.length) {
+/* 001227 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001227 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001227 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001227 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001227 */ 					switch (__attrib0__) {
+/* 001227 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 001227 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 001227 */ 					}
+/* 001227 */ 				}
+/* 001227 */ 			}
+/* 001227 */ 		}
+/* 001227 */ 		else {
+/* 001227 */ 		}
+/* 001239 */ 		(function () {
+/* 001239 */ 			var __accu0__ = node;
+/* 001239 */ 			return __call__ (__accu0__.accept_node_visitor, __accu0__, self);
+/* 001239 */ 		}) ();
+/* 001239 */ 	});}
+/* 001239 */ });
+/* 001250 */ export var latex_node_types = [LatexNode, LatexCharsNode, LatexGroupNode, LatexCommentNode, LatexMacroNode, LatexEnvironmentNode, LatexSpecialsNode, LatexMathNode];
+/* 001261 */ export var __all__ = __add__ ((function () {
+/* 001261 */ 	var __accu0__ = [];
+/* 001261 */ 	var __iterable0__ = latex_node_types;
+/* 001261 */ 	for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 001261 */ 		var nc = __getitem__ (__iterable0__, __index0__);
+/* 001261 */ 		(function () {
+/* 001261 */ 			var __accu1__ = __accu0__;
+/* 001261 */ 			return __call__ (__accu1__.append, __accu1__, nc.__name__);
+/* 001261 */ 		}) ();
+/* 001261 */ 	}
+/* 001261 */ 	return __accu0__;
+/* 001261 */ }) (), ['LatexNodeList', 'LatexNodesVisitor']);
 /* 000037 */ 
 //# sourceMappingURL=pylatexenc.latexnodes.nodes.map

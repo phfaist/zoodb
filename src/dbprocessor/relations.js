@@ -224,6 +224,14 @@ export class RelationsPopulator extends ZooDbProcessorBase
         );
     }
 
+    // If we're going to update objects, then we clear everything and rebuild
+    // all relations.
+    prepare_zoo_update_objects(db_objects)
+    {
+        this.clear_all_relation_fields();
+    };
+
+
     // ---
 
     clear_all_relation_fields()

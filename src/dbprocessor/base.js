@@ -22,4 +22,17 @@ export class ZooDbProcessorBase
     {
         throw new Error(`Please reimplement me`);
     }
+
+
+    prepare_zoo_update_objects(db_objects)
+    {
+        // by default do nothing
+    }
+
+    process_zoo_update_objects(db_objects)
+    {
+        // by default simply process_zoo() again.
+        this.process_zoo();
+    }
+
 };

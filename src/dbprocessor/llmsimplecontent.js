@@ -3,8 +3,9 @@ const debug = debug_module('zoodb.dbprocessor.llmcontent');
 
 import { ZooDbProcessorBase } from './base.js';
 
+import { getfield } from '../util/getfield.js';
 import { iter_object_fields_recursive } from '../util/objectinspector.js';
-import { ZooLLMResourceInfo, $$kw, LLMDataDumper } from '../zoollm/index.js';
+import { ZooLLMResourceInfo, $$kw, LLMDataDumper, LLMFragment } from '../zoollm/index.js';
 
 
 function parse_schema_llm_options(schema)
@@ -87,10 +88,24 @@ export class LLMSimpleContentCompiler extends ZooDbProcessorBase
         }
     }
 
+    prepare_zoo_update_objects(db_objects)
+    {
+        for (const [object_type, objectdb] of Object.entries(db_objects)) {
+            for (const [object_id, obj] of Object.entries(objectdb)) {
+                this.config.content_scanner.unregister_all_from_object(object_type, object_id);
+            }
+        }
+    }
+
     // ----
 
     compile_llm( llm_content, { object_type, llm_options, object, fieldname } )
     {
+        if (llm_content instanceof LLMFragment) {
+            // it's already compiled!
+            return llm_content;
+        }
+
         const object_id = object._zoodb.id;
         const source_file_path = object._zoodb.source_file_path;
 
@@ -129,37 +144,47 @@ export class LLMSimpleContentCompiler extends ZooDbProcessorBase
         return fragment;
     }
 
+    * _iter_llm_fields(obj, schema)
+    {
+        for (const {fieldname, fieldvalue, fieldschema, parent, parent_index}
+             of iter_object_fields_recursive(obj, schema, {provide_parent: true})) {
+
+            const llm_options = parse_schema_llm_options(fieldschema);
+
+            if ( llm_options.enabled ) {
+
+                // this is an LLM field !
+
+                yield {fieldname, fieldvalue, fieldschema, parent, parent_index, llm_options};
+
+            }
+        }
+    }
+
     compile_object(object_type, objid, obj, schema)
     {
         obj._zoodb.llm_fields = [];
 
-        for (const {fieldname, fieldvalue, fieldschema, parent, parent_index}
-             of iter_object_fields_recursive(obj, schema, {provide_parent: true})) {
-            
-            const llm_options = parse_schema_llm_options(fieldschema);
+        for (const {fieldname, fieldvalue, fieldschema, parent, parent_index, llm_options}
+             of this._iter_llm_fields(obj, schema)) {
 
-            if ( llm_options.enabled ) {
-                // this is an LLM field !
+            // debug(
+            //     `Compiling ${object_type} ${objid}'s LLM field ${fieldname}: `
+            //     + `‘${fieldvalue}’`
+            // );
 
-                // debug(
-                //     `Compiling ${object_type} ${objid}'s LLM field ${fieldname}: `
-                //     + `‘${fieldvalue}’`
-                // );
+            // register this field as having LLM content
+            obj._zoodb.llm_fields.push(fieldname);
 
-                // register this field as having LLM content
-                obj._zoodb.llm_fields.push(fieldname);
-
-                parent[parent_index] = this.compile_llm(
-                    fieldvalue,
-                    {
-                        object_type: object_type,
-                        llm_options: llm_options,
-                        object: obj,
-                        fieldname: fieldname
-                    }
-                );
-
-            }
+            parent[parent_index] = this.compile_llm(
+                fieldvalue,
+                {
+                    object_type: object_type,
+                    llm_options: llm_options,
+                    object: obj,
+                    fieldname: fieldname
+                }
+            );
 
         }
     }
