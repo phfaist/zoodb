@@ -53,6 +53,9 @@ export class LLMGraphicsResourceProcessor
         const graphics_resource =
               GraphicsResource(target_info.target_name ?? null, $$kw( grdata ));
 
+        // debug(`llmgraphicsprocessor: Adding to the environment's graphics collection `
+        //       + ` graphics_resource = `, graphics_resource);
+
         this.zoo_llm_environment.graphics_collection.add_graphics(
             source,
             graphics_resource

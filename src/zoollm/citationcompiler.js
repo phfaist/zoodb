@@ -242,14 +242,6 @@ export class CitationCompiler
             throw new Error(`Please provide a citation manager object`);
         }
 
-        // List of citation keys to compile.  If set to non-null, we'll only
-        // compile these citations and not all the citations of the database.
-        // (Empty list means compile nothing.)  Each list element should be an
-        // object that provides the keys 'cite_prefix' and 'cite_key'.  (E.g.,
-        // as returned by ZooLLMScanner objects in ./scanner.js via
-        // `scanner.get_encountered('citations')`)
-        this.compile_citations = this.options.compile_citations ?? null;
-
         // The caller/user should fetch these locales or read them from disk
         // beforehand.  The en-US locale is provided by default here.
         this.locales = this.options.locales || {};
@@ -292,6 +284,8 @@ export class CitationCompiler
                 return obj;
             }
         };
+
+        this.compiled_citations = {};
     }
 
     produce_link = {
@@ -307,14 +301,32 @@ export class CitationCompiler
                 `<a href="${escape_html(url)}" target="_blank">${escape_html(displaytext)}</a>`
             );
         },
+    };
+
+    * iter_compiled_citations()
+    {
+        for (const {cite_prefix, cite_key, citation_text}
+             of Object.values(this.compiled_citations)) {
+            yield {cite_prefix, cite_key, citation_text};
+        }
     }
 
-    compile_citations_to_provider(external_citations_provider)
+    get_compiled_citation(cite_prefix, cite_key)
     {
-        const compile_citations =
-              this.compile_citations
-              ?? (this.citation_manager.keys().map(_split_to_cite_prefix_key))
-        ;
+        const {citation_text} = this.compiled_citations[`${cite_prefix}:${cite_key}`];
+        return citation_text;
+    }
+
+    compile_citations(compile_citations)
+    {
+        // compile_citations is a list of citation keys to compile.  If set to
+        // non-null, we'll only compile these citations and not all the
+        // citations of the database.  (Empty list means compile nothing.)  Each
+        // list element should be an object that provides the keys 'cite_prefix'
+        // and 'cite_key'.  (E.g., as returned by ZooLLMScanner objects in
+        // ./scanner.js via `scanner.get_encountered('citations')`)
+
+        compile_citations ??= this.citation_manager.keys().map(_split_to_cite_prefix_key);
 
         //debug(`compile_citations:`, compile_citations);
 
@@ -337,10 +349,22 @@ export class CitationCompiler
 
             const obj = this.citation_manager.get_citation_by_id(citeid);
 
+            // check if this citation is already compiled and up to date (e.g.,
+            // from an earlier run)
+            if (citeid in this.compiled_citations
+                && obj._hash == this.compiled_citations[citeid].hash) {
+                // already compiled!
+                continue;
+            }
+
             if (obj._ready_formatted && obj._ready_formatted[this.output_format]) {
-                external_citations_provider.add_citation(
-                    cite_prefix, cite_key, obj._ready_formatted[this.output_format]
-                );
+                const c = {
+                    hash: obj._hash,
+                    cite_prefix,
+                    cite_key,
+                    citation_text: obj._ready_formatted[this.output_format],
+                };
+                this.compiled_citations[citeid] = c;
                 continue;
             }
 
@@ -386,11 +410,13 @@ export class CitationCompiler
                 );
             }
 
-            //
-            external_citations_provider.add_citation(
-                cite_prefix, cite_key,
-                result_formatted.trim(),
-            );
+            const c = {
+                hash: obj._hash,
+                cite_prefix,
+                cite_key,
+                citation_text: result_formatted.trim()
+            };
+            this.compiled_citations[citeid] = c;
         }
 
     }

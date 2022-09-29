@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-09-29 00:22:15
+/* 000001 */ // Transcrypt'ed from Python, 2022-09-29 22:20:46
 /* 000006 */ var html = {};
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
@@ -983,7 +983,7 @@
 /* 000558 */ 		}
 /* 000560 */ 		var src_url = graphics_resource.src_url;
 /* 000561 */ 		__setitem__ (imgattrs, 'src', src_url);
-/* 000563 */ 		if (__t__ (graphics_resource.srcset)) {
+/* 000563 */ 		if (__t__ (__t__ (graphics_resource.srcset !== null) && __call__ (len, null, graphics_resource.srcset))) {
 /* 000564 */ 			__setitem__ (imgattrs, 'srcset', graphics_resource.srcset);
 /* 000564 */ 		}
 /* 000567 */ 		return (function () {

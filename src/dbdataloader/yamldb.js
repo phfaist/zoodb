@@ -268,7 +268,7 @@ export class YamlDbZooDataLoader
             }
         ) );
 
-        return {
+        const d = {
             dbdata: {
                 //
                 // Provide all the schema objects (might contain circular refs!):
@@ -292,6 +292,11 @@ export class YamlDbZooDataLoader
                 reloaded_objects: existing_dbdata_info.reloaded_objects,
             }
         };
+
+        debug(`(re)load(): d.dbdata.objects = `, d.dbdata.objects,
+              `; d.reload_info.reloaded_objects = `, d.reload_info.reloaded_objects);
+
+        return d;
     }
 
 
@@ -473,18 +478,34 @@ export class YamlDbZooDataLoader
 
         if (source_file_path in existing_dbdata_info.objects_by_source
             && object_type in existing_dbdata_info.objects_by_source[source_file_path]) {
+
             // We already have data loaded from this source file.  Let's check
             // if we can keep the objects we've already seen or if the file has
             // been modified since.
+
             const old_modification_token =
                   existing_dbdata_info.source_modification_tokens[source_file_path];
             if (old_modification_token === source_file_modification_token) {
                 // same token, file hasn't changed
 
+                debug(`File ‘${source_file_path}’ has not changed, re-using existing objects`);
+
                 let objects_data =
                     existing_dbdata_info.objects_by_source[source_file_path][object_type];
 
                 return objects_data;
+            }
+
+            debug(`File ‘${source_file_path}’ has changed since last load, reloading`);
+
+            // We need to reload the data, continue this function normally.
+
+            // to help debugging, mark all old object instances, which we'll replace
+            // here, as "STALE"
+            for (const [old_object_id, old_object]
+                 of existing_dbdata_info.objects_by_source[source_file_path][object_type]) {
+                old_object.$STALE = true;
+                old_object._zoodb.$STALE = true;
             }
         }
 
@@ -507,7 +528,9 @@ export class YamlDbZooDataLoader
             existing_dbdata_info.reloaded_objects[objectconfig.object_type][obj._zoodb.id] = obj;
         }
 
-        // debug(`objects_data = `, objects_data);
+        // debug(`(re)loaded: ${object_type}: objects_data = `, objects_data);
+        // debug(`and existing_dbdata_info.reloaded_objects = `,
+        //       existing_dbdata_info.reloaded_objects);
 
         return objects_data.map( (obj) => [ obj._zoodb.id, obj ] );
     }

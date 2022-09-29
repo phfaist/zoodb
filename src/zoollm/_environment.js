@@ -5,12 +5,12 @@ const debug = debug_module('zoodb.zoollm._environment');
 
 
 import {$$kw, repr} from '#llm-js/py.js';
-import {__class__, __super__, __get__} from '#llm-js/org.transcrypt.__runtime__.js';
+import {__class__, __super__, __get__, isinstance} from '#llm-js/org.transcrypt.__runtime__.js';
 
 import { ParsingStateDelta } from '#llm-js/pylatexenc.latexnodes.js';
 
 import { LLMFragment } from '#llm-js/llm.llmfragment.js';
-export { LLMFragment };
+
 
 import * as llmstd from '#llm-js/llm.llmstd.js';
 
@@ -37,7 +37,10 @@ export const GraphicsResource = llm_feature_graphics.GraphicsResource;
 
 
 
-
+export function is_llm_fragment(obj)
+{
+    return isinstance(obj, LLMFragment);
+}
 
 
 export class ExternalRefResolver
@@ -152,6 +155,14 @@ export class CitationsProvider
         this.citations_database[cite_prefix][cite_key] = full_citation_llm_text;
     }
 
+    set_citations(iterable)
+    {
+        this.clear_citations();
+        for (const {cite_prefix, cite_key, citation_text} of iterable) {
+            this.add_citation(cite_prefix, cite_key, citation_text);
+        }
+    }
+
     get_citation_full_text_llm(cite_prefix, cite_key, resource_info)
     {
         if (!this.citations_database.hasOwnProperty(cite_prefix)) {
@@ -180,7 +191,7 @@ export const FeatureZooGraphicsCollection = __class__(
     {
         // static members
 
- 	__module__: 'zoodb.zoollm.environment',
+ 	__module__: 'zoodb.zoollm._environment',
 
         // static member - nested class definition
         RenderManager:  __class__(
@@ -214,6 +225,9 @@ export const FeatureZooGraphicsCollection = __class__(
                             graphics_resource,
                             self.render_context
                         );
+                        if (src_url === undefined) {
+                            throw new Error(`src_url_resolver() did not return { src_url }.`);
+                        }
                         return GraphicsResource($$kw(
                             Object.assign({}, graphics_resource.asdict(),
                                           { src_url, srcset, })

@@ -5,7 +5,7 @@ import { ZooDbProcessorBase } from './base.js';
 
 import { getfield } from '../util/getfield.js';
 import { iter_object_fields_recursive } from '../util/objectinspector.js';
-import { ZooLLMResourceInfo, $$kw, LLMDataDumper, LLMFragment } from '../zoollm/index.js';
+import { ZooLLMResourceInfo, $$kw, LLMDataDumper, is_llm_fragment } from '../zoollm/index.js';
 
 
 function parse_schema_llm_options(schema)
@@ -101,7 +101,7 @@ export class LLMSimpleContentCompiler extends ZooDbProcessorBase
 
     compile_llm( llm_content, { object_type, llm_options, object, fieldname } )
     {
-        if (llm_content instanceof LLMFragment) {
+        if (is_llm_fragment(llm_content)) {
             // it's already compiled!
             return llm_content;
         }

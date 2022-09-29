@@ -68,7 +68,15 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
         //
         // So that we can compile citations
         //
+
         install_csl_llm_output_format(this.zoo_llm_environment);
+
+        const csl_style = this.options.citations.csl_style;
+
+        this.citation_compiler = new CitationCompiler({
+            citation_manager: this.citation_manager,
+            csl_style: csl_style,
+        });
 
         //
         // Resource collector, e.g. for graphics
@@ -100,9 +108,6 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
         //debug("Zoo LLM content populated!");
 
         this.zoo_llm_environment.external_ref_resolver.clear_all_refs();
-
-        // doesn't clear the downloaded citation cache, only the stored compiled citation
-        this.zoo_llm_environment.external_citations_provider.clear_citations();
 
         await this.process_ref_targets_objects();
         await this.process_ref_targets_referenceables();
@@ -226,16 +231,12 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
     {
         debug('Compiling citations ...');
 
-        const csl_style = this.options.citations.csl_style;
+        this.citation_compiler.compile_citations(
+            this.scanner.get_encountered('citations')
+        );
 
-        let citecompiler = new CitationCompiler({
-            citation_manager: this.citation_manager,
-            compile_citations: this.scanner.get_encountered('citations'),
-            csl_style: csl_style,
-        });
-
-        citecompiler.compile_citations_to_provider(
-            this.zoo_llm_environment.external_citations_provider
+        this.zoo_llm_environment.external_citations_provider.set_citations(
+            this.citation_compiler.iter_compiled_citations()
         );
     }
 
@@ -248,7 +249,7 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
 
         for (const resource of encountered_resources) {
 
-            // console.log('resource = ', resource);
+            // debug('resource = ', resource);
 
             const source_directory =
                   resource.encountered_in.resource_info.get_source_directory();

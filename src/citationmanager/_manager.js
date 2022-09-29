@@ -1,9 +1,9 @@
 import debug_module from 'debug';
 const debug = debug_module('zoodb.citationmanager');
 
-
 import fs from 'fs';
 
+import sha256 from 'hash.js/lib/hash/sha/256.js';
 
 import { Cache } from './_cache.js';
 
@@ -232,6 +232,10 @@ export class CitationDatabaseManager
         const entry = Object.assign({}, entry_csl_json, { id: cite_id });
         //debug(`Storing entry ${JSON.stringify(entry)}`);
 
+        // compute a hash of the object for later convenience (to see if the
+        // citation has changed later)
+        entry._hash = this.compute_entry_hash(entry);
+
         this.cache.put(
             cite_id,
             entry,
@@ -240,6 +244,28 @@ export class CitationDatabaseManager
 
         // save cache at each store
         this.save_cache();
+    }
+
+
+
+    compute_entry_hash(entry)
+    {
+        let hasher = sha256();
+
+        let visit = (x) => {
+            if (Array.isArray(x)) {
+                x.forEach(visit);
+            } else if (x instanceof Object) {
+                for (const key of Object.keys(x).sort()) {
+                    visit(key);
+                    visit(x[key]);
+                }
+            } else {
+                hasher.update(x);
+            }
+        };
+        visit(entry);
+        return hasher.digest('hex');
     }
 
 };

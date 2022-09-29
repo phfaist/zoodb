@@ -147,7 +147,8 @@ logger.info("Zoo is now loaded!");
 
 
 zoollmenviron.graphics_collection.src_url_resolver = (graphics_resource, render_context) => {
-    return path.join('./_output_resource_graphics_files/', graphics_resource.src_url);
+    const src_url = path.join('./_output_resource_graphics_files/', graphics_resource.src_url);
+    return { src_url, srcset: null };
 };
 
 // target_href resolver
@@ -166,38 +167,42 @@ zoollmenviron.external_ref_resolver.target_href_resolver = (ref_instance, render
 // Now render some code information
 //
 
-const mycode = zoodb.objects.code.css;
-//const mycode = zoodb.objects.code.testcode;
+const test_render_code = () => {
 
-// simple standalone text rendering?
+    //const mycode = zoodb.objects.code.css;
+    const mycode = zoodb.objects.code.testcode;
 
-logger.debug(
-    "Simple standalone text rendering: ‘%s’",
-    mycode.name.render_standalone(new zoollm.ZooTextFragmentRenderer())
-);
+    // simple standalone text rendering?
 
-// full html rendering?
+    logger.debug(
+        "Simple standalone text rendering: ‘%s’",
+        mycode.name.render_standalone(new zoollm.ZooTextFragmentRenderer())
+    );
 
-let doc = zoollmenviron.make_document(
-    (render_context) => {
-        const thecode = mycode;
-        return `
+    logger.debug('mycode.name =', mycode.name);
+
+    // full html rendering?
+
+    let doc = zoollmenviron.make_document(
+        (render_context) => {
+            const thecode = mycode;
+            return `
 <h1>${thecode.name.render(render_context)} ${thecode.introduced.render(render_context)}</h1>
 <h2>Description</h2>
 ${thecode.description.render(render_context)}
 <h2>Protection</h2>
 ${thecode.protection.render(render_context)}
 `;
-    } );
-let [rendered_html, render_context] = doc.render( new zoollm.ZooHtmlFragmentRenderer() );
-rendered_html += `
+        } );
+    let [rendered_html, render_context] = doc.render( new zoollm.ZooHtmlFragmentRenderer() );
+    rendered_html += `
 <h2>References</h2>
 ${render_context.feature_render_manager('endnotes').render_endnotes()}
 `
-logger.info("Rendered HTML: ");
-logger.info(rendered_html);
+    logger.info("Rendered HTML: ");
+    logger.info(rendered_html);
 
-const full_rendered_html = `
+    const full_rendered_html = `
 <!doctype html>
 <html>
 <head>
@@ -417,11 +422,27 @@ ${rendered_html}
 </html>
 `;
 
-fs.writeFileSync('out_test.html', full_rendered_html);
+    return full_rendered_html;
+};
+
+fs.writeFileSync('out_test.html', test_render_code());
 
 
 
+// Try to reload the zoo, simulating a file change
+//await new Promise( (resolve) => setTimeout(resolve, 1000) ); // wait a moment
+let pp = path.join(eczoo_data_dir, 'codes', 'CSS.yml');
+//logger.debug(`Touching file ${pp}`);
+fs.appendFileSync( pp, "\n" );
+//await new Promise( (resolve) => setTimeout(resolve, 1000) ); // wait a moment
 
+
+// reload!
+const { dbdata, reload_info } = await loader.reload(zoodb.db);
+await zoodb.update_objects(reload_info.reloaded_objects);
+
+
+fs.writeFileSync('out_test_2.html', test_render_code());
 
 
 
