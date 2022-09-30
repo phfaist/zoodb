@@ -76,8 +76,8 @@ export class ZooDb
 
     async update_objects(db_objects)
     {
-        debug(`Updating zoo with db_objects =`, db_objects);
-        debug(`this.db.objects=`, this.db.objects);
+        // debug(`Updating zoo with db_objects =`, db_objects);
+        // debug(`this.db.objects=`, this.db.objects);
 
         for (const processor of this.processors) {
             await processor.prepare_zoo_update_objects(db_objects);
@@ -94,7 +94,7 @@ export class ZooDb
             await processor.process_zoo_update_objects(db_objects);
         }
         
-        debug(`Finally, this.db.objects=`, this.db.objects);
+        // debug(`Finally, this.db.objects=`, this.db.objects);
     }
 
     update_object(object_db, object_id, new_object)

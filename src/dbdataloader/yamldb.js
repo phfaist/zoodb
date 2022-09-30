@@ -259,14 +259,21 @@ export class YamlDbZooDataLoader
             //       existing_dbdata_info.objects_by_source['codes/CSS.yml'].code);
         }
 
-        const objects_results = await Promise.all( Object.values(this.config.objects).map(
-            async (objectconfig) => {
-                const obj_results =
-                      await this._load_objects_of_type(objectconfig, existing_dbdata_info);
-                // debug(`reload() object_type ‘${objectconfig.object_type}’ ->`, obj_results);
-                return obj_results;
-            }
-        ) );
+        // const objects_results = await Promise.all( Object.values(this.config.objects).map(
+        //     async (objectconfig) => {
+        //         const obj_results =
+        //               await this._load_objects_of_type(objectconfig, existing_dbdata_info);
+        //         // debug(`reload() object_type ‘${objectconfig.object_type}’ ->`, obj_results);
+        //         return obj_results;
+        //     }
+        // ) );
+        let objects_results = {};
+        for (const [object_type, objectconfig] of Object.entries(this.config.objects)) {
+            const obj_db =
+                  await this._load_objects_of_type(objectconfig, existing_dbdata_info);
+            objects_results[object_type] = obj_db;
+        }
+
 
         const d = {
             dbdata: {
@@ -282,7 +289,7 @@ export class YamlDbZooDataLoader
                 //
                 // Provide all the object data:
                 //
-                objects: Object.fromEntries( objects_results ),
+                objects: objects_results,
 
             },
             //
@@ -293,8 +300,8 @@ export class YamlDbZooDataLoader
             }
         };
 
-        debug(`(re)load(): d.dbdata.objects = `, d.dbdata.objects,
-              `; d.reload_info.reloaded_objects = `, d.reload_info.reloaded_objects);
+        // debug(`(re)load(): d.dbdata.objects = `, d.dbdata.objects,
+        //       `; d.reload_info.reloaded_objects = `, d.reload_info.reloaded_objects);
 
         return d;
     }
@@ -359,7 +366,7 @@ export class YamlDbZooDataLoader
 
         //debug(`_load_objects_of_type() [${objectconfig.object_type}] --> ${JSON.stringify(d)}`);
 
-        return [objectconfig.object_type, d];
+        return d; //[objectconfig.object_type, d];
     }
 
     /// Recursively explores the given directory `root_path` and calls
@@ -374,7 +381,7 @@ export class YamlDbZooDataLoader
     /// value returned in a length-1 array.
     async walk(root_path, dir_callback, file_callback)
     {
-        debug(`walk(), root_path=‘${root_path}’`);
+        // debug(`walk(), root_path=‘${root_path}’`);
         // heavily inspired by
         // https://git.rootprojects.org/root/walk.js/src/branch/main/walk.js
         const do_walk_dir = async (rel_path, dirent) => {
@@ -449,21 +456,24 @@ export class YamlDbZooDataLoader
     read_file_contents(root_path, rel_path)
     {
         const fullpath = path.join(root_path, rel_path);
+        //debug(`read_file_contents ${fullpath}`);
         return fs.readFileSync(fullpath);
     }
     parse_file_data(file_contents, objectconfig, root_path, rel_path)
     {
+        // in case root_path is already a JSON/YAML file and rel_path is empty
+        const fullpath = path.join(root_path, rel_path);
         try {
-            if ( /\.ya?ml$/i.test(rel_path) ) {
+            if ( /\.ya?ml$/i.test(fullpath) ) {
                 return jsyaml.load( file_contents );
-            } else if ( /\.json$/i.test(rel_path) ) {
+            } else if ( /\.json$/i.test(fullpath) ) {
                 return JSON.parse( file_contents );
             } else {
-                throw new Error(`Unknown file type for path ‘${path}’`);
+                throw new Error(`Unknown file type for path ‘${fullpath}’`);
             }
         } catch (err) {
             console.error(
-                `Parse error in ‘${rel_path}’: ${err}`
+                `Parse error in ‘${fullpath}’: ${err}`
             );
             throw err;
         }
@@ -509,6 +519,8 @@ export class YamlDbZooDataLoader
             }
         }
 
+        debug(`Loading file ‘${rel_path}’ (from ${root_path})`);
+
         const file_contents = this.read_file_contents(root_path, rel_path);
         const file_data = this.parse_file_data( file_contents, objectconfig,
                                                 root_path, rel_path );
@@ -539,10 +551,14 @@ export class YamlDbZooDataLoader
                     {root_path, rel_path, source_file_path, source_file_modification_token})
     {
         // validate according to the JSON schema
+
+        // if (objectconfig.object_type == 'user') {
+        //   debug(`DEBUG: Validating ${JSON.stringify(obj,null,4)} on ${JSON.stringify(objectconfig.schema,null,4)}`);
+        // }
         const validation_result = this.schema_validator.validate(obj, objectconfig.schema);
         if (!validation_result.valid) {
             throw new Error(
-                `Invalid ${objectconfig.object_type} object data in `
+                `Schema validation failed for ${objectconfig.object_type} object data in `
                 +`‘${source_file_path}’:\n\n`
                 +`*** ${ validation_result.errors.join("\n*** ") }\n`
             );
@@ -556,7 +572,7 @@ export class YamlDbZooDataLoader
             source_file_modification_token: source_file_modification_token,
         };
 
-        debug(`Finalized object, _zoodb -> ${JSON.stringify(obj._zoodb)}`);
+        // debug(`Finalized object, _zoodb -> ${JSON.stringify(obj._zoodb)}`);
     }
 
 
