@@ -107,7 +107,7 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
         await this.llm_simple_content_compiler.process_zoo(); // process simple LLM fields
         //debug("Zoo LLM content populated!");
 
-        this.zoo_llm_environment.external_ref_resolver.clear_all_refs();
+        this.zoo_llm_environment.ref_resolver.clear_all_refs();
 
         await this.process_ref_targets_objects();
         await this.process_ref_targets_referenceables();
@@ -139,7 +139,7 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
         // create an URL target for where we should link to the given object.
         // Remember that target_href's can still be adjusted at a later stage by
         // setting a target_href_resolver in the zoo llm environment's
-        // external_ref_resolver instance.
+        // ref_resolver instance.
         return `zoodbobjectref:///${object_type}:${object_id}`;
     }
     
@@ -164,7 +164,7 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
 
                 const formatted_ref_llm_text = formatted_ref_llm_text_fn(objid, obj);
 
-                this.zoo_llm_environment.external_ref_resolver.add_ref(
+                this.zoo_llm_environment.ref_resolver.add_ref(
                     zoollm.RefInstance($$kw({
                         ref_type: object_type,
                         ref_label: objid,
@@ -198,7 +198,7 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
             for (const lbl of referenceable_info.labels) {
                 const [ref_type, ref_label] = lbl;
                 debug(`\t\tlabel: ${ref_type}:${ref_label}`);
-                this.zoo_llm_environment.external_ref_resolver.add_ref(
+                this.zoo_llm_environment.ref_resolver.add_ref(
                     zoollm.RefInstance($$kw({
                         ref_type: ref_type,
                         ref_label: ref_label,
@@ -235,7 +235,7 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
             this.scanner.get_encountered('citations')
         );
 
-        this.zoo_llm_environment.external_citations_provider.set_citations(
+        this.zoo_llm_environment.citations_provider.set_citations(
             this.citation_compiler.iter_compiled_citations()
         );
     }

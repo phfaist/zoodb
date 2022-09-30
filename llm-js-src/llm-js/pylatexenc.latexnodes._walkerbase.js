@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-09-30 21:33:08
+/* 000001 */ // Transcrypt'ed from Python, 2022-09-30 23:10:28
 /* 000037 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000037 */ import {ParsingStateDelta} from './pylatexenc.latexnodes._parsingstatedelta.js';
 /* 000037 */ export {ParsingStateDelta};
@@ -224,7 +224,24 @@
 /* 000094 */ 		else {
 /* 000094 */ 		}
 /* 000103 */ 		return exc;
-/* 000103 */ 	});}
-/* 000103 */ });
+/* 000103 */ 	});},
+/* 000105 */ 	get format_node_pos () {return __get__ (this, function (self, node) {
+/* 000105 */ 		if (arguments.length) {
+/* 000105 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000105 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000105 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000105 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000105 */ 					switch (__attrib0__) {
+/* 000105 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000105 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000105 */ 					}
+/* 000105 */ 				}
+/* 000105 */ 			}
+/* 000105 */ 		}
+/* 000105 */ 		else {
+/* 000105 */ 		}
+/* 000106 */ 		return __add__ ('character position ', __call__ (repr, null, node.pos));
+/* 000106 */ 	});}
+/* 000106 */ });
 /* 000037 */ 
 //# sourceMappingURL=pylatexenc.latexnodes._walkerbase.map

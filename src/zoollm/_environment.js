@@ -43,7 +43,7 @@ export function is_llm_fragment(obj)
 }
 
 
-export class ExternalRefResolver
+export class RefResolver
 {
     constructor(options)
     {
@@ -343,11 +343,11 @@ function prep_llm_environ_features(zoollm_options)
 
     let props = {};
 
-    props.external_citations_provider =
-        zoollm_options.external_citations_provider || new CitationsProvider;
-    props.external_ref_resolver =
-        zoollm_options.external_ref_resolver
-        || new ExternalRefResolver(zoollm_options.external_ref_resolver_options);
+    props.citations_provider =
+        zoollm_options.citations_provider || new CitationsProvider;
+    props.ref_resolver =
+        zoollm_options.ref_resolver
+        || new RefResolver(zoollm_options.ref_resolver_options);
     
     props.graphics_collection =
         zoollm_options.graphics_collection || new FeatureZooGraphicsCollection();
@@ -358,7 +358,7 @@ function prep_llm_environ_features(zoollm_options)
               zoollm_options.heading_section_commands_by_level}),
     )
     props.feature_refs = new llm_feature_refs.FeatureRefs(
-        $$kw({external_ref_resolvers: [props.external_ref_resolver]}),
+        $$kw({external_ref_resolvers: [props.ref_resolver]}),
     )
 
     props.feature_endnotes = new llm_feature_endnotes.FeatureEndnotes(
@@ -366,7 +366,7 @@ function prep_llm_environ_features(zoollm_options)
     )
     
     props.feature_citations = new llm_feature_cite.FeatureExternalPrefixedCitations(
-        $$kw({ external_citations_provider: props.external_citations_provider,
+        $$kw({ external_citations_provider: props.citations_provider,
                counter_formatter: zoollm_options.citation_counter_formatter,
                citation_delimiters: zoollm_options.citation_delimiters, })
     )
@@ -417,9 +417,9 @@ export function make_zoo_llm_environment(zoollm_options)
 
         // enable \begin{raw:html}...\end{raw:html},
         // \begin{raw:latex}...\end{raw:latex}, etc. TODO
-        'enable-raw': ParsingStateDelta(
-            // ...
-        ),
+        // 'enable-raw': ParsingStateDelta(
+        //     // ...
+        // ),
     };
 
     const zoollm_environ = llmstd.LLMStandardEnvironment(

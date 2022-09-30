@@ -193,35 +193,41 @@ export class RelationsPopulator extends ZooDbProcessorBase
         };
 
         // explore all objects and populate relations
-        object_types.forEach(
-            (object_type) => {
+        for (const object_type of object_types) {
 
-                debug(`Processing relations for ${object_type} object relations`);
+            debug(`Processing relations for ${object_type} object relations`);
 
-                if (!this.relations[object_type]) {
-                    return;
-                }
-
-                //
-                // now we populate the relations in all objects of this type
-                //
-
-                let objectsdict = zoodb.objects[object_type];
-                
-                // debug(`Processing ${object_type}'s relations: `
-                //              +`${JSON.stringify(schema_zoo_relations)}`);
-
-                Object.values(objectsdict).forEach(
-                    (obj) => {
-                        this.relations[object_type].forEach(
-                            (relation) => {
-                                relation.process_object_relation(obj, process_options);
-                            }
-                        );
-                    }
-                );
+            if (!this.relations[object_type]) {
+                return;
             }
-        );
+
+            //
+            // now we populate the relations in all objects of this type
+            //
+
+            // // prepare any backreference fields on the target objects, if applicable
+            // for (const relation of this.relations[object_type]) {
+            //     if (object_types.includes(relation.to_object_type)
+            //         && relation.backref_field != null) {
+            //         const target_objects = zoodb.objects[relation.to_object_type];
+            //         for (const target_object of Object.values(target_objects)) {
+            //             // create empty field
+            //             concatlistfield(target_object, relation.backref_field, []);
+            //         }
+            //     }
+            // }
+
+            let objectsdict = zoodb.objects[object_type];
+            
+            // debug(`Processing ${object_type}'s relations: `
+            //              +`${JSON.stringify(schema_zoo_relations)}`);
+
+            for (const obj of Object.values(objectsdict)) {
+                for (const relation of this.relations[object_type]) {
+                    relation.process_object_relation(obj, process_options);
+                }
+            }
+        }
     }
 
     // If we're going to update objects, then we clear everything and rebuild
@@ -256,17 +262,16 @@ export class RelationsPopulator extends ZooDbProcessorBase
 
         const all_relations_computed_fields = {};
 
-        Object.entries(this.relations).forEach( (pair) => {
-            const [object_type, relations] = pair;
-            relations.forEach( (relation) => {
+        for (const [object_type, relations] of Object.entries(this.relations)) {
+            for (const relation of relations) {
                 const computed_fields = relation.get_computed_fields();
                 for (const [fld_object_type, fld_infos] of Object.entries(computed_fields)) {
                     all_relations_computed_fields[fld_object_type] =
                         ( all_relations_computed_fields[fld_object_type] || [] )
                         .concat( fld_infos );
                 }
-            } );
-        } );
+            }
+        }
         
         for (const [object_type, ofields] of Object.entries(all_relations_computed_fields)) {
             for (const object of Object.values(this.zoodb.objects[object_type])) {
@@ -274,7 +279,7 @@ export class RelationsPopulator extends ZooDbProcessorBase
                 for (const computed_relation_fieldinfo of ofields) {
                     const { fieldname } = computed_relation_fieldinfo;
                     for (const value of iterfield(object, fieldname)) {
-                        if (typeof value != 'undefined') {
+                        if (value !== undefined) {
                             action({ object_type, object, computed_relation_fieldinfo, value });
                         }
                     }
