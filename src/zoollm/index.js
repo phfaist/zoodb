@@ -1,3 +1,6 @@
+//
+import debug_module from 'debug';
+const debug = debug_module('zoodb.zoollm');
 
 
 // provide $$kw({...}) and repr() to importers

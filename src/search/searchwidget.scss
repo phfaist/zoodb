@@ -1,0 +1,81 @@
+
+.zoodb-search-widget {
+
+    .search-input {
+        padding: 0.5em 1em;
+        font-size: 1.2rem;
+
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    .search-no-results, .search-no-query-string,
+    .search-results-error
+    {
+        padding: 2em 0px;
+    }
+
+    .search-no-query-string {
+        font-style: italic;
+    }
+
+    .search-results-error {
+        padding: 2em 0px;
+        color: rgb(180,0,0);
+    }
+    .search-query-info {
+        display: block;
+        margin-top: 0.5em;
+    }
+
+
+    .search-result {
+
+        .search-result-title {
+            font-style: bold;
+            display: block;
+        }
+
+        .search-result-display-field-name {
+            color: rgba(0,0,0,0.6);
+            //display: inline-block;
+            //margin-left: 0.7rem;
+            font-size: 0.9em;
+        }
+        .search-result-display-field-name::before {
+            content: ' — ';
+        }
+        // .search-result-display-field-name::after {
+        //     //content: ')';
+        // }
+
+        .search-result-field-display {
+            display: block;
+            font-style: italic;
+        }
+
+
+    }
+
+    .search-instructions-tip {
+        p {
+            font-size: 14px;
+            font-style: italic;
+            margin: 0.4em 0px 0.4em 0px;
+        }
+        p.search-instructions-item::before {
+            content: '• ';
+        }
+        code {
+            font-size: 12.5px;
+            font-family: monospace;
+        }
+    }
+
+
+}
+
+.sr-highlight {
+    background-color: rgba(255,255,200,0.5);
+}
+

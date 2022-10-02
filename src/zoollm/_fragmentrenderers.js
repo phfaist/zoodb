@@ -49,6 +49,8 @@ export const ZooTextFragmentRenderer = __class__(
 
         display_href_urls: false,
 
+        float_separator_top: '[figure]', // mark the figure like this simply
+        float_separator_bottom: '', // no bottom marker needed
     }
 );
 

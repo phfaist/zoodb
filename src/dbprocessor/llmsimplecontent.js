@@ -168,10 +168,10 @@ export class LLMSimpleContentCompiler extends ZooDbProcessorBase
         for (const {fieldname, fieldvalue, fieldschema, parent, parent_index, llm_options}
              of this._iter_llm_fields(obj, schema)) {
 
-            // debug(
-            //     `Compiling ${object_type} ${objid}'s LLM field ${fieldname}: `
-            //     + `‘${fieldvalue}’`
-            // );
+            debug(
+                `Compiling ${object_type} ${objid}'s LLM field ${fieldname}: `
+                + `‘${fieldvalue}’`
+            );
 
             // register this field as having LLM content
             obj._zoodb.llm_fields.push(fieldname);

@@ -99,6 +99,9 @@ const zoodbdataloader = new ZooDbDataLoader({
       schema_rel_path: '/schemas/',
       schema_add_extension: '.json',
     },
+    options: {
+    normalize_id_for_uniqueness_check: (object_id) => object_id.toLowerCase()
+    },
   });
 
 const dbdata = zoodbdataloader.load();
@@ -111,31 +114,34 @@ export class YamlDbZooDataLoader
     constructor(config)
     {
         this.config = Object.assign({}, config);
-        this.config.objects = Object.assign({}, this.config.objects || {});
-        this.config.object_defaults = Object.assign({}, this.config.object_defaults || {});
-        this.config.schemas = Object.assign({}, this.config.schemas || {});
+        this.config.objects = Object.assign({}, this.config.objects ?? {});
+        this.config.object_defaults = Object.assign({}, this.config.object_defaults ?? {});
+        this.config.schemas = Object.assign({}, this.config.schemas ?? {});
+
+        this.config.options ??= {};
+        this.config.options.normalize_id_for_uniqueness_check ??= ((x) => x.toLowerCase());
 
         // set defaults in config
-        this.config.object_defaults.file_name_match ||= /\.(ya?ml|json)$/i;
+        this.config.object_defaults.file_name_match ??= /\.(ya?ml|json)$/i;
         this.config.object_defaults.ignore_file_name_match
-            ||= get_default_ignore_file_name_match(
+            ??= get_default_ignore_file_name_match(
                 this.config.resource_file_extensions ?? default_resource_file_extensions
             );
-        this.config.object_defaults.load_objects ||=  (d) => [ d ] ;
-        this.config.object_defaults.expected_msg ||=
+        this.config.object_defaults.load_objects ??=  (d) => [ d ] ;
+        this.config.object_defaults.expected_msg ??=
             `File name matching ‘/${this.config.object_defaults.file_name_match.source}/`
             +`${this.config.object_defaults.file_name_match.flags}’`;
 
         for (let [object_type, objectconfig] of Object.entries(this.config.objects))
         {
             objectconfig.object_type = object_type;
-            objectconfig.schema_name ||= object_type;
-            objectconfig.data_src_path ||= object_type + 's'; // 'code' -> 'codes/'
-            objectconfig.file_name_match ||= this.config.object_defaults.file_name_match;
-            objectconfig.ignore_file_name_match ||=
+            objectconfig.schema_name ??= object_type;
+            objectconfig.data_src_path ??= object_type + 's'; // 'code' -> 'codes/'
+            objectconfig.file_name_match ??= this.config.object_defaults.file_name_match;
+            objectconfig.ignore_file_name_match ??=
                 this.config.object_defaults.ignore_file_name_match;
-            objectconfig.expected_msg ||= this.config.object_defaults.expected_msg;
-            objectconfig.load_objects ||= this.config.object_defaults.load_objects;
+            objectconfig.expected_msg ??= this.config.object_defaults.expected_msg;
+            objectconfig.load_objects ??= this.config.object_defaults.load_objects;
         }
 
         // simplify schema_root URL (e.g., remove x/y/../z -> x/z, will be
@@ -352,16 +358,25 @@ export class YamlDbZooDataLoader
 
         let d = {};
 
+        let unique_ids_check_seen = {};
+        let normalize_id_fn = this.config.options.normalize_id_for_uniqueness_check;
         for (const [objid, obj] of loaded_objects_pair_with_id) {
             //debug(`Got object: objid=${objid}, obj=${JSON.stringify(obj)}`);
-            if (d.hasOwnProperty(objid)) {
+            const object_id_unique_normalized = normalize_id_fn(objid);
+            const other_object = unique_ids_check_seen[object_id_unique_normalized];
+            if (other_object !== undefined) {
                 throw new Error(
-                    `ID ‘${objid}’ was assigned to multiple objects, in `
-                    + `files ‘${d[objid]._zoodb.source_file_path}’ and `
-                    + `‘${obj._zoodb.source_file_path}’`
+                    `ID ‘${objid}’ was assigned to multiple objects (duplicate ID), in `
+                    + `files ‘${other_object._zoodb.source_file_path}’ and `
+                    + `‘${obj._zoodb.source_file_path}’ [normalized ID `
+                    + `‘${object_id_unique_normalized}’]`
                 );
             }
+            // keep original ID in the database
             d[objid] = obj;
+            // but use the "normalized" ID for the temporary ID uniqueness check
+            // dictionary
+            unique_ids_check_seen[object_id_unique_normalized] = obj;
         }
 
         //debug(`_load_objects_of_type() [${objectconfig.object_type}] --> ${JSON.stringify(d)}`);

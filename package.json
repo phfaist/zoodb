@@ -16,10 +16,12 @@
         "hash.js": "^1.1.7",
         "js-yaml": "^4.1.0",
         "jsonschema": "^1.4.1",
+        "lunr": "^2.3.9",
         "node-fetch": "^3.2.10",
         "parse-full-name": "^1.2.6",
         "sax": "^1.2.4",
-        "stream-parser": "^0.3.1"
+        "stream-parser": "^0.3.1",
+        "tippy.js": "^6.3.7"
     },
     "exports": {
         ".": "./src/index.js",
@@ -33,7 +35,9 @@
         "./zoollm": "./src/zoollm/index.js",
         "./zoollm/citationcompiler": "./src/zoollm/citationcompiler.js",
         "./zoollm/scanner": "./src/zoollm/scanner.js",
-        "./util": "./src/util/index.js"
+        "./util": "./src/util/index.js",
+        "./search/searchindex": "./src/search/searchindex.js",
+        "./search/searchwidget": "./src/search/searchwidget.js"
     },
     "imports": {
         "#llm-js/*": "./llm-js-src/llm-js/*"
