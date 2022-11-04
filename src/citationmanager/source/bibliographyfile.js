@@ -88,7 +88,8 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
             this.citation_manager.store_citation(
                 this.cite_prefix, key,
                 d,
-                { cache_duration_ms: this.options.cache_duration_ms }
+                { cache_duration_ms: this.options.cache_duration_ms },
+                this.cache_store_options
             );
         }
     }

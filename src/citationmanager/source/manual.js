@@ -24,6 +24,10 @@ export class CitationSourceManual extends CitationSourceBase
             options,
             default_options,
         );
+
+        // do not keep in cache (it will stay though long enough for the zoo to
+        // be built)
+        this.cache_store_options.cache_duration_ms ??= 0;
     }
 
     async run_retrieve_chunk(id_list)
@@ -37,11 +41,7 @@ export class CitationSourceManual extends CitationSourceBase
                         llm: key
                     }
                 },
-                {
-                    // do not keep in cache (it will stay though long enough for
-                    // the zoo to be built)
-                    cache_duration_ms: 0,
-                }
+                this.cache_store_options,
             );
 
         }

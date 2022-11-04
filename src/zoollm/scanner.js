@@ -233,8 +233,8 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
             // it's something referenceable, like a defterm or a section heading
             const referenceable_info = node.llm_referenceable_info;
 
-            debug(`Found referenceable in node=${_abbrev(repr(node))}: labels=`,
-                  referenceable_info.labels);
+            debug(`Found referenceable in node=${_abbrev(repr(node))}: labels =`,
+                  repr(referenceable_info.labels));
 
             this._register_encountered('referenceables', {
                 referenceable_info: referenceable_info,

@@ -36,7 +36,19 @@ export class CitationSourceBase
         this.keys_to_retrieve = [];
         this.keys_to_retrieve_remaining = [];
 
-        this.options = Object.assign({}, default_options, options || {}, override_options);
+        // Apply options in order of precedence.  Object.assign() is not
+        // recursive, so make sure that any sub-option trees are assigned
+        // correctly, too.
+        options ||= {};
+        this.options = Object.assign(
+            {}, default_options ?? {}, options, override_options ?? {}
+        );
+        this.options.cache_store_options = Object.assign(
+            {},
+            default_options.cache_store_options ?? {},
+            options.cache_store_options ?? {},
+            override_options.cache_store_options ?? {}
+        );
 
         this.total_queried = 0;
 
@@ -51,6 +63,11 @@ export class CitationSourceBase
         this.cite_prefix = this.options.cite_prefix;
         this.chains_to_sources = this.options.chains_to_sources || [];
         this.source_name = this.options.source_name || '<unknown source>';
+
+        // e.g. { cache_duration_ms: ... }.  Subclasses should remember to pass
+        // this option on in calls to this.citation_manager.store_citation(...,
+        // this.cache_store_options)
+        this.cache_store_options = this.options.cache_store_options;
 
         this._retrieve_more_done = false;
 

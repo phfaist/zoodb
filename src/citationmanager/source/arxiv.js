@@ -195,7 +195,9 @@ export class CitationSourceArxiv extends CitationSourceBase
             // If a specific version was requested, we don't chain the citation
             // resolution to the DOI entry, because we want to print the info
             // associated with that specific arXiv version.
-            this.citation_manager.store_citation(this.cite_prefix, arxividkey, citeprocjsond);
+            this.citation_manager.store_citation(
+                this.cite_prefix, arxividkey, citeprocjsond, this.cache_store_options
+            );
         }
 
         if (this.data_for_versionless_arxivid.hasOwnProperty(arxivid)) {
@@ -216,11 +218,12 @@ export class CitationSourceArxiv extends CitationSourceBase
             this.citation_manager.store_citation_chained(
                 this.cite_prefix, arxividkey,
                 'doi', citeprocjsond.doi,
-                { arxivid: arxividkey }
+                { arxivid: arxividkey },
+                this.cache_store_options
             );
         } else {
             this.citation_manager.store_citation(
-                this.cite_prefix, arxividkey, citeprocjsond
+                this.cite_prefix, arxividkey, citeprocjsond, this.cache_store_options
             );
         }
     }

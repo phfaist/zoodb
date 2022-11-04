@@ -58,6 +58,8 @@ export class SearchIndex
 {
     static build(zoodb, options)
     {
+        debug(`setting up search index`);
+
         //
         // inspect the zoodb to extract fields.
         //
@@ -75,7 +77,7 @@ export class SearchIndex
             }
         }
         const fields = Array.from(fields_set).sort();
-        debug(`SearchIndex: fields = ${fields.join(',')}`);
+        debug(`search index fields: ${fields.join(',')}`);
 
         const field_name_id = options.field_name_id ?? 'id';
         const field_name_title = options.field_name_title ?? 'title';
@@ -104,6 +106,7 @@ export class SearchIndex
         //
         // create the store of all documents
         //
+        debug(`creating text data store ...`);
         let store = {};
         let counter = 1;
         for (const [object_type, object_db] of Object.entries(zoodb.objects)) {
@@ -137,7 +140,7 @@ export class SearchIndex
                 // convert any special fields to text (eg. for LLM)
                 const doc = assemble_doc_text_values(doc_values);
                 
-                debug(`SearchIndex: crafted doc =`, doc);
+                //debug(`SearchIndex: crafted doc =`, doc);
 
                 store[doc._z_id] = doc;
             }
@@ -146,6 +149,7 @@ export class SearchIndex
         //
         // build the index!
         //
+        debug(`building the index ...`);
         const idx = lunr( function () {
             //
             // Function will build the index. Lunr's API is accessed via 'this'
@@ -170,11 +174,12 @@ export class SearchIndex
             obj.metadataWhitelist = [ 'position' ];
             
             for (const doc of Object.values(store)) {
-                debug(`Adding doc =`, doc);
+                //debug(`Adding doc =`, doc);
                 obj.add(doc);
             }
 
         } );
+        debug(`... done.`);
 
         return new SearchIndex(info, store, idx);
     }

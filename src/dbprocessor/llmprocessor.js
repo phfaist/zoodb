@@ -191,8 +191,11 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
                 && encountered_in.resource_info.object_type) {
                 const { object_type, object_id } = encountered_in.resource_info;
                 target_href =
-                    this.get_object_target_href(object_type, object_id)
-                    + '#' + referenceable_info.get_target_id() ;
+                    this.get_object_target_href(object_type, object_id);
+                const referenceable_info_target_id = referenceable_info.get_target_id();
+                if (referenceable_info_target_id != null) {
+                    target_href += '#' + referenceable_info_target_id;
+                }
             }
             debug(`\treferenceable: ${repr(referenceable_info)}  -> ${target_href}`);
             for (const lbl of referenceable_info.labels) {

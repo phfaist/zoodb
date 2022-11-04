@@ -4,6 +4,10 @@ const debug = debug_module('zoodb.citationmanager.source.doi');
 
 import { CitationSourceBase } from './base.js';
 
+
+const one_day = 1000 * 3600 * 24;
+
+
 export class CitationSourceDoi extends CitationSourceBase
 {
     constructor(options)
@@ -17,6 +21,9 @@ export class CitationSourceDoi extends CitationSourceBase
         const default_options = {
             chunk_retrieve_delay_ms: 1000,
             cite_prefix: 'doi',
+            cache_store_options: {
+                cache_duration_ms: 360*one_day, // keep it for a year
+            },
         };
 
         super(
@@ -53,7 +60,7 @@ export class CitationSourceDoi extends CitationSourceBase
         csljsondata.reference = [];
 
         this.citation_manager.store_citation(
-            this.cite_prefix, doi, csljsondata
+            this.cite_prefix, doi, csljsondata, this.cache_store_options
         );
     }
 

@@ -5,7 +5,7 @@ import { ZooDbProcessorBase } from './base.js';
 
 import { getfield } from '../util/getfield.js';
 import { iter_object_fields_recursive } from '../util/objectinspector.js';
-import { ZooLLMResourceInfo, $$kw, LLMDataDumper, is_llm_fragment } from '../zoollm/index.js';
+import { ZooLLMResourceInfo, $$kw, repr, LLMDataDumper, is_llm_fragment } from '../zoollm/index.js';
 
 
 function parse_schema_llm_options(schema)
@@ -163,15 +163,17 @@ export class LLMSimpleContentCompiler extends ZooDbProcessorBase
 
     compile_object(object_type, objid, obj, schema)
     {
+        debug(`Compiling LLM content - ${object_type} ‘${objid}’`);
+
         obj._zoodb.llm_fields = [];
 
         for (const {fieldname, fieldvalue, fieldschema, parent, parent_index, llm_options}
              of this._iter_llm_fields(obj, schema)) {
 
-            debug(
-                `Compiling ${object_type} ${objid}'s LLM field ${fieldname}: `
-                + `‘${fieldvalue}’`
-            );
+            // debug(
+            //     `Compiling ${object_type} ${objid}'s LLM field ${fieldname}: `
+            //     + `‘${repr(fieldvalue)}’`
+            // );
 
             // register this field as having LLM content
             obj._zoodb.llm_fields.push(fieldname);
