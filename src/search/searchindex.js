@@ -25,7 +25,7 @@ const _iterfieldsopts = {
         if (fieldschema._auto_populated) {
             return false;
         }
-        if (fieldschema._zoo_search && fieldschema._zoo_search.skip_index) {
+        if (fieldschema._zoo_search && !(fieldschema._zoo_search.include_in_index ?? true)) {
             return false;
         }
         // skip "private" fields like "_meta"
@@ -56,22 +56,42 @@ function default_assemble_doc_text_values(doc_values) {
 
 export class SearchIndex
 {
-    static build(zoodb, options)
+    static create(zoodb, options)
     {
         debug(`setting up search index`);
 
+        let object_types = options.object_types ?? Object.keys(zoodb.schemas);
+
+        let exclude_fields = new Set(options.exclude_fields ?? []);
+
         //
-        // inspect the zoodb to extract fields.
+        // fields the zoodb to extract fields.
         //
         let fields_set = new Set();
-        for (const [object_type, schema] of Object.entries(zoodb.schemas)) {
+        for (const object_type of object_types) {
+            const schema = zoodb.schema(object_type);
             const titlefield = schema._zoo_titlefield ?? 'name';
-            for (const { fieldname, fieldschema }
+            for (let { fieldname, fieldschema }
                  of iter_schema_fields_recursive(schema, _iterfieldsopts)) {
-                if (fieldname === schema._zoo_primarykey
-                    || fieldname === titlefield) {
+
+                if (fieldname === schema._zoo_primarykey || fieldname === titlefield) {
                     // already got this one as 'id' or 'name'
+                    if (fieldschema._zoo_search && fieldschema._zoo_search.field_name) {
+                        console.warn(
+                            `WARNING: Ignoring custom field name `
+                            + `‘${fieldschema._zoo_search.field_name}’ in ${object_type}:`
+                            + `${fieldname} because it is a special field (id or name/title)`
+                        );
+                    }
                     continue;
+                }
+                if (exclude_fields.has(fieldname)) {
+                    continue;
+                }
+                //debug(`fieldname = `, fieldname, `; fieldschema = `, fieldschema);
+                if (fieldschema._zoo_search &&
+                    fieldschema._zoo_search.field_name != null) {
+                    fieldname = fieldschema._zoo_search.field_name;
                 }
                 fields_set.add(fieldname);
             }
@@ -88,6 +108,7 @@ export class SearchIndex
         fields_options.boost = Object.assign({ [field_name_title]: 40, }, fields_options.boost);
 
         const info = {
+            object_types,
             fields,
             fields_options,
             field_name_id,
@@ -107,31 +128,39 @@ export class SearchIndex
         // create the store of all documents
         //
         debug(`creating text data store ...`);
-        let store = {};
-        let counter = 1;
-        for (const [object_type, object_db] of Object.entries(zoodb.objects)) {
+        let store = [];
+        for (const object_type of object_types) {
+            const object_db = zoodb.objects[object_type];
             const schema = zoodb.schema(object_type);
             const titlefield = schema._zoo_titlefield ?? 'name';
             for (const [object_id, object] of Object.entries(object_db)) {
                 // create the search-index document to add to the LUNR index
                 let doc_values = [
-                    ['_z_id', counter],
+                    ['_z_stid', store.length],
                     ['_z_otype', object_type],
                     [field_name_id, object_id], // object ID field gets named 'id'
                     [field_name_title, object[ titlefield ]], // same with name -> 'title'
                 ];
-                ++counter;
                 const href = resolve_object_href(object_id, object);
                 if (href != null) {
-                    doc_values.push([_z_href, href]);
+                    doc_values.push(['_z_href', href]);
                 }
-                for (let { fieldname, fieldvalue }
+                for (let { fieldname, fieldvalue, fieldschema }
                      of iter_object_fields_recursive(object, schema, _iterfieldsopts)) {
+
+                    // honor field name aliases
+                    if (fieldschema._zoo_search != null &&
+                        fieldschema._zoo_search.field_name != null) {
+                        fieldname = fieldschema._zoo_search.field_name;
+                    }
+
+                    // skip any fields not included in the index (e.g.,
+                    // auto-populated fields or fields that were manually
+                    // excluded from index)
                     if (!fields_set.has(fieldname)) {
-                        // skip any fields not included in the index (e.g.,
-                        // auto-populated fields)
                         continue;
                     }
+
                     if (fieldvalue != null) {
                         //debug(`search index doc: field ${fieldname}, value =`, fieldvalue);
                         doc_values.push([fieldname, fieldvalue]);
@@ -142,22 +171,31 @@ export class SearchIndex
                 
                 //debug(`SearchIndex: crafted doc =`, doc);
 
-                store[doc._z_id] = doc;
+                store.push(doc);
             }
         }
+        debug(`... done.`);
+
+        return new SearchIndex(info, store, null);
+    }
+
+    build()
+    {
+        let info = this.info;
+        let store = this.store;
 
         //
         // build the index!
         //
         debug(`building the index ...`);
-        const idx = lunr( function () {
+        this.idx = lunr( function () {
             //
             // Function will build the index. Lunr's API is accessed via 'this'
             // (aliased to 'obj' here).
             //
             let obj = this;
 
-            obj.ref('_z_id');
+            obj.ref('_z_stid');
             obj.field('_z_otype');
             obj.field('_z_href');
             // these are included in info.fields
@@ -173,29 +211,37 @@ export class SearchIndex
             }
             obj.metadataWhitelist = [ 'position' ];
             
-            for (const doc of Object.values(store)) {
+            for (const doc of store) {
                 //debug(`Adding doc =`, doc);
                 obj.add(doc);
             }
 
         } );
         debug(`... done.`);
-
-        return new SearchIndex(info, store, idx);
     }
 
-    static load(index_data)
+    static load(search_index_data)
     {
-        const idx = lunr.Index.load(index_data.serialized_index);
-        return new SearchIndex(index_data.info, index_data.store, idx);
+        const {info, serialized_store, serialized_index} = search_index_data;
+
+        const store = this._load_store(info, serialized_store);
+
+        if (serialized_index != null) {
+            const idx = this._load_idx_notnull(info, serialized_index);
+            return new SearchIndex(info, store, idx);
+        } else {
+            let si = new SearchIndex(info, store, null);
+            si.build();
+            return si;
+        }
     }
 
     toJSON()
     {
         return {
             info: this.info,
-            store: this.store,
-            serialized_index: this.idx.toJSON(),
+            serialized_store: this._dump_store(),
+            serialized_index: this._dump_idx(),
         };
     }
 
@@ -206,6 +252,63 @@ export class SearchIndex
         this.info = info;
         this.store = store;
         this.idx = idx;
+    }
+
+
+    //
+    // internal methods to load/dump index and store.
+    //
+    _dump_idx()
+    {
+        if (this.idx == null) {
+            return null;
+        }
+        return this.idx.toJSON();
+    }
+
+    static _load_idx_notnull(info, serialized_idx)
+    {
+        return lunr.Index.load(serialized_index);
+    }
+
+    _dump_store()
+    {
+        // compress the store's representation to save data
+        const store_size = this.store.length;
+        const storefields = [].concat(['_z_otype', '_z_href'], this.info.fields);
+        let serialized_store = Object.fromEntries(
+            storefields
+            .map( (fldname) => [fldname, new Array(store_size)] )
+        );
+        for (let j = 0; j < store_size; ++j) {
+            const st_doc = this.store[j];
+            if (j != st_doc._z_stid) {
+                throw new Error(
+                    `Internal error: inconsistency of store id: `
+                    + `st_id=${st_id}, st_doc=${JSON.stringify(st_doc)}`
+                );
+            }
+            for (const fieldname of storefields) {
+                serialized_store[fieldname][j] = st_doc[fieldname];
+            }
+        }
+        serialized_store._z_store_size = store_size;
+        return serialized_store;
+    }
+    static _load_store(info, serialized_store)
+    {
+        const storefields = [].concat(['_z_otype', '_z_href'], info.fields);
+        const store_size = serialized_store._z_store_size;
+        let store = new Array(store_size);
+        for (let j = 0; j < store_size; ++j) {
+            store[j] = Object.fromEntries(
+                storefields.map(
+                    (fieldname) => [fieldname, serialized_store[fieldname][j]]
+                )
+            );
+            store[j]._z_stid = j;
+        }
+        return store;
     }
 
 };

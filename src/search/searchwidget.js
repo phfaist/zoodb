@@ -60,8 +60,13 @@ export class SearchWidget
 
         this.initial_search_query = options.initial_search_query;
 
+        this.auto_fuzz_min_word_length = options.auto_fuzz_min_word_length ?? 4;
         this.auto_fuzz_distance = options.auto_fuzz_distance ?? 1;
-        debug("Auto fuzz distance is = ", this.auto_fuzz_distance);
+        debug("Auto fuzz distance is = ",
+              this.auto_fuzz_distance,
+              " to be applied to words of length at least = ",
+              this.auto_fuzz_min_word_length);
+
         this.context_length = options.context_length ?? default_context_length;
 
         this.MathJax = options.MathJax ?? null;
@@ -145,7 +150,7 @@ export class SearchWidget
                 interactiveBorder: 30,
                 maxWidth: '450px',
                 placement: 'bottom',
-                flip: false,
+                //flip: false,
                 // popperOptions: {
                 //     placement: 'bottom',
                 // },
@@ -180,6 +185,7 @@ export class SearchWidget
 
         console.log("Searching! search_str =", search_str);
 
+        let _auto_fuzz_min_word_length = this.auto_fuzz_min_word_length;
         let _auto_fuzz_distance = this.auto_fuzz_distance;
 
         let results;
@@ -190,13 +196,18 @@ export class SearchWidget
                 let qq = parser.parse();
                 console.log("Query = ", qq);
                 // tweak the query to add an edit distance to all terms
-                qq.clauses.forEach( (clause) => {
+                for (let clause of qq.clauses) {
                     console.log("Processing clause: ", clause,
+                                " auto_fuzz_min_word_length = ", _auto_fuzz_min_word_length,
                                 " auto_fuzz_distance = ", _auto_fuzz_distance);
-                    if (typeof clause.editDistance === 'undefined') {
+                    const term_length = clause.term.length;
+                    if (clause.term.charAt(0) == '*') { --term_length; }
+                    if (clause.term.charAt(clause.term.length - 1) == '*') { --term_length; }
+                    if (typeof clause.editDistance === 'undefined'
+                        && term_length >= _auto_fuzz_min_word_length) {
                         clause.editDistance = _auto_fuzz_distance;
                     }
-                } );
+                };
                 console.log("Done processing clauses.");
                 return qq;
             };
@@ -285,7 +296,7 @@ export class SearchWidget
 
     _add_display_result(result, container)
     {
-        const doc = this.search_index.store[result.ref];
+        const doc = this.search_index.store[parseInt(result.ref)];
 
         const div = document.createElement('div');
         div.classList.add("search-result");
