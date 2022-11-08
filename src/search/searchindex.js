@@ -7,35 +7,6 @@ import { iter_schema_fields_recursive, iter_object_fields_recursive }
     from '../util/objectinspector.js';
 
 
-const _iterfieldsopts = {
-
-    propfieldname(fieldname, propname) {
-        // e.g. "features_rate"
-        return (fieldname ? (fieldname + '_' + propname) : propname);
-    },
-
-    arrayitemfieldname(fieldname, i) {
-        // don't keep array indices or '[]', flatten them out
-        return fieldname ?? '';
-    },
-
-    visit_predicate({fieldname, fieldschema, fieldvalue}) {
-        // skip fields that are computed from other field (e.g.,
-        // resolved references to code objects)
-        if (fieldschema._auto_populated) {
-            return false;
-        }
-        if (fieldschema._zoo_search && !(fieldschema._zoo_search.include_in_index ?? true)) {
-            return false;
-        }
-        // skip "private" fields like "_meta"
-        if (fieldname.startsWith('_')) {
-            return false;
-        }
-        return true;
-    }
-};
-
 
 
 function default_assemble_doc_text_values(doc_values) {
@@ -54,124 +25,64 @@ function default_assemble_doc_text_values(doc_values) {
 
 
 
+/**
+ * 
+ * The SearchIndex assumes that you have processed your database using the
+ * MakeSearchableText database processor.
+ *
+ */
 export class SearchIndex
 {
-    static create(zoodb, options)
+    static create(zoodb, searchable_text_fieldset, options)
     {
         debug(`setting up search index`);
 
-        let object_types = options.object_types ?? Object.keys(zoodb.schemas);
+        options ??= {};
 
-        let exclude_fields = new Set(options.exclude_fields ?? []);
-
-        //
-        // fields the zoodb to extract fields.
-        //
-        let fields_set = new Set();
-        for (const object_type of object_types) {
-            const schema = zoodb.schema(object_type);
-            const titlefield = schema._zoo_titlefield ?? 'name';
-            for (let { fieldname, fieldschema }
-                 of iter_schema_fields_recursive(schema, _iterfieldsopts)) {
-
-                if (fieldname === schema._zoo_primarykey || fieldname === titlefield) {
-                    // already got this one as 'id' or 'name'
-                    if (fieldschema._zoo_search && fieldschema._zoo_search.field_name) {
-                        console.warn(
-                            `WARNING: Ignoring custom field name `
-                            + `‘${fieldschema._zoo_search.field_name}’ in ${object_type}:`
-                            + `${fieldname} because it is a special field (id or name/title)`
-                        );
-                    }
-                    continue;
-                }
-                if (exclude_fields.has(fieldname)) {
-                    continue;
-                }
-                //debug(`fieldname = `, fieldname, `; fieldschema = `, fieldschema);
-                if (fieldschema._zoo_search &&
-                    fieldschema._zoo_search.field_name != null) {
-                    fieldname = fieldschema._zoo_search.field_name;
-                }
-                fields_set.add(fieldname);
-            }
-        }
-        const fields = Array.from(fields_set).sort();
-        debug(`search index fields: ${fields.join(',')}`);
-
-        const field_name_id = options.field_name_id ?? 'id';
-        const field_name_title = options.field_name_title ?? 'title';
-        // insert these field names at beginning of the fields array
-        fields.splice(0, 0,  field_name_id, field_name_title);
-
-        let fields_options = options.fields_options ?? {}
-        fields_options.boost = Object.assign({ [field_name_title]: 40, }, fields_options.boost);
+        let fields_options = options.fields_options ?? {};
+        fields_options.boost = Object.assign(
+            { [searchable_text_fieldset.field_name_title]: 40, },
+            fields_options.boost ?? {}
+        );
 
         const info = {
-            object_types,
-            fields,
+            object_types: searchable_text_fieldset.object_types,
+            fields: searchable_text_fieldset.fields,
+            field_name_id: searchable_text_fieldset.field_name_id,
+            field_name_title: searchable_text_fieldset.field_name_title,
             fields_options,
-            field_name_id,
-            field_name_title,
         };
 
-        const resolve_object_href = options.resolve_object_href ??
-              ((object_type, object_id) => null);
-
-        // const convert_field_to_text =
-        //       options.convert_field_to_text ?? ((x) => x.toString())
-        // ;
-        const assemble_doc_text_values =
-              options.assemble_doc_text_values ?? default_assemble_doc_text_values;
-
         //
-        // create the store of all documents
+        // create the store of all documents' searchable text documents
         //
         debug(`creating text data store ...`);
         let store = [];
-        for (const object_type of object_types) {
+        for (const object_type of searchable_text_fieldset.object_types) {
             const object_db = zoodb.objects[object_type];
-            const schema = zoodb.schema(object_type);
-            const titlefield = schema._zoo_titlefield ?? 'name';
             for (const [object_id, object] of Object.entries(object_db)) {
-                // create the search-index document to add to the LUNR index
-                let doc_values = [
-                    ['_z_stid', store.length],
-                    ['_z_otype', object_type],
-                    [field_name_id, object_id], // object ID field gets named 'id'
-                    [field_name_title, object[ titlefield ]], // same with name -> 'title'
-                ];
-                const href = resolve_object_href(object_id, object);
-                if (href != null) {
-                    doc_values.push(['_z_href', href]);
+
+                if (object._zoodb == null) { // null or undefined
+                    throw new Error(`${object_type} ${object_id} does not have field _zoodb!`);
                 }
-                for (let { fieldname, fieldvalue, fieldschema }
-                     of iter_object_fields_recursive(object, schema, _iterfieldsopts)) {
 
-                    // honor field name aliases
-                    if (fieldschema._zoo_search != null &&
-                        fieldschema._zoo_search.field_name != null) {
-                        fieldname = fieldschema._zoo_search.field_name;
-                    }
+                const searchable_text_doc =
+                      object._zoodb[ searchable_text_fieldset.searchable_text_fieldset_name ];
 
-                    // skip any fields not included in the index (e.g.,
-                    // auto-populated fields or fields that were manually
-                    // excluded from index)
-                    if (!fields_set.has(fieldname)) {
-                        continue;
-                    }
-
-                    if (fieldvalue != null) {
-                        //debug(`search index doc: field ${fieldname}, value =`, fieldvalue);
-                        doc_values.push([fieldname, fieldvalue]);
-                    }
+                if (searchable_text_doc == null) { // null or undefined
+                    throw new Error(
+                        `${object_type} ${object_id}'s _zoodb does not have the field `
+                            + `${searchable_text_fieldset.searchable_text_fieldset_name}!`
+                    );
                 }
-                // convert any special fields to text (eg. for LLM)
-                const doc = assemble_doc_text_values(doc_values);
-                
-                //debug(`SearchIndex: crafted doc =`, doc);
+
+                const doc = Object.assign(
+                    searchable_text_doc,
+                    { _z_stid: store.length } // lunr needs the current index here.
+                );
 
                 store.push(doc);
+
             }
         }
         debug(`... done.`);

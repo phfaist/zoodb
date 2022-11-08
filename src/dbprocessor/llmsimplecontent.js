@@ -79,7 +79,6 @@ export class LLMSimpleContentCompiler extends ZooDbProcessorBase
             throw new Error(`No zoodb set!`);
         }
 
-        let promises = [];
         for (const object_type of this.config.object_types) {
             const schema = this.zoodb.schema(object_type);
             for (const [objid, obj] of Object.entries(this.zoodb.objects[object_type])) {
