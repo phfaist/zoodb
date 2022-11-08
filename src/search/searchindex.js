@@ -177,9 +177,9 @@ export class SearchIndex
         return this.idx.toJSON();
     }
 
-    static _load_idx_notnull(info, serialized_idx)
+    static _load_idx_notnull(info, serialized_index)
     {
-        return lunr.Index.load(serialized_index);
+        return lunr.Index.load( serialized_index );
     }
 
     _dump_store()
@@ -223,3 +223,6 @@ export class SearchIndex
     }
 
 };
+
+
+

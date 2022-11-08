@@ -35,4 +35,13 @@ export class ZooDbProcessorBase
         this.process_zoo();
     }
 
+    // ---
+
+    // Note: do not modify `data`! Return a new data structure if modifications
+    // are needed please.
+    process_data_dump(data, options)
+    {
+        return data;
+    }
+
 };

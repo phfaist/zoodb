@@ -1,7 +1,5 @@
 import path from 'path';
 
-
-
 export class ZooLLMResourceInfo
 {
     /// source_path is used to resolve access to external files like graphics

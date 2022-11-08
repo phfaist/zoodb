@@ -190,4 +190,18 @@ export class LLMSimpleContentCompiler extends ZooDbProcessorBase
         }
     }
 
+
+
+    // ---
+    prepare_data_dump(data, options)
+    {
+        if (options.llm_keep_fragment_instances) {
+            return data;
+        }
+        // remove object pointers in relations, to avoid cyclic references, and
+        // instead list all relations separately.
+
+        throw new Error(`Operation not supported!`);
+    }
+
 }

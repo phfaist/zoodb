@@ -1,8 +1,7 @@
-import path from 'path';
-
 import debug_module from 'debug';
 const debug = debug_module('zoodb.zoollm._environment');
 
+import path from 'path';
 
 import {$$kw, repr} from '#llm-js/py.js';
 import {__class__, __super__, __get__, isinstance} from '#llm-js/org.transcrypt.__runtime__.js';

@@ -290,6 +290,29 @@ export class RelationsPopulator extends ZooDbProcessorBase
 
 
 
+    // ---
+    prepare_data_dump(data, options)
+    {
+        if (options.relations_keep_object_property_pointers) {
+            return data;
+        }
+        // remove object pointers in relations, to avoid cyclic references, and
+        // instead list all relations separately.
+
+        throw new Error(`Operation not supported!`);
+
+        // // copy in all props except 'db' contents
+        // let newdata = Object.assign({}, data, { db: {} });
+
+        // for (const [object_type, objects_db] of Object.entries(data.db)) {
+        //     newdata.db[object_type] = {};
+        //     for (const [object_id, object] of Object.entries(objects_db)) {
+                
+        //         newdata.db[object_type]
+        //     }
+        // }
+        
+    }
 
 };
 
