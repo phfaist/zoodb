@@ -4,7 +4,7 @@ const debug = debug_module('zoodb.zoollm');
 
 
 // provide $$kw({...}) and repr() to importers
-export {$$kw, repr} from '#llm-js/py.js';
+export {$$kw, repr} from './llm-js/py.js';
 
 
 // ZooLLMResourceInfo
@@ -20,7 +20,7 @@ export * from './_environment.js';
 //
 // Easily dump and reload compiled LLM to/from data/JSON
 //
-export { LLMDataDumper, LLMDataLoader } from '#llm-js/llm.llmdump.js';
+export { LLMDataDumper, LLMDataLoader } from './llm-js/llm.llmdump.js';
 
 
 

@@ -39,7 +39,7 @@
         "./search/searchindex": "./src/search/searchindex.js",
         "./search/searchwidget": "./src/search/searchwidget.js"
     },
-    "imports": {
+    "COMMENTED_OUT_NOT_SUPPORTED_BY_PARCEL__imports": {
         "#llm-js/*": "./llm-js-src/llm-js/*"
     }
 }

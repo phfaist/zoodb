@@ -1,9 +1,9 @@
 import debug_module from 'debug';
 const debug = debug_module('zoodb.zoollm.scanner');
 
-import {$$kw, repr} from '#llm-js/py.js';
-import * as latexnodes_nodes from '#llm-js/pylatexenc.latexnodes.nodes.js';
-import {LLMFragment} from '#llm-js/llm.llmfragment.js';
+import {$$kw, repr} from './llm-js/py.js';
+import * as latexnodes_nodes from './llm-js/pylatexenc.latexnodes.nodes.js';
+import {LLMFragment} from './llm-js/llm.llmfragment.js';
 
 //import {getfield, setfield, concatlistfield, get_field_schema} from '../util/getfield.js';
 import {iter_object_fields_recursive} from '../util/objectinspector.js';

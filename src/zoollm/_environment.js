@@ -3,24 +3,24 @@ const debug = debug_module('zoodb.zoollm._environment');
 
 import path from 'path';
 
-import {$$kw, repr} from '#llm-js/py.js';
-import {__class__, __super__, __get__, isinstance} from '#llm-js/org.transcrypt.__runtime__.js';
+import {$$kw, repr} from './llm-js/py.js';
+import {__class__, __super__, __get__, isinstance} from './llm-js/org.transcrypt.__runtime__.js';
 
-import { ParsingStateDelta } from '#llm-js/pylatexenc.latexnodes.js';
+import { ParsingStateDelta } from './llm-js/pylatexenc.latexnodes.js';
 
-import { LLMFragment } from '#llm-js/llm.llmfragment.js';
+import { LLMFragment } from './llm-js/llm.llmfragment.js';
 
 
-import * as llmstd from '#llm-js/llm.llmstd.js';
+import * as llmstd from './llm-js/llm.llmstd.js';
 
-import * as llm_feature from '#llm-js/llm.feature.js';
-import * as llm_feature_headings from '#llm-js/llm.feature.headings.js';
-import * as llm_feature_endnotes from '#llm-js/llm.feature.endnotes.js';
-import * as llm_feature_refs from '#llm-js/llm.feature.refs.js';
-import * as llm_feature_cite from '#llm-js/llm.feature.cite.js';
-import * as llm_feature_floats from '#llm-js/llm.feature.floats.js';
-import * as llm_feature_defterm from '#llm-js/llm.feature.defterm.js';
-import * as llm_feature_graphics from '#llm-js/llm.feature.graphics.js';
+import * as llm_feature from './llm-js/llm.feature.js';
+import * as llm_feature_headings from './llm-js/llm.feature.headings.js';
+import * as llm_feature_endnotes from './llm-js/llm.feature.endnotes.js';
+import * as llm_feature_refs from './llm-js/llm.feature.refs.js';
+import * as llm_feature_cite from './llm-js/llm.feature.cite.js';
+import * as llm_feature_floats from './llm-js/llm.feature.floats.js';
+import * as llm_feature_defterm from './llm-js/llm.feature.defterm.js';
+import * as llm_feature_graphics from './llm-js/llm.feature.graphics.js';
 
 
 export const SectionCommandSpec = llm_feature_headings.FeatureHeadings.SectionCommandSpec;

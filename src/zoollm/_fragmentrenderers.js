@@ -1,10 +1,10 @@
 
-import {$$kw, repr} from '#llm-js/py.js';
-import {__class__, __super__, __get__} from '#llm-js/org.transcrypt.__runtime__.js';
+import {$$kw, repr} from './llm-js/py.js';
+import {__class__, __super__, __get__} from './llm-js/org.transcrypt.__runtime__.js';
 
 
-import * as llm_fragmentrenderer_html from '#llm-js/llm.fragmentrenderer.html.js'; 
-import * as llm_fragmentrenderer_text from '#llm-js/llm.fragmentrenderer.text.js';
+import * as llm_fragmentrenderer_html from './llm-js/llm.fragmentrenderer.html.js'; 
+import * as llm_fragmentrenderer_text from './llm-js/llm.fragmentrenderer.text.js';
 
 
 
