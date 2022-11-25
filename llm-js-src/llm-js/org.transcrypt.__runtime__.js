@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-10-02 16:34:48
+/* 000001 */ // Transcrypt'ed from Python, 2022-11-13 21:11:20
 /* 000001 */ var __name__ = 'org.transcrypt.__runtime__';
 /* 000003 */ export var __envir__ = {};
 /* 000003 */ __envir__.interpreter_name = 'python';

@@ -336,102 +336,193 @@ export function zoollm_default_options(footnote_counter_formatter='alph')
 
 
 
-function prep_llm_environ_features(zoollm_options)
-{
-    zoollm_options ||= zoollm_default_options();
+// function prep_llm_environ_features(zoollm_options)
+// {
+//     zoollm_options ||= zoollm_default_options();
 
-    let props = {};
+//     let props = {};
 
-    props.citations_provider =
-        zoollm_options.citations_provider || new CitationsProvider;
-    props.ref_resolver =
-        zoollm_options.ref_resolver
-        || new RefResolver(zoollm_options.ref_resolver_options);
+//     props.citations_provider =
+//         zoollm_options.citations_provider || new CitationsProvider;
+//     props.ref_resolver =
+//         zoollm_options.ref_resolver
+//         || new RefResolver(zoollm_options.ref_resolver_options);
     
-    props.graphics_collection =
-        zoollm_options.graphics_collection || new FeatureZooGraphicsCollection();
+//     props.graphics_collection =
+//         zoollm_options.graphics_collection || new FeatureZooGraphicsCollection();
 
 
-    props.feature_headings = new llm_feature_headings.FeatureHeadings(
-        $$kw({section_commands_by_level:
-              zoollm_options.heading_section_commands_by_level}),
-    )
-    props.feature_refs = new llm_feature_refs.FeatureRefs(
-        $$kw({external_ref_resolvers: [props.ref_resolver]}),
-    )
+//     props.feature_headings = new llm_feature_headings.FeatureHeadings(
+//         $$kw({section_commands_by_level:
+//               zoollm_options.heading_section_commands_by_level}),
+//     )
+//     props.feature_refs = new llm_feature_refs.FeatureRefs(
+//         $$kw({external_ref_resolvers: [props.ref_resolver]}),
+//     )
 
-    props.feature_endnotes = new llm_feature_endnotes.FeatureEndnotes(
-        $$kw({categories: zoollm_options.endnote_categories})
-    )
+//     props.feature_endnotes = new llm_feature_endnotes.FeatureEndnotes(
+//         $$kw({categories: zoollm_options.endnote_categories})
+//     )
     
-    props.feature_citations = new llm_feature_cite.FeatureExternalPrefixedCitations(
-        $$kw({ external_citations_provider: props.citations_provider,
-               counter_formatter: zoollm_options.citation_counter_formatter,
-               citation_delimiters: zoollm_options.citation_delimiters, })
-    )
+//     props.feature_citations = new llm_feature_cite.FeatureExternalPrefixedCitations(
+//         $$kw({ external_citations_provider: props.citations_provider,
+//                counter_formatter: zoollm_options.citation_counter_formatter,
+//                citation_delimiters: zoollm_options.citation_delimiters, })
+//     )
 
-    props.feature_floats = new llm_feature_floats.FeatureFloats(
-        $$kw({float_types: zoollm_options.float_types})
-    )
+//     props.feature_floats = new llm_feature_floats.FeatureFloats(
+//         $$kw({float_types: zoollm_options.float_types})
+//     )
 
-    props.feature_defterm = new llm_feature_defterm.FeatureDefTerm()
-    props.feature_defterm.render_defterm_with_term =
-        zoollm_options.defterm_render_defterm_with_term;
-    props.feature_defterm.render_defterm_with_term_suffix =
-        zoollm_options.defterm_render_defterm_with_term_suffix;
+//     props.feature_defterm = new llm_feature_defterm.FeatureDefTerm()
+//     props.feature_defterm.render_defterm_with_term =
+//         zoollm_options.defterm_render_defterm_with_term;
+//     props.feature_defterm.render_defterm_with_term_suffix =
+//         zoollm_options.defterm_render_defterm_with_term_suffix;
 
-    return props;
-}
+//     return props;
+// }
 
 
 
-//export class ZooLLMEnvironment extends llmstd.LLMStandardEnvironment
-export function make_zoo_llm_environment(zoollm_options)
-{
-    // since we cannot assign to this.xyz before calling the superclass
-    // constructor, we prepare a temporary object (simple dictionary) with
-    // the values we'd like to assign, and we'll assign them to 'this'
-    // later below, after calling the superclass constructor.
-    const _feature_props = prep_llm_environ_features(zoollm_options);
+export var ZooLLMEnvironment = __class__(
+    'ZooLLMEnvironment', // class name
+    [ llmstd.LLMStandardEnvironment ], // base classes
+    {
+        // static members
 
-    const features =  [
-        _feature_props.feature_headings,
-        _feature_props.feature_refs,
-        _feature_props.feature_endnotes,
-        _feature_props.feature_citations,
-        _feature_props.feature_floats,
-        _feature_props.feature_defterm,
-        _feature_props.graphics_collection,
-    ];
+        get __init__ () {return __get__ (this, function
+        (self, zoollm_options) {
 
-    const parsing_mode_deltas = {
-        // /// not sure how useful this is ...
-        // 'safer-latexier': ParsingStateDelta( $$kw({
-        //     set_attributes: {
-        //         enable_comments: false,
-        //         latex_inline_math_delimiters: [['$','$'], ['\\(', '\\)']],
-        //         forbidden_characters: '',
-        //     },
-        // }) ),
+            zoollm_options ||= zoollm_default_options();
 
-        // enable \begin{raw:html}...\end{raw:html},
-        // \begin{raw:latex}...\end{raw:latex}, etc. TODO
-        // 'enable-raw': ParsingStateDelta(
-        //     // ...
-        // ),
-    };
+            self.citations_provider =
+                zoollm_options.citations_provider || new CitationsProvider;
+            self.ref_resolver =
+                zoollm_options.ref_resolver
+                || new RefResolver(zoollm_options.ref_resolver_options);
+            
+            self.graphics_collection =
+                zoollm_options.graphics_collection || new FeatureZooGraphicsCollection();
 
-    const zoollm_environ = llmstd.LLMStandardEnvironment(
-        $$kw({
-            features: features,
-            parsing_mode_deltas: parsing_mode_deltas,
-        })
-    );
-    
-    // copy all properties from _feature_props. to the new object
-    for (const [prop, value] of Object.entries(_feature_props)) {
-        zoollm_environ[prop] = value;
+
+            self.feature_headings = new llm_feature_headings.FeatureHeadings(
+                $$kw({section_commands_by_level:
+                      zoollm_options.heading_section_commands_by_level}),
+            )
+            self.feature_refs = new llm_feature_refs.FeatureRefs(
+                $$kw({external_ref_resolvers: [self.ref_resolver]}),
+            )
+
+            self.feature_endnotes = new llm_feature_endnotes.FeatureEndnotes(
+                $$kw({categories: zoollm_options.endnote_categories})
+            )
+            
+            self.feature_citations = new llm_feature_cite.FeatureExternalPrefixedCitations(
+                $$kw({ external_citations_provider: self.citations_provider,
+                       counter_formatter: zoollm_options.citation_counter_formatter,
+                       citation_delimiters: zoollm_options.citation_delimiters, })
+            )
+
+            self.feature_floats = new llm_feature_floats.FeatureFloats(
+                $$kw({float_types: zoollm_options.float_types})
+            )
+
+            self.feature_defterm = new llm_feature_defterm.FeatureDefTerm()
+            self.feature_defterm.render_defterm_with_term =
+                zoollm_options.defterm_render_defterm_with_term;
+            self.feature_defterm.render_defterm_with_term_suffix =
+                zoollm_options.defterm_render_defterm_with_term_suffix;
+
+            const features =  [
+                self.feature_headings,
+                self.feature_refs,
+                self.feature_endnotes,
+                self.feature_citations,
+                self.feature_floats,
+                self.feature_defterm,
+                self.graphics_collection,
+            ];
+
+            const parsing_mode_deltas = {
+                // /// not sure how useful this is ...
+                // 'safer-latexier': ParsingStateDelta( $$kw({
+                //     set_attributes: {
+                //         enable_comments: false,
+                //         latex_inline_math_delimiters: [['$','$'], ['\\(', '\\)']],
+                //         forbidden_characters: '',
+                //     },
+                // }) ),
+                //
+                // enable \begin{raw:html}...\end{raw:html},
+                // \begin{raw:latex}...\end{raw:latex}, etc. TODO
+                // 'enable-raw': ParsingStateDelta(
+                //     // ...
+                // ),
+            };
+
+            __super__(ZooLLMEnvironment, '__init__')(
+                self,
+                $$kw({
+                    features: features,
+                    parsing_mode_deltas: parsing_mode_deltas,
+                })
+            );
+            
+            // environment set up.
+        });}
+
     }
+);
 
-    return zoollm_environ;
-}
+
+// //export class ZooLLMEnvironment extends llmstd.LLMStandardEnvironment
+// export function make_zoo_llm_environment(zoollm_options)
+// {
+//     // since we cannot assign to this.xyz before calling the superclass
+//     // constructor, we prepare a temporary object (simple dictionary) with
+//     // the values we'd like to assign, and we'll assign them to 'this'
+//     // later below, after calling the superclass constructor.
+//     const _feature_props = prep_llm_environ_features(zoollm_options);
+
+//     const features =  [
+//         _feature_props.feature_headings,
+//         _feature_props.feature_refs,
+//         _feature_props.feature_endnotes,
+//         _feature_props.feature_citations,
+//         _feature_props.feature_floats,
+//         _feature_props.feature_defterm,
+//         _feature_props.graphics_collection,
+//     ];
+
+//     const parsing_mode_deltas = {
+//         // /// not sure how useful this is ...
+//         // 'safer-latexier': ParsingStateDelta( $$kw({
+//         //     set_attributes: {
+//         //         enable_comments: false,
+//         //         latex_inline_math_delimiters: [['$','$'], ['\\(', '\\)']],
+//         //         forbidden_characters: '',
+//         //     },
+//         // }) ),
+
+//         // enable \begin{raw:html}...\end{raw:html},
+//         // \begin{raw:latex}...\end{raw:latex}, etc. TODO
+//         // 'enable-raw': ParsingStateDelta(
+//         //     // ...
+//         // ),
+//     };
+
+//     const zoollm_environ = llmstd.LLMStandardEnvironment(
+//         $$kw({
+//             features: features,
+//             parsing_mode_deltas: parsing_mode_deltas,
+//         })
+//     );
+    
+//     // copy all properties from _feature_props. to the new object
+//     for (const [prop, value] of Object.entries(_feature_props)) {
+//         zoollm_environ[prop] = value;
+//     }
+
+//     return zoollm_environ;
+// }

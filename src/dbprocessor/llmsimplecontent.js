@@ -66,6 +66,8 @@ export class LLMSimpleContentCompiler extends ZooDbProcessorBase
         }
 
         this.config.content_scanner ??= null;
+
+        this.config.llm_error_policy ??= 'abort';
     }
 
     initialize_zoo()
@@ -129,11 +131,35 @@ export class LLMSimpleContentCompiler extends ZooDbProcessorBase
                 })
             );
         } catch (err) {
+            const errmsgobj = (err.msg !== undefined) ? (err.msg + '\n' + err.stack) : err;
             console.error(
                 `Error while compiling LLM content for ${resource_info} `
-                + `— field ‘${fieldname}’: ` + err
+                + `— field ‘${fieldname}’: `,
+                errmsgobj
             );
-            throw err;
+            if (this.config.llm_error_policy == 'abort') {
+                debug(`LLM Error & policy is 'abort', aborting compilation`);
+                throw err;
+            } else if (this.config.llm_error_policy == 'continue') {
+                // report the error in the text field itself, as a fake fragment, so
+                // it can be debugged.
+                debug(`Continuing despite LLM Error (llm_error_policy is 'continue')`);
+                fragment = this.config.llm_environment.make_fragment(
+                    `\\textbf{LLM ERROR `
+                    +   `(\\begin{verbatimtext}${what} (‘${fieldname}’)\\end{verbatimtext}):} `
+                    + `\\begin{verbatimtext}${errmsgobj}\\end{verbatimtext}`,
+                    $$kw({
+                        standalone_mode: true,
+                        resource_info: resource_info,
+                        what: `ERROR-MESSAGE:${what}`,
+                    })
+                );
+            } else {
+                throw new Error(
+                    `Invalid llm_error_policy: ‘${this.config.llm_error_policy}’, `
+                    + `expected 'abort' or 'continue'`
+                );
+            }
         }
 
         if (this.config.content_scanner != null) {

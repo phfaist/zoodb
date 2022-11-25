@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-10-02 16:34:49
+/* 000001 */ // Transcrypt'ed from Python, 2022-11-13 21:11:22
 /* 000038 */ var logging = {};
 /* 000038 */ var unique_object_id = {};
 /* 000038 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
@@ -454,144 +454,147 @@
 /* 000443 */ 			var __accu0__ = self;
 /* 000443 */ 			return __call__ (__accu0__.__class__, __accu0__, __kwargtrans__ (__mergekwargtrans__ ({_parent_parsing_state_info: tuple ([self, kwargs2])}, attrs)));
 /* 000443 */ 		}) ();
-/* 000446 */ 		// pass;
-/* 000450 */ 		return p;
-/* 000450 */ 	});},
-/* 000453 */ 	get get_fields () {return __get__ (this, function (self) {
-/* 000453 */ 		if (arguments.length) {
-/* 000453 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000453 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000453 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000453 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000453 */ 					switch (__attrib0__) {
-/* 000453 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000453 */ 					}
-/* 000453 */ 				}
-/* 000453 */ 			}
-/* 000453 */ 		}
-/* 000453 */ 		else {
-/* 000453 */ 		}
-/* 000458 */ 		return __call__ (dict, null, (function () {
-/* 000458 */ 			var __accu0__ = [];
-/* 000458 */ 			var __iterable0__ = self._fields;
-/* 000458 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000458 */ 				var f = __getitem__ (__iterable0__, __index0__);
-/* 000458 */ 				(function () {
-/* 000458 */ 					var __accu1__ = __accu0__;
-/* 000458 */ 					return __call__ (__accu1__.append, __accu1__, tuple ([f, __call__ (getattr, null, self, f)]));
-/* 000458 */ 				}) ();
-/* 000458 */ 			}
-/* 000458 */ 			return __accu0__;
-/* 000458 */ 		}) ());
-/* 000458 */ 	});},
-/* 000462 */ 	get __repr__ () {return __get__ (this, function (self) {
-/* 000462 */ 		if (arguments.length) {
-/* 000462 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000462 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000462 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000462 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000462 */ 					switch (__attrib0__) {
-/* 000462 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000462 */ 					}
-/* 000462 */ 				}
-/* 000462 */ 			}
-/* 000462 */ 		}
-/* 000462 */ 		else {
-/* 000462 */ 		}
-/* 000467 */ 		var clsname = self.__class__.__name__;
-/* 000468 */ 		var pswid = (function () {
-/* 000468 */ 			var __accu0__ = '{}<{:#x}>';
-/* 000468 */ 			return __call__ (__accu0__.format, __accu0__, clsname, __call__ (fn_unique_object_id, null, self));
-/* 000468 */ 		}) ();
-/* 000470 */ 		var __left0__ = self._parent_parsing_state_info;
-/* 000470 */ 		var parent_obj = __left0__ [0];
-/* 000470 */ 		var diff_kwargs = __left0__ [1];
-/* 000472 */ 		if (__t__ (!__t__ ((parent_obj)))) {
-/* 000475 */ 			return pswid;
-/* 000475 */ 		}
-/* 000479 */ 		return __add__ (__add__ (__add__ (pswid, (function () {
-/* 000479 */ 			var __accu0__ = '(<{:#x}> {} ';
-/* 000479 */ 			return __call__ (__accu0__.format, __accu0__, __call__ (fn_unique_object_id, null, parent_obj), _unisafe_arrow_s);
-/* 000480 */ 		}) ()), (function () {
-/* 000480 */ 			var __accu0__ = ', ';
-/* 000480 */ 			return __call__ (__accu0__.join, __accu0__, (function () {
-/* 000480 */ 				var __accu1__ = [];
-/* 000482 */ 				var __iterable0__ = (function () {
-/* 000482 */ 					var __accu2__ = diff_kwargs;
-/* 000482 */ 					return __call__ (__accu2__.py_items, __accu2__);
-/* 000482 */ 				}) ();
-/* 000482 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000482 */ 					var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000482 */ 					var k = __left0__ [0];
-/* 000482 */ 					var v = __left0__ [1];
-/* 000482 */ 					if (__t__ (!__in__ (k, tuple (['s'])))) {
-/* 000483 */ 						(function () {
-/* 000483 */ 							var __accu2__ = __accu1__;
-/* 000481 */ 							return __call__ (__accu2__.append, __accu2__, (function () {
-/* 000481 */ 								var __accu3__ = '{}={!r}';
-/* 000481 */ 								return __call__ (__accu3__.format, __accu3__, k, v);
-/* 000481 */ 							}) ());
-/* 000481 */ 						}) ();
-/* 000481 */ 					}
-/* 000481 */ 				}
-/* 000481 */ 				return __accu1__;
-/* 000481 */ 			}) ());
-/* 000481 */ 		}) ()), ')');
-/* 000481 */ 	});},
-/* 000488 */ 	get to_json_object () {return __get__ (this, function (self) {
-/* 000488 */ 		if (arguments.length) {
-/* 000488 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000488 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000488 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000488 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000488 */ 					switch (__attrib0__) {
-/* 000488 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000488 */ 					}
-/* 000488 */ 				}
-/* 000488 */ 			}
-/* 000488 */ 		}
-/* 000488 */ 		else {
-/* 000488 */ 		}
-/* 000489 */ 		return (function () {
-/* 000489 */ 			var __accu0__ = [];
-/* 000490 */ 			var __iterable0__ = (function () {
-/* 000490 */ 				var __accu1__ = (function () {
-/* 000490 */ 					var __accu2__ = self;
-/* 000490 */ 					return __call__ (__accu2__.get_fields, __accu2__);
-/* 000490 */ 				}) ();
-/* 000490 */ 				return __call__ (__accu1__.py_items, __accu1__);
-/* 000490 */ 			}) ();
-/* 000490 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000490 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000490 */ 				var k = __left0__ [0];
-/* 000490 */ 				var v = __left0__ [1];
-/* 000490 */ 				if (__t__ (!__in__ (k, tuple (['latex_context', 's'])))) {
-/* 000491 */ 					(function () {
-/* 000491 */ 						var __accu1__ = __accu0__;
-/* 000491 */ 						return __call__ (__accu1__.append, __accu1__, [k, v]);
-/* 000491 */ 					}) ();
-/* 000491 */ 				}
-/* 000491 */ 			}
-/* 000491 */ 			return dict (__accu0__);
-/* 000491 */ 		}) ();
-/* 000491 */ 	});}
-/* 000491 */ });
-/* 000495 */ export var _safe_eq = function (a, b) {
-/* 000495 */ 	if (arguments.length) {
-/* 000495 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 000495 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000495 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000495 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 000495 */ 				switch (__attrib0__) {
-/* 000495 */ 					case 'a': var a = __allkwargs0__ [__attrib0__]; break;
-/* 000495 */ 					case 'b': var b = __allkwargs0__ [__attrib0__]; break;
-/* 000495 */ 				}
-/* 000495 */ 			}
-/* 000495 */ 		}
-/* 000495 */ 	}
-/* 000495 */ 	else {
-/* 000495 */ 	}
-/* 000496 */ 	return __t__ (__t__ (a === null) && b === null) || __eq__ (a, b);
-/* 000496 */ };
+/* 000446 */ 		(function () {
+/* 000446 */ 			var __accu0__ = logger;
+/* 000446 */ 			return __call__ (__accu0__.debug, __accu0__, '%s.sub_context(%r): %r --> %r', self.__class__.__name__, kwargs, self, p);
+/* 000446 */ 		}) ();
+/* 000448 */ 		return p;
+/* 000448 */ 	});},
+/* 000451 */ 	get get_fields () {return __get__ (this, function (self) {
+/* 000451 */ 		if (arguments.length) {
+/* 000451 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000451 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000451 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000451 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000451 */ 					switch (__attrib0__) {
+/* 000451 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000451 */ 					}
+/* 000451 */ 				}
+/* 000451 */ 			}
+/* 000451 */ 		}
+/* 000451 */ 		else {
+/* 000451 */ 		}
+/* 000456 */ 		return __call__ (dict, null, (function () {
+/* 000456 */ 			var __accu0__ = [];
+/* 000456 */ 			var __iterable0__ = self._fields;
+/* 000456 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000456 */ 				var f = __getitem__ (__iterable0__, __index0__);
+/* 000456 */ 				(function () {
+/* 000456 */ 					var __accu1__ = __accu0__;
+/* 000456 */ 					return __call__ (__accu1__.append, __accu1__, tuple ([f, __call__ (getattr, null, self, f)]));
+/* 000456 */ 				}) ();
+/* 000456 */ 			}
+/* 000456 */ 			return __accu0__;
+/* 000456 */ 		}) ());
+/* 000456 */ 	});},
+/* 000460 */ 	get __repr__ () {return __get__ (this, function (self) {
+/* 000460 */ 		if (arguments.length) {
+/* 000460 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000460 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000460 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000460 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000460 */ 					switch (__attrib0__) {
+/* 000460 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000460 */ 					}
+/* 000460 */ 				}
+/* 000460 */ 			}
+/* 000460 */ 		}
+/* 000460 */ 		else {
+/* 000460 */ 		}
+/* 000465 */ 		var clsname = self.__class__.__name__;
+/* 000466 */ 		var pswid = (function () {
+/* 000466 */ 			var __accu0__ = '{}<{:#x}>';
+/* 000466 */ 			return __call__ (__accu0__.format, __accu0__, clsname, __call__ (fn_unique_object_id, null, self));
+/* 000466 */ 		}) ();
+/* 000468 */ 		var __left0__ = self._parent_parsing_state_info;
+/* 000468 */ 		var parent_obj = __left0__ [0];
+/* 000468 */ 		var diff_kwargs = __left0__ [1];
+/* 000470 */ 		if (__t__ (!__t__ ((parent_obj)))) {
+/* 000473 */ 			return pswid;
+/* 000473 */ 		}
+/* 000477 */ 		return __add__ (__add__ (__add__ (pswid, (function () {
+/* 000477 */ 			var __accu0__ = '(<{:#x}> {} ';
+/* 000477 */ 			return __call__ (__accu0__.format, __accu0__, __call__ (fn_unique_object_id, null, parent_obj), _unisafe_arrow_s);
+/* 000478 */ 		}) ()), (function () {
+/* 000478 */ 			var __accu0__ = ', ';
+/* 000478 */ 			return __call__ (__accu0__.join, __accu0__, (function () {
+/* 000478 */ 				var __accu1__ = [];
+/* 000480 */ 				var __iterable0__ = (function () {
+/* 000480 */ 					var __accu2__ = diff_kwargs;
+/* 000480 */ 					return __call__ (__accu2__.py_items, __accu2__);
+/* 000480 */ 				}) ();
+/* 000480 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000480 */ 					var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000480 */ 					var k = __left0__ [0];
+/* 000480 */ 					var v = __left0__ [1];
+/* 000480 */ 					if (__t__ (!__in__ (k, tuple (['s'])))) {
+/* 000481 */ 						(function () {
+/* 000481 */ 							var __accu2__ = __accu1__;
+/* 000479 */ 							return __call__ (__accu2__.append, __accu2__, (function () {
+/* 000479 */ 								var __accu3__ = '{}={!r}';
+/* 000479 */ 								return __call__ (__accu3__.format, __accu3__, k, v);
+/* 000479 */ 							}) ());
+/* 000479 */ 						}) ();
+/* 000479 */ 					}
+/* 000479 */ 				}
+/* 000479 */ 				return __accu1__;
+/* 000479 */ 			}) ());
+/* 000479 */ 		}) ()), ')');
+/* 000479 */ 	});},
+/* 000486 */ 	get to_json_object () {return __get__ (this, function (self) {
+/* 000486 */ 		if (arguments.length) {
+/* 000486 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000486 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000486 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000486 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000486 */ 					switch (__attrib0__) {
+/* 000486 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000486 */ 					}
+/* 000486 */ 				}
+/* 000486 */ 			}
+/* 000486 */ 		}
+/* 000486 */ 		else {
+/* 000486 */ 		}
+/* 000487 */ 		return (function () {
+/* 000487 */ 			var __accu0__ = [];
+/* 000488 */ 			var __iterable0__ = (function () {
+/* 000488 */ 				var __accu1__ = (function () {
+/* 000488 */ 					var __accu2__ = self;
+/* 000488 */ 					return __call__ (__accu2__.get_fields, __accu2__);
+/* 000488 */ 				}) ();
+/* 000488 */ 				return __call__ (__accu1__.py_items, __accu1__);
+/* 000488 */ 			}) ();
+/* 000488 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000488 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000488 */ 				var k = __left0__ [0];
+/* 000488 */ 				var v = __left0__ [1];
+/* 000488 */ 				if (__t__ (!__in__ (k, tuple (['latex_context', 's'])))) {
+/* 000489 */ 					(function () {
+/* 000489 */ 						var __accu1__ = __accu0__;
+/* 000489 */ 						return __call__ (__accu1__.append, __accu1__, [k, v]);
+/* 000489 */ 					}) ();
+/* 000489 */ 				}
+/* 000489 */ 			}
+/* 000489 */ 			return dict (__accu0__);
+/* 000489 */ 		}) ();
+/* 000489 */ 	});}
+/* 000489 */ });
+/* 000493 */ export var _safe_eq = function (a, b) {
+/* 000493 */ 	if (arguments.length) {
+/* 000493 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 000493 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000493 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000493 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 000493 */ 				switch (__attrib0__) {
+/* 000493 */ 					case 'a': var a = __allkwargs0__ [__attrib0__]; break;
+/* 000493 */ 					case 'b': var b = __allkwargs0__ [__attrib0__]; break;
+/* 000493 */ 				}
+/* 000493 */ 			}
+/* 000493 */ 		}
+/* 000493 */ 	}
+/* 000493 */ 	else {
+/* 000493 */ 	}
+/* 000494 */ 	return __t__ (__t__ (a === null) && b === null) || __eq__ (a, b);
+/* 000494 */ };
 /* 000038 */ 
 //# sourceMappingURL=pylatexenc.latexnodes._parsingstate.map

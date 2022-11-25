@@ -35,6 +35,9 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
         this.options.citations.sources ||= {};
         this.options.citations.default_user_agent ||= null;
 
+        // 'abort' or 'continue'
+        this.options.llm_error_policy ??= 'abort';
+
         this.zoo_llm_environment = this.options.zoo_llm_environment;
         if (!this.zoo_llm_environment) {
             throw new Error(`No zoo_llm_environment object provided`);
@@ -51,7 +54,8 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
         this.llm_simple_content_compiler = new LLMSimpleContentCompiler(
             {
                 llm_environment: this.zoo_llm_environment,
-                content_scanner: this.scanner
+                content_scanner: this.scanner,
+                llm_error_policy: this.options.llm_error_policy,
             }
         );
 

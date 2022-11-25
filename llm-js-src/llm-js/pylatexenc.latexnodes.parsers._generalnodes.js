@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-10-02 16:34:49
+/* 000001 */ // Transcrypt'ed from Python, 2022-11-13 21:11:21
 /* 000037 */ var logging = {};
 /* 000037 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000045 */ import {LatexParserBase} from './pylatexenc.latexnodes.parsers._base.js';
@@ -6,7 +6,7 @@
 /* 000040 */ import {LatexWalkerEndOfStream, LatexWalkerError, LatexWalkerNodesParseError, LatexWalkerParseError, LatexWalkerParseErrorFormatter, LatexWalkerTokenParseError, __all__, _unicode_from_str, format_pos} from './pylatexenc.latexnodes._exctypes.js';
 /* 000037 */ import * as __module_logging__ from './logging.js';
 /* 000037 */ __nest__ (logging, '', __module_logging__);
-/* 000037 */ export {LatexWalkerTokenParseError, LatexWalkerParseError, LatexWalkerNodesParseError, LatexParserBase, __all__, format_pos, LatexWalkerError, nodes, LatexWalkerParseErrorFormatter, LatexWalkerEndOfStream, _unicode_from_str};
+/* 000037 */ export {LatexWalkerEndOfStream, LatexWalkerParseError, LatexWalkerTokenParseError, _unicode_from_str, __all__, nodes, LatexWalkerError, LatexWalkerNodesParseError, format_pos, LatexWalkerParseErrorFormatter, LatexParserBase};
 /* 000001 */ var __name__ = 'pylatexenc.latexnodes.parsers._generalnodes';
 /* 000038 */ export var logger = (function () {
 /* 000038 */ 	var __accu0__ = logging;
@@ -133,195 +133,204 @@
 /* 000164 */ 		catch (__except0__) {
 /* 000164 */ 			if (isinstance (__except0__, LatexWalkerParseError)) {
 /* 000164 */ 				var e = __except0__;
-/* 000173 */ 				// pass;
-/* 000177 */ 				var thenodelist = (function () {
-/* 000177 */ 					var __accu0__ = collector;
-/* 000177 */ 					return __call__ (__accu0__.get_final_nodelist, __accu0__);
-/* 000177 */ 				}) ();
-/* 000178 */ 				if (__t__ (thenodelist.pos === null)) {
-/* 000179 */ 					thenodelist.pos = pos_start;
+/* 000173 */ 				(function () {
+/* 000173 */ 					var __accu0__ = logger;
+/* 000173 */ 					return __call__ (__accu0__.debug, __accu0__, 'Got parse error while reading general nodes: %r', e);
+/* 000173 */ 				}) ();
+/* 000175 */ 				var thenodelist = (function () {
+/* 000175 */ 					var __accu0__ = collector;
+/* 000175 */ 					return __call__ (__accu0__.get_final_nodelist, __accu0__);
+/* 000175 */ 				}) ();
+/* 000176 */ 				if (__t__ (thenodelist.pos === null)) {
+/* 000177 */ 					thenodelist.pos = pos_start;
+/* 000177 */ 				}
+/* 000178 */ 				if (__t__ (thenodelist.pos_end === null)) {
+/* 000179 */ 					thenodelist.pos_end = pos_start;
 /* 000179 */ 				}
-/* 000180 */ 				if (__t__ (thenodelist.pos_end === null)) {
-/* 000181 */ 					thenodelist.pos_end = pos_start;
-/* 000181 */ 				}
-/* 000189 */ 				var __except1__ = __call__ (LatexWalkerNodesParseError, null, __kwargtrans__ ({msg: e.msg, pos: e.pos, open_contexts: e.open_contexts, error_type_info: e.error_type_info, recovery_nodes: thenodelist, recovery_parsing_state_delta: (function () {
-/* 000189 */ 					var __accu0__ = collector;
-/* 000189 */ 					return __call__ (__accu0__.get_parser_parsing_state_delta, __accu0__);
-/* 000189 */ 				}) ()}));
-/* 000189 */ 				__except1__.__cause__ = null;
-/* 000189 */ 				throw __except1__;
-/* 000189 */ 			}
-/* 000189 */ 			else {
-/* 000189 */ 				throw __except0__;
-/* 000189 */ 			}
-/* 000189 */ 		}
-/* 000192 */ 		var collected_nodelist = (function () {
-/* 000192 */ 			var __accu0__ = collector;
-/* 000192 */ 			return __call__ (__accu0__.get_final_nodelist, __accu0__);
-/* 000192 */ 		}) ();
-/* 000193 */ 		if (__t__ (collected_nodelist.pos === null)) {
-/* 000194 */ 			collected_nodelist.pos = pos_start;
+/* 000187 */ 				var __except1__ = __call__ (LatexWalkerNodesParseError, null, __kwargtrans__ ({msg: e.msg, pos: e.pos, open_contexts: e.open_contexts, error_type_info: e.error_type_info, recovery_nodes: thenodelist, recovery_parsing_state_delta: (function () {
+/* 000187 */ 					var __accu0__ = collector;
+/* 000187 */ 					return __call__ (__accu0__.get_parser_parsing_state_delta, __accu0__);
+/* 000187 */ 				}) ()}));
+/* 000187 */ 				__except1__.__cause__ = null;
+/* 000187 */ 				throw __except1__;
+/* 000187 */ 			}
+/* 000187 */ 			else {
+/* 000187 */ 				throw __except0__;
+/* 000187 */ 			}
+/* 000187 */ 		}
+/* 000190 */ 		var collected_nodelist = (function () {
+/* 000190 */ 			var __accu0__ = collector;
+/* 000190 */ 			return __call__ (__accu0__.get_final_nodelist, __accu0__);
+/* 000190 */ 		}) ();
+/* 000191 */ 		if (__t__ (collected_nodelist.pos === null)) {
+/* 000192 */ 			collected_nodelist.pos = pos_start;
+/* 000192 */ 		}
+/* 000193 */ 		if (__t__ (collected_nodelist.pos_end === null)) {
+/* 000194 */ 			collected_nodelist.pos_end = pos_start;
 /* 000194 */ 		}
-/* 000195 */ 		if (__t__ (collected_nodelist.pos_end === null)) {
-/* 000196 */ 			collected_nodelist.pos_end = pos_start;
-/* 000196 */ 		}
-/* 000201 */ 		var stop_token_condition_met = (function () {
-/* 000201 */ 			var __accu0__ = collector;
-/* 000201 */ 			return __call__ (__accu0__.stop_token_condition_met, __accu0__);
-/* 000201 */ 		}) ();
-/* 000202 */ 		var stop_nodelist_condition_met = (function () {
-/* 000202 */ 			var __accu0__ = collector;
-/* 000202 */ 			return __call__ (__accu0__.stop_nodelist_condition_met, __accu0__);
-/* 000202 */ 		}) ();
-/* 000204 */ 		if (__t__ (!__t__ ((self.require_stop_condition_met)))) {
-/* 000206 */ 			var met_a_required_stop_condition = true;
-/* 000206 */ 		}
-/* 000207 */ 		else {
-/* 000208 */ 			var met_a_required_stop_condition = false;
-/* 000209 */ 			if (__t__ (self.stop_token_condition !== null)) {
-/* 000210 */ 				if (__t__ (stop_token_condition_met)) {
-/* 000211 */ 					var met_a_required_stop_condition = true;
-/* 000211 */ 				}
-/* 000211 */ 			}
-/* 000212 */ 			else if (__t__ (self.stop_nodelist_condition !== null)) {
-/* 000213 */ 				if (__t__ (stop_nodelist_condition_met)) {
-/* 000214 */ 					var met_a_required_stop_condition = true;
-/* 000214 */ 				}
-/* 000214 */ 			}
-/* 000215 */ 			else {
-/* 000217 */ 				var met_a_required_stop_condition = true;
-/* 000217 */ 			}
-/* 000217 */ 		}
-/* 000219 */ 		// pass;
-/* 000231 */ 		if (__t__ (!__t__ ((met_a_required_stop_condition)))) {
-/* 000233 */ 			var message = self.stop_condition_message;
-/* 000234 */ 			if (__t__ (message === null)) {
-/* 000235 */ 				var message = 'End of stream encountered while parsing nodes without stop condition being met [reporting starting position]';
-/* 000235 */ 			}
-/* 000241 */ 			var exc = __call__ (LatexWalkerNodesParseError, null, __kwargtrans__ ({msg: message, pos: (function () {
-/* 000241 */ 				var __accu0__ = collector;
-/* 000241 */ 				return __call__ (__accu0__.pos_start, __accu0__);
-/* 000243 */ 			}) (), recovery_nodes: collected_nodelist, recovery_parsing_state_delta: (function () {
-/* 000243 */ 				var __accu0__ = collector;
-/* 000243 */ 				return __call__ (__accu0__.get_parser_parsing_state_delta, __accu0__);
-/* 000243 */ 			}) (), error_type_info: dict ({'what': 'nodes_generalnodes_required_stop_condition_not_met', 'stop_condition_message': self.stop_condition_message})}));
-/* 000249 */ 			var __except0__ = exc;
-/* 000249 */ 			__except0__.__cause__ = null;
-/* 000249 */ 			throw __except0__;
-/* 000249 */ 		}
-/* 000251 */ 		if (__t__ (__t__ (stop_token_condition_met) && self.handle_stop_condition_token !== null)) {
-/* 000253 */ 			var stoptoken = (function () {
-/* 000253 */ 				var __accu0__ = collector;
-/* 000253 */ 				return __call__ (__accu0__.stop_token_condition_met_token, __accu0__);
-/* 000253 */ 			}) ();
-/* 000255 */ 			if (__t__ (stoptoken !== null)) {
-/* 000256 */ 				(function () {
-/* 000256 */ 					var __accu0__ = self;
-/* 000256 */ 					return __call__ (__accu0__.handle_stop_condition_token, __accu0__, stoptoken, __kwargtrans__ ({latex_walker: latex_walker, token_reader: token_reader, parsing_state: parsing_state}));
-/* 000256 */ 				}) ();
-/* 000256 */ 			}
-/* 000256 */ 		}
-/* 000263 */ 		var stop_data = (function () {
-/* 000263 */ 			var __accu0__ = collector;
-/* 000263 */ 			return __call__ (__accu0__.stop_condition_stop_data, __accu0__);
-/* 000263 */ 		}) ();
-/* 000264 */ 		if (__t__ (__t__ (stop_data !== null) && self.handle_stop_data !== null)) {
-/* 000265 */ 			(function () {
-/* 000265 */ 				var __accu0__ = self;
-/* 000265 */ 				return __call__ (__accu0__.handle_stop_data, __accu0__, stop_data, __kwargtrans__ ({latex_walker: latex_walker, token_reader: token_reader, parsing_state: parsing_state}));
-/* 000265 */ 			}) ();
-/* 000265 */ 		}
-/* 000272 */ 		var nodelist = collected_nodelist;
-/* 000273 */ 		var parsing_state_delta = (function () {
-/* 000273 */ 			var __accu0__ = collector;
-/* 000273 */ 			return __call__ (__accu0__.get_parser_parsing_state_delta, __accu0__);
-/* 000273 */ 		}) ();
-/* 000275 */ 		// pass;
-/* 000279 */ 		return tuple ([nodelist, parsing_state_delta]);
-/* 000279 */ 	});}
-/* 000279 */ });
-/* 000286 */ export var LatexSingleNodeParser =  __class__ ('LatexSingleNodeParser', [LatexGeneralNodesParser], {
-/* 000286 */ 	__module__: __name__,
-/* 000307 */ 	get __init__ () {return __get__ (this, function (self, stop_on_comment) {
-/* 000307 */ 		if (typeof stop_on_comment == 'undefined' || (stop_on_comment != null && stop_on_comment.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000307 */ 			var stop_on_comment = true;
-/* 000307 */ 		};
-/* 000307 */ 		var kwargs = dict ();
-/* 000307 */ 		if (arguments.length) {
-/* 000307 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000307 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000307 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000307 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000307 */ 					switch (__attrib0__) {
-/* 000307 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000307 */ 						case 'stop_on_comment': var stop_on_comment = __allkwargs0__ [__attrib0__]; break;
-/* 000307 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000307 */ 					}
-/* 000307 */ 				}
-/* 000307 */ 				delete kwargs.__kwargtrans__;
-/* 000307 */ 			}
-/* 000307 */ 		}
-/* 000307 */ 		else {
-/* 000307 */ 		}
-/* 000308 */ 		__call__ (__call__ (__super__, null, LatexSingleNodeParser, '__init__'), null, self, __kwargtrans__ (__mergekwargtrans__ ({stop_nodelist_condition: self._stop_nodelist_condition, require_stop_condition_met: false}, kwargs)));
-/* 000313 */ 		self.stop_on_comment = stop_on_comment;
-/* 000313 */ 	});},
-/* 000315 */ 	get _stop_nodelist_condition () {return __get__ (this, function (self, nodelist) {
-/* 000315 */ 		if (arguments.length) {
-/* 000315 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000315 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000315 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000315 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000315 */ 					switch (__attrib0__) {
-/* 000315 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000315 */ 						case 'nodelist': var nodelist = __allkwargs0__ [__attrib0__]; break;
-/* 000315 */ 					}
-/* 000315 */ 				}
-/* 000315 */ 			}
-/* 000315 */ 		}
-/* 000315 */ 		else {
-/* 000315 */ 		}
-/* 000316 */ 		var nl = nodelist;
-/* 000317 */ 		if (__t__ (!__t__ ((self.stop_on_comment)))) {
-/* 000318 */ 			var nl = (function () {
-/* 000318 */ 				var __accu0__ = [];
-/* 000318 */ 				var __iterable0__ = nl;
-/* 000318 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000318 */ 					var n = __getitem__ (__iterable0__, __index0__);
-/* 000318 */ 					if (__t__ (!__t__ (((function () {
-/* 000318 */ 						var __accu1__ = n;
-/* 000318 */ 						return __call__ (__accu1__.isNodeType, __accu1__, nodes.LatexCommentNode);
-/* 000318 */ 					}) ())))) {
-/* 000318 */ 						(function () {
-/* 000318 */ 							var __accu1__ = __accu0__;
-/* 000318 */ 							return __call__ (__accu1__.append, __accu1__, n);
-/* 000318 */ 						}) ();
-/* 000318 */ 					}
-/* 000318 */ 				}
-/* 000318 */ 				return __accu0__;
-/* 000318 */ 			}) ();
-/* 000318 */ 		}
-/* 000319 */ 		if (__t__ (__ge__ (__call__ (len, null, nl), 1))) {
-/* 000320 */ 			return true;
-/* 000320 */ 		}
-/* 000321 */ 		return false;
-/* 000321 */ 	});},
-/* 000323 */ 	get contents_can_be_empty () {return __get__ (this, function (self) {
-/* 000323 */ 		if (arguments.length) {
-/* 000323 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000323 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000323 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000323 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000323 */ 					switch (__attrib0__) {
-/* 000323 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000323 */ 					}
-/* 000323 */ 				}
-/* 000323 */ 			}
-/* 000323 */ 		}
-/* 000323 */ 		else {
-/* 000323 */ 		}
-/* 000328 */ 		return false;
-/* 000328 */ 	});}
-/* 000328 */ });
+/* 000199 */ 		var stop_token_condition_met = (function () {
+/* 000199 */ 			var __accu0__ = collector;
+/* 000199 */ 			return __call__ (__accu0__.stop_token_condition_met, __accu0__);
+/* 000199 */ 		}) ();
+/* 000200 */ 		var stop_nodelist_condition_met = (function () {
+/* 000200 */ 			var __accu0__ = collector;
+/* 000200 */ 			return __call__ (__accu0__.stop_nodelist_condition_met, __accu0__);
+/* 000200 */ 		}) ();
+/* 000202 */ 		if (__t__ (!__t__ ((self.require_stop_condition_met)))) {
+/* 000204 */ 			var met_a_required_stop_condition = true;
+/* 000204 */ 		}
+/* 000205 */ 		else {
+/* 000206 */ 			var met_a_required_stop_condition = false;
+/* 000207 */ 			if (__t__ (self.stop_token_condition !== null)) {
+/* 000208 */ 				if (__t__ (stop_token_condition_met)) {
+/* 000209 */ 					var met_a_required_stop_condition = true;
+/* 000209 */ 				}
+/* 000209 */ 			}
+/* 000210 */ 			else if (__t__ (self.stop_nodelist_condition !== null)) {
+/* 000211 */ 				if (__t__ (stop_nodelist_condition_met)) {
+/* 000212 */ 					var met_a_required_stop_condition = true;
+/* 000212 */ 				}
+/* 000212 */ 			}
+/* 000213 */ 			else {
+/* 000215 */ 				var met_a_required_stop_condition = true;
+/* 000215 */ 			}
+/* 000215 */ 		}
+/* 000217 */ 		(function () {
+/* 000217 */ 			var __accu0__ = logger;
+/* 000217 */ 			return __call__ (__accu0__.debug, __accu0__, 'finished parsing general nodes; self.require_stop_condition_met=%r, stop_token_condition=%r, stop_token_condition_met=%r, stop_nodelist_condition=%r, stop_nodelist_condition_met=%r;met_a_required_stop_condition=%r', self.require_stop_condition_met, self.stop_token_condition, stop_token_condition_met, self.stop_nodelist_condition, stop_nodelist_condition_met, met_a_required_stop_condition);
+/* 000217 */ 		}) ();
+/* 000227 */ 		if (__t__ (!__t__ ((met_a_required_stop_condition)))) {
+/* 000229 */ 			var message = self.stop_condition_message;
+/* 000230 */ 			if (__t__ (message === null)) {
+/* 000231 */ 				var message = 'End of stream encountered while parsing nodes without stop condition being met [reporting starting position]';
+/* 000231 */ 			}
+/* 000237 */ 			var exc = __call__ (LatexWalkerNodesParseError, null, __kwargtrans__ ({msg: message, pos: (function () {
+/* 000237 */ 				var __accu0__ = collector;
+/* 000237 */ 				return __call__ (__accu0__.pos_start, __accu0__);
+/* 000239 */ 			}) (), recovery_nodes: collected_nodelist, recovery_parsing_state_delta: (function () {
+/* 000239 */ 				var __accu0__ = collector;
+/* 000239 */ 				return __call__ (__accu0__.get_parser_parsing_state_delta, __accu0__);
+/* 000239 */ 			}) (), error_type_info: dict ({'what': 'nodes_generalnodes_required_stop_condition_not_met', 'stop_condition_message': self.stop_condition_message})}));
+/* 000245 */ 			var __except0__ = exc;
+/* 000245 */ 			__except0__.__cause__ = null;
+/* 000245 */ 			throw __except0__;
+/* 000245 */ 		}
+/* 000247 */ 		if (__t__ (__t__ (stop_token_condition_met) && self.handle_stop_condition_token !== null)) {
+/* 000249 */ 			var stoptoken = (function () {
+/* 000249 */ 				var __accu0__ = collector;
+/* 000249 */ 				return __call__ (__accu0__.stop_token_condition_met_token, __accu0__);
+/* 000249 */ 			}) ();
+/* 000251 */ 			if (__t__ (stoptoken !== null)) {
+/* 000252 */ 				(function () {
+/* 000252 */ 					var __accu0__ = self;
+/* 000252 */ 					return __call__ (__accu0__.handle_stop_condition_token, __accu0__, stoptoken, __kwargtrans__ ({latex_walker: latex_walker, token_reader: token_reader, parsing_state: parsing_state}));
+/* 000252 */ 				}) ();
+/* 000252 */ 			}
+/* 000252 */ 		}
+/* 000259 */ 		var stop_data = (function () {
+/* 000259 */ 			var __accu0__ = collector;
+/* 000259 */ 			return __call__ (__accu0__.stop_condition_stop_data, __accu0__);
+/* 000259 */ 		}) ();
+/* 000260 */ 		if (__t__ (__t__ (stop_data !== null) && self.handle_stop_data !== null)) {
+/* 000261 */ 			(function () {
+/* 000261 */ 				var __accu0__ = self;
+/* 000261 */ 				return __call__ (__accu0__.handle_stop_data, __accu0__, stop_data, __kwargtrans__ ({latex_walker: latex_walker, token_reader: token_reader, parsing_state: parsing_state}));
+/* 000261 */ 			}) ();
+/* 000261 */ 		}
+/* 000268 */ 		var nodelist = collected_nodelist;
+/* 000269 */ 		var parsing_state_delta = (function () {
+/* 000269 */ 			var __accu0__ = collector;
+/* 000269 */ 			return __call__ (__accu0__.get_parser_parsing_state_delta, __accu0__);
+/* 000269 */ 		}) ();
+/* 000271 */ 		(function () {
+/* 000271 */ 			var __accu0__ = logger;
+/* 000271 */ 			return __call__ (__accu0__.debug, __accu0__, 'parser - we got final nodelist - %r', nodelist);
+/* 000271 */ 		}) ();
+/* 000273 */ 		return tuple ([nodelist, parsing_state_delta]);
+/* 000273 */ 	});}
+/* 000273 */ });
+/* 000280 */ export var LatexSingleNodeParser =  __class__ ('LatexSingleNodeParser', [LatexGeneralNodesParser], {
+/* 000280 */ 	__module__: __name__,
+/* 000301 */ 	get __init__ () {return __get__ (this, function (self, stop_on_comment) {
+/* 000301 */ 		if (typeof stop_on_comment == 'undefined' || (stop_on_comment != null && stop_on_comment.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000301 */ 			var stop_on_comment = true;
+/* 000301 */ 		};
+/* 000301 */ 		var kwargs = dict ();
+/* 000301 */ 		if (arguments.length) {
+/* 000301 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000301 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000301 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000301 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000301 */ 					switch (__attrib0__) {
+/* 000301 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000301 */ 						case 'stop_on_comment': var stop_on_comment = __allkwargs0__ [__attrib0__]; break;
+/* 000301 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000301 */ 					}
+/* 000301 */ 				}
+/* 000301 */ 				delete kwargs.__kwargtrans__;
+/* 000301 */ 			}
+/* 000301 */ 		}
+/* 000301 */ 		else {
+/* 000301 */ 		}
+/* 000302 */ 		__call__ (__call__ (__super__, null, LatexSingleNodeParser, '__init__'), null, self, __kwargtrans__ (__mergekwargtrans__ ({stop_nodelist_condition: self._stop_nodelist_condition, require_stop_condition_met: false}, kwargs)));
+/* 000307 */ 		self.stop_on_comment = stop_on_comment;
+/* 000307 */ 	});},
+/* 000309 */ 	get _stop_nodelist_condition () {return __get__ (this, function (self, nodelist) {
+/* 000309 */ 		if (arguments.length) {
+/* 000309 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000309 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000309 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000309 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000309 */ 					switch (__attrib0__) {
+/* 000309 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000309 */ 						case 'nodelist': var nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 000309 */ 					}
+/* 000309 */ 				}
+/* 000309 */ 			}
+/* 000309 */ 		}
+/* 000309 */ 		else {
+/* 000309 */ 		}
+/* 000310 */ 		var nl = nodelist;
+/* 000311 */ 		if (__t__ (!__t__ ((self.stop_on_comment)))) {
+/* 000312 */ 			var nl = (function () {
+/* 000312 */ 				var __accu0__ = [];
+/* 000312 */ 				var __iterable0__ = nl;
+/* 000312 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000312 */ 					var n = __getitem__ (__iterable0__, __index0__);
+/* 000312 */ 					if (__t__ (!__t__ (((function () {
+/* 000312 */ 						var __accu1__ = n;
+/* 000312 */ 						return __call__ (__accu1__.isNodeType, __accu1__, nodes.LatexCommentNode);
+/* 000312 */ 					}) ())))) {
+/* 000312 */ 						(function () {
+/* 000312 */ 							var __accu1__ = __accu0__;
+/* 000312 */ 							return __call__ (__accu1__.append, __accu1__, n);
+/* 000312 */ 						}) ();
+/* 000312 */ 					}
+/* 000312 */ 				}
+/* 000312 */ 				return __accu0__;
+/* 000312 */ 			}) ();
+/* 000312 */ 		}
+/* 000313 */ 		if (__t__ (__ge__ (__call__ (len, null, nl), 1))) {
+/* 000314 */ 			return true;
+/* 000314 */ 		}
+/* 000315 */ 		return false;
+/* 000315 */ 	});},
+/* 000317 */ 	get contents_can_be_empty () {return __get__ (this, function (self) {
+/* 000317 */ 		if (arguments.length) {
+/* 000317 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000317 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000317 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000317 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000317 */ 					switch (__attrib0__) {
+/* 000317 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000317 */ 					}
+/* 000317 */ 				}
+/* 000317 */ 			}
+/* 000317 */ 		}
+/* 000317 */ 		else {
+/* 000317 */ 		}
+/* 000322 */ 		return false;
+/* 000322 */ 	});}
+/* 000322 */ });
 /* 000037 */ 
 //# sourceMappingURL=pylatexenc.latexnodes.parsers._generalnodes.map

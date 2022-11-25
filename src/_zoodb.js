@@ -78,6 +78,7 @@ export class ZooDb
         this._object_types = Object.keys(db.objects);
 
         this.raw_data_db = JSON.parse(JSON.stringify(this.db));
+        //debug('raw_data_db = ', this.raw_data_db);
 
         if (!this.processors_initialized) {
             this.processors_initialized = true;
@@ -100,7 +101,7 @@ export class ZooDb
         // update the raw data
         for (const [object_type, object_db] of Object.entries(db_objects)) {
             for (const [object_id, object] of Object.entries(object_db)) {
-                this.raw_data_db[object_type][object_id] =
+                this.raw_data_db.objects[object_type][object_id] =
                     JSON.parse(JSON.stringify(db_objects[object_type][object_id]));
             }
         }

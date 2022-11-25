@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-10-02 16:34:48
+/* 000001 */ // Transcrypt'ed from Python, 2022-11-13 21:11:21
 /* 000037 */ var logging = {};
 /* 000037 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000051 */ import {LatexDelimitedGroupParser} from './pylatexenc.latexnodes.parsers._delimited.js';
@@ -8,7 +8,7 @@
 /* 000041 */ import {LatexWalkerEndOfStream, LatexWalkerNodesParseError, LatexWalkerTokenParseError} from './pylatexenc.latexnodes._exctypes.js';
 /* 000037 */ import * as __module_logging__ from './logging.js';
 /* 000037 */ __nest__ (logging, '', __module_logging__);
-/* 000037 */ export {LatexWalkerTokenParseError, LatexParserBase, LatexDelimitedGroupParser, LatexEnvironmentNode, LatexCommentNode, LatexWalkerEndOfStream, LatexCharsNode, _update_posposend_from_nodelist, _unicode_from_str, LatexNodeList, LatexWalkerParseError, _get_content_as_chars, LatexSpecialsNode, __all__, latex_node_types, LatexNodesVisitor, LatexNode, LatexGroupNode, LatexWalkerNodesParseError, LatexMathNode, LatexMacroNode, ParsedArguments};
+/* 000037 */ export {_unicode_from_str, __all__, latex_node_types, LatexWalkerNodesParseError, LatexParserBase, _get_content_as_chars, LatexCharsNode, LatexMathNode, LatexNodeList, LatexWalkerEndOfStream, LatexWalkerParseError, LatexGroupNode, LatexWalkerTokenParseError, LatexDelimitedGroupParser, LatexCommentNode, ParsedArguments, LatexMacroNode, LatexEnvironmentNode, LatexSpecialsNode, _update_posposend_from_nodelist, LatexNodesVisitor, LatexNode};
 /* 000001 */ var __name__ = 'pylatexenc.latexnodes.parsers._expression';
 /* 000038 */ export var logger = (function () {
 /* 000038 */ 	var __accu0__ = logging;
@@ -152,257 +152,266 @@
 /* 000114 */ 					return __call__ (__accu0__.make_node, __accu0__, LatexGroupNode, __kwargtrans__ ({parsing_state: parsing_state, nodelist: expr_nodelist, delimiters: tuple (['', '']), pos: expr_nodelist.pos, pos_end: expr_nodelist.pos_end}));
 /* 000114 */ 				}) ();
 /* 000114 */ 			}
-/* 000123 */ 			// pass;
-/* 000127 */ 			return tuple ([thenodelist, null]);
-/* 000127 */ 		}
-/* 000127 */ 	});},
-/* 000130 */ 	get _parse_single_token () {return __get__ (this, function (self, latex_walker, token_reader, expr_parsing_state, parsing_state) {
-/* 000130 */ 		var kwargs = dict ();
-/* 000130 */ 		if (arguments.length) {
-/* 000130 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000130 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000130 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000130 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000130 */ 					switch (__attrib0__) {
-/* 000130 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000130 */ 						case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
-/* 000130 */ 						case 'token_reader': var token_reader = __allkwargs0__ [__attrib0__]; break;
-/* 000130 */ 						case 'expr_parsing_state': var expr_parsing_state = __allkwargs0__ [__attrib0__]; break;
-/* 000130 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
-/* 000130 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000130 */ 					}
-/* 000130 */ 				}
-/* 000130 */ 				delete kwargs.__kwargtrans__;
-/* 000130 */ 			}
-/* 000130 */ 		}
-/* 000130 */ 		else {
-/* 000130 */ 		}
-/* 000133 */ 		try {
-/* 000134 */ 			var tok = (function () {
-/* 000134 */ 				var __accu0__ = token_reader;
-/* 000134 */ 				return __call__ (__accu0__.next_token, __accu0__, __kwargtrans__ ({parsing_state: expr_parsing_state}));
-/* 000134 */ 			}) ();
-/* 000134 */ 		}
-/* 000134 */ 		catch (__except0__) {
-/* 000134 */ 			if (isinstance (__except0__, LatexWalkerTokenParseError)) {
-/* 000134 */ 				var e = __except0__;
-/* 000136 */ 				var exc = (function () {
-/* 000136 */ 					var __accu0__ = latex_walker;
-/* 000136 */ 					return __call__ (__accu0__.check_tolerant_parsing_ignore_error, __accu0__, e);
-/* 000136 */ 				}) ();
-/* 000137 */ 				if (__t__ (exc !== null)) {
-/* 000138 */ 					var __except1__ = exc;
-/* 000138 */ 					__except1__.__cause__ = null;
-/* 000138 */ 					throw __except1__;
-/* 000138 */ 				}
-/* 000145 */ 				var tok = exc.recovery_token_placeholder;
-/* 000146 */ 				(function () {
-/* 000146 */ 					var __accu0__ = token_reader;
-/* 000146 */ 					return __call__ (__accu0__.move_to_pos_chars, __accu0__, exc.recovery_token_at_pos);
-/* 000146 */ 				}) ();
-/* 000146 */ 			}
-/* 000146 */ 			else if (isinstance (__except0__, LatexWalkerEndOfStream)) {
-/* 000146 */ 				var e = __except0__;
-/* 000148 */ 				var exc = (function () {
-/* 000148 */ 					var __accu0__ = latex_walker;
-/* 000151 */ 					return __call__ (__accu0__.check_tolerant_parsing_ignore_error, __accu0__, __call__ (LatexWalkerParseError, null, 'End of input encountered but we expected an expression', __kwargtrans__ ({pos: (function () {
-/* 000151 */ 						var __accu1__ = token_reader;
-/* 000151 */ 						return __call__ (__accu1__.cur_pos, __accu1__);
-/* 000151 */ 					}) (), error_type_info: dict ({'what': 'expression_required_got_unexpected', 'unexpected': 'end_of_stream'})})));
-/* 000151 */ 				}) ();
-/* 000158 */ 				if (__t__ (exc !== null)) {
-/* 000159 */ 					var __except1__ = exc;
-/* 000159 */ 					__except1__.__cause__ = null;
-/* 000159 */ 					throw __except1__;
-/* 000159 */ 				}
-/* 000160 */ 				return [];
-/* 000160 */ 			}
-/* 000160 */ 			else {
-/* 000160 */ 				throw __except0__;
-/* 000160 */ 			}
-/* 000160 */ 		}
-/* 000162 */ 		if (__t__ (__eq__ (tok.tok, 'macro'))) {
-/* 000164 */ 			var macroname = tok.arg;
-/* 000166 */ 			if (__t__ (__t__ (self.single_token_requiring_arg_is_error) && __in__ (macroname, tuple (['begin', 'end'])))) {
-/* 000169 */ 				var exc = (function () {
-/* 000169 */ 					var __accu0__ = latex_walker;
-/* 000171 */ 					return __call__ (__accu0__.check_tolerant_parsing_ignore_error, __accu0__, __call__ (LatexWalkerParseError, null, (function () {
-/* 000171 */ 						var __accu1__ = 'Expected expression, got \\{}';
-/* 000171 */ 						return __call__ (__accu1__.format, __accu1__, macroname);
-/* 000171 */ 					}) (), __kwargtrans__ ({pos: tok.pos, error_type_info: dict ({'what': 'expression_required_got_unexpected', 'unexpected': 'beginend', 'beginend': macroname})})));
-/* 000171 */ 				}) ();
-/* 000180 */ 				if (__t__ (exc !== null)) {
-/* 000181 */ 					var __except0__ = exc;
-/* 000181 */ 					__except0__.__cause__ = null;
-/* 000181 */ 					throw __except0__;
-/* 000181 */ 				}
-/* 000185 */ 				return [(function () {
-/* 000185 */ 					var __accu0__ = latex_walker;
-/* 000185 */ 					return __call__ (__accu0__.make_node, __accu0__, LatexMacroNode, __kwargtrans__ ({parsing_state: parsing_state, macroname: macroname, spec: null, nodeargd: null, macro_post_space: tok.post_space, pos: tok.pos, pos_end: tok.pos_end}));
-/* 000185 */ 				}) ()];
-/* 000185 */ 			}
-/* 000197 */ 			var mspec = (function () {
-/* 000197 */ 				var __accu0__ = parsing_state.latex_context;
-/* 000197 */ 				return __call__ (__accu0__.get_macro_spec, __accu0__, macroname);
-/* 000197 */ 			}) ();
-/* 000199 */ 			var parsed_arguments = (function () {
-/* 000199 */ 				var __accu0__ = self;
-/* 000201 */ 				return __call__ (__accu0__._check_if_requires_args, __accu0__, latex_walker, mspec, tok, (function () {
-/* 000201 */ 					var __accu1__ = 'a single macro ‘\\{}’';
-/* 000201 */ 					return __call__ (__accu1__.format, __accu1__, macroname);
-/* 000201 */ 				}) ());
-/* 000201 */ 			}) ();
-/* 000205 */ 			return [(function () {
-/* 000205 */ 				var __accu0__ = latex_walker;
-/* 000205 */ 				return __call__ (__accu0__.make_node, __accu0__, LatexMacroNode, __kwargtrans__ ({parsing_state: parsing_state, macroname: tok.arg, spec: mspec, nodeargd: parsed_arguments, macro_post_space: tok.post_space, pos: tok.pos, pos_end: tok.pos_end}));
-/* 000205 */ 			}) ()];
-/* 000205 */ 		}
-/* 000217 */ 		if (__t__ (__eq__ (tok.tok, 'specials'))) {
-/* 000219 */ 			var specialsspec = tok.arg;
-/* 000221 */ 			var parsed_arguments = (function () {
-/* 000221 */ 				var __accu0__ = self;
-/* 000223 */ 				return __call__ (__accu0__._check_if_requires_args, __accu0__, latex_walker, specialsspec, tok, (function () {
-/* 000223 */ 					var __accu1__ = 'specials ‘{}’';
-/* 000223 */ 					return __call__ (__accu1__.format, __accu1__, specialsspec.specials_chars);
-/* 000223 */ 				}) ());
-/* 000223 */ 			}) ();
-/* 000227 */ 			return [(function () {
-/* 000227 */ 				var __accu0__ = latex_walker;
-/* 000227 */ 				return __call__ (__accu0__.make_node, __accu0__, LatexSpecialsNode, __kwargtrans__ ({parsing_state: parsing_state, specials_chars: specialsspec.specials_chars, spec: specialsspec, nodeargd: parsed_arguments, pos: tok.pos, pos_end: tok.pos_end}));
-/* 000227 */ 			}) ()];
-/* 000227 */ 		}
-/* 000238 */ 		if (__t__ (__eq__ (tok.tok, 'comment'))) {
-/* 000240 */ 			if (__t__ (self.include_skipped_comments)) {
-/* 000242 */ 				var cnodes = [(function () {
-/* 000242 */ 					var __accu0__ = latex_walker;
-/* 000242 */ 					return __call__ (__accu0__.make_node, __accu0__, LatexCommentNode, __kwargtrans__ ({parsing_state: parsing_state, comment: tok.arg, comment_post_space: tok.post_space, pos: tok.pos, pos_end: tok.pos_end}));
-/* 000242 */ 				}) ()];
-/* 000242 */ 			}
-/* 000248 */ 			else {
-/* 000250 */ 				var cnodes = [];
-/* 000250 */ 			}
-/* 000252 */ 			var __except0__ = __call__ (_TryAgainWithSkippedCommentNodes, null, cnodes, tok.pos);
-/* 000252 */ 			__except0__.__cause__ = null;
-/* 000252 */ 			throw __except0__;
-/* 000252 */ 		}
-/* 000255 */ 		if (__t__ (__eq__ (tok.tok, 'brace_open'))) {
-/* 000259 */ 			(function () {
-/* 000259 */ 				var __accu0__ = token_reader;
-/* 000259 */ 				return __call__ (__accu0__.move_to_token, __accu0__, tok);
-/* 000259 */ 			}) ();
-/* 000261 */ 			var __left0__ = (function () {
-/* 000261 */ 				var __accu0__ = latex_walker;
-/* 000262 */ 				return __call__ (__accu0__.parse_content, __accu0__, __call__ (LatexDelimitedGroupParser, null, __kwargtrans__ ({delimiters: tok.arg})), __kwargtrans__ ({token_reader: token_reader, parsing_state: parsing_state}));
-/* 000262 */ 			}) ();
-/* 000262 */ 			var groupnode = __left0__ [0];
-/* 000262 */ 			var parsing_state_delta = __left0__ [1];
-/* 000269 */ 			// pass;
-/* 000273 */ 			if (__t__ (parsing_state_delta !== null)) {
-/* 000274 */ 				(function () {
-/* 000274 */ 					var __accu0__ = logger;
-/* 000274 */ 					return __call__ (__accu0__.warning, __accu0__, 'Ignoring parsing_state_delta after parsing an expression group!');
-/* 000274 */ 				}) ();
-/* 000274 */ 			}
-/* 000276 */ 			return [groupnode];
-/* 000276 */ 		}
-/* 000278 */ 		if (__t__ (__eq__ (tok.tok, 'brace_close'))) {
-/* 000282 */ 			(function () {
-/* 000282 */ 				var __accu0__ = token_reader;
-/* 000282 */ 				return __call__ (__accu0__.move_to_token, __accu0__, tok);
-/* 000282 */ 			}) ();
-/* 000285 */ 			var exc = __call__ (LatexWalkerNodesParseError, null, __kwargtrans__ ({msg: (function () {
-/* 000285 */ 				var __accu0__ = 'Expected LaTeX expression, got closing brace ‘{}’';
-/* 000285 */ 				return __call__ (__accu0__.format, __accu0__, tok.arg);
-/* 000287 */ 			}) (), pos: tok.pos, recovery_nodes: (function () {
-/* 000287 */ 				var __accu0__ = latex_walker;
-/* 000287 */ 				return __call__ (__accu0__.make_node, __accu0__, LatexCharsNode, __kwargtrans__ ({parsing_state: parsing_state, chars: '', pos: tok.pos, pos_end: tok.pos}));
-/* 000287 */ 			}) (), recovery_at_token: tok, error_type_info: dict ({'what': 'expression_required_got_unexpected', 'unexpected': 'closing_latex_group', 'delimiter': tok.arg})}));
-/* 000302 */ 			exc._error_was_unexpected_closing_brace_in_expression = true;
-/* 000303 */ 			var __except0__ = exc;
-/* 000303 */ 			__except0__.__cause__ = null;
-/* 000303 */ 			throw __except0__;
+/* 000123 */ 			(function () {
+/* 000123 */ 				var __accu0__ = logger;
+/* 000123 */ 				return __call__ (__accu0__.debug, __accu0__, 'thenodelist = %r', thenodelist);
+/* 000123 */ 			}) ();
+/* 000125 */ 			return tuple ([thenodelist, null]);
+/* 000125 */ 		}
+/* 000125 */ 	});},
+/* 000128 */ 	get _parse_single_token () {return __get__ (this, function (self, latex_walker, token_reader, expr_parsing_state, parsing_state) {
+/* 000128 */ 		var kwargs = dict ();
+/* 000128 */ 		if (arguments.length) {
+/* 000128 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000128 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000128 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000128 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000128 */ 					switch (__attrib0__) {
+/* 000128 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000128 */ 						case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
+/* 000128 */ 						case 'token_reader': var token_reader = __allkwargs0__ [__attrib0__]; break;
+/* 000128 */ 						case 'expr_parsing_state': var expr_parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 000128 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 000128 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000128 */ 					}
+/* 000128 */ 				}
+/* 000128 */ 				delete kwargs.__kwargtrans__;
+/* 000128 */ 			}
+/* 000128 */ 		}
+/* 000128 */ 		else {
+/* 000128 */ 		}
+/* 000131 */ 		try {
+/* 000132 */ 			var tok = (function () {
+/* 000132 */ 				var __accu0__ = token_reader;
+/* 000132 */ 				return __call__ (__accu0__.next_token, __accu0__, __kwargtrans__ ({parsing_state: expr_parsing_state}));
+/* 000132 */ 			}) ();
+/* 000132 */ 		}
+/* 000132 */ 		catch (__except0__) {
+/* 000132 */ 			if (isinstance (__except0__, LatexWalkerTokenParseError)) {
+/* 000132 */ 				var e = __except0__;
+/* 000134 */ 				var exc = (function () {
+/* 000134 */ 					var __accu0__ = latex_walker;
+/* 000134 */ 					return __call__ (__accu0__.check_tolerant_parsing_ignore_error, __accu0__, e);
+/* 000134 */ 				}) ();
+/* 000135 */ 				if (__t__ (exc !== null)) {
+/* 000136 */ 					var __except1__ = exc;
+/* 000136 */ 					__except1__.__cause__ = null;
+/* 000136 */ 					throw __except1__;
+/* 000136 */ 				}
+/* 000143 */ 				var tok = exc.recovery_token_placeholder;
+/* 000144 */ 				(function () {
+/* 000144 */ 					var __accu0__ = token_reader;
+/* 000144 */ 					return __call__ (__accu0__.move_to_pos_chars, __accu0__, exc.recovery_token_at_pos);
+/* 000144 */ 				}) ();
+/* 000144 */ 			}
+/* 000144 */ 			else if (isinstance (__except0__, LatexWalkerEndOfStream)) {
+/* 000144 */ 				var e = __except0__;
+/* 000146 */ 				var exc = (function () {
+/* 000146 */ 					var __accu0__ = latex_walker;
+/* 000149 */ 					return __call__ (__accu0__.check_tolerant_parsing_ignore_error, __accu0__, __call__ (LatexWalkerParseError, null, 'End of input encountered but we expected an expression', __kwargtrans__ ({pos: (function () {
+/* 000149 */ 						var __accu1__ = token_reader;
+/* 000149 */ 						return __call__ (__accu1__.cur_pos, __accu1__);
+/* 000149 */ 					}) (), error_type_info: dict ({'what': 'expression_required_got_unexpected', 'unexpected': 'end_of_stream'})})));
+/* 000149 */ 				}) ();
+/* 000156 */ 				if (__t__ (exc !== null)) {
+/* 000157 */ 					var __except1__ = exc;
+/* 000157 */ 					__except1__.__cause__ = null;
+/* 000157 */ 					throw __except1__;
+/* 000157 */ 				}
+/* 000158 */ 				return [];
+/* 000158 */ 			}
+/* 000158 */ 			else {
+/* 000158 */ 				throw __except0__;
+/* 000158 */ 			}
+/* 000158 */ 		}
+/* 000160 */ 		if (__t__ (__eq__ (tok.tok, 'macro'))) {
+/* 000162 */ 			var macroname = tok.arg;
+/* 000164 */ 			if (__t__ (__t__ (self.single_token_requiring_arg_is_error) && __in__ (macroname, tuple (['begin', 'end'])))) {
+/* 000167 */ 				var exc = (function () {
+/* 000167 */ 					var __accu0__ = latex_walker;
+/* 000169 */ 					return __call__ (__accu0__.check_tolerant_parsing_ignore_error, __accu0__, __call__ (LatexWalkerParseError, null, (function () {
+/* 000169 */ 						var __accu1__ = 'Expected expression, got \\{}';
+/* 000169 */ 						return __call__ (__accu1__.format, __accu1__, macroname);
+/* 000169 */ 					}) (), __kwargtrans__ ({pos: tok.pos, error_type_info: dict ({'what': 'expression_required_got_unexpected', 'unexpected': 'beginend', 'beginend': macroname})})));
+/* 000169 */ 				}) ();
+/* 000178 */ 				if (__t__ (exc !== null)) {
+/* 000179 */ 					var __except0__ = exc;
+/* 000179 */ 					__except0__.__cause__ = null;
+/* 000179 */ 					throw __except0__;
+/* 000179 */ 				}
+/* 000183 */ 				return [(function () {
+/* 000183 */ 					var __accu0__ = latex_walker;
+/* 000183 */ 					return __call__ (__accu0__.make_node, __accu0__, LatexMacroNode, __kwargtrans__ ({parsing_state: parsing_state, macroname: macroname, spec: null, nodeargd: null, macro_post_space: tok.post_space, pos: tok.pos, pos_end: tok.pos_end}));
+/* 000183 */ 				}) ()];
+/* 000183 */ 			}
+/* 000195 */ 			var mspec = (function () {
+/* 000195 */ 				var __accu0__ = parsing_state.latex_context;
+/* 000195 */ 				return __call__ (__accu0__.get_macro_spec, __accu0__, macroname);
+/* 000195 */ 			}) ();
+/* 000197 */ 			var parsed_arguments = (function () {
+/* 000197 */ 				var __accu0__ = self;
+/* 000199 */ 				return __call__ (__accu0__._check_if_requires_args, __accu0__, latex_walker, mspec, tok, (function () {
+/* 000199 */ 					var __accu1__ = 'a single macro ‘\\{}’';
+/* 000199 */ 					return __call__ (__accu1__.format, __accu1__, macroname);
+/* 000199 */ 				}) ());
+/* 000199 */ 			}) ();
+/* 000203 */ 			return [(function () {
+/* 000203 */ 				var __accu0__ = latex_walker;
+/* 000203 */ 				return __call__ (__accu0__.make_node, __accu0__, LatexMacroNode, __kwargtrans__ ({parsing_state: parsing_state, macroname: tok.arg, spec: mspec, nodeargd: parsed_arguments, macro_post_space: tok.post_space, pos: tok.pos, pos_end: tok.pos_end}));
+/* 000203 */ 			}) ()];
+/* 000203 */ 		}
+/* 000215 */ 		if (__t__ (__eq__ (tok.tok, 'specials'))) {
+/* 000217 */ 			var specialsspec = tok.arg;
+/* 000219 */ 			var parsed_arguments = (function () {
+/* 000219 */ 				var __accu0__ = self;
+/* 000221 */ 				return __call__ (__accu0__._check_if_requires_args, __accu0__, latex_walker, specialsspec, tok, (function () {
+/* 000221 */ 					var __accu1__ = 'specials ‘{}’';
+/* 000221 */ 					return __call__ (__accu1__.format, __accu1__, specialsspec.specials_chars);
+/* 000221 */ 				}) ());
+/* 000221 */ 			}) ();
+/* 000225 */ 			return [(function () {
+/* 000225 */ 				var __accu0__ = latex_walker;
+/* 000225 */ 				return __call__ (__accu0__.make_node, __accu0__, LatexSpecialsNode, __kwargtrans__ ({parsing_state: parsing_state, specials_chars: specialsspec.specials_chars, spec: specialsspec, nodeargd: parsed_arguments, pos: tok.pos, pos_end: tok.pos_end}));
+/* 000225 */ 			}) ()];
+/* 000225 */ 		}
+/* 000236 */ 		if (__t__ (__eq__ (tok.tok, 'comment'))) {
+/* 000238 */ 			if (__t__ (self.include_skipped_comments)) {
+/* 000240 */ 				var cnodes = [(function () {
+/* 000240 */ 					var __accu0__ = latex_walker;
+/* 000240 */ 					return __call__ (__accu0__.make_node, __accu0__, LatexCommentNode, __kwargtrans__ ({parsing_state: parsing_state, comment: tok.arg, comment_post_space: tok.post_space, pos: tok.pos, pos_end: tok.pos_end}));
+/* 000240 */ 				}) ()];
+/* 000240 */ 			}
+/* 000246 */ 			else {
+/* 000248 */ 				var cnodes = [];
+/* 000248 */ 			}
+/* 000250 */ 			var __except0__ = __call__ (_TryAgainWithSkippedCommentNodes, null, cnodes, tok.pos);
+/* 000250 */ 			__except0__.__cause__ = null;
+/* 000250 */ 			throw __except0__;
+/* 000250 */ 		}
+/* 000253 */ 		if (__t__ (__eq__ (tok.tok, 'brace_open'))) {
+/* 000257 */ 			(function () {
+/* 000257 */ 				var __accu0__ = token_reader;
+/* 000257 */ 				return __call__ (__accu0__.move_to_token, __accu0__, tok);
+/* 000257 */ 			}) ();
+/* 000259 */ 			var __left0__ = (function () {
+/* 000259 */ 				var __accu0__ = latex_walker;
+/* 000260 */ 				return __call__ (__accu0__.parse_content, __accu0__, __call__ (LatexDelimitedGroupParser, null, __kwargtrans__ ({delimiters: tok.arg})), __kwargtrans__ ({token_reader: token_reader, parsing_state: parsing_state}));
+/* 000260 */ 			}) ();
+/* 000260 */ 			var groupnode = __left0__ [0];
+/* 000260 */ 			var parsing_state_delta = __left0__ [1];
+/* 000267 */ 			(function () {
+/* 000267 */ 				var __accu0__ = logger;
+/* 000267 */ 				return __call__ (__accu0__.debug, __accu0__, 'Got groupnode = %r', groupnode);
+/* 000267 */ 			}) ();
+/* 000269 */ 			if (__t__ (parsing_state_delta !== null)) {
+/* 000270 */ 				(function () {
+/* 000270 */ 					var __accu0__ = logger;
+/* 000270 */ 					return __call__ (__accu0__.warning, __accu0__, 'Ignoring parsing_state_delta after parsing an expression group!');
+/* 000270 */ 				}) ();
+/* 000270 */ 			}
+/* 000272 */ 			return [groupnode];
+/* 000272 */ 		}
+/* 000274 */ 		if (__t__ (__eq__ (tok.tok, 'brace_close'))) {
+/* 000278 */ 			(function () {
+/* 000278 */ 				var __accu0__ = token_reader;
+/* 000278 */ 				return __call__ (__accu0__.move_to_token, __accu0__, tok);
+/* 000278 */ 			}) ();
+/* 000281 */ 			var exc = __call__ (LatexWalkerNodesParseError, null, __kwargtrans__ ({msg: (function () {
+/* 000281 */ 				var __accu0__ = 'Expected LaTeX expression, got closing brace ‘{}’';
+/* 000281 */ 				return __call__ (__accu0__.format, __accu0__, tok.arg);
+/* 000283 */ 			}) (), pos: tok.pos, recovery_nodes: (function () {
+/* 000283 */ 				var __accu0__ = latex_walker;
+/* 000283 */ 				return __call__ (__accu0__.make_node, __accu0__, LatexCharsNode, __kwargtrans__ ({parsing_state: parsing_state, chars: '', pos: tok.pos, pos_end: tok.pos}));
+/* 000283 */ 			}) (), recovery_at_token: tok, error_type_info: dict ({'what': 'expression_required_got_unexpected', 'unexpected': 'closing_latex_group', 'delimiter': tok.arg})}));
+/* 000298 */ 			exc._error_was_unexpected_closing_brace_in_expression = true;
+/* 000299 */ 			var __except0__ = exc;
+/* 000299 */ 			__except0__.__cause__ = null;
+/* 000299 */ 			throw __except0__;
+/* 000299 */ 		}
+/* 000301 */ 		if (__t__ (__eq__ (tok.tok, 'char'))) {
+/* 000303 */ 			return [(function () {
+/* 000303 */ 				var __accu0__ = latex_walker;
+/* 000303 */ 				return __call__ (__accu0__.make_node, __accu0__, LatexCharsNode, __kwargtrans__ ({parsing_state: parsing_state, chars: tok.arg, pos: tok.pos, pos_end: tok.pos_end}));
+/* 000303 */ 			}) ()];
 /* 000303 */ 		}
-/* 000305 */ 		if (__t__ (__eq__ (tok.tok, 'char'))) {
-/* 000307 */ 			return [(function () {
-/* 000307 */ 				var __accu0__ = latex_walker;
-/* 000307 */ 				return __call__ (__accu0__.make_node, __accu0__, LatexCharsNode, __kwargtrans__ ({parsing_state: parsing_state, chars: tok.arg, pos: tok.pos, pos_end: tok.pos_end}));
-/* 000307 */ 			}) ()];
-/* 000307 */ 		}
-/* 000313 */ 		if (__t__ (__in__ (tok.tok, tuple (['mathmode_inline', 'mathmode_display'])))) {
-/* 000321 */ 			if (__t__ ((function () {
-/* 000321 */ 				var __accu0__ = tok.arg;
-/* 000321 */ 				return __call__ (__accu0__.startswith, __accu0__, '\\');
-/* 000321 */ 			}) ())) {
-/* 000322 */ 				var recovery_nodes = (function () {
-/* 000322 */ 					var __accu0__ = latex_walker;
-/* 000322 */ 					return __call__ (__accu0__.make_node, __accu0__, LatexMacroNode, __kwargtrans__ ({parsing_state: parsing_state, macroname: tok.arg, macro_post_space: tok.post_space, pos: tok.pos, pos_end: tok.pos_end}));
-/* 000322 */ 				}) ();
-/* 000322 */ 			}
-/* 000328 */ 			else {
-/* 000329 */ 				var recovery_nodes = (function () {
-/* 000329 */ 					var __accu0__ = latex_walker;
-/* 000329 */ 					return __call__ (__accu0__.make_node, __accu0__, LatexCharsNode, __kwargtrans__ ({parsing_state: parsing_state, chars: tok.arg, pos: tok.pos, pos_end: tok.pos_end}));
-/* 000329 */ 				}) ();
-/* 000329 */ 			}
-/* 000336 */ 			var __except0__ = __call__ (LatexWalkerNodesParseError, null, (function () {
-/* 000336 */ 				var __accu0__ = 'Unexpected math mode delimiter ‘{}’, was expecting a LaTeX expression';
-/* 000336 */ 				return __call__ (__accu0__.format, __accu0__, tok.arg);
-/* 000336 */ 			}) (), __kwargtrans__ ({pos: tok.pos, recovery_nodes: recovery_nodes, recovery_past_token: tok, error_type_info: dict ({'what': 'expression_required_got_unexpected', 'unexpected': 'math_mode_delimiter', 'mathmode_type': tok.tok, 'delimiter': tok.arg})}));
-/* 000336 */ 			__except0__.__cause__ = null;
-/* 000336 */ 			throw __except0__;
-/* 000336 */ 		}
-/* 000350 */ 		var __except0__ = __call__ (LatexWalkerParseError, null, (function () {
-/* 000350 */ 			var __accu0__ = 'Unknown token type: ‘{}’';
-/* 000350 */ 			return __call__ (__accu0__.format, __accu0__, tok.tok);
-/* 000350 */ 		}) (), __kwargtrans__ ({pos: tok.pos}));
-/* 000350 */ 		__except0__.__cause__ = null;
-/* 000350 */ 		throw __except0__;
-/* 000350 */ 	});},
-/* 000355 */ 	get _check_if_requires_args () {return __get__ (this, function (self, latex_walker, spec, got_token, what_we_got) {
-/* 000355 */ 		if (arguments.length) {
-/* 000355 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000355 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000355 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000355 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000355 */ 					switch (__attrib0__) {
-/* 000355 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000355 */ 						case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
-/* 000355 */ 						case 'spec': var spec = __allkwargs0__ [__attrib0__]; break;
-/* 000355 */ 						case 'got_token': var got_token = __allkwargs0__ [__attrib0__]; break;
-/* 000355 */ 						case 'what_we_got': var what_we_got = __allkwargs0__ [__attrib0__]; break;
-/* 000355 */ 					}
-/* 000355 */ 				}
-/* 000355 */ 			}
-/* 000355 */ 		}
-/* 000355 */ 		else {
-/* 000355 */ 		}
-/* 000357 */ 		if (__t__ (self.single_token_requiring_arg_is_error)) {
-/* 000359 */ 			var arg_contents_empty_ok = (function () {
-/* 000359 */ 				var __accu0__ = (function () {
-/* 000359 */ 					var __accu1__ = spec;
-/* 000359 */ 					return __call__ (__accu1__.get_node_parser, __accu1__, got_token);
-/* 000359 */ 				}) ();
-/* 000359 */ 				return __call__ (__accu0__.contents_can_be_empty, __accu0__);
-/* 000359 */ 			}) ();
-/* 000360 */ 			// pass;
-/* 000365 */ 			if (__t__ (!__t__ ((arg_contents_empty_ok)))) {
-/* 000366 */ 				var exc = (function () {
-/* 000366 */ 					var __accu0__ = latex_walker;
-/* 000368 */ 					return __call__ (__accu0__.check_tolerant_parsing_ignore_error, __accu0__, __call__ (LatexWalkerParseError, null, (function () {
-/* 000368 */ 						var __accu1__ = 'Expected a LaTeX expression but got {} which expects arguments; did you mean to provide an expression in {{curly braces}} ?';
-/* 000368 */ 						return __call__ (__accu1__.format, __accu1__, what_we_got);
-/* 000368 */ 					}) (), __kwargtrans__ ({pos: got_token.pos, error_type_info: dict ({'what': 'expression_required_got_unexpected', 'unexpected': 'callable_with_mandatory_arguments', 'callable_token': got_token})})));
-/* 000368 */ 				}) ();
-/* 000379 */ 				if (__t__ (exc !== null)) {
-/* 000380 */ 					var __except0__ = exc;
-/* 000380 */ 					__except0__.__cause__ = null;
-/* 000380 */ 					throw __except0__;
-/* 000380 */ 				}
-/* 000382 */ 				return null;
-/* 000382 */ 			}
-/* 000382 */ 		}
-/* 000384 */ 		return __call__ (ParsedArguments, null);
-/* 000384 */ 	});}
-/* 000384 */ });
+/* 000309 */ 		if (__t__ (__in__ (tok.tok, tuple (['mathmode_inline', 'mathmode_display'])))) {
+/* 000317 */ 			if (__t__ ((function () {
+/* 000317 */ 				var __accu0__ = tok.arg;
+/* 000317 */ 				return __call__ (__accu0__.startswith, __accu0__, '\\');
+/* 000317 */ 			}) ())) {
+/* 000318 */ 				var recovery_nodes = (function () {
+/* 000318 */ 					var __accu0__ = latex_walker;
+/* 000318 */ 					return __call__ (__accu0__.make_node, __accu0__, LatexMacroNode, __kwargtrans__ ({parsing_state: parsing_state, macroname: tok.arg, macro_post_space: tok.post_space, pos: tok.pos, pos_end: tok.pos_end}));
+/* 000318 */ 				}) ();
+/* 000318 */ 			}
+/* 000324 */ 			else {
+/* 000325 */ 				var recovery_nodes = (function () {
+/* 000325 */ 					var __accu0__ = latex_walker;
+/* 000325 */ 					return __call__ (__accu0__.make_node, __accu0__, LatexCharsNode, __kwargtrans__ ({parsing_state: parsing_state, chars: tok.arg, pos: tok.pos, pos_end: tok.pos_end}));
+/* 000325 */ 				}) ();
+/* 000325 */ 			}
+/* 000332 */ 			var __except0__ = __call__ (LatexWalkerNodesParseError, null, (function () {
+/* 000332 */ 				var __accu0__ = 'Unexpected math mode delimiter ‘{}’, was expecting a LaTeX expression';
+/* 000332 */ 				return __call__ (__accu0__.format, __accu0__, tok.arg);
+/* 000332 */ 			}) (), __kwargtrans__ ({pos: tok.pos, recovery_nodes: recovery_nodes, recovery_past_token: tok, error_type_info: dict ({'what': 'expression_required_got_unexpected', 'unexpected': 'math_mode_delimiter', 'mathmode_type': tok.tok, 'delimiter': tok.arg})}));
+/* 000332 */ 			__except0__.__cause__ = null;
+/* 000332 */ 			throw __except0__;
+/* 000332 */ 		}
+/* 000346 */ 		var __except0__ = __call__ (LatexWalkerParseError, null, (function () {
+/* 000346 */ 			var __accu0__ = 'Unknown token type: ‘{}’';
+/* 000346 */ 			return __call__ (__accu0__.format, __accu0__, tok.tok);
+/* 000346 */ 		}) (), __kwargtrans__ ({pos: tok.pos}));
+/* 000346 */ 		__except0__.__cause__ = null;
+/* 000346 */ 		throw __except0__;
+/* 000346 */ 	});},
+/* 000351 */ 	get _check_if_requires_args () {return __get__ (this, function (self, latex_walker, spec, got_token, what_we_got) {
+/* 000351 */ 		if (arguments.length) {
+/* 000351 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000351 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000351 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000351 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000351 */ 					switch (__attrib0__) {
+/* 000351 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000351 */ 						case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
+/* 000351 */ 						case 'spec': var spec = __allkwargs0__ [__attrib0__]; break;
+/* 000351 */ 						case 'got_token': var got_token = __allkwargs0__ [__attrib0__]; break;
+/* 000351 */ 						case 'what_we_got': var what_we_got = __allkwargs0__ [__attrib0__]; break;
+/* 000351 */ 					}
+/* 000351 */ 				}
+/* 000351 */ 			}
+/* 000351 */ 		}
+/* 000351 */ 		else {
+/* 000351 */ 		}
+/* 000353 */ 		if (__t__ (self.single_token_requiring_arg_is_error)) {
+/* 000355 */ 			var arg_contents_empty_ok = (function () {
+/* 000355 */ 				var __accu0__ = (function () {
+/* 000355 */ 					var __accu1__ = spec;
+/* 000355 */ 					return __call__ (__accu1__.get_node_parser, __accu1__, got_token);
+/* 000355 */ 				}) ();
+/* 000355 */ 				return __call__ (__accu0__.contents_can_be_empty, __accu0__);
+/* 000355 */ 			}) ();
+/* 000356 */ 			(function () {
+/* 000356 */ 				var __accu0__ = logger;
+/* 000356 */ 				return __call__ (__accu0__.debug, __accu0__, 'Checking if %s/‘%s’ requires an arg: %r', got_token.tok, got_token.arg, arg_contents_empty_ok);
+/* 000356 */ 			}) ();
+/* 000359 */ 			if (__t__ (!__t__ ((arg_contents_empty_ok)))) {
+/* 000360 */ 				var exc = (function () {
+/* 000360 */ 					var __accu0__ = latex_walker;
+/* 000362 */ 					return __call__ (__accu0__.check_tolerant_parsing_ignore_error, __accu0__, __call__ (LatexWalkerParseError, null, (function () {
+/* 000362 */ 						var __accu1__ = 'Expected a LaTeX expression but got {} which expects arguments; did you mean to provide an expression in {{curly braces}} ?';
+/* 000362 */ 						return __call__ (__accu1__.format, __accu1__, what_we_got);
+/* 000362 */ 					}) (), __kwargtrans__ ({pos: got_token.pos, error_type_info: dict ({'what': 'expression_required_got_unexpected', 'unexpected': 'callable_with_mandatory_arguments', 'callable_token': got_token})})));
+/* 000362 */ 				}) ();
+/* 000373 */ 				if (__t__ (exc !== null)) {
+/* 000374 */ 					var __except0__ = exc;
+/* 000374 */ 					__except0__.__cause__ = null;
+/* 000374 */ 					throw __except0__;
+/* 000374 */ 				}
+/* 000376 */ 				return null;
+/* 000376 */ 			}
+/* 000376 */ 		}
+/* 000378 */ 		return __call__ (ParsedArguments, null);
+/* 000378 */ 	});}
+/* 000378 */ });
 /* 000037 */ 
 //# sourceMappingURL=pylatexenc.latexnodes.parsers._expression.map
