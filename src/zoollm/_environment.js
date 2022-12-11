@@ -14,6 +14,7 @@ import { LLMFragment } from './llm-js/llm.llmfragment.js';
 import * as llmstd from './llm-js/llm.llmstd.js';
 
 import * as llm_feature from './llm-js/llm.feature.js';
+import * as llm_feature_math from './llm-js/llm.feature.math.js';
 import * as llm_feature_headings from './llm-js/llm.feature.headings.js';
 import * as llm_feature_endnotes from './llm-js/llm.feature.endnotes.js';
 import * as llm_feature_refs from './llm-js/llm.feature.refs.js';
@@ -35,6 +36,22 @@ export const FloatType = llm_feature_floats.FloatType;
 export const GraphicsResource = llm_feature_graphics.GraphicsResource;
 
 
+// patch some objects that expose .asdict() to also enable .toJSON()
+for (const Cls of [SectionCommandSpec,
+                   EndnoteCategory,
+                   ReferenceableInfo,
+                   RefInstance,
+                   FloatType,
+                   GraphicsResource])
+{
+    // Remember, these are Transcrypt/Python's class objects; don't use the
+    // .prototype field because these are not native JavaScript classes using
+    // the JS protype chain.
+    Cls.toJSON = function() { return this.asdict(); }
+}
+
+
+
 
 export function is_llm_fragment(obj)
 {
@@ -46,7 +63,7 @@ export class RefResolver
 {
     constructor(options)
     {
-        this.options = options || {};
+        this.options = options ?? {};
         // e.g., options = { ref_types: [ 'code', 'term', 'topic' ] }
 
         this.clear_all_refs();
@@ -90,6 +107,7 @@ export class RefResolver
             );
         }
         debug(`adding ref: ${ref_type}:${ref_label}`); // -> `, ref_instance);
+
         this.ref_instance_database[ref_type][ref_label] = ref_instance;
 
         //debug(`added ref, ref_instance_database =`, this.ref_instance_database);
@@ -97,6 +115,8 @@ export class RefResolver
     
     get_ref(ref_type, ref_label, resource_info, render_context)
     {
+        debug(`Resolving ref ‘${ref_type}:${ref_label}’ ...`);
+
         if (!this.ref_instance_database.hasOwnProperty(ref_type)) {
             throw new Error(
                 `Invalid reference, unknown reference prefix ‘${ref_type}’ `
@@ -112,6 +132,8 @@ export class RefResolver
 
         const ref_instance = this.ref_instance_database[ref_type][ref_label];
 
+        debug(`Got ref ‘${ref_type}:${ref_label}’: ${repr(ref_instance)}`);
+
         if (this.target_href_resolver) {
             return RefInstance( $$kw(
                 Object.assign({}, ref_instance.asdict(), {
@@ -122,6 +144,19 @@ export class RefResolver
 
         return ref_instance;
     }
+
+    // load/save DB
+    dump_ref_instance_database()
+    {
+        return {
+            ref_instance_database: this.ref_instance_database
+        };
+    }
+    load_ref_instance_database(data)
+    {
+        this.ref_instance_database = data.ref_instance_database;
+    }
+
 };
 
 
@@ -336,55 +371,6 @@ export function zoollm_default_options(footnote_counter_formatter='alph')
 
 
 
-// function prep_llm_environ_features(zoollm_options)
-// {
-//     zoollm_options ||= zoollm_default_options();
-
-//     let props = {};
-
-//     props.citations_provider =
-//         zoollm_options.citations_provider || new CitationsProvider;
-//     props.ref_resolver =
-//         zoollm_options.ref_resolver
-//         || new RefResolver(zoollm_options.ref_resolver_options);
-    
-//     props.graphics_collection =
-//         zoollm_options.graphics_collection || new FeatureZooGraphicsCollection();
-
-
-//     props.feature_headings = new llm_feature_headings.FeatureHeadings(
-//         $$kw({section_commands_by_level:
-//               zoollm_options.heading_section_commands_by_level}),
-//     )
-//     props.feature_refs = new llm_feature_refs.FeatureRefs(
-//         $$kw({external_ref_resolvers: [props.ref_resolver]}),
-//     )
-
-//     props.feature_endnotes = new llm_feature_endnotes.FeatureEndnotes(
-//         $$kw({categories: zoollm_options.endnote_categories})
-//     )
-    
-//     props.feature_citations = new llm_feature_cite.FeatureExternalPrefixedCitations(
-//         $$kw({ external_citations_provider: props.citations_provider,
-//                counter_formatter: zoollm_options.citation_counter_formatter,
-//                citation_delimiters: zoollm_options.citation_delimiters, })
-//     )
-
-//     props.feature_floats = new llm_feature_floats.FeatureFloats(
-//         $$kw({float_types: zoollm_options.float_types})
-//     )
-
-//     props.feature_defterm = new llm_feature_defterm.FeatureDefTerm()
-//     props.feature_defterm.render_defterm_with_term =
-//         zoollm_options.defterm_render_defterm_with_term;
-//     props.feature_defterm.render_defterm_with_term_suffix =
-//         zoollm_options.defterm_render_defterm_with_term_suffix;
-
-//     return props;
-// }
-
-
-
 export var ZooLLMEnvironment = __class__(
     'ZooLLMEnvironment', // class name
     [ llmstd.LLMStandardEnvironment ], // base classes
@@ -405,6 +391,8 @@ export var ZooLLMEnvironment = __class__(
             self.graphics_collection =
                 zoollm_options.graphics_collection || new FeatureZooGraphicsCollection();
 
+
+            self.feature_math = new llm_feature_math.FeatureMath();
 
             self.feature_headings = new llm_feature_headings.FeatureHeadings(
                 $$kw({section_commands_by_level:
@@ -435,6 +423,7 @@ export var ZooLLMEnvironment = __class__(
                 zoollm_options.defterm_render_defterm_with_term_suffix;
 
             const features =  [
+                self.feature_math,
                 self.feature_headings,
                 self.feature_refs,
                 self.feature_endnotes,
@@ -474,55 +463,3 @@ export var ZooLLMEnvironment = __class__(
 
     }
 );
-
-
-// //export class ZooLLMEnvironment extends llmstd.LLMStandardEnvironment
-// export function make_zoo_llm_environment(zoollm_options)
-// {
-//     // since we cannot assign to this.xyz before calling the superclass
-//     // constructor, we prepare a temporary object (simple dictionary) with
-//     // the values we'd like to assign, and we'll assign them to 'this'
-//     // later below, after calling the superclass constructor.
-//     const _feature_props = prep_llm_environ_features(zoollm_options);
-
-//     const features =  [
-//         _feature_props.feature_headings,
-//         _feature_props.feature_refs,
-//         _feature_props.feature_endnotes,
-//         _feature_props.feature_citations,
-//         _feature_props.feature_floats,
-//         _feature_props.feature_defterm,
-//         _feature_props.graphics_collection,
-//     ];
-
-//     const parsing_mode_deltas = {
-//         // /// not sure how useful this is ...
-//         // 'safer-latexier': ParsingStateDelta( $$kw({
-//         //     set_attributes: {
-//         //         enable_comments: false,
-//         //         latex_inline_math_delimiters: [['$','$'], ['\\(', '\\)']],
-//         //         forbidden_characters: '',
-//         //     },
-//         // }) ),
-
-//         // enable \begin{raw:html}...\end{raw:html},
-//         // \begin{raw:latex}...\end{raw:latex}, etc. TODO
-//         // 'enable-raw': ParsingStateDelta(
-//         //     // ...
-//         // ),
-//     };
-
-//     const zoollm_environ = llmstd.LLMStandardEnvironment(
-//         $$kw({
-//             features: features,
-//             parsing_mode_deltas: parsing_mode_deltas,
-//         })
-//     );
-    
-//     // copy all properties from _feature_props. to the new object
-//     for (const [prop, value] of Object.entries(_feature_props)) {
-//         zoollm_environ[prop] = value;
-//     }
-
-//     return zoollm_environ;
-// }

@@ -21,8 +21,10 @@
         "parse-full-name": "^1.2.6",
         "sax": "^1.2.4",
         "stream-parser": "^0.3.1",
-        "tippy.js": "^6.3.7"
+        "tippy.js": "^6.3.7",
+        "url": "^0.11.0"
     },
+    "main": "./src/index.js",
     "exports": {
         ".": "./src/index.js",
         "./citationmanager": "./src/citationmanager/index.js",

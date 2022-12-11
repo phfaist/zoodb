@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-11-13 21:11:20
+/* 000001 */ // Transcrypt'ed from Python, 2022-12-10 23:30:54
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
@@ -10,7 +10,7 @@
 /* 000007 */ __nest__ (logging, '', __module_logging__);
 /* 000006 */ import * as __module_re__ from './re.js';
 /* 000006 */ __nest__ (re, '', __module_re__);
-/* 000006 */ export {LLMStandaloneModeRenderContext, latexnodes_parsers, latexnodes, latexnodes_nodes};
+/* 000006 */ export {latexnodes_parsers, latexnodes_nodes, LLMStandaloneModeRenderContext, latexnodes};
 /* 000001 */ var __name__ = 'llm.llmfragment';
 /* 000008 */ export var logger = (function () {
 /* 000008 */ 	var __accu0__ = logging;
@@ -634,7 +634,7 @@
 /* 000302 */ 			return __call__ (__accu0__.collect_nodes, __accu0__, node.nodelist);
 /* 000302 */ 		}) ();
 /* 000303 */ 		if (__t__ (groupnodelist === null)) {
-/* 000305 */ 			return ;
+/* 000305 */ 			return null;
 /* 000305 */ 		}
 /* 000307 */ 		var groupnode = (function () {
 /* 000307 */ 			var __accu0__ = node.latex_walker;
@@ -746,7 +746,7 @@
 /* 000362 */ 			return __call__ (__accu0__.collect_nodes, __accu0__, node.nodelist);
 /* 000362 */ 		}) ();
 /* 000363 */ 		if (__t__ (nodelist === null)) {
-/* 000365 */ 			return ;
+/* 000365 */ 			return null;
 /* 000365 */ 		}
 /* 000367 */ 		var newnode = (function () {
 /* 000367 */ 			var __accu0__ = node.latex_walker;
@@ -840,44 +840,46 @@
 /* 000427 */ 		if (__t__ (__lt__ (self.count, self.min_chars))) {
 /* 000429 */ 			return node;
 /* 000429 */ 		}
-/* 000429 */ 	});},
-/* 000433 */ 	get estimate_simple_node_char_count () {return __get__ (this, function (self, node) {
-/* 000433 */ 		if (arguments.length) {
-/* 000433 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000433 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000433 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000433 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000433 */ 					switch (__attrib0__) {
-/* 000433 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000433 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000433 */ 					}
-/* 000433 */ 				}
-/* 000433 */ 			}
-/* 000433 */ 		}
-/* 000433 */ 		else {
-/* 000433 */ 		}
-/* 000435 */ 		if (__t__ ((function () {
-/* 000435 */ 			var __accu0__ = node;
-/* 000435 */ 			return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexCharsNode);
-/* 000435 */ 		}) ())) {
-/* 000436 */ 			return __call__ (len, null, node.chars);
-/* 000436 */ 		}
-/* 000438 */ 		if (__t__ ((function () {
-/* 000438 */ 			var __accu0__ = node;
-/* 000438 */ 			return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexMathNode);
-/* 000438 */ 		}) ())) {
-/* 000443 */ 			return __floordiv__ ((__mul__ (__call__ (len, null, (function () {
-/* 000443 */ 				var __accu0__ = node;
-/* 000443 */ 				return __call__ (__accu0__.latex_verbatim, __accu0__);
-/* 000443 */ 			}) ()), 2)), 3);
-/* 000443 */ 		}
-/* 000445 */ 		if (__t__ ((function () {
-/* 000445 */ 			var __accu0__ = node;
-/* 000445 */ 			return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexCommentNode);
-/* 000445 */ 		}) ())) {
-/* 000446 */ 			return 0;
-/* 000446 */ 		}
-/* 000446 */ 	});}
-/* 000446 */ });
+/* 000432 */ 		return true;
+/* 000432 */ 	});},
+/* 000435 */ 	get estimate_simple_node_char_count () {return __get__ (this, function (self, node) {
+/* 000435 */ 		if (arguments.length) {
+/* 000435 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000435 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000435 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000435 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000435 */ 					switch (__attrib0__) {
+/* 000435 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000435 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000435 */ 					}
+/* 000435 */ 				}
+/* 000435 */ 			}
+/* 000435 */ 		}
+/* 000435 */ 		else {
+/* 000435 */ 		}
+/* 000437 */ 		if (__t__ ((function () {
+/* 000437 */ 			var __accu0__ = node;
+/* 000437 */ 			return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexCharsNode);
+/* 000437 */ 		}) ())) {
+/* 000438 */ 			return __call__ (len, null, node.chars);
+/* 000438 */ 		}
+/* 000440 */ 		if (__t__ ((function () {
+/* 000440 */ 			var __accu0__ = node;
+/* 000440 */ 			return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexMathNode);
+/* 000440 */ 		}) ())) {
+/* 000445 */ 			return __floordiv__ ((__mul__ (__call__ (len, null, (function () {
+/* 000445 */ 				var __accu0__ = node;
+/* 000445 */ 				return __call__ (__accu0__.latex_verbatim, __accu0__);
+/* 000445 */ 			}) ()), 2)), 3);
+/* 000445 */ 		}
+/* 000447 */ 		if (__t__ ((function () {
+/* 000447 */ 			var __accu0__ = node;
+/* 000447 */ 			return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexCommentNode);
+/* 000447 */ 		}) ())) {
+/* 000448 */ 			return 0;
+/* 000448 */ 		}
+/* 000450 */ 		return 0;
+/* 000450 */ 	});}
+/* 000450 */ });
 /* 000006 */ 
 //# sourceMappingURL=llm.llmfragment.map

@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-11-13 21:11:20
+/* 000001 */ // Transcrypt'ed from Python, 2022-12-10 23:30:54
 /* 000037 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000038 */ import {ParsedArguments} from './pylatexenc.latexnodes._parsedargs.js';
 /* 000037 */ import {LatexWalkerParseError} from './pylatexenc.latexnodes._exctypes.js';
@@ -1584,23 +1584,20 @@
 /* 001038 */ 							continue;
 /* 001038 */ 						}
 /* 001038 */ 					}
-/* 001040 */ 					else {
-/* 001041 */ 						if (__t__ (__eq__ (prev_sep_end, 0))) {
-/* 001045 */ 							(function () {
-/* 001045 */ 								var __accu0__ = pending_nodes;
-/* 001045 */ 								return __call__ (__accu0__.append, __accu0__, n);
-/* 001045 */ 							}) ();
-/* 001045 */ 							break;
-/* 001045 */ 						}
-/* 001047 */ 						else {
-/* 001050 */ 							var p = __getslice__ (n.chars, prev_sep_end, null, 1);
-/* 001051 */ 							if (__t__ (__call__ (len, null, p))) {
-/* 001052 */ 								(function () {
-/* 001052 */ 									var __accu0__ = pending_nodes;
-/* 001053 */ 									return __call__ (__accu0__.append, __accu0__, __call__ (chars_to_node, null, p, n, prev_sep_end, __call__ (len, null, n.chars)));
-/* 001053 */ 								}) ();
-/* 001053 */ 							}
-/* 001053 */ 							break;
+/* 001041 */ 					else if (__t__ (__eq__ (prev_sep_end, 0))) {
+/* 001045 */ 						(function () {
+/* 001045 */ 							var __accu0__ = pending_nodes;
+/* 001045 */ 							return __call__ (__accu0__.append, __accu0__, n);
+/* 001045 */ 						}) ();
+/* 001045 */ 						break;
+/* 001045 */ 					}
+/* 001047 */ 					else {
+/* 001050 */ 						var p = __getslice__ (n.chars, prev_sep_end, null, 1);
+/* 001051 */ 						if (__t__ (__call__ (len, null, p))) {
+/* 001052 */ 							(function () {
+/* 001052 */ 								var __accu0__ = pending_nodes;
+/* 001053 */ 								return __call__ (__accu0__.append, __accu0__, __call__ (chars_to_node, null, p, n, prev_sep_end, __call__ (len, null, n.chars)));
+/* 001053 */ 							}) ();
 /* 001053 */ 						}
 /* 001053 */ 						break;
 /* 001053 */ 					}

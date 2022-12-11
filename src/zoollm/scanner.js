@@ -228,21 +228,23 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
             }
         }
 
-        if (node.hasOwnProperty('llm_referenceable_info'))
+        if (node.hasOwnProperty('llm_referenceable_infos'))
         {
             // it's something referenceable, like a defterm or a section heading
-            const referenceable_info = node.llm_referenceable_info;
+            for (const referenceable_info of node.llm_referenceable_infos) {
 
-            debug(`Found referenceable in node=${_abbrev(repr(node))}: labels =`,
-                  repr(referenceable_info.labels));
+                debug(`Found referenceable in node=${_abbrev(repr(node))}: labels =`,
+                      repr(referenceable_info.labels));
 
-            this._register_encountered('referenceables', {
-                referenceable_info: referenceable_info,
-                encountered_in: {
-                    resource_info: node.latex_walker.resource_info,
-                    what: node.latex_walker.what,
-                }
-            } );
+                this._register_encountered('referenceables', {
+                    referenceable_info: referenceable_info,
+                    encountered_in: {
+                        resource_info: node.latex_walker.resource_info,
+                        what: node.latex_walker.what,
+                    }
+                } );
+
+            }
         }
     }
 
