@@ -118,7 +118,7 @@ export class RefResolver
     
     get_ref(ref_type, ref_label, resource_info, render_context)
     {
-        debug(`Resolving ref ‘${ref_type}:${ref_label}’ ...`);
+        debug(`RefResolver: resolving ref ‘${ref_type}:${ref_label}’ ...`);
 
         if (!this.ref_instance_database.hasOwnProperty(ref_type)) {
             // no such reference type
@@ -132,7 +132,7 @@ export class RefResolver
 
         const ref_instance = this.ref_instance_database[ref_type][ref_label];
 
-        debug(`Got ref ‘${ref_type}:${ref_label}’: ${repr(ref_instance)}`);
+        // debug(`Got ref ‘${ref_type}:${ref_label}’: ${repr(ref_instance)}`);
 
         if (this.target_href_resolver != null) {
             return RefInstance( $$kw(
