@@ -5,7 +5,13 @@ node_modules
 node_modules_*
 node_modules-*
 
-.yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
 
 # playground test files
