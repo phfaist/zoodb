@@ -79,7 +79,7 @@ let zoo_relations_populator = new zoodbrelations.RelationsPopulator();
 //
 
 // see if we can mix in some LLM processing
-let zoollmenviron = zoollm.make_zoo_llm_environment();
+let zoollmenviron = new zoollm.ZooLLMEnvironment();
 
 
 const cslfn = 'eczoo-bib-style.csl';

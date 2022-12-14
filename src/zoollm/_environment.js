@@ -86,13 +86,14 @@ export class RefResolver
     add_ref(ref_instance)
     {
         const {ref_type, ref_label} = ref_instance;
-        if ( typeof ref_type == 'undefined' || !ref_label) {
+        if (ref_type == null) { // undefined or null
             throw new Error(`Invalid ref_type:ref_label pair ‘${ref_type}:${ref_label}’`);
         }
         if (!this.ref_instance_database.hasOwnProperty(ref_type)) {
-            if (typeof this.options.ref_types != 'undefined') {
+            if (this.options.ref_types !== undefined) {
                 throw new Error(
-                    `Invalid ref prefix ‘${ref_type}’ in ‘${ref_type}:${ref_label}’`
+                    `Invalid ref prefix ‘${ref_type}’ in ‘${ref_type}:${ref_label}’, `
+                    + `expected one of ${this.options.ref_types}`
                 );
             }
             // if options.ref_types is undefined, we dynamically grow the dict
@@ -134,7 +135,7 @@ export class RefResolver
 
         debug(`Got ref ‘${ref_type}:${ref_label}’: ${repr(ref_instance)}`);
 
-        if (this.target_href_resolver) {
+        if (this.target_href_resolver != null) {
             return RefInstance( $$kw(
                 Object.assign({}, ref_instance.asdict(), {
                     target_href: this.target_href_resolver(ref_instance, render_context)
@@ -380,16 +381,16 @@ export var ZooLLMEnvironment = __class__(
         get __init__ () {return __get__ (this, function
         (self, zoollm_options) {
 
-            zoollm_options ||= zoollm_default_options();
+            zoollm_options ??= zoollm_default_options();
 
             self.citations_provider =
-                zoollm_options.citations_provider || new CitationsProvider;
+                zoollm_options.citations_provider ?? new CitationsProvider();
             self.ref_resolver =
                 zoollm_options.ref_resolver
-                || new RefResolver(zoollm_options.ref_resolver_options);
+                ?? new RefResolver(zoollm_options.ref_resolver_options);
             
             self.graphics_collection =
-                zoollm_options.graphics_collection || new FeatureZooGraphicsCollection();
+                zoollm_options.graphics_collection ?? new FeatureZooGraphicsCollection();
 
 
             self.feature_math = new llm_feature_math.FeatureMath();

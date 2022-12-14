@@ -5,6 +5,8 @@ node_modules
 node_modules_*
 node_modules-*
 
+.yarn
+
 
 # playground test files
 zoo_dbdata_output*.json
