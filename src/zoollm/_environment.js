@@ -6,7 +6,7 @@ import path from 'path';
 import {$$kw, repr} from './llm-js/py.js';
 import {__class__, __super__, __get__, isinstance} from './llm-js/org.transcrypt.__runtime__.js';
 
-import { ParsingStateDelta } from './llm-js/pylatexenc.latexnodes.js';
+import { ParsingState, ParsingStateDelta } from './llm-js/pylatexenc.latexnodes.js';
 
 import { LLMFragment } from './llm-js/llm.llmfragment.js';
 
@@ -23,6 +23,8 @@ import * as llm_feature_floats from './llm-js/llm.feature.floats.js';
 import * as llm_feature_defterm from './llm-js/llm.feature.defterm.js';
 import * as llm_feature_graphics from './llm-js/llm.feature.graphics.js';
 
+
+export { ParsingState };
 
 export const SectionCommandSpec = llm_feature_headings.FeatureHeadings.SectionCommandSpec;
 
@@ -119,16 +121,13 @@ export class RefResolver
         debug(`Resolving ref ‘${ref_type}:${ref_label}’ ...`);
 
         if (!this.ref_instance_database.hasOwnProperty(ref_type)) {
-            throw new Error(
-                `Invalid reference, unknown reference prefix ‘${ref_type}’ `
-                + `in request for ‘${ref_type}:${ref_label}’ in ${resource_info}`
-            );
+            // no such reference type
+            debug(`No such reference type in ref instance database — ${ref_type}`);
+            return null;
         }
         if (!this.ref_instance_database[ref_type].hasOwnProperty(ref_label)) {
-            throw new Error(
-                `Invalid reference ‘${ref_type}:${ref_label}’ `
-                + `in ${resource_info}`
-            );
+            // no such reference.
+            return null;
         }
 
         const ref_instance = this.ref_instance_database[ref_type][ref_label];
@@ -381,43 +380,45 @@ export var ZooLLMEnvironment = __class__(
         get __init__ () {return __get__ (this, function
         (self, zoollm_options) {
 
-            zoollm_options ??= zoollm_default_options();
+            zoollm_options = Object.assign({}, zoollm_default_options(), zoollm_options);
 
             self.citations_provider =
                 zoollm_options.citations_provider ?? new CitationsProvider();
             self.ref_resolver =
                 zoollm_options.ref_resolver
                 ?? new RefResolver(zoollm_options.ref_resolver_options);
-            
+
             self.graphics_collection =
                 zoollm_options.graphics_collection ?? new FeatureZooGraphicsCollection();
 
+
+            debug("ZooLLMEnvironment.__init__(): creating feature class instances ...");
 
             self.feature_math = new llm_feature_math.FeatureMath();
 
             self.feature_headings = new llm_feature_headings.FeatureHeadings(
                 $$kw({section_commands_by_level:
                       zoollm_options.heading_section_commands_by_level}),
-            )
+            );
             self.feature_refs = new llm_feature_refs.FeatureRefs(
-                $$kw({external_ref_resolvers: [self.ref_resolver]}),
-            )
+                [self.ref_resolver],
+            );
 
             self.feature_endnotes = new llm_feature_endnotes.FeatureEndnotes(
                 $$kw({categories: zoollm_options.endnote_categories})
-            )
+            );
             
             self.feature_citations = new llm_feature_cite.FeatureExternalPrefixedCitations(
                 $$kw({ external_citations_provider: self.citations_provider,
                        counter_formatter: zoollm_options.citation_counter_formatter,
                        citation_delimiters: zoollm_options.citation_delimiters, })
-            )
+            );
 
             self.feature_floats = new llm_feature_floats.FeatureFloats(
                 $$kw({float_types: zoollm_options.float_types})
-            )
+            );
 
-            self.feature_defterm = new llm_feature_defterm.FeatureDefTerm()
+            self.feature_defterm = new llm_feature_defterm.FeatureDefTerm();
             self.feature_defterm.render_defterm_with_term =
                 zoollm_options.defterm_render_defterm_with_term;
             self.feature_defterm.render_defterm_with_term_suffix =
@@ -451,12 +452,14 @@ export var ZooLLMEnvironment = __class__(
                 // ),
             };
 
+            debug("ZooLLMEnvironment.__init__(): calling super constructor ...");
+
             __super__(ZooLLMEnvironment, '__init__')(
                 self,
-                $$kw({
-                    features: features,
-                    parsing_mode_deltas: parsing_mode_deltas,
-                })
+                features,
+                // $$kw({
+                //     parsing_mode_deltas: parsing_mode_deltas,
+                // })
             );
             
             // environment set up.

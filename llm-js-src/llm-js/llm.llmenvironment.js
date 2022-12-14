@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-12-10 23:30:55
+/* 000001 */ // Transcrypt'ed from Python, 2022-12-14 17:06:08
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
 /* 000006 */ var unique_object_id = {};
@@ -15,7 +15,7 @@
 /* 000007 */ __nest__ (logging, '', __module_logging__);
 /* 000006 */ import * as __module_re__ from './re.js';
 /* 000006 */ __nest__ (re, '', __module_re__);
-/* 000006 */ export {latexnodes_nodes, LLMFragment, LatexWalkerParseError, LLMDocument, latexwalker, LatexWalkerParseErrorFormatter, latexnodes};
+/* 000006 */ export {LatexWalkerParseError, latexwalker, LLMFragment, latexnodes_nodes, LLMDocument, LatexWalkerParseErrorFormatter, latexnodes};
 /* 000001 */ var __name__ = 'llm.llmenvironment';
 /* 000008 */ export var logger = (function () {
 /* 000008 */ 	var __accu0__ = logging;
@@ -608,9 +608,9 @@
 /* 000354 */ });
 /* 000358 */ export var LLMEnvironment =  __class__ ('LLMEnvironment', [object], {
 /* 000358 */ 	__module__: __name__,
-/* 000377 */ 	get __init__ () {return __get__ (this, function (self) {
-/* 000377 */ 		var parsing_mode_deltas = null;
+/* 000377 */ 	get __init__ () {return __get__ (this, function (self, features, parsing_state, latex_context) {
 /* 000377 */ 		var tolerant_parsing = false;
+/* 000377 */ 		var parsing_mode_deltas = null;
 /* 000377 */ 		if (arguments.length) {
 /* 000377 */ 			var __ilastarg0__ = arguments.length - 1;
 /* 000377 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -618,11 +618,11 @@
 /* 000377 */ 				for (var __attrib0__ in __allkwargs0__) {
 /* 000377 */ 					switch (__attrib0__) {
 /* 000377 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000377 */ 						case 'latex_context': var latex_context = __allkwargs0__ [__attrib0__]; break;
-/* 000377 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
 /* 000377 */ 						case 'features': var features = __allkwargs0__ [__attrib0__]; break;
-/* 000377 */ 						case 'parsing_mode_deltas': var parsing_mode_deltas = __allkwargs0__ [__attrib0__]; break;
+/* 000377 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 000377 */ 						case 'latex_context': var latex_context = __allkwargs0__ [__attrib0__]; break;
 /* 000377 */ 						case 'tolerant_parsing': var tolerant_parsing = __allkwargs0__ [__attrib0__]; break;
+/* 000377 */ 						case 'parsing_mode_deltas': var parsing_mode_deltas = __allkwargs0__ [__attrib0__]; break;
 /* 000377 */ 					}
 /* 000377 */ 				}
 /* 000377 */ 			}
@@ -634,14 +634,14 @@
 /* 000388 */ 			var __accu0__ = logger;
 /* 000388 */ 			return __call__ (__accu0__.debug, __accu0__, 'LLMEnvironment constructor');
 /* 000388 */ 		}) ();
-/* 000390 */ 		(function () {
-/* 000390 */ 			var __accu0__ = logger;
-/* 000390 */ 			return __call__ (__accu0__.debug, __accu0__, 'features={}'.format (features));
-/* 000390 */ 		}) ();
-/* 000392 */ 		self.latex_context = latex_context;
-/* 000393 */ 		self.parsing_state = parsing_state;
-/* 000395 */ 		self.parsing_mode_deltas = (__t__ (parsing_mode_deltas) ? __call__ (dict, null, parsing_mode_deltas) : dict ({}));
-/* 000397 */ 		self.features = __call__ (list, null, features);
+/* 000390 */ 		self.latex_context = latex_context;
+/* 000391 */ 		self.parsing_state = parsing_state;
+/* 000393 */ 		self.parsing_mode_deltas = (__t__ (parsing_mode_deltas) ? __call__ (dict, null, parsing_mode_deltas) : dict ({}));
+/* 000395 */ 		self.features = __call__ (list, null, features);
+/* 000397 */ 		(function () {
+/* 000397 */ 			var __accu0__ = logger;
+/* 000397 */ 			return __call__ (__accu0__.debug, __accu0__, 'Creating environment; features = %r', self.features);
+/* 000397 */ 		}) ();
 /* 000402 */ 		self.features_by_name = dict ({});
 /* 000403 */ 		var __iterable0__ = self.features;
 /* 000403 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {

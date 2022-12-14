@@ -100,6 +100,12 @@ export class LLMSimpleContentCompiler extends ZooDbProcessorBase
 
     // ----
 
+    /**
+     *
+     * Note: the API guarantees that compile_llm() and compile_object() also
+     * work if no zoodb is set, and can be used w/o zoodb if you want to compile
+     * a single ad hoc object.
+     */
     compile_llm( llm_content, { object_type, llm_options, object, fieldname } )
     {
         if (is_llm_fragment(llm_content)) {
@@ -186,6 +192,12 @@ export class LLMSimpleContentCompiler extends ZooDbProcessorBase
         }
     }
 
+    /**
+     *
+     * Note: the API guarantees that compile_llm() and compile_object() also
+     * work if no zoodb is set, and can be used w/o zoodb if you want to compile
+     * a single ad hoc object.
+     */
     compile_object(object_type, objid, obj, schema)
     {
         debug(`Compiling LLM content - ${object_type} ‘${objid}’`);

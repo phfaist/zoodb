@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-12-10 23:30:56
+/* 000001 */ // Transcrypt'ed from Python, 2022-12-14 17:06:08
 /* 000006 */ var logging = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000033 */ import {FeatureDefTerm} from './llm.feature.defterm.js';
@@ -16,7 +16,7 @@
 /* 000009 */ import * as latexnodes from './pylatexenc.latexnodes.js';
 /* 000006 */ import * as __module_logging__ from './logging.js';
 /* 000006 */ __nest__ (logging, '', __module_logging__);
-/* 000006 */ export {FeatureEndnotes, LLMEnvironment, ParagraphBreakSpecials, FeatureExternalPrefixedCitations, FeatureRefs, FeatureHeadings, FeatureEnumeration, FeatureSimplePathGraphicsResourceProvider, FeatureDefTerm, FeatureFloats, TextFormatMacro, ConstantValueSpecials, ConstantValueMacro, EndnoteCategory, LLMParsingState, HrefHyperlinkMacro, latexnodes, FeatureMath, macrospec, VerbatimEnvironment};
+/* 000006 */ export {TextFormatMacro, macrospec, EndnoteCategory, ConstantValueMacro, FeatureSimplePathGraphicsResourceProvider, HrefHyperlinkMacro, VerbatimEnvironment, latexnodes, ConstantValueSpecials, FeatureEndnotes, ParagraphBreakSpecials, FeatureRefs, FeatureMath, FeatureFloats, LLMParsingState, FeatureDefTerm, FeatureEnumeration, LLMEnvironment, FeatureHeadings, FeatureExternalPrefixedCitations};
 /* 000001 */ var __name__ = 'llm.llmstd';
 /* 000007 */ export var logger = (function () {
 /* 000007 */ 	var __accu0__ = logging;
@@ -265,15 +265,15 @@
 /* 000283 */ };
 /* 000290 */ export var LLMStandardEnvironment =  __class__ ('LLMStandardEnvironment', [LLMEnvironment], {
 /* 000290 */ 	__module__: __name__,
-/* 000291 */ 	get __init__ () {return __get__ (this, function (self, latex_context, parsing_state, features) {
-/* 000291 */ 		if (typeof latex_context == 'undefined' || (latex_context != null && latex_context.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000291 */ 			var latex_context = null;
+/* 000291 */ 	get __init__ () {return __get__ (this, function (self, features, parsing_state, latex_context) {
+/* 000291 */ 		if (typeof features == 'undefined' || (features != null && features.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000291 */ 			var features = null;
 /* 000291 */ 		};
 /* 000291 */ 		if (typeof parsing_state == 'undefined' || (parsing_state != null && parsing_state.hasOwnProperty ("__kwargtrans__"))) {;
 /* 000291 */ 			var parsing_state = null;
 /* 000291 */ 		};
-/* 000291 */ 		if (typeof features == 'undefined' || (features != null && features.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000291 */ 			var features = null;
+/* 000291 */ 		if (typeof latex_context == 'undefined' || (latex_context != null && latex_context.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000291 */ 			var latex_context = null;
 /* 000291 */ 		};
 /* 000291 */ 		var kwargs = dict ();
 /* 000291 */ 		if (arguments.length) {
@@ -283,9 +283,9 @@
 /* 000291 */ 				for (var __attrib0__ in __allkwargs0__) {
 /* 000291 */ 					switch (__attrib0__) {
 /* 000291 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000291 */ 						case 'latex_context': var latex_context = __allkwargs0__ [__attrib0__]; break;
-/* 000291 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
 /* 000291 */ 						case 'features': var features = __allkwargs0__ [__attrib0__]; break;
+/* 000291 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 000291 */ 						case 'latex_context': var latex_context = __allkwargs0__ [__attrib0__]; break;
 /* 000291 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
 /* 000291 */ 					}
 /* 000291 */ 				}
@@ -294,91 +294,91 @@
 /* 000291 */ 		}
 /* 000291 */ 		else {
 /* 000291 */ 		}
-/* 000304 */ 		if (__t__ (latex_context === null)) {
-/* 000305 */ 			var latex_context = __call__ (standard_latex_context_db, null);
-/* 000305 */ 		}
-/* 000306 */ 		if (__t__ (parsing_state === null)) {
-/* 000307 */ 			var parsing_state = __call__ (standard_parsing_state, null, __kwargtrans__ ((function () {
-/* 000307 */ 				var __accu0__ = [];
-/* 000308 */ 				var __iterable0__ = tuple (['enable_comments', 'comment_start']);
-/* 000308 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000309 */ 					var k = __getitem__ (__iterable0__, __index0__);
-/* 000309 */ 					if (__t__ (__in__ (k, kwargs))) {
-/* 000310 */ 						(function () {
-/* 000310 */ 							var __accu1__ = __accu0__;
-/* 000308 */ 							return __call__ (__accu1__.append, __accu1__, [k, (function () {
-/* 000308 */ 								var __accu2__ = kwargs;
-/* 000308 */ 								return __call__ (__accu2__.py_pop, __accu2__, k);
-/* 000308 */ 							}) ()]);
-/* 000308 */ 						}) ();
-/* 000308 */ 					}
-/* 000308 */ 				}
-/* 000308 */ 				return dict (__accu0__);
-/* 000308 */ 			}) ()));
-/* 000308 */ 		}
-/* 000312 */ 		if (__t__ (features === null)) {
-/* 000313 */ 			var features = __call__ (standard_features, null, __kwargtrans__ ((function () {
-/* 000313 */ 				var __accu0__ = [];
-/* 000314 */ 				var __iterable0__ = tuple (['external_citations_provider', 'external_ref_resolvers', 'footnote_counter_formatter', 'citation_counter_formatter']);
-/* 000314 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000318 */ 					var k = __getitem__ (__iterable0__, __index0__);
-/* 000315 */ 					if (__t__ (__in__ (k, kwargs))) {
-/* 000319 */ 						(function () {
-/* 000319 */ 							var __accu1__ = __accu0__;
-/* 000314 */ 							return __call__ (__accu1__.append, __accu1__, [k, (function () {
-/* 000314 */ 								var __accu2__ = kwargs;
-/* 000314 */ 								return __call__ (__accu2__.py_pop, __accu2__, k);
-/* 000314 */ 							}) ()]);
-/* 000314 */ 						}) ();
-/* 000314 */ 					}
-/* 000314 */ 				}
-/* 000314 */ 				return dict (__accu0__);
-/* 000314 */ 			}) ()));
-/* 000314 */ 		}
-/* 000322 */ 		__call__ (__call__ (__super__, null, LLMStandardEnvironment, '__init__'), null, self, __kwargtrans__ (__mergekwargtrans__ ({latex_context: latex_context, parsing_state: parsing_state, features: features}, kwargs)));
-/* 000322 */ 	});},
-/* 000330 */ 	parsing_state_event_handler: __call__ (LLMLatexWalkerParsingStateEventHandler, null),
-/* 000332 */ 	get get_parse_error_message () {return __get__ (this, function (self, exception_object) {
-/* 000332 */ 		if (arguments.length) {
-/* 000332 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000332 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000332 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000332 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000332 */ 					switch (__attrib0__) {
-/* 000332 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000332 */ 						case 'exception_object': var exception_object = __allkwargs0__ [__attrib0__]; break;
-/* 000332 */ 					}
+/* 000297 */ 		if (__t__ (latex_context === null)) {
+/* 000298 */ 			var latex_context = __call__ (standard_latex_context_db, null);
+/* 000298 */ 		}
+/* 000299 */ 		if (__t__ (parsing_state === null)) {
+/* 000300 */ 			var parsing_state = __call__ (standard_parsing_state, null, __kwargtrans__ ((function () {
+/* 000300 */ 				var __accu0__ = [];
+/* 000301 */ 				var __iterable0__ = tuple (['enable_comments', 'comment_start']);
+/* 000301 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000302 */ 					var k = __getitem__ (__iterable0__, __index0__);
+/* 000302 */ 					if (__t__ (__in__ (k, kwargs))) {
+/* 000303 */ 						(function () {
+/* 000303 */ 							var __accu1__ = __accu0__;
+/* 000301 */ 							return __call__ (__accu1__.append, __accu1__, [k, (function () {
+/* 000301 */ 								var __accu2__ = kwargs;
+/* 000301 */ 								return __call__ (__accu2__.py_pop, __accu2__, k);
+/* 000301 */ 							}) ()]);
+/* 000301 */ 						}) ();
+/* 000301 */ 					}
+/* 000301 */ 				}
+/* 000301 */ 				return dict (__accu0__);
+/* 000301 */ 			}) ()));
+/* 000301 */ 		}
+/* 000305 */ 		if (__t__ (features === null)) {
+/* 000306 */ 			var features = __call__ (standard_features, null, __kwargtrans__ ((function () {
+/* 000306 */ 				var __accu0__ = [];
+/* 000307 */ 				var __iterable0__ = tuple (['external_citations_provider', 'external_ref_resolvers', 'footnote_counter_formatter', 'citation_counter_formatter']);
+/* 000307 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000311 */ 					var k = __getitem__ (__iterable0__, __index0__);
+/* 000308 */ 					if (__t__ (__in__ (k, kwargs))) {
+/* 000312 */ 						(function () {
+/* 000312 */ 							var __accu1__ = __accu0__;
+/* 000307 */ 							return __call__ (__accu1__.append, __accu1__, [k, (function () {
+/* 000307 */ 								var __accu2__ = kwargs;
+/* 000307 */ 								return __call__ (__accu2__.py_pop, __accu2__, k);
+/* 000307 */ 							}) ()]);
+/* 000307 */ 						}) ();
+/* 000307 */ 					}
+/* 000307 */ 				}
+/* 000307 */ 				return dict (__accu0__);
+/* 000307 */ 			}) ()));
+/* 000307 */ 		}
+/* 000315 */ 		__call__ (__call__ (__super__, null, LLMStandardEnvironment, '__init__'), null, self, features, parsing_state, latex_context, __kwargtrans__ (kwargs));
+/* 000315 */ 	});},
+/* 000323 */ 	parsing_state_event_handler: __call__ (LLMLatexWalkerParsingStateEventHandler, null),
+/* 000325 */ 	get get_parse_error_message () {return __get__ (this, function (self, exception_object) {
+/* 000325 */ 		if (arguments.length) {
+/* 000325 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000325 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000325 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000325 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000325 */ 					switch (__attrib0__) {
+/* 000325 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000325 */ 						case 'exception_object': var exception_object = __allkwargs0__ [__attrib0__]; break;
+/* 000325 */ 					}
+/* 000325 */ 				}
+/* 000325 */ 			}
+/* 000325 */ 		}
+/* 000325 */ 		else {
+/* 000325 */ 		}
+/* 000326 */ 		var msg = null;
+/* 000327 */ 		var error_type_info = exception_object.error_type_info;
+/* 000328 */ 		if (__t__ (error_type_info)) {
+/* 000329 */ 			var what = __getitem__ (error_type_info, 'what');
+/* 000330 */ 			if (__t__ (__eq__ (what, 'token_forbidden_character'))) {
+/* 000331 */ 				if (__t__ (__eq__ (__getitem__ (error_type_info, 'forbidden_character'), '%'))) {
+/* 000332 */ 					var msg = 'LaTeX comments are not allowed here. Use ‘\\%’ to typeset a literal percent sign.';
 /* 000332 */ 				}
-/* 000332 */ 			}
-/* 000332 */ 		}
-/* 000332 */ 		else {
-/* 000332 */ 		}
-/* 000333 */ 		var msg = null;
-/* 000334 */ 		var error_type_info = exception_object.error_type_info;
-/* 000335 */ 		if (__t__ (error_type_info)) {
-/* 000336 */ 			var what = __getitem__ (error_type_info, 'what');
-/* 000337 */ 			if (__t__ (__eq__ (what, 'token_forbidden_character'))) {
-/* 000338 */ 				if (__t__ (__eq__ (__getitem__ (error_type_info, 'forbidden_character'), '%'))) {
-/* 000339 */ 					var msg = 'LaTeX comments are not allowed here. Use ‘\\%’ to typeset a literal percent sign.';
-/* 000339 */ 				}
-/* 000343 */ 				else if (__t__ (__eq__ (__getitem__ (error_type_info, 'forbidden_character'), '$'))) {
-/* 000344 */ 					var msg = "You can't use ‘$’ here. LaTeX math should be typeset using \\(...\\) for inline math and \\[...\\] for unnumbered display equations. Use ‘\\$’ for a literal dollar sign.";
-/* 000344 */ 				}
-/* 000344 */ 			}
-/* 000344 */ 		}
-/* 000349 */ 		if (__t__ (!__t__ ((msg)))) {
-/* 000350 */ 			var msg = exception_object.msg;
-/* 000350 */ 		}
-/* 000352 */ 		var errfmt = (function () {
-/* 000352 */ 			var __accu0__ = latexnodes;
-/* 000352 */ 			return __call__ (__accu0__.LatexWalkerParseErrorFormatter, __accu0__, exception_object);
-/* 000352 */ 		}) ();
-/* 000354 */ 		var msg = __call__ (__iadd__, null, msg, (function () {
-/* 000354 */ 			var __accu0__ = errfmt;
-/* 000354 */ 			return __call__ (__accu0__.format_full_traceback, __accu0__);
-/* 000354 */ 		}) ());
-/* 000356 */ 		return msg;
-/* 000356 */ 	});}
-/* 000356 */ });
+/* 000336 */ 				else if (__t__ (__eq__ (__getitem__ (error_type_info, 'forbidden_character'), '$'))) {
+/* 000337 */ 					var msg = "You can't use ‘$’ here. LaTeX math should be typeset using \\(...\\) for inline math and \\[...\\] for unnumbered display equations. Use ‘\\$’ for a literal dollar sign.";
+/* 000337 */ 				}
+/* 000337 */ 			}
+/* 000337 */ 		}
+/* 000342 */ 		if (__t__ (!__t__ ((msg)))) {
+/* 000343 */ 			var msg = exception_object.msg;
+/* 000343 */ 		}
+/* 000345 */ 		var errfmt = (function () {
+/* 000345 */ 			var __accu0__ = latexnodes;
+/* 000345 */ 			return __call__ (__accu0__.LatexWalkerParseErrorFormatter, __accu0__, exception_object);
+/* 000345 */ 		}) ();
+/* 000347 */ 		var msg = __call__ (__iadd__, null, msg, (function () {
+/* 000347 */ 			var __accu0__ = errfmt;
+/* 000347 */ 			return __call__ (__accu0__.format_full_traceback, __accu0__);
+/* 000347 */ 		}) ());
+/* 000349 */ 		return msg;
+/* 000349 */ 	});}
+/* 000349 */ });
 /* 000006 */ 
 //# sourceMappingURL=llm.llmstd.map
