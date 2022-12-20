@@ -28,7 +28,7 @@ import * as llm_feature_defterm from './llm-js/llm.feature.defterm.js';
 import * as llm_feature_graphics from './llm-js/llm.feature.graphics.js';
 
 
-export { LLMParsingState, LLMParsingStateDeltaSetBlockLevel };
+export { LLMParsingState, ParsingStateDelta, LLMParsingStateDeltaSetBlockLevel };
 
 export const SectionCommandSpec = llm_feature_headings.FeatureHeadings.SectionCommandSpec;
 
