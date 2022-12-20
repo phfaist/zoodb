@@ -10,6 +10,10 @@ import { ParsingState, ParsingStateDelta } from './llm-js/pylatexenc.latexnodes.
 
 import { LLMFragment } from './llm-js/llm.llmfragment.js';
 
+import {
+    LLMParsingState,
+    LLMParsingStateDeltaSetBlockLevel,
+} from './llm-js/llm.llmfragment.js';
 
 import * as llmstd from './llm-js/llm.llmstd.js';
 
@@ -24,7 +28,7 @@ import * as llm_feature_defterm from './llm-js/llm.feature.defterm.js';
 import * as llm_feature_graphics from './llm-js/llm.feature.graphics.js';
 
 
-export { ParsingState };
+export { LLMParsingState, LLMParsingStateDeltaSetBlockLevel };
 
 export const SectionCommandSpec = llm_feature_headings.FeatureHeadings.SectionCommandSpec;
 
