@@ -13,7 +13,7 @@ import { LLMFragment } from './llm-js/llm.llmfragment.js';
 import {
     LLMParsingState,
     LLMParsingStateDeltaSetBlockLevel,
-} from './llm-js/llm.llmfragment.js';
+} from './llm-js/llm.llmenvironment.js';
 
 import * as llmstd from './llm-js/llm.llmstd.js';
 
