@@ -56,11 +56,12 @@ export function * iter_object_fields_recursive(obj, schema, options, fieldname=u
     }
 
     if (schema.type == 'object') {
+        const schema_properties = schema.properties ?? {};
         const keys =
-              only_schema_properties ? Object.keys(schema.properties) : Object.keys(obj) ;
+              only_schema_properties ? Object.keys(schema_properties) : Object.keys(obj) ;
         for (const propname of keys) {
             const propschema =
-                  (schema.properties??{})[propname] ?? schema.additionalProperties;
+                  (schema_properties??{})[propname] ?? schema.additionalProperties ?? {};
             const propvalue = obj[propname];
 
             let iter = iter_object_fields_recursive(
