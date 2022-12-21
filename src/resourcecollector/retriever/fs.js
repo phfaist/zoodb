@@ -24,23 +24,21 @@ const debug = debug_module('zoodb.resourcecollector.retriever.fs');
  */
 export class FilesystemResourceRetriever
 {
-    constructor(options)
+    constructor(options={})
     {
-        options ||= {};
-
         this.fs = options.fs;
 
         this.copy_to_target_directory = options.copy_to_target_directory ?? false;
 
-        this.source_directory = options.source_directory || '.';
-        this.target_directory = options.target_directory || './_output_file_resources/';
+        this.source_directory = options.source_directory ?? '.';
+        this.target_directory = options.target_directory ?? './_output_file_resources/';
         this.rename_file_template =
-            options.rename_file_template || ( (f) => `fig-${f.b32hash(24)}${f.lowerext()}` );
+            options.rename_file_template ?? ( (f) => `fig-${f.b32hash(24)}${f.lowerext()}` );
 
         // don't forget to include the empty string in this list in case you'd
         // like to support the situation where the source already specifies the
         // full file name with extension.
-        this.extensions = options.extensions || [ '' ];
+        this.extensions = options.extensions ?? [ '' ];
 
         if (this.copy_to_target_directory) {
             //this.mkdir_promise = 

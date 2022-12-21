@@ -1,4 +1,4 @@
-import { $$kw, render_value } from '../zoollm/index.js';
+import { $$kw, render_value, ZooTextFragmentRenderer } from '../zoollm/index.js';
 
 
 // -----------------------------------------------------------------------------
@@ -17,7 +17,7 @@ export class LLMSearchableDocTextValuesAssembler
         this.doc_metadata = doc_metadata ?? null;
         this.render_value_fn = render_value_fn ?? render_value;
 
-        this.text_fragment_renderer = ZooTextFragmentRenderer();
+        this.text_fragment_renderer = new ZooTextFragmentRenderer();
     }
     
     assemble_doc_text_values(doc_values)
