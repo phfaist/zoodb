@@ -24,7 +24,7 @@ import { CitationSourceDoi } from '@phfaist/zoodb/citationmanager/source/doi';
 import { CitationSourceManual } from '@phfaist/zoodb/citationmanager/source/manual';
 import { CitationSourceBibliographyFile } from '@phfaist/zoodb/citationmanager/source/bibliographyfile';
 
-import { FileResourceRetriever } from '@phfaist/zoodb/resourcecollector/retriever/file';
+import { FilesystemResourceRetriever } from '@phfaist/zoodb/resourcecollector/retriever/fs';
 
 import { LLMGraphicsResourceProcessor } from '@phfaist/zoodb/resourcecollector/processor/llmgraphicsprocessor';
 
@@ -96,11 +96,13 @@ let zoo_llm_processor = new ZooLLMProcessor({
         sources: {
             arxiv: new CitationSourceArxiv({
                 override_arxiv_dois_file: 'playground/overridearxivdois.yaml',
+                fs,
             }),
             doi: new CitationSourceDoi(),
             manual: new CitationSourceManual(),
             preset: new CitationSourceBibliographyFile({
                 bibliography_files: ['playground/bibpreset.yaml',],
+                fs,
             }),
         },
         default_user_agent: `ecczoogen-bibliography-build-script/0.1 `
@@ -110,17 +112,19 @@ let zoo_llm_processor = new ZooLLMProcessor({
     resource_collector_options: {
         resource_types: [ 'graphics_path' ],
         resource_retrievers: {
-            'graphics_path': new FileResourceRetriever({
+            'graphics_path': new FilesystemResourceRetriever({
                 source_directory: eczoo_data_dir,
                 copy_to_target_directory: true,
                 target_directory: './_output_resource_graphics_files/',
                 extensions: [ '', '.svg', '.png', '.jpeg', '.jpg' ],
+                fs,
             }),
         },
         resource_processors: {
             'graphics_path': [
                 new LLMGraphicsResourceProcessor({
-                    zoo_llm_environment: zoollmenviron
+                    zoo_llm_environment: zoollmenviron,
+                    fs,
                 }),
             ],
         },

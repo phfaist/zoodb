@@ -1,7 +1,7 @@
 import debug_module from 'debug';
 const debug = debug_module('zoodb.citationmanager.sources.base');
 
-import fs from 'fs';
+//import fs from 'fs';
 import fetch from 'node-fetch';
 
 
@@ -41,7 +41,22 @@ export class CitationSourceBase
         // correctly, too.
         options ||= {};
         this.options = Object.assign(
-            {}, default_options ?? {}, options, override_options ?? {}
+            {
+                fs: {
+                    readFileSync(fname) {
+                        throw new Error(
+                            `You did not specify fs: to your CitationSource `
+                            + `instance but the source requested a local file.  You `
+                            + `probably want `
+                            + `"fs: { readFileSync(fname) { return fs.readFileSync(fname) }}"`
+                        );
+                    }
+                },
+                fsRootFilePath: '/',
+            },
+            default_options ?? {},
+            options,
+            override_options ?? {},
         );
         this.options.cache_store_options = Object.assign(
             {},
@@ -176,15 +191,16 @@ export class CitationSourceBase
     }
 
     // helper for fetch()
-    fetch_url(url, fetch_options)
+    fetch_url(url, fetch_options=undefined)
     {
-        debug(`Fetching URL ‘${url}’ ...`);
-        if (url.startsWith('file://')) {
+        // convert simple fs paths to file:/// URLs
+        const urlobj = new URL(url, `file:${this.options.fsRootFilePath}`);
+        debug(`Fetching URL ‘${urlobj}’ ...`);
+        if (urlobj.protocol === 'file:') {
             // a local file.
-            const urlobj = new URL(url);
-            return fs.readFileSync(urlobj.pathname);
+            return this.options.fs.readFileSync(urlobj.pathname);
         }
-        return fetch(url, fetch_options);
+        return fetch(urlobj.href, fetch_options);
     }
 
 

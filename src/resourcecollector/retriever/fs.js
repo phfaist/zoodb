@@ -1,5 +1,5 @@
-import fs from 'fs';
-import * as fsPromises from 'fs/promises';
+//import fs from 'fs';
+//import * as fsPromises from 'fs/promises';
 
 import path from 'path';
 
@@ -8,15 +8,27 @@ import base32Encode from 'base32-encode';
 
 
 import debug_module from 'debug';
-const debug = debug_module('zoodb.resourcecollector.retriever.file');
+const debug = debug_module('zoodb.resourcecollector.retriever.fs');
 
 
 
-export class FileResourceRetriever
+/**
+ * ........
+ *
+ * `options.fs` should be an object providing the methods `accessSync()` and
+ * `readFileSync()` (the `readFileSync()` method is in fact only needed if the
+ * file renaming template includes a hash of the file content). Additionally, if
+ * `copy_to_target_directory` is true, then the methods `mkdirSync()` and
+ * `copyFileSync(src, dest)` should also be available.
+ *
+ */
+export class FilesystemResourceRetriever
 {
     constructor(options)
     {
         options ||= {};
+
+        this.fs = options.fs;
 
         this.copy_to_target_directory = options.copy_to_target_directory ?? false;
 
@@ -31,10 +43,12 @@ export class FileResourceRetriever
         this.extensions = options.extensions || [ '' ];
 
         if (this.copy_to_target_directory) {
-            this.mkdir_promise = fsPromises.mkdir(this.target_directory, { recursive: true });
-        } else {
-            this.mkdir_promise = null;
+            //this.mkdir_promise = 
+            this.fs.mkdirSync(this.target_directory, { recursive: true });
         }
+        //  else {
+        //     this.mkdir_promise = null;
+        // }
     }
 
     async resolve(source)
@@ -43,7 +57,7 @@ export class FileResourceRetriever
             const resolved_source = source + extension;
             const full_source_path = path.resolve(this.source_directory, resolved_source);
             try {
-                await fsPromises.access( full_source_path );
+                this.fs.accessSync( full_source_path );
                 // file exists!
                 debug(`located ‘${source}’ at ‘${full_source_path}’`);
                 return { resolved_source: resolved_source,
@@ -59,16 +73,16 @@ export class FileResourceRetriever
 
     async retrieve(resolved_info, source)
     {
-        if (this.mkdir_promise) {
-            await this.mkdir_promise;
-            this.mkdir_promise = null;
-        }
+        // if (this.mkdir_promise) {
+        //     await this.mkdir_promise;
+        //     this.mkdir_promise = null;
+        // }
 
         // Find the file. We might have to try different extensions, for instance.
         const {resolved_source, full_source_path} = resolved_info;
         
         const target_name = this.rename_file_template(
-            new FilePropertiesAccessor(resolved_source, full_source_path)
+            new FilesystemPropertiesAccessor(resolved_source, full_source_path, this.fs)
         );
 
         const target_full_path = path.resolve(this.target_directory, target_name);
@@ -76,7 +90,7 @@ export class FileResourceRetriever
         if (this.copy_to_target_directory) {
             // actually copy the file (await in case we have to process it after
             // retrieval...)
-            await fsPromises.copyFile(full_source_path, target_full_path);
+            this.fs.copyFileSync(full_source_path, target_full_path);
         }
 
         return {
@@ -93,12 +107,13 @@ export class FileResourceRetriever
 };
 
 
-class FilePropertiesAccessor
+class FilesystemPropertiesAccessor
 {
-    constructor(resolved_source, full_source_path)
+    constructor(resolved_source, full_source_path, fs)
     {
         this.resolved_source = resolved_source;
         this.full_source_path = full_source_path;
+        this.fs = fs;
     }
 
     fullname()
@@ -133,13 +148,17 @@ class FilePropertiesAccessor
 
     binary_hash()
     {
-        return sha256().update( fs.readFileSync(this.full_source_path) ).digest();
+        return sha256().update(
+            this.fs.readFileSync(this.full_source_path)
+        ).digest();
     }
 
     // hash the actual file contents
     hexhash(len)
     {
-        const res = sha256().update( fs.readFileSync(this.full_source_path) ).digest('hex');
+        const res = sha256().update(
+            this.fs.readFileSync(this.full_source_path)
+        ).digest('hex');
         if (len) {
             return res.slice(0, len);
         }

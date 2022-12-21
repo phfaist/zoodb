@@ -1,4 +1,4 @@
-import fs from 'fs';
+//import fs from 'fs';
 
 import jsyaml from 'js-yaml';
 
@@ -62,8 +62,8 @@ export class CitationSourceArxiv extends CitationSourceBase
         if (this.override_arxiv_dois_file) {
             Object.assign(
                 this.override_arxiv_dois,
-                // should work with both YAML & JSON given that JSON is a YAML subset
-                jsyaml.load(fs.readFileSync(this.override_arxiv_dois_file))
+                // should work with both YAML & JSON given that JSON is a YAML 1.2 subset
+                jsyaml.load( this.fetch_url(this.override_arxiv_dois_file) )
             );
         }
     }

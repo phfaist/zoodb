@@ -1,4 +1,4 @@
-import fs from 'fs';
+//import fs from 'fs';
 import path from 'path';
 import stream from 'stream';
 
@@ -386,7 +386,7 @@ const parser_ext_dispatchers = {
 };
 
 
-export async function parse_image_metadata(filename)
+export async function parse_image_metadata(filename, stream)
 {
     const ext = path.extname(filename);
 
@@ -401,7 +401,6 @@ export async function parse_image_metadata(filename)
         );
     }
 
-    let stream = fs.createReadStream(filename);
     stream.on('error', (err) => { console.error(`Error (${filename}) -- `, err); });
     try {
         return await parser_fn(stream, { what: filename });

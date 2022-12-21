@@ -11,7 +11,7 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
 {
     constructor(options)
     {
-        options ||= {};
+        options ??= {};
 
         const override_options = {
             source_name: 'Bibliography file citation info source',
@@ -29,16 +29,16 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
             default_options,
         );
 
-        let have_remote = false;
+        this.have_remote = false;
 
         this.bibliography_files = this.options.bibliography_files;
         if (this.bibliography_files == null) { // undefined or null
             throw new Error(`You need to specify option {bibliography_files: ...}`);
         }
         this.bibliography_files_url = this.bibliography_files.map( (bibfile) => {
-            const url = new URL(bibfile, 'file://'+path.resolve('.')+'/');
+            const url = new URL(bibfile, `file://${path.resolve('.')}/`);
             if (url.protocol !== 'file:') {
-                have_remote = true;
+                this.have_remote = true;
             }
             return url.href;
         } );
@@ -46,7 +46,7 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
 
         if (this.options.cache_duration_ms === true) {
             // auto-detect cache duration time.
-            if (have_remote) {
+            if (this.have_remote) {
                 this.options.cache_duration_ms = 3*60*1000; // 3 minutes
             } else {
                 this.options.cache_duration_ms = 60*1000; // 60 seconds

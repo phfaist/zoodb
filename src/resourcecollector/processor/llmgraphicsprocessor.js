@@ -31,11 +31,24 @@ export class LLMGraphicsResourceProcessor
         this.global_raster_scale = options.global_raster_scale ?? null;
 
         this.zoo_llm_environment = options.zoo_llm_environment;
+
+        this.fs = options.fs;
+        if (this.fs == null) {
+            throw new Error(
+                `You did not specify fs for your shiny `
+                + `new LLMGraphicsResourceProcessor instance.  If you're running on `
+                + `node, you probably want `
+                + `"fs: { createReadStream(fname) { return fs.createReadStream(fname) } }"`
+            );
+        }
     }
 
     async process(target_info, source)
     {
-        let grdata = await parse_image_metadata(target_info.full_source_path);
+        const filename = target_info.full_source_path;
+        const stream = this.fs.createReadStream(filename);
+
+        let grdata = await parse_image_metadata(filename);
         //debug(`DEBUG - got grdata = ${JSON.stringify(grdata)}`);
 
         if (grdata.graphics_type == 'vector' && this.global_vector_scale) {
