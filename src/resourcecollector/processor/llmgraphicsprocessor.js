@@ -48,7 +48,7 @@ export class LLMGraphicsResourceProcessor
         const filename = target_info.full_source_path;
         const stream = this.fs.createReadStream(filename);
 
-        let grdata = await parse_image_metadata(filename);
+        let grdata = await parse_image_metadata(filename, stream);
         //debug(`DEBUG - got grdata = ${JSON.stringify(grdata)}`);
 
         if (grdata.graphics_type == 'vector' && this.global_vector_scale) {
