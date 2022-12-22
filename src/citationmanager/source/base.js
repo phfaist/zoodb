@@ -52,7 +52,7 @@ export class CitationSourceBase
                         );
                     }
                 },
-                fsRootFilePath: '/',
+                fsRootFilePath: '',
             },
             default_options ?? {},
             options,
