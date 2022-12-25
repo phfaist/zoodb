@@ -98,7 +98,7 @@ class ZooRelation
         if ( !zoodb.objects[this.to_object_type].hasOwnProperty( target_obj_id ) ) {
             throw new Error(
                 `In ${this.object_type} object ‘${obj._zoodb.id}’ `
-                + `(‘${obj._zodb.source_file_path}’): Invalid reference in `
+                + `(‘${obj._zoodb.source_file_path}’): Invalid reference in `
                 + ` ‘${this.object_field}’ `
                 + `to ${this.to_object_type} object with nonexistent ID ‘${target_obj_id}’`
             );
@@ -128,7 +128,7 @@ class ZooRelation
 
             if (!this.backref_field) {
                 throw new Error(`Invalid field: in backreference: in relation object `
-                                +`in ${this.object_type}`)
+                                +`in ${this.object_type}`);
             }
 
             concatlistfield(target_object, this.backref_field, [ backref_object ]);
@@ -204,18 +204,6 @@ export class RelationsPopulator extends ZooDbProcessorBase
             //
             // now we populate the relations in all objects of this type
             //
-
-            // // prepare any backreference fields on the target objects, if applicable
-            // for (const relation of this.relations[object_type]) {
-            //     if (object_types.includes(relation.to_object_type)
-            //         && relation.backref_field != null) {
-            //         const target_objects = zoodb.objects[relation.to_object_type];
-            //         for (const target_object of Object.values(target_objects)) {
-            //             // create empty field
-            //             concatlistfield(target_object, relation.backref_field, []);
-            //         }
-            //     }
-            // }
 
             let objectsdict = zoodb.objects[object_type];
             

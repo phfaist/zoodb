@@ -55,6 +55,12 @@ export const ZooTextFragmentRenderer = __class__(
 );
 
 
+export function render_html_standalone(fragment)
+{
+    const html_renderer = new ZooHtmlFragmentRenderer();
+    return fragment.render_standalone(html_renderer);
+}
+
 export function render_text_standalone(fragment)
 {
     const text_renderer = new ZooTextFragmentRenderer();
