@@ -68,6 +68,9 @@ export function value_not_empty(value)
     if (value == null) { // null or undefined
         return false;
     }
+    if (value === '') {
+        return false;
+    }
     // e.g., llmfragment:
     if ('is_empty' in value && !value.is_empty()) {
         return true;
