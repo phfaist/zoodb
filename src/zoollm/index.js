@@ -33,6 +33,10 @@ export * from './_fragmentrenderers.js';
 
 export function render_value(x, render_context, render_value_options = {})
 {
+    if (x == null) {
+        return '';
+    }
+
     const { list_joiner, list_item_wrapper } = Object.assign(
         {
             list_joiner: '\n',
@@ -65,14 +69,11 @@ export function value_not_empty(value)
         return false;
     }
     // e.g., llmfragment:
-    if (value.is_empty !== undefined && !value.is_empty()) {
+    if (is_empty in value && !value.is_empty()) {
         return true;
     }
     // e.g., string or array:
     if (value.length !== undefined && value.length > 0) {
-        return true;
-    }
-    if (value !== undefined) {
         return true;
     }
     return false;
