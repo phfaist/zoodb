@@ -122,7 +122,7 @@ export class RefResolver
     
     get_ref(ref_type, ref_label, resource_info, render_context)
     {
-        debug(`RefResolver: resolving ref ‘${ref_type}:${ref_label}’ ...`);
+        //debug(`RefResolver: resolving ref ‘${ref_type}:${ref_label}’ ...`);
 
         if (!this.ref_instance_database.hasOwnProperty(ref_type)) {
             // no such reference type

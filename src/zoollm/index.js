@@ -52,7 +52,7 @@ export function render_value(x, render_context, render_value_options = {})
             render_value(value, render_context, render_value_options)
         ) ).join(list_joiner);
     }
-    if (x && x.render) { // has a render method -> e.g., llm fragment
+    if (x && 'render' in x) { // has a render method -> e.g., llm fragment
         return x.render(render_context);
     }
     debug('Cannot render %O', x);
