@@ -69,7 +69,7 @@ export function value_not_empty(value)
         return false;
     }
     // e.g., llmfragment:
-    if (is_empty in value && !value.is_empty()) {
+    if ('is_empty' in value && !value.is_empty()) {
         return true;
     }
     // e.g., string or array:
