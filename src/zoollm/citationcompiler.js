@@ -427,20 +427,20 @@ export class CitationCompiler
             this.finalize_compiled_citation(c);
             this.compiled_citations[citeid] = c;
         }
+    }
 
-        finalize_compiled_citation(c)
-        {
-            if (this.output_format === 'llm' && this.llm_compile_fragments
-                && this.llm_environment != null) {
-                c.citation_text = this.llm_environment.make_fragment(
-                    c.citation_text,
-                    $$kw({
-                        is_block_level: false,
-                        standalone_mode: true,
-                        what: `Citation text for ${c.cite_prefix}:${c.cite_key}`,
-                    }),
-                )
-            }
+    finalize_compiled_citation(c)
+    {
+        if (this.output_format === 'llm' && this.llm_compile_fragments
+            && this.llm_environment != null) {
+            c.citation_text = this.llm_environment.make_fragment(
+                c.citation_text,
+                $$kw({
+                    is_block_level: false,
+                    standalone_mode: true,
+                    what: `Citation text for ${c.cite_prefix}:${c.cite_key}`,
+                }),
+            )
         }
     }
 
