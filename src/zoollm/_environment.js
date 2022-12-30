@@ -180,6 +180,8 @@ export class CitationsProvider
         this.citations_database = {};
     }
 
+    /// The LLM argument can be either valid standalone LLM text given as a
+    /// string or a precompiled LLM fragment object instance.
     add_citation(cite_prefix, cite_key, full_citation_llm_text)
     {
         if (!this.citations_database.hasOwnProperty(cite_prefix)) {
@@ -405,7 +407,7 @@ export var ZooLLMEnvironment = __class__(
                       zoollm_options.heading_section_commands_by_level}),
             );
             self.feature_refs = new llm_feature_refs.FeatureRefs(
-                [self.ref_resolver],
+                [ self.ref_resolver ],
             );
 
             self.feature_endnotes = new llm_feature_endnotes.FeatureEndnotes(
@@ -413,7 +415,7 @@ export var ZooLLMEnvironment = __class__(
             );
             
             self.feature_citations = new llm_feature_cite.FeatureExternalPrefixedCitations(
-                $$kw({ external_citations_provider: self.citations_provider,
+                $$kw({ external_citations_providers: [ self.citations_provider ],
                        counter_formatter: zoollm_options.citation_counter_formatter,
                        citation_delimiters: zoollm_options.citation_delimiters, })
             );

@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-12-30 19:10:11
+/* 000001 */ // Transcrypt'ed from Python, 2022-12-30 19:36:40
 /* 000006 */ var logging = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000033 */ import {FeatureDefTerm} from './llm.feature.defterm.js';
@@ -16,7 +16,7 @@
 /* 000009 */ import * as latexnodes from './pylatexenc.latexnodes.js';
 /* 000006 */ import * as __module_logging__ from './logging.js';
 /* 000006 */ __nest__ (logging, '', __module_logging__);
-/* 000006 */ export {FeatureEnumeration, ConstantValueSpecials, TextFormatMacro, HrefHyperlinkMacro, FeatureRefs, FeatureHeadings, FeatureEndnotes, FeatureSimplePathGraphicsResourceProvider, latexnodes, ConstantValueMacro, EndnoteCategory, LLMEnvironment, ParagraphBreakSpecials, FeatureDefTerm, FeatureMath, FeatureExternalPrefixedCitations, VerbatimEnvironment, LLMParsingState, FeatureFloats, macrospec};
+/* 000006 */ export {macrospec, FeatureSimplePathGraphicsResourceProvider, LLMEnvironment, TextFormatMacro, FeatureMath, LLMParsingState, HrefHyperlinkMacro, FeatureDefTerm, FeatureRefs, EndnoteCategory, VerbatimEnvironment, FeatureExternalPrefixedCitations, FeatureHeadings, FeatureFloats, FeatureEndnotes, latexnodes, ConstantValueMacro, FeatureEnumeration, ParagraphBreakSpecials, ConstantValueSpecials};
 /* 000001 */ var __name__ = 'llm.llmstd';
 /* 000007 */ export var logger = (function () {
 /* 000007 */ 	var __accu0__ = logging;
@@ -164,7 +164,7 @@
 /* 000196 */ 	var enumeration_environments_dict = null;
 /* 000196 */ 	var endnotes = true;
 /* 000196 */ 	var citations = true;
-/* 000196 */ 	var external_citations_provider = null;
+/* 000196 */ 	var external_citations_providers = null;
 /* 000196 */ 	var eq_counter_formatter = null;
 /* 000196 */ 	var footnote_counter_formatter = null;
 /* 000196 */ 	var citation_counter_formatter = null;
@@ -187,7 +187,7 @@
 /* 000196 */ 					case 'enumeration_environments_dict': var enumeration_environments_dict = __allkwargs0__ [__attrib0__]; break;
 /* 000196 */ 					case 'endnotes': var endnotes = __allkwargs0__ [__attrib0__]; break;
 /* 000196 */ 					case 'citations': var citations = __allkwargs0__ [__attrib0__]; break;
-/* 000196 */ 					case 'external_citations_provider': var external_citations_provider = __allkwargs0__ [__attrib0__]; break;
+/* 000196 */ 					case 'external_citations_providers': var external_citations_providers = __allkwargs0__ [__attrib0__]; break;
 /* 000196 */ 					case 'eq_counter_formatter': var eq_counter_formatter = __allkwargs0__ [__attrib0__]; break;
 /* 000196 */ 					case 'footnote_counter_formatter': var footnote_counter_formatter = __allkwargs0__ [__attrib0__]; break;
 /* 000196 */ 					case 'citation_counter_formatter': var citation_counter_formatter = __allkwargs0__ [__attrib0__]; break;
@@ -239,10 +239,10 @@
 /* 000260 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureEndnotes, null, __kwargtrans__ ({categories: endnote_categories})));
 /* 000260 */ 		}) ();
 /* 000260 */ 	}
-/* 000263 */ 	if (__t__ (__t__ (citations) && external_citations_provider !== null)) {
+/* 000263 */ 	if (__t__ (__t__ (citations) && external_citations_providers !== null)) {
 /* 000264 */ 		(function () {
 /* 000264 */ 			var __accu0__ = features;
-/* 000265 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureExternalPrefixedCitations, null, __kwargtrans__ ({external_citations_provider: external_citations_provider, counter_formatter: citation_counter_formatter, citation_delimiters: tuple (['[', ']'])})));
+/* 000265 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureExternalPrefixedCitations, null, __kwargtrans__ ({external_citations_providers: external_citations_providers, counter_formatter: citation_counter_formatter, citation_delimiters: tuple (['[', ']'])})));
 /* 000265 */ 		}) ();
 /* 000265 */ 	}
 /* 000272 */ 	if (__t__ (use_simple_path_graphics_resource_provider)) {
@@ -321,7 +321,7 @@
 /* 000310 */ 		if (__t__ (features === null)) {
 /* 000311 */ 			var features = __call__ (standard_features, null, __kwargtrans__ ((function () {
 /* 000311 */ 				var __accu0__ = [];
-/* 000312 */ 				var __iterable0__ = tuple (['external_citations_provider', 'external_ref_resolvers', 'footnote_counter_formatter', 'citation_counter_formatter']);
+/* 000312 */ 				var __iterable0__ = tuple (['external_citations_providers', 'external_ref_resolvers', 'footnote_counter_formatter', 'citation_counter_formatter']);
 /* 000312 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
 /* 000316 */ 					var k = __getitem__ (__iterable0__, __index0__);
 /* 000313 */ 					if (__t__ (__in__ (k, kwargs))) {
