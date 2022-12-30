@@ -262,7 +262,14 @@ export class CitationCompiler
                  url: 'only-if-no-other-link' };
 
         // The output format.  By default, LLM.
-        this.output_format = this.options.output_format || 'llm';
+        this.output_format = this.options.output_format ?? 'llm';
+
+        // Whether or not we should compile LLM fragment instances so they don't
+        // have to be compiled later.  If llm_compile_fragments is set, then we
+        // need to also give an LLM environment instance to use to compile these
+        // fragments.
+        this.llm_compile_fragments = this.options.llm_compile_fragments ?? false;
+        this.llm_environment = this.options.llm_environment ?? null;
 
         // Options to format links
         this.format_link_text = Object.assign(
@@ -364,6 +371,7 @@ export class CitationCompiler
                     cite_key,
                     citation_text: obj._ready_formatted[this.output_format],
                 };
+                this.finalize_compiled_citation(c);
                 this.compiled_citations[citeid] = c;
                 continue;
             }
@@ -416,9 +424,24 @@ export class CitationCompiler
                 cite_key,
                 citation_text: result_formatted.trim()
             };
+            this.finalize_compiled_citation(c);
             this.compiled_citations[citeid] = c;
         }
 
+        finalize_compiled_citation(c)
+        {
+            if (this.output_format === 'llm' && this.llm_compile_fragments
+                && this.llm_environment != null) {
+                c.citation_text = this.llm_environment.make_fragment(
+                    c.citation_text,
+                    $$kw({
+                        is_block_level: false,
+                        standalone_mode: true,
+                        what: `Citation text for ${c.cite_prefix}:${c.cite_key}`,
+                    }),
+                )
+            }
+        }
     }
 
 };

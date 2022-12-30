@@ -80,6 +80,8 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
         this.citation_compiler = new CitationCompiler({
             citation_manager: this.citation_manager,
             csl_style: csl_style,
+            llm_compile_fragments: true,
+            llm_environment: this.zoo_llm_environment,
         });
 
         //
