@@ -113,7 +113,7 @@ export class RefResolver
                 + `${JSON.stringify(this.ref_instance_database[ref_type][ref_label])}`
             );
         }
-        debug(`adding ref: ${ref_type}:${ref_label}`); // -> `, ref_instance);
+        //debug(`adding ref: ${ref_type}:${ref_label}`); // -> `, ref_instance);
 
         this.ref_instance_database[ref_type][ref_label] = ref_instance;
 

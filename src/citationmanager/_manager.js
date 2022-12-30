@@ -206,7 +206,7 @@ export class CitationDatabaseManager
     {
         const cite_id = `${cite_prefix}:${cite_key}`;
 
-        debug(`Storing citation for ‘${cite_prefix}:${cite_key}’`);
+        //debug(`Storing citation for ‘${cite_prefix}:${cite_key}’`);
 
         if (entry_csl_json.chained) {
             const new_cite_prefix = entry_csl_json.chained.cite_prefix;

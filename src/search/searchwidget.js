@@ -69,7 +69,7 @@ export class SearchWidget
 
         this.context_length = options.context_length ?? default_context_length;
 
-        this.MathJax = options.MathJax ?? null;
+        this.getMathJax = options.getMathJax ?? null;
 
         this._install();
     }
@@ -171,8 +171,8 @@ export class SearchWidget
 
     do_search(search_str)
     {
-        if (this.MathJax != null) {
-            this.MathJax.typesetClear(this.search_results_container);
+        if (this.getMathJax != null) {
+            this.getMathJax()?.typesetClear(this.search_results_container);
         }
         this.search_results_container.innerHTML = '';
 
@@ -267,19 +267,22 @@ export class SearchWidget
             );
 
             if ( (results.length < max_num_results_for_mathjax)
-                 && this.MathJax != null) {
+                 && this.getMathJax != null) {
 
-                // reset equation numbering & disable numbers (to avoid
-                // potentially multiply-defined labels)
-                this.MathJax.texReset();
+                const MathJax = this.getMathJax();
+                if (MathJax != null) {
+                    // reset equation numbering & disable numbers (to avoid
+                    // potentially multiply-defined labels)
+                    MathJax.texReset();
 
-                // Setting tags to null here doesn't work, probably need to do
-                // this before loading MathJax
-                //
-                //this.MathJax.config.tex.tags = null;
+                    // Setting tags to null here doesn't work, probably need to do
+                    // this before loading MathJax
+                    //
+                    //this.getMathJax().config.tex.tags = null;
 
-                // typeset the math in our results
-                this.MathJax.typesetPromise();
+                    // typeset the math in our results
+                    MathJax.typesetPromise();
+                }
             }
         }
     }
