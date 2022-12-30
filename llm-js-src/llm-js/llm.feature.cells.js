@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2022-12-20 20:23:36
+/* 000001 */ // Transcrypt'ed from Python, 2022-12-30 19:10:11
 /* 000010 */ var logging = {};
 /* 000010 */ var re = {};
 /* 000010 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
@@ -13,7 +13,7 @@
 /* 000012 */ __nest__ (logging, '', __module_logging__);
 /* 000010 */ import * as __module_re__ from './re.js';
 /* 000010 */ __nest__ (re, '', __module_re__);
-/* 000010 */ export {Feature, latexnodes_nodes, LLMMacroSpecError, LatexArgumentSpec, LatexWalkerParseError, ParsingStateDelta, macrospec, latexnodes_parsers, LLMEnvironmentSpecBase, ParsedArgumentsInfo, LLMArgumentSpec};
+/* 000010 */ export {LLMArgumentSpec, ParsingStateDelta, LLMEnvironmentSpecBase, latexnodes_nodes, ParsedArgumentsInfo, LatexArgumentSpec, Feature, LatexWalkerParseError, macrospec, latexnodes_parsers, LLMMacroSpecError};
 /* 000001 */ var __name__ = 'llm.feature.cells';
 /* 000013 */ export var logger = (function () {
 /* 000013 */ 	var __accu0__ = logging;
@@ -840,808 +840,796 @@
 /* 000400 */ 			}
 /* 000400 */ 			return __accu0__;
 /* 000400 */ 		}) ();
-/* 000404 */ 		(function () {
-/* 000404 */ 			var __accu0__ = logger;
-/* 000404 */ 			return __call__ (__accu0__.debug, __accu0__, 'data_content_nodes = %r', data_content_nodes);
-/* 000404 */ 		}) ();
-/* 000406 */ 		(function () {
-/* 000406 */ 			var __accu0__ = self;
-/* 000406 */ 			return __call__ (__accu0__.add_celldata, __accu0__, placement_mapping_spec, styles_mapping, data_content_nodes);
-/* 000406 */ 		}) ();
-/* 000406 */ 	});},
-/* 000409 */ 	get add_celldata () {return __get__ (this, function (self, placement_mapping_spec, styles_mapping, data_content_nodes) {
-/* 000409 */ 		if (arguments.length) {
-/* 000409 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000409 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000409 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000409 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000409 */ 					switch (__attrib0__) {
-/* 000409 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000409 */ 						case 'placement_mapping_spec': var placement_mapping_spec = __allkwargs0__ [__attrib0__]; break;
-/* 000409 */ 						case 'styles_mapping': var styles_mapping = __allkwargs0__ [__attrib0__]; break;
-/* 000409 */ 						case 'data_content_nodes': var data_content_nodes = __allkwargs0__ [__attrib0__]; break;
-/* 000409 */ 					}
-/* 000409 */ 				}
-/* 000409 */ 			}
-/* 000409 */ 		}
-/* 000409 */ 		else {
-/* 000409 */ 		}
-/* 000411 */ 		var placement_mapping = (function () {
-/* 000411 */ 			var __accu0__ = self;
-/* 000411 */ 			return __call__ (__accu0__.parse_placement_mapping_spec, __accu0__, placement_mapping_spec);
-/* 000411 */ 		}) ();
-/* 000415 */ 		(function () {
-/* 000415 */ 			var __accu0__ = logger;
-/* 000415 */ 			return __call__ (__accu0__.debug, __accu0__, 'add_celldata, placement_mapping = %r', placement_mapping);
-/* 000415 */ 		}) ();
-/* 000417 */ 		var __left0__ = (function () {
-/* 000417 */ 			var __accu0__ = placement_mapping;
-/* 000417 */ 			return __call__ (__accu0__.start_row_col, __accu0__, __kwargtrans__ ({current_row: self.current_row, current_col: self.current_col}));
-/* 000417 */ 		}) ();
-/* 000417 */ 		self.current_row = __left0__ [0];
-/* 000417 */ 		self.current_col = __left0__ [1];
-/* 000421 */ 		var data_row_j = 0;
-/* 000422 */ 		var __iterable0__ = data_content_nodes;
-/* 000422 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000422 */ 			var data_row_data = __getitem__ (__iterable0__, __index0__);
-/* 000424 */ 			var data_col_j = 0;
-/* 000425 */ 			var __iterable1__ = data_row_data;
-/* 000425 */ 			for (var __index1__ = 0; __index1__ < len (__iterable1__); __index1__++) {
-/* 000425 */ 				var cell_content = __getitem__ (__iterable1__, __index1__);
-/* 000427 */ 				var row_range = (function () {
-/* 000427 */ 					var __accu0__ = placement_mapping;
-/* 000427 */ 					return __call__ (__accu0__.get_row_index_range, __accu0__, data_row_j, __kwargtrans__ ({current_row: self.current_row}));
-/* 000427 */ 				}) ();
-/* 000430 */ 				var col_range = (function () {
-/* 000430 */ 					var __accu0__ = placement_mapping;
-/* 000430 */ 					return __call__ (__accu0__.get_col_index_range, __accu0__, data_col_j, __kwargtrans__ ({current_col: self.current_col}));
-/* 000430 */ 				}) ();
-/* 000433 */ 				var placement = __call__ (CellPlacementModel, null, __kwargtrans__ ({row_range: row_range, col_range: col_range}));
-/* 000438 */ 				if (__t__ (__lt__ (data_col_j, __call__ (len, null, styles_mapping)))) {
-/* 000439 */ 					var styles = __getitem__ (styles_mapping, data_col_j);
-/* 000439 */ 				}
-/* 000440 */ 				else {
-/* 000441 */ 					var styles = __getitem__ (styles_mapping, __neg__ (1));
-/* 000441 */ 				}
-/* 000444 */ 				var cell_content_nl = (function () {
-/* 000444 */ 					var __accu0__ = cell_content.latex_walker;
-/* 000444 */ 					return __call__ (__accu0__.filter_whitespace_comments_nodes, __accu0__, cell_content);
-/* 000444 */ 				}) ();
-/* 000448 */ 				(function () {
-/* 000448 */ 					var __accu0__ = logger;
-/* 000449 */ 					return __call__ (__accu0__.debug, __accu0__, 'placing cell ‘{}’ at default placement {}; data_row_j={}, data_col_j={}'.format (__call__ (_splfysidews, null, (function () {
-/* 000449 */ 						var __accu1__ = cell_content_nl;
-/* 000449 */ 						return __call__ (__accu1__.latex_verbatim, __accu1__);
-/* 000449 */ 					}) ()), placement, data_row_j, data_col_j));
-/* 000449 */ 				}) ();
-/* 000454 */ 				if (__t__ (__t__ (__eq__ (__call__ (len, null, cell_content_nl), 1)) && __t__ ((function () {
-/* 000454 */ 					var __accu0__ = __getitem__ (cell_content_nl, 0);
-/* 000454 */ 					return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexMacroNode);
-/* 000454 */ 				}) ()) && __eq__ (__getitem__ (cell_content_nl, 0).macroname, 'cell'))) {
-/* 000457 */ 					var cell = (function () {
-/* 000457 */ 						var __accu0__ = self;
-/* 000457 */ 						return __call__ (__accu0__.add_cell_node, __accu0__, __getitem__ (cell_content_nl, 0), __kwargtrans__ ({default_placement: placement, default_styles: styles}));
-/* 000457 */ 					}) ();
-/* 000460 */ 					var data_col_j = __call__ (__iadd__, null, data_col_j, __sub__ (cell.placement.col_range.end, cell.placement.col_range.start));
-/* 000460 */ 				}
-/* 000463 */ 				else if (__t__ (__eq__ (__call__ (len, null, cell_content_nl), 0))) {
-/* 000466 */ 					self.current_col = col_range.end;
-/* 000467 */ 					var data_col_j = __call__ (__iadd__, null, data_col_j, 1);
-/* 000467 */ 				}
-/* 000468 */ 				else {
-/* 000470 */ 					(function () {
-/* 000470 */ 						var __accu0__ = self;
-/* 000470 */ 						return __call__ (__accu0__.add_cell, __accu0__, placement, styles, cell_content);
-/* 000470 */ 					}) ();
-/* 000471 */ 					var data_col_j = __call__ (__iadd__, null, data_col_j, 1);
-/* 000471 */ 				}
-/* 000471 */ 			}
-/* 000473 */ 			(function () {
-/* 000473 */ 				var __accu0__ = self;
-/* 000473 */ 				return __call__ (__accu0__.move_next_row, __accu0__);
-/* 000473 */ 			}) ();
-/* 000474 */ 			var data_row_j = __call__ (__iadd__, null, data_row_j, 1);
-/* 000475 */ 			var data_col_j = 0;
-/* 000475 */ 		}
-/* 000475 */ 	});},
-/* 000480 */ 	_rx_int: (function () {
-/* 000480 */ 		var __accu0__ = re;
-/* 000480 */ 		return __call__ (__accu0__.compile, __accu0__, '^\\d+$');
-/* 000480 */ 	}) (),
-/* 000482 */ 	get parse_cell_index_spec () {return __get__ (this, function (self, index_spec, is_row, is_col, py_default) {
-/* 000482 */ 		if (typeof is_row == 'undefined' || (is_row != null && is_row.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000482 */ 			var is_row = false;
-/* 000482 */ 		};
-/* 000482 */ 		if (typeof is_col == 'undefined' || (is_col != null && is_col.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000482 */ 			var is_col = false;
-/* 000482 */ 		};
-/* 000482 */ 		if (typeof py_default == 'undefined' || (py_default != null && py_default.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000482 */ 			var py_default = _NotSpecified;
-/* 000482 */ 		};
-/* 000482 */ 		if (arguments.length) {
-/* 000482 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000482 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000482 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000482 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000482 */ 					switch (__attrib0__) {
-/* 000482 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000482 */ 						case 'index_spec': var index_spec = __allkwargs0__ [__attrib0__]; break;
-/* 000482 */ 						case 'is_row': var is_row = __allkwargs0__ [__attrib0__]; break;
-/* 000482 */ 						case 'is_col': var is_col = __allkwargs0__ [__attrib0__]; break;
-/* 000482 */ 						case 'py_default': var py_default = __allkwargs0__ [__attrib0__]; break;
-/* 000482 */ 					}
-/* 000482 */ 				}
-/* 000482 */ 			}
-/* 000482 */ 		}
-/* 000482 */ 		else {
-/* 000482 */ 		}
-/* 000485 */ 		if (__t__ (__call__ (isinstance, null, index_spec, str))) {
-/* 000486 */ 			var index_spec_s = index_spec;
-/* 000486 */ 		}
-/* 000487 */ 		else {
-/* 000489 */ 			var index_spec_s = (function () {
-/* 000489 */ 				var __accu0__ = index_spec;
-/* 000489 */ 				return __call__ (__accu0__.get_content_as_chars, __accu0__);
-/* 000489 */ 			}) ();
-/* 000489 */ 		}
-/* 000491 */ 		var index_spec_s = (function () {
-/* 000491 */ 			var __accu0__ = index_spec_s;
-/* 000491 */ 			return __call__ (__accu0__.strip, __accu0__);
-/* 000491 */ 		}) ();
-/* 000494 */ 		if (__t__ (__t__ (!__t__ ((index_spec_s))) || __eq__ (index_spec_s, '.'))) {
-/* 000495 */ 			if (__t__ (py_default !== _NotSpecified)) {
-/* 000496 */ 				return py_default;
-/* 000496 */ 			}
-/* 000497 */ 			if (__t__ (is_row)) {
-/* 000498 */ 				return self.current_row;
-/* 000498 */ 			}
-/* 000499 */ 			if (__t__ (is_col)) {
-/* 000500 */ 				return self.current_col;
-/* 000500 */ 			}
-/* 000501 */ 			var __except0__ = __call__ (RuntimeError, null, 'Internal error: Neither is_row nor is_col is set!');
-/* 000501 */ 			__except0__.__cause__ = null;
-/* 000501 */ 			throw __except0__;
-/* 000501 */ 		}
-/* 000504 */ 		if (__t__ ((function () {
-/* 000504 */ 			var __accu0__ = self._rx_int;
-/* 000504 */ 			return __call__ (__accu0__.match, __accu0__, index_spec_s);
-/* 000504 */ 		}) ())) {
-/* 000505 */ 			return __sub__ (__call__ (int, null, index_spec_s), 1);
-/* 000505 */ 		}
-/* 000508 */ 		if (__t__ (__t__ (is_row) && __in__ (index_spec_s, self.row_names))) {
-/* 000509 */ 			return __getitem__ (self.row_names, index_spec_s);
-/* 000509 */ 		}
-/* 000510 */ 		if (__t__ (__t__ (is_col) && __in__ (index_spec_s, self.col_names))) {
-/* 000511 */ 			return __getitem__ (self.col_names, index_spec_s);
+/* 000404 */ 		// pass;
+/* 000408 */ 		(function () {
+/* 000408 */ 			var __accu0__ = self;
+/* 000408 */ 			return __call__ (__accu0__.add_celldata, __accu0__, placement_mapping_spec, styles_mapping, data_content_nodes);
+/* 000408 */ 		}) ();
+/* 000408 */ 	});},
+/* 000411 */ 	get add_celldata () {return __get__ (this, function (self, placement_mapping_spec, styles_mapping, data_content_nodes) {
+/* 000411 */ 		if (arguments.length) {
+/* 000411 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000411 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000411 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000411 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000411 */ 					switch (__attrib0__) {
+/* 000411 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000411 */ 						case 'placement_mapping_spec': var placement_mapping_spec = __allkwargs0__ [__attrib0__]; break;
+/* 000411 */ 						case 'styles_mapping': var styles_mapping = __allkwargs0__ [__attrib0__]; break;
+/* 000411 */ 						case 'data_content_nodes': var data_content_nodes = __allkwargs0__ [__attrib0__]; break;
+/* 000411 */ 					}
+/* 000411 */ 				}
+/* 000411 */ 			}
+/* 000411 */ 		}
+/* 000411 */ 		else {
+/* 000411 */ 		}
+/* 000413 */ 		var placement_mapping = (function () {
+/* 000413 */ 			var __accu0__ = self;
+/* 000413 */ 			return __call__ (__accu0__.parse_placement_mapping_spec, __accu0__, placement_mapping_spec);
+/* 000413 */ 		}) ();
+/* 000417 */ 		// pass;
+/* 000421 */ 		var __left0__ = (function () {
+/* 000421 */ 			var __accu0__ = placement_mapping;
+/* 000421 */ 			return __call__ (__accu0__.start_row_col, __accu0__, __kwargtrans__ ({current_row: self.current_row, current_col: self.current_col}));
+/* 000421 */ 		}) ();
+/* 000421 */ 		self.current_row = __left0__ [0];
+/* 000421 */ 		self.current_col = __left0__ [1];
+/* 000425 */ 		var data_row_j = 0;
+/* 000426 */ 		var __iterable0__ = data_content_nodes;
+/* 000426 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000426 */ 			var data_row_data = __getitem__ (__iterable0__, __index0__);
+/* 000428 */ 			var data_col_j = 0;
+/* 000429 */ 			var __iterable1__ = data_row_data;
+/* 000429 */ 			for (var __index1__ = 0; __index1__ < len (__iterable1__); __index1__++) {
+/* 000429 */ 				var cell_content = __getitem__ (__iterable1__, __index1__);
+/* 000431 */ 				var row_range = (function () {
+/* 000431 */ 					var __accu0__ = placement_mapping;
+/* 000431 */ 					return __call__ (__accu0__.get_row_index_range, __accu0__, data_row_j, __kwargtrans__ ({current_row: self.current_row}));
+/* 000431 */ 				}) ();
+/* 000434 */ 				var col_range = (function () {
+/* 000434 */ 					var __accu0__ = placement_mapping;
+/* 000434 */ 					return __call__ (__accu0__.get_col_index_range, __accu0__, data_col_j, __kwargtrans__ ({current_col: self.current_col}));
+/* 000434 */ 				}) ();
+/* 000437 */ 				var placement = __call__ (CellPlacementModel, null, __kwargtrans__ ({row_range: row_range, col_range: col_range}));
+/* 000442 */ 				if (__t__ (__lt__ (data_col_j, __call__ (len, null, styles_mapping)))) {
+/* 000443 */ 					var styles = __getitem__ (styles_mapping, data_col_j);
+/* 000443 */ 				}
+/* 000444 */ 				else {
+/* 000445 */ 					var styles = __getitem__ (styles_mapping, __neg__ (1));
+/* 000445 */ 				}
+/* 000448 */ 				var cell_content_nl = (function () {
+/* 000448 */ 					var __accu0__ = cell_content.latex_walker;
+/* 000448 */ 					return __call__ (__accu0__.filter_whitespace_comments_nodes, __accu0__, cell_content);
+/* 000448 */ 				}) ();
+/* 000452 */ 				// pass;
+/* 000460 */ 				if (__t__ (__t__ (__eq__ (__call__ (len, null, cell_content_nl), 1)) && __t__ ((function () {
+/* 000460 */ 					var __accu0__ = __getitem__ (cell_content_nl, 0);
+/* 000460 */ 					return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexMacroNode);
+/* 000460 */ 				}) ()) && __eq__ (__getitem__ (cell_content_nl, 0).macroname, 'cell'))) {
+/* 000463 */ 					var cell = (function () {
+/* 000463 */ 						var __accu0__ = self;
+/* 000463 */ 						return __call__ (__accu0__.add_cell_node, __accu0__, __getitem__ (cell_content_nl, 0), __kwargtrans__ ({default_placement: placement, default_styles: styles}));
+/* 000463 */ 					}) ();
+/* 000466 */ 					var data_col_j = __call__ (__iadd__, null, data_col_j, __sub__ (cell.placement.col_range.end, cell.placement.col_range.start));
+/* 000466 */ 				}
+/* 000469 */ 				else if (__t__ (__eq__ (__call__ (len, null, cell_content_nl), 0))) {
+/* 000472 */ 					self.current_col = col_range.end;
+/* 000473 */ 					var data_col_j = __call__ (__iadd__, null, data_col_j, 1);
+/* 000473 */ 				}
+/* 000474 */ 				else {
+/* 000476 */ 					(function () {
+/* 000476 */ 						var __accu0__ = self;
+/* 000476 */ 						return __call__ (__accu0__.add_cell, __accu0__, placement, styles, cell_content);
+/* 000476 */ 					}) ();
+/* 000477 */ 					var data_col_j = __call__ (__iadd__, null, data_col_j, 1);
+/* 000477 */ 				}
+/* 000477 */ 			}
+/* 000479 */ 			(function () {
+/* 000479 */ 				var __accu0__ = self;
+/* 000479 */ 				return __call__ (__accu0__.move_next_row, __accu0__);
+/* 000479 */ 			}) ();
+/* 000480 */ 			var data_row_j = __call__ (__iadd__, null, data_row_j, 1);
+/* 000481 */ 			var data_col_j = 0;
+/* 000481 */ 		}
+/* 000481 */ 	});},
+/* 000486 */ 	_rx_int: (function () {
+/* 000486 */ 		var __accu0__ = re;
+/* 000486 */ 		return __call__ (__accu0__.compile, __accu0__, '^\\d+$');
+/* 000486 */ 	}) (),
+/* 000488 */ 	get parse_cell_index_spec () {return __get__ (this, function (self, index_spec, is_row, is_col, py_default) {
+/* 000488 */ 		if (typeof is_row == 'undefined' || (is_row != null && is_row.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000488 */ 			var is_row = false;
+/* 000488 */ 		};
+/* 000488 */ 		if (typeof is_col == 'undefined' || (is_col != null && is_col.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000488 */ 			var is_col = false;
+/* 000488 */ 		};
+/* 000488 */ 		if (typeof py_default == 'undefined' || (py_default != null && py_default.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000488 */ 			var py_default = _NotSpecified;
+/* 000488 */ 		};
+/* 000488 */ 		if (arguments.length) {
+/* 000488 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000488 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000488 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000488 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000488 */ 					switch (__attrib0__) {
+/* 000488 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000488 */ 						case 'index_spec': var index_spec = __allkwargs0__ [__attrib0__]; break;
+/* 000488 */ 						case 'is_row': var is_row = __allkwargs0__ [__attrib0__]; break;
+/* 000488 */ 						case 'is_col': var is_col = __allkwargs0__ [__attrib0__]; break;
+/* 000488 */ 						case 'py_default': var py_default = __allkwargs0__ [__attrib0__]; break;
+/* 000488 */ 					}
+/* 000488 */ 				}
+/* 000488 */ 			}
+/* 000488 */ 		}
+/* 000488 */ 		else {
+/* 000488 */ 		}
+/* 000491 */ 		if (__t__ (__call__ (isinstance, null, index_spec, str))) {
+/* 000492 */ 			var index_spec_s = index_spec;
+/* 000492 */ 		}
+/* 000493 */ 		else {
+/* 000495 */ 			var index_spec_s = (function () {
+/* 000495 */ 				var __accu0__ = index_spec;
+/* 000495 */ 				return __call__ (__accu0__.get_content_as_chars, __accu0__);
+/* 000495 */ 			}) ();
+/* 000495 */ 		}
+/* 000497 */ 		var index_spec_s = (function () {
+/* 000497 */ 			var __accu0__ = index_spec_s;
+/* 000497 */ 			return __call__ (__accu0__.strip, __accu0__);
+/* 000497 */ 		}) ();
+/* 000500 */ 		if (__t__ (__t__ (!__t__ ((index_spec_s))) || __eq__ (index_spec_s, '.'))) {
+/* 000501 */ 			if (__t__ (py_default !== _NotSpecified)) {
+/* 000502 */ 				return py_default;
+/* 000502 */ 			}
+/* 000503 */ 			if (__t__ (is_row)) {
+/* 000504 */ 				return self.current_row;
+/* 000504 */ 			}
+/* 000505 */ 			if (__t__ (is_col)) {
+/* 000506 */ 				return self.current_col;
+/* 000506 */ 			}
+/* 000507 */ 			var __except0__ = __call__ (RuntimeError, null, 'Internal error: Neither is_row nor is_col is set!');
+/* 000507 */ 			__except0__.__cause__ = null;
+/* 000507 */ 			throw __except0__;
+/* 000507 */ 		}
+/* 000510 */ 		if (__t__ ((function () {
+/* 000510 */ 			var __accu0__ = self._rx_int;
+/* 000510 */ 			return __call__ (__accu0__.match, __accu0__, index_spec_s);
+/* 000510 */ 		}) ())) {
+/* 000511 */ 			return __sub__ (__call__ (int, null, index_spec_s), 1);
 /* 000511 */ 		}
-/* 000513 */ 		var __except0__ = __call__ (ValueError, null, 'Invalid cell index: ‘{}’, expected number or valid alias name'.format (index_spec_s));
-/* 000513 */ 		__except0__.__cause__ = null;
-/* 000513 */ 		throw __except0__;
-/* 000513 */ 	});},
-/* 000517 */ 	get parse_cell_index_range_spec () {return __get__ (this, function (self, range_spec_s, is_row, is_col, py_default, default_start, default_end) {
-/* 000517 */ 		if (typeof is_row == 'undefined' || (is_row != null && is_row.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000517 */ 			var is_row = false;
-/* 000517 */ 		};
-/* 000517 */ 		if (typeof is_col == 'undefined' || (is_col != null && is_col.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000517 */ 			var is_col = false;
-/* 000517 */ 		};
-/* 000517 */ 		if (typeof py_default == 'undefined' || (py_default != null && py_default.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000517 */ 			var py_default = _NotSpecified;
-/* 000517 */ 		};
-/* 000517 */ 		if (typeof default_start == 'undefined' || (default_start != null && default_start.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000517 */ 			var default_start = null;
-/* 000517 */ 		};
-/* 000517 */ 		if (typeof default_end == 'undefined' || (default_end != null && default_end.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000517 */ 			var default_end = null;
-/* 000517 */ 		};
-/* 000517 */ 		if (arguments.length) {
-/* 000517 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000517 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000517 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000517 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000517 */ 					switch (__attrib0__) {
-/* 000517 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000517 */ 						case 'range_spec_s': var range_spec_s = __allkwargs0__ [__attrib0__]; break;
-/* 000517 */ 						case 'is_row': var is_row = __allkwargs0__ [__attrib0__]; break;
-/* 000517 */ 						case 'is_col': var is_col = __allkwargs0__ [__attrib0__]; break;
-/* 000517 */ 						case 'py_default': var py_default = __allkwargs0__ [__attrib0__]; break;
-/* 000517 */ 						case 'default_start': var default_start = __allkwargs0__ [__attrib0__]; break;
-/* 000517 */ 						case 'default_end': var default_end = __allkwargs0__ [__attrib0__]; break;
-/* 000517 */ 					}
-/* 000517 */ 				}
-/* 000517 */ 			}
+/* 000514 */ 		if (__t__ (__t__ (is_row) && __in__ (index_spec_s, self.row_names))) {
+/* 000515 */ 			return __getitem__ (self.row_names, index_spec_s);
+/* 000515 */ 		}
+/* 000516 */ 		if (__t__ (__t__ (is_col) && __in__ (index_spec_s, self.col_names))) {
+/* 000517 */ 			return __getitem__ (self.col_names, index_spec_s);
 /* 000517 */ 		}
-/* 000517 */ 		else {
-/* 000517 */ 		}
-/* 000521 */ 		if (__t__ (__in__ (',', range_spec_s))) {
-/* 000523 */ 			var parts = (function () {
-/* 000523 */ 				var __accu0__ = range_spec_s;
-/* 000523 */ 				return __call__ (__accu0__.py_split, __accu0__, ',');
-/* 000523 */ 			}) ();
-/* 000524 */ 			var include_array = [];
-/* 000525 */ 			var overall_start = null;
-/* 000526 */ 			var overall_end = null;
-/* 000527 */ 			var __iterable0__ = parts;
-/* 000527 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000527 */ 				var part = __getitem__ (__iterable0__, __index0__);
-/* 000528 */ 				var __left0__ = (function () {
-/* 000528 */ 					var __accu0__ = self;
-/* 000528 */ 					return __call__ (__accu0__.parse_cell_index_range_spec, __accu0__, part, __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: py_default}));
-/* 000528 */ 				}) ();
-/* 000528 */ 				var start = __left0__ [0];
-/* 000528 */ 				var end = __left0__ [1];
-/* 000532 */ 				for (var idx = start; idx < end; idx++) {
-/* 000533 */ 					if (__t__ (__ge__ (idx, __call__ (len, null, include_array)))) {
-/* 000534 */ 						var include_array = __call__ (__iadd__, null, include_array, (function () {
-/* 000534 */ 							var __accu0__ = [];
-/* 000534 */ 							for (var _ = 0; _ < __add__ (__sub__ (end, __call__ (len, null, include_array)), 1); _++) {
-/* 000534 */ 								(function () {
-/* 000534 */ 									var __accu1__ = __accu0__;
-/* 000534 */ 									return __call__ (__accu1__.append, __accu1__, false);
-/* 000534 */ 								}) ();
-/* 000534 */ 							}
-/* 000534 */ 							return __accu0__;
-/* 000534 */ 						}) ());
-/* 000534 */ 					}
-/* 000535 */ 					__setitem__ (include_array, idx, true);
-/* 000535 */ 				}
-/* 000536 */ 				if (__t__ (__t__ (overall_start === null) || __gt__ (overall_start, start))) {
-/* 000537 */ 					var overall_start = start;
-/* 000537 */ 				}
-/* 000538 */ 				if (__t__ (__t__ (overall_end === null) || __lt__ (overall_end, end))) {
-/* 000539 */ 					var overall_end = end;
-/* 000539 */ 				}
-/* 000539 */ 			}
-/* 000541 */ 			for (var idx = overall_start; idx < overall_end; idx++) {
-/* 000542 */ 				if (__t__ (!__t__ ((__getitem__ (include_array, idx))))) {
-/* 000543 */ 					var __except0__ = __call__ (ValueError, null, 'Specified range ‘{}’ is not contiguous'.format (range_spec_s));
-/* 000543 */ 					__except0__.__cause__ = null;
-/* 000543 */ 					throw __except0__;
+/* 000519 */ 		var __except0__ = __call__ (ValueError, null, 'Invalid cell index: ‘{}’, expected number or valid alias name'.format (index_spec_s));
+/* 000519 */ 		__except0__.__cause__ = null;
+/* 000519 */ 		throw __except0__;
+/* 000519 */ 	});},
+/* 000523 */ 	get parse_cell_index_range_spec () {return __get__ (this, function (self, range_spec_s, is_row, is_col, py_default, default_start, default_end) {
+/* 000523 */ 		if (typeof is_row == 'undefined' || (is_row != null && is_row.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000523 */ 			var is_row = false;
+/* 000523 */ 		};
+/* 000523 */ 		if (typeof is_col == 'undefined' || (is_col != null && is_col.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000523 */ 			var is_col = false;
+/* 000523 */ 		};
+/* 000523 */ 		if (typeof py_default == 'undefined' || (py_default != null && py_default.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000523 */ 			var py_default = _NotSpecified;
+/* 000523 */ 		};
+/* 000523 */ 		if (typeof default_start == 'undefined' || (default_start != null && default_start.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000523 */ 			var default_start = null;
+/* 000523 */ 		};
+/* 000523 */ 		if (typeof default_end == 'undefined' || (default_end != null && default_end.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000523 */ 			var default_end = null;
+/* 000523 */ 		};
+/* 000523 */ 		if (arguments.length) {
+/* 000523 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000523 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000523 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000523 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000523 */ 					switch (__attrib0__) {
+/* 000523 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000523 */ 						case 'range_spec_s': var range_spec_s = __allkwargs0__ [__attrib0__]; break;
+/* 000523 */ 						case 'is_row': var is_row = __allkwargs0__ [__attrib0__]; break;
+/* 000523 */ 						case 'is_col': var is_col = __allkwargs0__ [__attrib0__]; break;
+/* 000523 */ 						case 'py_default': var py_default = __allkwargs0__ [__attrib0__]; break;
+/* 000523 */ 						case 'default_start': var default_start = __allkwargs0__ [__attrib0__]; break;
+/* 000523 */ 						case 'default_end': var default_end = __allkwargs0__ [__attrib0__]; break;
+/* 000523 */ 					}
+/* 000523 */ 				}
+/* 000523 */ 			}
+/* 000523 */ 		}
+/* 000523 */ 		else {
+/* 000523 */ 		}
+/* 000527 */ 		if (__t__ (__in__ (',', range_spec_s))) {
+/* 000529 */ 			var parts = (function () {
+/* 000529 */ 				var __accu0__ = range_spec_s;
+/* 000529 */ 				return __call__ (__accu0__.py_split, __accu0__, ',');
+/* 000529 */ 			}) ();
+/* 000530 */ 			var include_array = [];
+/* 000531 */ 			var overall_start = null;
+/* 000532 */ 			var overall_end = null;
+/* 000533 */ 			var __iterable0__ = parts;
+/* 000533 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000533 */ 				var part = __getitem__ (__iterable0__, __index0__);
+/* 000534 */ 				var __left0__ = (function () {
+/* 000534 */ 					var __accu0__ = self;
+/* 000534 */ 					return __call__ (__accu0__.parse_cell_index_range_spec, __accu0__, part, __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: py_default}));
+/* 000534 */ 				}) ();
+/* 000534 */ 				var start = __left0__ [0];
+/* 000534 */ 				var end = __left0__ [1];
+/* 000538 */ 				for (var idx = start; idx < end; idx++) {
+/* 000539 */ 					if (__t__ (__ge__ (idx, __call__ (len, null, include_array)))) {
+/* 000540 */ 						var include_array = __call__ (__iadd__, null, include_array, (function () {
+/* 000540 */ 							var __accu0__ = [];
+/* 000540 */ 							for (var _ = 0; _ < __add__ (__sub__ (end, __call__ (len, null, include_array)), 1); _++) {
+/* 000540 */ 								(function () {
+/* 000540 */ 									var __accu1__ = __accu0__;
+/* 000540 */ 									return __call__ (__accu1__.append, __accu1__, false);
+/* 000540 */ 								}) ();
+/* 000540 */ 							}
+/* 000540 */ 							return __accu0__;
+/* 000540 */ 						}) ());
+/* 000540 */ 					}
+/* 000541 */ 					__setitem__ (include_array, idx, true);
+/* 000541 */ 				}
+/* 000542 */ 				if (__t__ (__t__ (overall_start === null) || __gt__ (overall_start, start))) {
+/* 000543 */ 					var overall_start = start;
 /* 000543 */ 				}
-/* 000543 */ 			}
-/* 000546 */ 			return tuple ([overall_start, overall_end]);
-/* 000546 */ 		}
-/* 000548 */ 		if (__t__ (__in__ ('-', range_spec_s))) {
-/* 000550 */ 			var __left0__ = (function () {
-/* 000550 */ 				var __accu0__ = range_spec_s;
-/* 000550 */ 				return __call__ (__accu0__.py_split, __accu0__, '-', 1);
-/* 000550 */ 			}) ();
-/* 000550 */ 			var start_spec = __left0__ [0];
-/* 000550 */ 			var end_spec = __left0__ [1];
-/* 000551 */ 			var start = (function () {
-/* 000551 */ 				var __accu0__ = self;
-/* 000551 */ 				return __call__ (__accu0__.parse_cell_index_spec, __accu0__, start_spec, __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: default_start}));
-/* 000551 */ 			}) ();
-/* 000554 */ 			var end_incl = (function () {
-/* 000554 */ 				var __accu0__ = self;
-/* 000554 */ 				return __call__ (__accu0__.parse_cell_index_spec, __accu0__, end_spec, __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: null}));
-/* 000554 */ 			}) ();
-/* 000557 */ 			if (__t__ (end_incl === null)) {
-/* 000558 */ 				var end = default_end;
-/* 000558 */ 			}
-/* 000559 */ 			else {
-/* 000560 */ 				var end = __add__ (end_incl, 1);
-/* 000560 */ 			}
-/* 000561 */ 			return tuple ([start, end]);
-/* 000561 */ 		}
-/* 000563 */ 		if (__t__ (__in__ ('+', range_spec_s))) {
-/* 000565 */ 			var __left0__ = (function () {
-/* 000565 */ 				var __accu0__ = range_spec_s;
-/* 000565 */ 				return __call__ (__accu0__.py_split, __accu0__, '+', 1);
-/* 000565 */ 			}) ();
-/* 000565 */ 			var start_spec = __left0__ [0];
-/* 000565 */ 			var len_spec = __left0__ [1];
-/* 000566 */ 			var start = (function () {
-/* 000566 */ 				var __accu0__ = self;
-/* 000566 */ 				return __call__ (__accu0__.parse_cell_index_spec, __accu0__, start_spec, __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: py_default}));
-/* 000566 */ 			}) ();
-/* 000569 */ 			if (__t__ (!__t__ (((function () {
-/* 000569 */ 				var __accu0__ = self._rx_int;
-/* 000569 */ 				return __call__ (__accu0__.match, __accu0__, len_spec);
-/* 000569 */ 			}) ())))) {
-/* 000570 */ 				var __except0__ = __call__ (ValueError, null, 'Invalid number in ‘START+N’ cell index range specification: ‘{}’'.format (len_spec));
-/* 000570 */ 				__except0__.__cause__ = null;
-/* 000570 */ 				throw __except0__;
-/* 000570 */ 			}
-/* 000573 */ 			var range_len = __call__ (int, null, len_spec);
-/* 000576 */ 			var end = __add__ (start, range_len);
-/* 000577 */ 			return tuple ([start, end]);
-/* 000577 */ 		}
-/* 000579 */ 		var idx = (function () {
-/* 000579 */ 			var __accu0__ = self;
-/* 000579 */ 			return __call__ (__accu0__.parse_cell_index_spec, __accu0__, range_spec_s, __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: py_default}));
-/* 000579 */ 		}) ();
-/* 000582 */ 		return tuple ([idx, __add__ (idx, 1)]);
-/* 000582 */ 	});},
-/* 000585 */ 	get parse_placement_index_spec () {return __get__ (this, function (self, placement_index_spec, is_row, is_col, py_default, default_start, default_end) {
-/* 000585 */ 		if (typeof is_row == 'undefined' || (is_row != null && is_row.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000585 */ 			var is_row = false;
-/* 000585 */ 		};
-/* 000585 */ 		if (typeof is_col == 'undefined' || (is_col != null && is_col.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000585 */ 			var is_col = false;
-/* 000585 */ 		};
-/* 000585 */ 		if (typeof py_default == 'undefined' || (py_default != null && py_default.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000585 */ 			var py_default = _NotSpecified;
-/* 000585 */ 		};
-/* 000585 */ 		if (typeof default_start == 'undefined' || (default_start != null && default_start.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000585 */ 			var default_start = 0;
-/* 000585 */ 		};
-/* 000585 */ 		if (typeof default_end == 'undefined' || (default_end != null && default_end.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000585 */ 			var default_end = _NotSpecified;
-/* 000585 */ 		};
-/* 000585 */ 		if (arguments.length) {
-/* 000585 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000585 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000585 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000585 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000585 */ 					switch (__attrib0__) {
-/* 000585 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000585 */ 						case 'placement_index_spec': var placement_index_spec = __allkwargs0__ [__attrib0__]; break;
-/* 000585 */ 						case 'is_row': var is_row = __allkwargs0__ [__attrib0__]; break;
-/* 000585 */ 						case 'is_col': var is_col = __allkwargs0__ [__attrib0__]; break;
-/* 000585 */ 						case 'py_default': var py_default = __allkwargs0__ [__attrib0__]; break;
-/* 000585 */ 						case 'default_start': var default_start = __allkwargs0__ [__attrib0__]; break;
-/* 000585 */ 						case 'default_end': var default_end = __allkwargs0__ [__attrib0__]; break;
-/* 000585 */ 					}
-/* 000585 */ 				}
-/* 000585 */ 			}
-/* 000585 */ 		}
-/* 000585 */ 		else {
-/* 000585 */ 		}
-/* 000590 */ 		if (__t__ (__eq__ (__call__ (len, null, placement_index_spec), 0))) {
-/* 000591 */ 			if (__t__ (is_row)) {
-/* 000592 */ 				return __call__ (CellIndexRangeModel, null, __kwargtrans__ ({start: self.current_row, end: __add__ (self.current_row, 1)}));
-/* 000592 */ 			}
-/* 000593 */ 			else if (__t__ (is_col)) {
-/* 000594 */ 				return __call__ (CellIndexRangeModel, null, __kwargtrans__ ({start: self.current_col, end: __add__ (self.current_col, 1)}));
-/* 000594 */ 			}
-/* 000595 */ 			else {
-/* 000596 */ 				var __except0__ = __call__ (RuntimeError, null, 'Internal error, neither is_row nor is_col was set here.');
-/* 000596 */ 				__except0__.__cause__ = null;
-/* 000596 */ 				throw __except0__;
-/* 000596 */ 			}
-/* 000596 */ 		}
-/* 000598 */ 		var nl = (function () {
-/* 000598 */ 			var __accu0__ = placement_index_spec.latex_walker;
-/* 000598 */ 			return __call__ (__accu0__.filter_whitespace_comments_nodes, __accu0__, placement_index_spec);
-/* 000598 */ 		}) ();
-/* 000602 */ 		if (__t__ (__ne__ (__call__ (len, null, nl), 1))) {
-/* 000603 */ 			if (__t__ (is_row)) {
-/* 000604 */ 				var PLACEHOLDER = 'ROW';
-/* 000604 */ 			}
-/* 000605 */ 			else if (__t__ (is_col)) {
-/* 000606 */ 				var PLACEHOLDER = 'COL';
-/* 000606 */ 			}
-/* 000607 */ 			else {
-/* 000608 */ 				var PLACEHOLDER = null;
-/* 000608 */ 			}
-/* 000612 */ 			var __except0__ = __call__ (LatexWalkerParseError, null, 'Bad cell index or merge range specification, expected ‘{}’ or ‘\\merge{}{}-RANGE{}’, got {} ({} nodes)'.format (PLACEHOLDER, '{', PLACEHOLDER, '}', __call__ (repr, null, placement_index_spec), __call__ (len, null, nl)), __kwargtrans__ ({pos: nl.pos}));
-/* 000612 */ 			__except0__.__cause__ = null;
-/* 000612 */ 			throw __except0__;
-/* 000612 */ 		}
-/* 000616 */ 		var node = __getitem__ (nl, 0);
-/* 000618 */ 		if (__t__ (__t__ ((function () {
-/* 000618 */ 			var __accu0__ = node;
-/* 000618 */ 			return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexMacroNode);
-/* 000618 */ 		}) ()) && __eq__ (node.macroname, 'merge'))) {
-/* 000622 */ 			var merge_node_args = (function () {
-/* 000622 */ 				var __accu0__ = __call__ (ParsedArgumentsInfo, null, __kwargtrans__ ({node: node}));
-/* 000622 */ 				return __call__ (__accu0__.get_all_arguments_info, __accu0__, tuple (['mergespec']));
-/* 000622 */ 			}) ();
-/* 000626 */ 			var range_spec_s = (function () {
-/* 000626 */ 				var __accu0__ = __getitem__ (merge_node_args, 'mergespec');
-/* 000626 */ 				return __call__ (__accu0__.get_content_as_chars, __accu0__);
-/* 000626 */ 			}) ();
-/* 000628 */ 			var default_end_computed = default_end;
-/* 000629 */ 			if (__t__ (default_end_computed === _NotSpecified)) {
-/* 000630 */ 				if (__t__ (is_row)) {
-/* 000631 */ 					var default_end_computed = __getitem__ (self.cells_size, 0);
-/* 000631 */ 				}
-/* 000632 */ 				if (__t__ (is_col)) {
-/* 000633 */ 					var default_end_computed = __getitem__ (self.cells_size, 1);
-/* 000633 */ 				}
-/* 000633 */ 			}
-/* 000635 */ 			var __left0__ = (function () {
-/* 000635 */ 				var __accu0__ = self;
-/* 000635 */ 				return __call__ (__accu0__.parse_cell_index_range_spec, __accu0__, range_spec_s, __kwargtrans__ ({is_row: is_row, is_col: is_col, default_start: default_start, default_end: default_end_computed}));
-/* 000635 */ 			}) ();
-/* 000635 */ 			var start = __left0__ [0];
-/* 000635 */ 			var end = __left0__ [1];
-/* 000640 */ 			return __call__ (CellIndexRangeModel, null, __kwargtrans__ ({start: start, end: end}));
-/* 000640 */ 		}
-/* 000643 */ 		var idx = (function () {
-/* 000643 */ 			var __accu0__ = self;
-/* 000644 */ 			return __call__ (__accu0__.parse_cell_index_spec, __accu0__, (function () {
-/* 000644 */ 				var __accu1__ = nl;
-/* 000644 */ 				return __call__ (__accu1__.get_content_as_chars, __accu1__);
-/* 000644 */ 			}) (), __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: py_default}));
-/* 000644 */ 		}) ();
-/* 000647 */ 		return __call__ (CellIndexRangeModel, null, __kwargtrans__ ({start: idx, end: __add__ (idx, 1)}));
-/* 000647 */ 	});},
-/* 000650 */ 	get parse_placement_spec () {return __get__ (this, function (self, placement_spec) {
-/* 000650 */ 		if (arguments.length) {
-/* 000650 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000650 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000650 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000650 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000650 */ 					switch (__attrib0__) {
-/* 000650 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000650 */ 						case 'placement_spec': var placement_spec = __allkwargs0__ [__attrib0__]; break;
-/* 000650 */ 					}
-/* 000650 */ 				}
-/* 000650 */ 			}
-/* 000650 */ 		}
-/* 000650 */ 		else {
-/* 000650 */ 		}
-/* 000652 */ 		if (__t__ (__call__ (isinstance, null, placement_spec, CellPlacementModel))) {
-/* 000653 */ 			return placement_spec;
-/* 000653 */ 		}
-/* 000655 */ 		var __left0__ = tuple ([[], []]);
-/* 000655 */ 		var row_spec_nl = __left0__ [0];
-/* 000655 */ 		var col_spec_nl = __left0__ [1];
-/* 000657 */ 		if (__t__ (placement_spec !== null)) {
-/* 000659 */ 			var placement_spec_split = (function () {
-/* 000659 */ 				var __accu0__ = placement_spec;
-/* 000659 */ 				return __call__ (__accu0__.split_at_chars, __accu0__, ';', __kwargtrans__ ({keep_empty: true}));
-/* 000659 */ 			}) ();
-/* 000661 */ 			if (__t__ (__eq__ (__call__ (len, null, placement_spec_split), 2))) {
-/* 000663 */ 				var __left0__ = placement_spec_split;
-/* 000663 */ 				var row_spec_nl = __left0__ [0];
-/* 000663 */ 				var col_spec_nl = __left0__ [1];
-/* 000663 */ 			}
-/* 000665 */ 			else if (__t__ (__eq__ (__call__ (len, null, placement_spec_split), 1))) {
-/* 000667 */ 				var __left0__ = placement_spec_split;
-/* 000667 */ 				var col_spec_nl = __left0__ [0];
-/* 000667 */ 			}
-/* 000669 */ 			else if (__t__ (__eq__ (__call__ (len, null, placement_spec_split), 0))) {
-/* 000672 */ 				// pass;
-/* 000672 */ 			}
-/* 000673 */ 			else {
-/* 000678 */ 				var __except0__ = __call__ (LatexWalkerParseError, null, 'Bad cell placement specification, expected ‘ROW;COL’ or ‘COL’, got ‘{}’'.format (__call__ (_splfysidews, null, (function () {
-/* 000678 */ 					var __accu0__ = placement_spec;
-/* 000678 */ 					return __call__ (__accu0__.latex_verbatim, __accu0__);
-/* 000678 */ 				}) ())), __kwargtrans__ ({pos: placement_spec.pos}));
-/* 000678 */ 				__except0__.__cause__ = null;
-/* 000678 */ 				throw __except0__;
+/* 000544 */ 				if (__t__ (__t__ (overall_end === null) || __lt__ (overall_end, end))) {
+/* 000545 */ 					var overall_end = end;
+/* 000545 */ 				}
+/* 000545 */ 			}
+/* 000547 */ 			for (var idx = overall_start; idx < overall_end; idx++) {
+/* 000548 */ 				if (__t__ (!__t__ ((__getitem__ (include_array, idx))))) {
+/* 000549 */ 					var __except0__ = __call__ (ValueError, null, 'Specified range ‘{}’ is not contiguous'.format (range_spec_s));
+/* 000549 */ 					__except0__.__cause__ = null;
+/* 000549 */ 					throw __except0__;
+/* 000549 */ 				}
+/* 000549 */ 			}
+/* 000552 */ 			return tuple ([overall_start, overall_end]);
+/* 000552 */ 		}
+/* 000554 */ 		if (__t__ (__in__ ('-', range_spec_s))) {
+/* 000556 */ 			var __left0__ = (function () {
+/* 000556 */ 				var __accu0__ = range_spec_s;
+/* 000556 */ 				return __call__ (__accu0__.py_split, __accu0__, '-', 1);
+/* 000556 */ 			}) ();
+/* 000556 */ 			var start_spec = __left0__ [0];
+/* 000556 */ 			var end_spec = __left0__ [1];
+/* 000557 */ 			var start = (function () {
+/* 000557 */ 				var __accu0__ = self;
+/* 000557 */ 				return __call__ (__accu0__.parse_cell_index_spec, __accu0__, start_spec, __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: default_start}));
+/* 000557 */ 			}) ();
+/* 000560 */ 			var end_incl = (function () {
+/* 000560 */ 				var __accu0__ = self;
+/* 000560 */ 				return __call__ (__accu0__.parse_cell_index_spec, __accu0__, end_spec, __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: null}));
+/* 000560 */ 			}) ();
+/* 000563 */ 			if (__t__ (end_incl === null)) {
+/* 000564 */ 				var end = default_end;
+/* 000564 */ 			}
+/* 000565 */ 			else {
+/* 000566 */ 				var end = __add__ (end_incl, 1);
+/* 000566 */ 			}
+/* 000567 */ 			return tuple ([start, end]);
+/* 000567 */ 		}
+/* 000569 */ 		if (__t__ (__in__ ('+', range_spec_s))) {
+/* 000571 */ 			var __left0__ = (function () {
+/* 000571 */ 				var __accu0__ = range_spec_s;
+/* 000571 */ 				return __call__ (__accu0__.py_split, __accu0__, '+', 1);
+/* 000571 */ 			}) ();
+/* 000571 */ 			var start_spec = __left0__ [0];
+/* 000571 */ 			var len_spec = __left0__ [1];
+/* 000572 */ 			var start = (function () {
+/* 000572 */ 				var __accu0__ = self;
+/* 000572 */ 				return __call__ (__accu0__.parse_cell_index_spec, __accu0__, start_spec, __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: py_default}));
+/* 000572 */ 			}) ();
+/* 000575 */ 			if (__t__ (!__t__ (((function () {
+/* 000575 */ 				var __accu0__ = self._rx_int;
+/* 000575 */ 				return __call__ (__accu0__.match, __accu0__, len_spec);
+/* 000575 */ 			}) ())))) {
+/* 000576 */ 				var __except0__ = __call__ (ValueError, null, 'Invalid number in ‘START+N’ cell index range specification: ‘{}’'.format (len_spec));
+/* 000576 */ 				__except0__.__cause__ = null;
+/* 000576 */ 				throw __except0__;
+/* 000576 */ 			}
+/* 000579 */ 			var range_len = __call__ (int, null, len_spec);
+/* 000582 */ 			var end = __add__ (start, range_len);
+/* 000583 */ 			return tuple ([start, end]);
+/* 000583 */ 		}
+/* 000585 */ 		var idx = (function () {
+/* 000585 */ 			var __accu0__ = self;
+/* 000585 */ 			return __call__ (__accu0__.parse_cell_index_spec, __accu0__, range_spec_s, __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: py_default}));
+/* 000585 */ 		}) ();
+/* 000588 */ 		return tuple ([idx, __add__ (idx, 1)]);
+/* 000588 */ 	});},
+/* 000591 */ 	get parse_placement_index_spec () {return __get__ (this, function (self, placement_index_spec, is_row, is_col, py_default, default_start, default_end) {
+/* 000591 */ 		if (typeof is_row == 'undefined' || (is_row != null && is_row.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000591 */ 			var is_row = false;
+/* 000591 */ 		};
+/* 000591 */ 		if (typeof is_col == 'undefined' || (is_col != null && is_col.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000591 */ 			var is_col = false;
+/* 000591 */ 		};
+/* 000591 */ 		if (typeof py_default == 'undefined' || (py_default != null && py_default.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000591 */ 			var py_default = _NotSpecified;
+/* 000591 */ 		};
+/* 000591 */ 		if (typeof default_start == 'undefined' || (default_start != null && default_start.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000591 */ 			var default_start = 0;
+/* 000591 */ 		};
+/* 000591 */ 		if (typeof default_end == 'undefined' || (default_end != null && default_end.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000591 */ 			var default_end = _NotSpecified;
+/* 000591 */ 		};
+/* 000591 */ 		if (arguments.length) {
+/* 000591 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000591 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000591 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000591 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000591 */ 					switch (__attrib0__) {
+/* 000591 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000591 */ 						case 'placement_index_spec': var placement_index_spec = __allkwargs0__ [__attrib0__]; break;
+/* 000591 */ 						case 'is_row': var is_row = __allkwargs0__ [__attrib0__]; break;
+/* 000591 */ 						case 'is_col': var is_col = __allkwargs0__ [__attrib0__]; break;
+/* 000591 */ 						case 'py_default': var py_default = __allkwargs0__ [__attrib0__]; break;
+/* 000591 */ 						case 'default_start': var default_start = __allkwargs0__ [__attrib0__]; break;
+/* 000591 */ 						case 'default_end': var default_end = __allkwargs0__ [__attrib0__]; break;
+/* 000591 */ 					}
+/* 000591 */ 				}
+/* 000591 */ 			}
+/* 000591 */ 		}
+/* 000591 */ 		else {
+/* 000591 */ 		}
+/* 000596 */ 		if (__t__ (__eq__ (__call__ (len, null, placement_index_spec), 0))) {
+/* 000597 */ 			if (__t__ (is_row)) {
+/* 000598 */ 				return __call__ (CellIndexRangeModel, null, __kwargtrans__ ({start: self.current_row, end: __add__ (self.current_row, 1)}));
+/* 000598 */ 			}
+/* 000599 */ 			else if (__t__ (is_col)) {
+/* 000600 */ 				return __call__ (CellIndexRangeModel, null, __kwargtrans__ ({start: self.current_col, end: __add__ (self.current_col, 1)}));
+/* 000600 */ 			}
+/* 000601 */ 			else {
+/* 000602 */ 				var __except0__ = __call__ (RuntimeError, null, 'Internal error, neither is_row nor is_col was set here.');
+/* 000602 */ 				__except0__.__cause__ = null;
+/* 000602 */ 				throw __except0__;
+/* 000602 */ 			}
+/* 000602 */ 		}
+/* 000604 */ 		var nl = (function () {
+/* 000604 */ 			var __accu0__ = placement_index_spec.latex_walker;
+/* 000604 */ 			return __call__ (__accu0__.filter_whitespace_comments_nodes, __accu0__, placement_index_spec);
+/* 000604 */ 		}) ();
+/* 000608 */ 		if (__t__ (__ne__ (__call__ (len, null, nl), 1))) {
+/* 000609 */ 			if (__t__ (is_row)) {
+/* 000610 */ 				var PLACEHOLDER = 'ROW';
+/* 000610 */ 			}
+/* 000611 */ 			else if (__t__ (is_col)) {
+/* 000612 */ 				var PLACEHOLDER = 'COL';
+/* 000612 */ 			}
+/* 000613 */ 			else {
+/* 000614 */ 				var PLACEHOLDER = null;
+/* 000614 */ 			}
+/* 000618 */ 			var __except0__ = __call__ (LatexWalkerParseError, null, 'Bad cell index or merge range specification, expected ‘{}’ or ‘\\merge{}{}-RANGE{}’, got {} ({} nodes)'.format (PLACEHOLDER, '{', PLACEHOLDER, '}', __call__ (repr, null, placement_index_spec), __call__ (len, null, nl)), __kwargtrans__ ({pos: nl.pos}));
+/* 000618 */ 			__except0__.__cause__ = null;
+/* 000618 */ 			throw __except0__;
+/* 000618 */ 		}
+/* 000622 */ 		var node = __getitem__ (nl, 0);
+/* 000624 */ 		if (__t__ (__t__ ((function () {
+/* 000624 */ 			var __accu0__ = node;
+/* 000624 */ 			return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexMacroNode);
+/* 000624 */ 		}) ()) && __eq__ (node.macroname, 'merge'))) {
+/* 000628 */ 			var merge_node_args = (function () {
+/* 000628 */ 				var __accu0__ = __call__ (ParsedArgumentsInfo, null, __kwargtrans__ ({node: node}));
+/* 000628 */ 				return __call__ (__accu0__.get_all_arguments_info, __accu0__, tuple (['mergespec']));
+/* 000628 */ 			}) ();
+/* 000632 */ 			var range_spec_s = (function () {
+/* 000632 */ 				var __accu0__ = __getitem__ (merge_node_args, 'mergespec');
+/* 000632 */ 				return __call__ (__accu0__.get_content_as_chars, __accu0__);
+/* 000632 */ 			}) ();
+/* 000634 */ 			var default_end_computed = default_end;
+/* 000635 */ 			if (__t__ (default_end_computed === _NotSpecified)) {
+/* 000636 */ 				if (__t__ (is_row)) {
+/* 000637 */ 					var default_end_computed = __getitem__ (self.cells_size, 0);
+/* 000637 */ 				}
+/* 000638 */ 				if (__t__ (is_col)) {
+/* 000639 */ 					var default_end_computed = __getitem__ (self.cells_size, 1);
+/* 000639 */ 				}
+/* 000639 */ 			}
+/* 000641 */ 			var __left0__ = (function () {
+/* 000641 */ 				var __accu0__ = self;
+/* 000641 */ 				return __call__ (__accu0__.parse_cell_index_range_spec, __accu0__, range_spec_s, __kwargtrans__ ({is_row: is_row, is_col: is_col, default_start: default_start, default_end: default_end_computed}));
+/* 000641 */ 			}) ();
+/* 000641 */ 			var start = __left0__ [0];
+/* 000641 */ 			var end = __left0__ [1];
+/* 000646 */ 			return __call__ (CellIndexRangeModel, null, __kwargtrans__ ({start: start, end: end}));
+/* 000646 */ 		}
+/* 000649 */ 		var idx = (function () {
+/* 000649 */ 			var __accu0__ = self;
+/* 000650 */ 			return __call__ (__accu0__.parse_cell_index_spec, __accu0__, (function () {
+/* 000650 */ 				var __accu1__ = nl;
+/* 000650 */ 				return __call__ (__accu1__.get_content_as_chars, __accu1__);
+/* 000650 */ 			}) (), __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: py_default}));
+/* 000650 */ 		}) ();
+/* 000653 */ 		return __call__ (CellIndexRangeModel, null, __kwargtrans__ ({start: idx, end: __add__ (idx, 1)}));
+/* 000653 */ 	});},
+/* 000656 */ 	get parse_placement_spec () {return __get__ (this, function (self, placement_spec) {
+/* 000656 */ 		if (arguments.length) {
+/* 000656 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000656 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000656 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000656 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000656 */ 					switch (__attrib0__) {
+/* 000656 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000656 */ 						case 'placement_spec': var placement_spec = __allkwargs0__ [__attrib0__]; break;
+/* 000656 */ 					}
+/* 000656 */ 				}
+/* 000656 */ 			}
+/* 000656 */ 		}
+/* 000656 */ 		else {
+/* 000656 */ 		}
+/* 000658 */ 		if (__t__ (__call__ (isinstance, null, placement_spec, CellPlacementModel))) {
+/* 000659 */ 			return placement_spec;
+/* 000659 */ 		}
+/* 000661 */ 		var __left0__ = tuple ([[], []]);
+/* 000661 */ 		var row_spec_nl = __left0__ [0];
+/* 000661 */ 		var col_spec_nl = __left0__ [1];
+/* 000663 */ 		if (__t__ (placement_spec !== null)) {
+/* 000665 */ 			var placement_spec_split = (function () {
+/* 000665 */ 				var __accu0__ = placement_spec;
+/* 000665 */ 				return __call__ (__accu0__.split_at_chars, __accu0__, ';', __kwargtrans__ ({keep_empty: true}));
+/* 000665 */ 			}) ();
+/* 000667 */ 			if (__t__ (__eq__ (__call__ (len, null, placement_spec_split), 2))) {
+/* 000669 */ 				var __left0__ = placement_spec_split;
+/* 000669 */ 				var row_spec_nl = __left0__ [0];
+/* 000669 */ 				var col_spec_nl = __left0__ [1];
+/* 000669 */ 			}
+/* 000671 */ 			else if (__t__ (__eq__ (__call__ (len, null, placement_spec_split), 1))) {
+/* 000673 */ 				var __left0__ = placement_spec_split;
+/* 000673 */ 				var col_spec_nl = __left0__ [0];
+/* 000673 */ 			}
+/* 000675 */ 			else if (__t__ (__eq__ (__call__ (len, null, placement_spec_split), 0))) {
+/* 000678 */ 				// pass;
 /* 000678 */ 			}
-/* 000678 */ 		}
-/* 000682 */ 		var row_range = (function () {
-/* 000682 */ 			var __accu0__ = self;
-/* 000682 */ 			return __call__ (__accu0__.parse_placement_index_spec, __accu0__, row_spec_nl, __kwargtrans__ ({is_row: true}));
-/* 000682 */ 		}) ();
-/* 000683 */ 		var col_range = (function () {
-/* 000683 */ 			var __accu0__ = self;
-/* 000683 */ 			return __call__ (__accu0__.parse_placement_index_spec, __accu0__, col_spec_nl, __kwargtrans__ ({is_col: true}));
-/* 000683 */ 		}) ();
-/* 000685 */ 		return __call__ (CellPlacementModel, null, __kwargtrans__ ({row_range: row_range, col_range: col_range}));
-/* 000685 */ 	});},
-/* 000690 */ 	get parse_placement_mapping_index_spec () {return __get__ (this, function (self, placement_mapping_index_spec, index_end, is_row, is_col) {
-/* 000690 */ 		if (typeof is_row == 'undefined' || (is_row != null && is_row.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000690 */ 			var is_row = false;
-/* 000690 */ 		};
-/* 000690 */ 		if (typeof is_col == 'undefined' || (is_col != null && is_col.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000690 */ 			var is_col = false;
-/* 000690 */ 		};
-/* 000690 */ 		if (arguments.length) {
-/* 000690 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000690 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000690 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000690 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000690 */ 					switch (__attrib0__) {
-/* 000690 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000690 */ 						case 'placement_mapping_index_spec': var placement_mapping_index_spec = __allkwargs0__ [__attrib0__]; break;
-/* 000690 */ 						case 'index_end': var index_end = __allkwargs0__ [__attrib0__]; break;
-/* 000690 */ 						case 'is_row': var is_row = __allkwargs0__ [__attrib0__]; break;
-/* 000690 */ 						case 'is_col': var is_col = __allkwargs0__ [__attrib0__]; break;
-/* 000690 */ 					}
-/* 000690 */ 				}
-/* 000690 */ 			}
-/* 000690 */ 		}
-/* 000690 */ 		else {
-/* 000690 */ 		}
-/* 000693 */ 		if (__t__ (__eq__ (__call__ (len, null, placement_mapping_index_spec), 0))) {
-/* 000695 */ 			return [];
-/* 000695 */ 		}
-/* 000697 */ 		var parts = (function () {
-/* 000697 */ 			var __accu0__ = placement_mapping_index_spec;
-/* 000697 */ 			return __call__ (__accu0__.split_at_chars, __accu0__, ',', __kwargtrans__ ({keep_empty: true}));
-/* 000697 */ 		}) ();
-/* 000700 */ 		var current_idx = 0;
-/* 000702 */ 		var index_placements = [];
-/* 000703 */ 		var __iterable0__ = parts;
-/* 000703 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000703 */ 			var placement_part_spec = __getitem__ (__iterable0__, __index0__);
-/* 000708 */ 			var nl = (function () {
-/* 000708 */ 				var __accu0__ = placement_part_spec.latex_walker;
-/* 000708 */ 				return __call__ (__accu0__.filter_whitespace_comments_nodes, __accu0__, placement_part_spec);
-/* 000708 */ 			}) ();
-/* 000712 */ 			if (__t__ (__ne__ (__call__ (len, null, nl), 1))) {
-/* 000713 */ 				if (__t__ (is_row)) {
-/* 000714 */ 					var PLACEHOLDER = 'ROW-RANGE';
-/* 000714 */ 				}
-/* 000715 */ 				else if (__t__ (is_col)) {
-/* 000716 */ 					var PLACEHOLDER = 'COL-RANGE';
-/* 000716 */ 				}
-/* 000717 */ 				else {
-/* 000718 */ 					var PLACEHOLDER = null;
-/* 000718 */ 				}
-/* 000723 */ 				var __except0__ = __call__ (LatexWalkerParseError, null, 'Bad cell index or range or merge range specification, expected ‘{}’ or ‘\\merge{}{}-RANGE{}’, got {} ({} nodes)'.format (PLACEHOLDER, '{', PLACEHOLDER, '}', __call__ (repr, null, placement_index_spec), __call__ (len, null, nl)), __kwargtrans__ ({pos: nl.pos}));
-/* 000723 */ 				__except0__.__cause__ = null;
-/* 000723 */ 				throw __except0__;
-/* 000723 */ 			}
-/* 000727 */ 			var node = __getitem__ (nl, 0);
-/* 000729 */ 			if (__t__ (__t__ ((function () {
-/* 000729 */ 				var __accu0__ = node;
-/* 000729 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexMacroNode);
-/* 000729 */ 			}) ()) && __eq__ (node.macroname, 'merge'))) {
-/* 000733 */ 				var merge_node_args = (function () {
-/* 000733 */ 					var __accu0__ = __call__ (ParsedArgumentsInfo, null, __kwargtrans__ ({node: node}));
-/* 000733 */ 					return __call__ (__accu0__.get_all_arguments_info, __accu0__, tuple (['mergespec']));
-/* 000733 */ 				}) ();
-/* 000737 */ 				var range_spec_s = (function () {
-/* 000737 */ 					var __accu0__ = __getitem__ (merge_node_args, 'mergespec');
-/* 000737 */ 					return __call__ (__accu0__.get_content_as_chars, __accu0__);
-/* 000737 */ 				}) ();
-/* 000739 */ 				var __left0__ = (function () {
-/* 000739 */ 					var __accu0__ = self;
-/* 000739 */ 					return __call__ (__accu0__.parse_cell_index_range_spec, __accu0__, range_spec_s, __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: current_idx, default_start: current_idx, default_end: null}));
+/* 000679 */ 			else {
+/* 000684 */ 				var __except0__ = __call__ (LatexWalkerParseError, null, 'Bad cell placement specification, expected ‘ROW;COL’ or ‘COL’, got ‘{}’'.format (__call__ (_splfysidews, null, (function () {
+/* 000684 */ 					var __accu0__ = placement_spec;
+/* 000684 */ 					return __call__ (__accu0__.latex_verbatim, __accu0__);
+/* 000684 */ 				}) ())), __kwargtrans__ ({pos: placement_spec.pos}));
+/* 000684 */ 				__except0__.__cause__ = null;
+/* 000684 */ 				throw __except0__;
+/* 000684 */ 			}
+/* 000684 */ 		}
+/* 000688 */ 		var row_range = (function () {
+/* 000688 */ 			var __accu0__ = self;
+/* 000688 */ 			return __call__ (__accu0__.parse_placement_index_spec, __accu0__, row_spec_nl, __kwargtrans__ ({is_row: true}));
+/* 000688 */ 		}) ();
+/* 000689 */ 		var col_range = (function () {
+/* 000689 */ 			var __accu0__ = self;
+/* 000689 */ 			return __call__ (__accu0__.parse_placement_index_spec, __accu0__, col_spec_nl, __kwargtrans__ ({is_col: true}));
+/* 000689 */ 		}) ();
+/* 000691 */ 		return __call__ (CellPlacementModel, null, __kwargtrans__ ({row_range: row_range, col_range: col_range}));
+/* 000691 */ 	});},
+/* 000696 */ 	get parse_placement_mapping_index_spec () {return __get__ (this, function (self, placement_mapping_index_spec, index_end, is_row, is_col) {
+/* 000696 */ 		if (typeof is_row == 'undefined' || (is_row != null && is_row.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000696 */ 			var is_row = false;
+/* 000696 */ 		};
+/* 000696 */ 		if (typeof is_col == 'undefined' || (is_col != null && is_col.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000696 */ 			var is_col = false;
+/* 000696 */ 		};
+/* 000696 */ 		if (arguments.length) {
+/* 000696 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000696 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000696 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000696 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000696 */ 					switch (__attrib0__) {
+/* 000696 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000696 */ 						case 'placement_mapping_index_spec': var placement_mapping_index_spec = __allkwargs0__ [__attrib0__]; break;
+/* 000696 */ 						case 'index_end': var index_end = __allkwargs0__ [__attrib0__]; break;
+/* 000696 */ 						case 'is_row': var is_row = __allkwargs0__ [__attrib0__]; break;
+/* 000696 */ 						case 'is_col': var is_col = __allkwargs0__ [__attrib0__]; break;
+/* 000696 */ 					}
+/* 000696 */ 				}
+/* 000696 */ 			}
+/* 000696 */ 		}
+/* 000696 */ 		else {
+/* 000696 */ 		}
+/* 000699 */ 		if (__t__ (__eq__ (__call__ (len, null, placement_mapping_index_spec), 0))) {
+/* 000701 */ 			return [];
+/* 000701 */ 		}
+/* 000703 */ 		var parts = (function () {
+/* 000703 */ 			var __accu0__ = placement_mapping_index_spec;
+/* 000703 */ 			return __call__ (__accu0__.split_at_chars, __accu0__, ',', __kwargtrans__ ({keep_empty: true}));
+/* 000703 */ 		}) ();
+/* 000706 */ 		var current_idx = 0;
+/* 000708 */ 		var index_placements = [];
+/* 000709 */ 		var __iterable0__ = parts;
+/* 000709 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000709 */ 			var placement_part_spec = __getitem__ (__iterable0__, __index0__);
+/* 000714 */ 			var nl = (function () {
+/* 000714 */ 				var __accu0__ = placement_part_spec.latex_walker;
+/* 000714 */ 				return __call__ (__accu0__.filter_whitespace_comments_nodes, __accu0__, placement_part_spec);
+/* 000714 */ 			}) ();
+/* 000718 */ 			if (__t__ (__ne__ (__call__ (len, null, nl), 1))) {
+/* 000719 */ 				if (__t__ (is_row)) {
+/* 000720 */ 					var PLACEHOLDER = 'ROW-RANGE';
+/* 000720 */ 				}
+/* 000721 */ 				else if (__t__ (is_col)) {
+/* 000722 */ 					var PLACEHOLDER = 'COL-RANGE';
+/* 000722 */ 				}
+/* 000723 */ 				else {
+/* 000724 */ 					var PLACEHOLDER = null;
+/* 000724 */ 				}
+/* 000729 */ 				var __except0__ = __call__ (LatexWalkerParseError, null, 'Bad cell index or range or merge range specification, expected ‘{}’ or ‘\\merge{}{}-RANGE{}’, got {} ({} nodes)'.format (PLACEHOLDER, '{', PLACEHOLDER, '}', __call__ (repr, null, placement_index_spec), __call__ (len, null, nl)), __kwargtrans__ ({pos: nl.pos}));
+/* 000729 */ 				__except0__.__cause__ = null;
+/* 000729 */ 				throw __except0__;
+/* 000729 */ 			}
+/* 000733 */ 			var node = __getitem__ (nl, 0);
+/* 000735 */ 			if (__t__ (__t__ ((function () {
+/* 000735 */ 				var __accu0__ = node;
+/* 000735 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexMacroNode);
+/* 000735 */ 			}) ()) && __eq__ (node.macroname, 'merge'))) {
+/* 000739 */ 				var merge_node_args = (function () {
+/* 000739 */ 					var __accu0__ = __call__ (ParsedArgumentsInfo, null, __kwargtrans__ ({node: node}));
+/* 000739 */ 					return __call__ (__accu0__.get_all_arguments_info, __accu0__, tuple (['mergespec']));
 /* 000739 */ 				}) ();
-/* 000739 */ 				var start = __left0__ [0];
-/* 000739 */ 				var end = __left0__ [1];
-/* 000745 */ 				(function () {
-/* 000745 */ 					var __accu0__ = index_placements;
-/* 000745 */ 					return __call__ (__accu0__.append, __accu0__, __call__ (CellIndexRangeModel, null, __kwargtrans__ ({start: start, end: end})));
+/* 000743 */ 				var range_spec_s = (function () {
+/* 000743 */ 					var __accu0__ = __getitem__ (merge_node_args, 'mergespec');
+/* 000743 */ 					return __call__ (__accu0__.get_content_as_chars, __accu0__);
+/* 000743 */ 				}) ();
+/* 000745 */ 				var __left0__ = (function () {
+/* 000745 */ 					var __accu0__ = self;
+/* 000745 */ 					return __call__ (__accu0__.parse_cell_index_range_spec, __accu0__, range_spec_s, __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: current_idx, default_start: current_idx, default_end: null}));
 /* 000745 */ 				}) ();
-/* 000746 */ 				var current_idx = end;
-/* 000746 */ 				continue;
-/* 000746 */ 			}
-/* 000750 */ 			var __left0__ = (function () {
-/* 000750 */ 				var __accu0__ = self;
-/* 000751 */ 				return __call__ (__accu0__.parse_cell_index_range_spec, __accu0__, (function () {
-/* 000751 */ 					var __accu1__ = nl;
-/* 000751 */ 					return __call__ (__accu1__.get_content_as_chars, __accu1__);
-/* 000751 */ 				}) (), __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: current_idx, default_start: current_idx, default_end: null}));
-/* 000751 */ 			}) ();
-/* 000751 */ 			var iter_start = __left0__ [0];
-/* 000751 */ 			var iter_end = __left0__ [1];
-/* 000759 */ 			if (__t__ (iter_end === null)) {
-/* 000760 */ 				(function () {
-/* 000760 */ 					var __accu0__ = index_placements;
-/* 000760 */ 					return __call__ (__accu0__.append, __accu0__, __call__ (CellIndexRangeModel, null, __kwargtrans__ ({start: iter_start, end: null})));
-/* 000760 */ 				}) ();
-/* 000761 */ 				var current_idx = null;
-/* 000761 */ 			}
-/* 000762 */ 			else {
-/* 000764 */ 				for (var j = iter_start; j < iter_end; j++) {
-/* 000765 */ 					(function () {
-/* 000765 */ 						var __accu0__ = index_placements;
-/* 000765 */ 						return __call__ (__accu0__.append, __accu0__, __call__ (CellIndexRangeModel, null, __kwargtrans__ ({start: j, end: __add__ (j, 1)})));
-/* 000765 */ 					}) ();
-/* 000766 */ 					var current_idx = __add__ (j, 1);
-/* 000766 */ 				}
-/* 000766 */ 			}
-/* 000766 */ 			continue;
-/* 000766 */ 		}
-/* 000770 */ 		return index_placements;
-/* 000770 */ 	});},
-/* 000772 */ 	get parse_placement_mapping_spec () {return __get__ (this, function (self, placement_mapping_spec) {
-/* 000772 */ 		if (arguments.length) {
-/* 000772 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000772 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000772 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000772 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000772 */ 					switch (__attrib0__) {
-/* 000772 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000772 */ 						case 'placement_mapping_spec': var placement_mapping_spec = __allkwargs0__ [__attrib0__]; break;
-/* 000772 */ 					}
+/* 000745 */ 				var start = __left0__ [0];
+/* 000745 */ 				var end = __left0__ [1];
+/* 000751 */ 				(function () {
+/* 000751 */ 					var __accu0__ = index_placements;
+/* 000751 */ 					return __call__ (__accu0__.append, __accu0__, __call__ (CellIndexRangeModel, null, __kwargtrans__ ({start: start, end: end})));
+/* 000751 */ 				}) ();
+/* 000752 */ 				var current_idx = end;
+/* 000752 */ 				continue;
+/* 000752 */ 			}
+/* 000756 */ 			var __left0__ = (function () {
+/* 000756 */ 				var __accu0__ = self;
+/* 000757 */ 				return __call__ (__accu0__.parse_cell_index_range_spec, __accu0__, (function () {
+/* 000757 */ 					var __accu1__ = nl;
+/* 000757 */ 					return __call__ (__accu1__.get_content_as_chars, __accu1__);
+/* 000757 */ 				}) (), __kwargtrans__ ({is_row: is_row, is_col: is_col, py_default: current_idx, default_start: current_idx, default_end: null}));
+/* 000757 */ 			}) ();
+/* 000757 */ 			var iter_start = __left0__ [0];
+/* 000757 */ 			var iter_end = __left0__ [1];
+/* 000765 */ 			if (__t__ (iter_end === null)) {
+/* 000766 */ 				(function () {
+/* 000766 */ 					var __accu0__ = index_placements;
+/* 000766 */ 					return __call__ (__accu0__.append, __accu0__, __call__ (CellIndexRangeModel, null, __kwargtrans__ ({start: iter_start, end: null})));
+/* 000766 */ 				}) ();
+/* 000767 */ 				var current_idx = null;
+/* 000767 */ 			}
+/* 000768 */ 			else {
+/* 000770 */ 				for (var j = iter_start; j < iter_end; j++) {
+/* 000771 */ 					(function () {
+/* 000771 */ 						var __accu0__ = index_placements;
+/* 000771 */ 						return __call__ (__accu0__.append, __accu0__, __call__ (CellIndexRangeModel, null, __kwargtrans__ ({start: j, end: __add__ (j, 1)})));
+/* 000771 */ 					}) ();
+/* 000772 */ 					var current_idx = __add__ (j, 1);
 /* 000772 */ 				}
 /* 000772 */ 			}
+/* 000772 */ 			continue;
 /* 000772 */ 		}
-/* 000772 */ 		else {
-/* 000772 */ 		}
-/* 000775 */ 		var placement_mapping_spec_split = (function () {
-/* 000775 */ 			var __accu0__ = placement_mapping_spec;
-/* 000775 */ 			return __call__ (__accu0__.split_at_chars, __accu0__, ';', __kwargtrans__ ({keep_empty: true}));
-/* 000775 */ 		}) ();
-/* 000777 */ 		if (__t__ (__eq__ (__call__ (len, null, placement_mapping_spec_split), 2))) {
-/* 000779 */ 			var __left0__ = placement_mapping_spec_split;
-/* 000779 */ 			var row_mapping_spec = __left0__ [0];
-/* 000779 */ 			var col_mapping_spec = __left0__ [1];
-/* 000779 */ 		}
-/* 000781 */ 		else if (__t__ (__eq__ (__call__ (len, null, placement_mapping_spec_split), 1))) {
-/* 000783 */ 			var row_mapping_spec = [];
-/* 000784 */ 			var __left0__ = placement_mapping_spec_split;
-/* 000784 */ 			var col_mapping_spec = __left0__ [0];
-/* 000784 */ 		}
-/* 000786 */ 		else if (__t__ (__eq__ (__call__ (len, null, placement_mapping_spec_split), 0))) {
-/* 000788 */ 			var __left0__ = tuple ([[], []]);
-/* 000788 */ 			var row_mapping_spec = __left0__ [0];
-/* 000788 */ 			var col_mapping_spec = __left0__ [1];
-/* 000788 */ 		}
-/* 000789 */ 		else {
-/* 000794 */ 			var __except0__ = __call__ (LatexWalkerParseError, null, 'Expected ‘ROWS;COLS’ or ‘COLS’ or ‘’ for placement argument, got ‘{}’'.format (__call__ (_splfysidews, null, (function () {
-/* 000794 */ 				var __accu0__ = placement_mapping_spec;
-/* 000794 */ 				return __call__ (__accu0__.latex_verbatim, __accu0__);
-/* 000794 */ 			}) ())), __kwargtrans__ ({pos: placement_mapping_spec.pos}));
-/* 000794 */ 			__except0__.__cause__ = null;
-/* 000794 */ 			throw __except0__;
+/* 000776 */ 		return index_placements;
+/* 000776 */ 	});},
+/* 000778 */ 	get parse_placement_mapping_spec () {return __get__ (this, function (self, placement_mapping_spec) {
+/* 000778 */ 		if (arguments.length) {
+/* 000778 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000778 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000778 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000778 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000778 */ 					switch (__attrib0__) {
+/* 000778 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000778 */ 						case 'placement_mapping_spec': var placement_mapping_spec = __allkwargs0__ [__attrib0__]; break;
+/* 000778 */ 					}
+/* 000778 */ 				}
+/* 000778 */ 			}
+/* 000778 */ 		}
+/* 000778 */ 		else {
+/* 000778 */ 		}
+/* 000781 */ 		var placement_mapping_spec_split = (function () {
+/* 000781 */ 			var __accu0__ = placement_mapping_spec;
+/* 000781 */ 			return __call__ (__accu0__.split_at_chars, __accu0__, ';', __kwargtrans__ ({keep_empty: true}));
+/* 000781 */ 		}) ();
+/* 000783 */ 		if (__t__ (__eq__ (__call__ (len, null, placement_mapping_spec_split), 2))) {
+/* 000785 */ 			var __left0__ = placement_mapping_spec_split;
+/* 000785 */ 			var row_mapping_spec = __left0__ [0];
+/* 000785 */ 			var col_mapping_spec = __left0__ [1];
+/* 000785 */ 		}
+/* 000787 */ 		else if (__t__ (__eq__ (__call__ (len, null, placement_mapping_spec_split), 1))) {
+/* 000789 */ 			var row_mapping_spec = [];
+/* 000790 */ 			var __left0__ = placement_mapping_spec_split;
+/* 000790 */ 			var col_mapping_spec = __left0__ [0];
+/* 000790 */ 		}
+/* 000792 */ 		else if (__t__ (__eq__ (__call__ (len, null, placement_mapping_spec_split), 0))) {
+/* 000794 */ 			var __left0__ = tuple ([[], []]);
+/* 000794 */ 			var row_mapping_spec = __left0__ [0];
+/* 000794 */ 			var col_mapping_spec = __left0__ [1];
 /* 000794 */ 		}
-/* 000798 */ 		var row_placements = (function () {
-/* 000798 */ 			var __accu0__ = self;
-/* 000798 */ 			return __call__ (__accu0__.parse_placement_mapping_index_spec, __accu0__, row_mapping_spec, __kwargtrans__ ({index_end: null, is_row: true}));
-/* 000798 */ 		}) ();
-/* 000801 */ 		var col_placements = (function () {
-/* 000801 */ 			var __accu0__ = self;
-/* 000801 */ 			return __call__ (__accu0__.parse_placement_mapping_index_spec, __accu0__, col_mapping_spec, __kwargtrans__ ({index_end: null, is_col: true}));
-/* 000801 */ 		}) ();
-/* 000805 */ 		return __call__ (CellPlacementsMappingModel, null, __kwargtrans__ ({row_placements: row_placements, col_placements: col_placements}));
-/* 000805 */ 	});}
-/* 000805 */ });
-/* 000815 */ export var CellsEnvironment =  __class__ ('CellsEnvironment', [LLMEnvironmentSpecBase], {
-/* 000815 */ 	__module__: __name__,
-/* 000817 */ 	is_block_level: true,
-/* 000819 */ 	allowed_in_standalone_mode: true,
-/* 000821 */ 	body_contents_is_block_level: true,
-/* 000824 */ 	get __init__ () {return __get__ (this, function (self, environmentname) {
-/* 000824 */ 		if (typeof environmentname == 'undefined' || (environmentname != null && environmentname.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000824 */ 			var environmentname = 'cells';
-/* 000824 */ 		};
-/* 000824 */ 		if (arguments.length) {
-/* 000824 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000824 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000824 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000824 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000824 */ 					switch (__attrib0__) {
-/* 000824 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000824 */ 						case 'environmentname': var environmentname = __allkwargs0__ [__attrib0__]; break;
-/* 000824 */ 					}
-/* 000824 */ 				}
-/* 000824 */ 			}
-/* 000824 */ 		}
-/* 000824 */ 		else {
-/* 000824 */ 		}
-/* 000825 */ 		__call__ (__call__ (__super__, null, CellsEnvironment, '__init__'), null, self, __kwargtrans__ ({environmentname: environmentname}));
-/* 000825 */ 	});},
-/* 000829 */ 	get make_body_parser () {return __get__ (this, function (self, token, nodeargd, arg_parsing_state_delta) {
-/* 000829 */ 		if (arguments.length) {
-/* 000829 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000829 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000829 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000829 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000829 */ 					switch (__attrib0__) {
-/* 000829 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000829 */ 						case 'token': var token = __allkwargs0__ [__attrib0__]; break;
-/* 000829 */ 						case 'nodeargd': var nodeargd = __allkwargs0__ [__attrib0__]; break;
-/* 000829 */ 						case 'arg_parsing_state_delta': var arg_parsing_state_delta = __allkwargs0__ [__attrib0__]; break;
-/* 000829 */ 					}
-/* 000829 */ 				}
-/* 000829 */ 			}
-/* 000829 */ 		}
-/* 000829 */ 		else {
-/* 000829 */ 		}
-/* 000830 */ 		return (function () {
-/* 000830 */ 			var __accu0__ = macrospec;
-/* 000832 */ 			return __call__ (__accu0__.LatexEnvironmentBodyContentsParser, __accu0__, __kwargtrans__ ({environmentname: token.arg, contents_parsing_state_delta: (function () {
-/* 000832 */ 				var __accu1__ = macrospec;
-/* 000837 */ 				return __call__ (__accu1__.ParsingStateDeltaExtendLatexContextDb, __accu1__, __kwargtrans__ ({extend_latex_context: __call__ (dict, null, __kwargtrans__ ({macros: [__call__ (CellMacro, null), __call__ (CelldataMacroSpec, null), __call__ (LatexTabularRowSeparatorSpec, null)]}))}));
-/* 000843 */ 			}) (), child_parsing_state_delta: __call__ (ParsingStateDelta, null)}));
-/* 000843 */ 		}) ();
-/* 000843 */ 	});},
-/* 000847 */ 	get postprocess_parsed_node () {return __get__ (this, function (self, node) {
-/* 000847 */ 		if (arguments.length) {
-/* 000847 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000847 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000847 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000847 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000847 */ 					switch (__attrib0__) {
-/* 000847 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000847 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000847 */ 					}
-/* 000847 */ 				}
-/* 000847 */ 			}
-/* 000847 */ 		}
-/* 000847 */ 		else {
-/* 000847 */ 		}
-/* 000851 */ 		var cells_model = __call__ (CellsModel, null);
-/* 000853 */ 		var __iterable0__ = node.nodelist;
-/* 000853 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000853 */ 			var n = __getitem__ (__iterable0__, __index0__);
-/* 000854 */ 			if (__t__ ((function () {
-/* 000854 */ 				var __accu0__ = n;
-/* 000854 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexMacroNode);
-/* 000854 */ 			}) ())) {
-/* 000855 */ 				if (__t__ (__eq__ (n.macroname, 'cell'))) {
-/* 000856 */ 					(function () {
-/* 000856 */ 						var __accu0__ = cells_model;
-/* 000856 */ 						return __call__ (__accu0__.add_cell_node, __accu0__, n);
-/* 000856 */ 					}) ();
-/* 000856 */ 					continue;
-/* 000856 */ 				}
-/* 000858 */ 				else if (__t__ (__eq__ (n.macroname, 'celldata'))) {
-/* 000859 */ 					(function () {
-/* 000859 */ 						var __accu0__ = cells_model;
-/* 000859 */ 						return __call__ (__accu0__.add_celldata_node, __accu0__, n);
-/* 000859 */ 					}) ();
-/* 000859 */ 					continue;
-/* 000859 */ 				}
-/* 000861 */ 				else if (__t__ (__eq__ (n.macroname, '\\'))) {
+/* 000795 */ 		else {
+/* 000800 */ 			var __except0__ = __call__ (LatexWalkerParseError, null, 'Expected ‘ROWS;COLS’ or ‘COLS’ or ‘’ for placement argument, got ‘{}’'.format (__call__ (_splfysidews, null, (function () {
+/* 000800 */ 				var __accu0__ = placement_mapping_spec;
+/* 000800 */ 				return __call__ (__accu0__.latex_verbatim, __accu0__);
+/* 000800 */ 			}) ())), __kwargtrans__ ({pos: placement_mapping_spec.pos}));
+/* 000800 */ 			__except0__.__cause__ = null;
+/* 000800 */ 			throw __except0__;
+/* 000800 */ 		}
+/* 000804 */ 		var row_placements = (function () {
+/* 000804 */ 			var __accu0__ = self;
+/* 000804 */ 			return __call__ (__accu0__.parse_placement_mapping_index_spec, __accu0__, row_mapping_spec, __kwargtrans__ ({index_end: null, is_row: true}));
+/* 000804 */ 		}) ();
+/* 000807 */ 		var col_placements = (function () {
+/* 000807 */ 			var __accu0__ = self;
+/* 000807 */ 			return __call__ (__accu0__.parse_placement_mapping_index_spec, __accu0__, col_mapping_spec, __kwargtrans__ ({index_end: null, is_col: true}));
+/* 000807 */ 		}) ();
+/* 000811 */ 		return __call__ (CellPlacementsMappingModel, null, __kwargtrans__ ({row_placements: row_placements, col_placements: col_placements}));
+/* 000811 */ 	});}
+/* 000811 */ });
+/* 000821 */ export var CellsEnvironment =  __class__ ('CellsEnvironment', [LLMEnvironmentSpecBase], {
+/* 000821 */ 	__module__: __name__,
+/* 000823 */ 	is_block_level: true,
+/* 000825 */ 	allowed_in_standalone_mode: true,
+/* 000827 */ 	body_contents_is_block_level: true,
+/* 000830 */ 	get __init__ () {return __get__ (this, function (self, environmentname) {
+/* 000830 */ 		if (typeof environmentname == 'undefined' || (environmentname != null && environmentname.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000830 */ 			var environmentname = 'cells';
+/* 000830 */ 		};
+/* 000830 */ 		if (arguments.length) {
+/* 000830 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000830 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000830 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000830 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000830 */ 					switch (__attrib0__) {
+/* 000830 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000830 */ 						case 'environmentname': var environmentname = __allkwargs0__ [__attrib0__]; break;
+/* 000830 */ 					}
+/* 000830 */ 				}
+/* 000830 */ 			}
+/* 000830 */ 		}
+/* 000830 */ 		else {
+/* 000830 */ 		}
+/* 000831 */ 		__call__ (__call__ (__super__, null, CellsEnvironment, '__init__'), null, self, __kwargtrans__ ({environmentname: environmentname}));
+/* 000831 */ 	});},
+/* 000835 */ 	get make_body_parser () {return __get__ (this, function (self, token, nodeargd, arg_parsing_state_delta) {
+/* 000835 */ 		if (arguments.length) {
+/* 000835 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000835 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000835 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000835 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000835 */ 					switch (__attrib0__) {
+/* 000835 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000835 */ 						case 'token': var token = __allkwargs0__ [__attrib0__]; break;
+/* 000835 */ 						case 'nodeargd': var nodeargd = __allkwargs0__ [__attrib0__]; break;
+/* 000835 */ 						case 'arg_parsing_state_delta': var arg_parsing_state_delta = __allkwargs0__ [__attrib0__]; break;
+/* 000835 */ 					}
+/* 000835 */ 				}
+/* 000835 */ 			}
+/* 000835 */ 		}
+/* 000835 */ 		else {
+/* 000835 */ 		}
+/* 000836 */ 		return (function () {
+/* 000836 */ 			var __accu0__ = macrospec;
+/* 000838 */ 			return __call__ (__accu0__.LatexEnvironmentBodyContentsParser, __accu0__, __kwargtrans__ ({environmentname: token.arg, contents_parsing_state_delta: (function () {
+/* 000838 */ 				var __accu1__ = macrospec;
+/* 000843 */ 				return __call__ (__accu1__.ParsingStateDeltaExtendLatexContextDb, __accu1__, __kwargtrans__ ({extend_latex_context: __call__ (dict, null, __kwargtrans__ ({macros: [__call__ (CellMacro, null), __call__ (CelldataMacroSpec, null), __call__ (LatexTabularRowSeparatorSpec, null)]}))}));
+/* 000849 */ 			}) (), child_parsing_state_delta: __call__ (ParsingStateDelta, null)}));
+/* 000849 */ 		}) ();
+/* 000849 */ 	});},
+/* 000853 */ 	get postprocess_parsed_node () {return __get__ (this, function (self, node) {
+/* 000853 */ 		if (arguments.length) {
+/* 000853 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000853 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000853 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000853 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000853 */ 					switch (__attrib0__) {
+/* 000853 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000853 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000853 */ 					}
+/* 000853 */ 				}
+/* 000853 */ 			}
+/* 000853 */ 		}
+/* 000853 */ 		else {
+/* 000853 */ 		}
+/* 000857 */ 		var cells_model = __call__ (CellsModel, null);
+/* 000859 */ 		var __iterable0__ = node.nodelist;
+/* 000859 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000859 */ 			var n = __getitem__ (__iterable0__, __index0__);
+/* 000860 */ 			if (__t__ ((function () {
+/* 000860 */ 				var __accu0__ = n;
+/* 000860 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexMacroNode);
+/* 000860 */ 			}) ())) {
+/* 000861 */ 				if (__t__ (__eq__ (n.macroname, 'cell'))) {
 /* 000862 */ 					(function () {
 /* 000862 */ 						var __accu0__ = cells_model;
-/* 000862 */ 						return __call__ (__accu0__.move_next_row, __accu0__);
+/* 000862 */ 						return __call__ (__accu0__.add_cell_node, __accu0__, n);
 /* 000862 */ 					}) ();
 /* 000862 */ 					continue;
 /* 000862 */ 				}
-/* 000862 */ 			}
-/* 000865 */ 			if (__t__ ((function () {
-/* 000865 */ 				var __accu0__ = n;
-/* 000865 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexCommentNode);
-/* 000865 */ 			}) ())) {
-/* 000865 */ 				continue;
-/* 000865 */ 			}
-/* 000869 */ 			if (__t__ (__t__ ((function () {
-/* 000869 */ 				var __accu0__ = n;
-/* 000869 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexCharsNode);
-/* 000870 */ 			}) ()) && __eq__ (__call__ (len, null, (function () {
-/* 000870 */ 				var __accu0__ = n.chars;
-/* 000870 */ 				return __call__ (__accu0__.strip, __accu0__);
-/* 000870 */ 			}) ()), 0))) {
-/* 000870 */ 				continue;
-/* 000870 */ 			}
-/* 000875 */ 			var __except0__ = __call__ (LatexWalkerParseError, null, 'You cannot place ‘{}’ here.  Expected: \\cell, \\celldata, \\\\.'.format (__call__ (_splfysidews, null, (function () {
+/* 000864 */ 				else if (__t__ (__eq__ (n.macroname, 'celldata'))) {
+/* 000865 */ 					(function () {
+/* 000865 */ 						var __accu0__ = cells_model;
+/* 000865 */ 						return __call__ (__accu0__.add_celldata_node, __accu0__, n);
+/* 000865 */ 					}) ();
+/* 000865 */ 					continue;
+/* 000865 */ 				}
+/* 000867 */ 				else if (__t__ (__eq__ (n.macroname, '\\'))) {
+/* 000868 */ 					(function () {
+/* 000868 */ 						var __accu0__ = cells_model;
+/* 000868 */ 						return __call__ (__accu0__.move_next_row, __accu0__);
+/* 000868 */ 					}) ();
+/* 000868 */ 					continue;
+/* 000868 */ 				}
+/* 000868 */ 			}
+/* 000871 */ 			if (__t__ ((function () {
+/* 000871 */ 				var __accu0__ = n;
+/* 000871 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexCommentNode);
+/* 000871 */ 			}) ())) {
+/* 000871 */ 				continue;
+/* 000871 */ 			}
+/* 000875 */ 			if (__t__ (__t__ ((function () {
 /* 000875 */ 				var __accu0__ = n;
-/* 000875 */ 				return __call__ (__accu0__.latex_verbatim, __accu0__);
-/* 000875 */ 			}) ())));
-/* 000875 */ 			__except0__.__cause__ = null;
-/* 000875 */ 			throw __except0__;
-/* 000875 */ 		}
-/* 000879 */ 		(function () {
-/* 000879 */ 			var __accu0__ = cells_model;
-/* 000879 */ 			return __call__ (__accu0__.finalize, __accu0__);
-/* 000879 */ 		}) ();
-/* 000881 */ 		node.llm_cells_model = cells_model;
-/* 000881 */ 	});},
-/* 000884 */ 	get render () {return __get__ (this, function (self, node, render_context) {
-/* 000884 */ 		if (arguments.length) {
-/* 000884 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000884 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000884 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000884 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000884 */ 					switch (__attrib0__) {
-/* 000884 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000884 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000884 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000884 */ 					}
-/* 000884 */ 				}
-/* 000884 */ 			}
-/* 000884 */ 		}
-/* 000884 */ 		else {
-/* 000884 */ 		}
-/* 000890 */ 		return (function () {
-/* 000890 */ 			var __accu0__ = render_context.fragment_renderer;
-/* 000890 */ 			return __call__ (__accu0__.render_cells, __accu0__, __kwargtrans__ ({cells_model: node.llm_cells_model, render_context: render_context}));
-/* 000890 */ 		}) ();
-/* 000890 */ 	});}
-/* 000890 */ });
-/* 000899 */ export var FeatureProvideCells =  __class__ ('FeatureProvideCells', [Feature], {
-/* 000899 */ 	__module__: __name__,
-/* 000901 */ 	DocumentManager: null,
-/* 000902 */ 	RenderManager: null,
-/* 000904 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
-/* 000904 */ 		if (arguments.length) {
-/* 000904 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000904 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000904 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000904 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000904 */ 					switch (__attrib0__) {
-/* 000904 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000904 */ 					}
-/* 000904 */ 				}
-/* 000904 */ 			}
-/* 000904 */ 		}
-/* 000904 */ 		else {
-/* 000904 */ 		}
-/* 000907 */ 		return __call__ (dict, null, __kwargtrans__ ({environments: [__call__ (CellsEnvironment, null)]}));
-/* 000907 */ 	});}
-/* 000907 */ });
+/* 000875 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexCharsNode);
+/* 000876 */ 			}) ()) && __eq__ (__call__ (len, null, (function () {
+/* 000876 */ 				var __accu0__ = n.chars;
+/* 000876 */ 				return __call__ (__accu0__.strip, __accu0__);
+/* 000876 */ 			}) ()), 0))) {
+/* 000876 */ 				continue;
+/* 000876 */ 			}
+/* 000881 */ 			var __except0__ = __call__ (LatexWalkerParseError, null, 'You cannot place ‘{}’ here.  Expected: \\cell, \\celldata, \\\\.'.format (__call__ (_splfysidews, null, (function () {
+/* 000881 */ 				var __accu0__ = n;
+/* 000881 */ 				return __call__ (__accu0__.latex_verbatim, __accu0__);
+/* 000881 */ 			}) ())));
+/* 000881 */ 			__except0__.__cause__ = null;
+/* 000881 */ 			throw __except0__;
+/* 000881 */ 		}
+/* 000885 */ 		(function () {
+/* 000885 */ 			var __accu0__ = cells_model;
+/* 000885 */ 			return __call__ (__accu0__.finalize, __accu0__);
+/* 000885 */ 		}) ();
+/* 000887 */ 		node.llm_cells_model = cells_model;
+/* 000887 */ 	});},
+/* 000890 */ 	get render () {return __get__ (this, function (self, node, render_context) {
+/* 000890 */ 		if (arguments.length) {
+/* 000890 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000890 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000890 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000890 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000890 */ 					switch (__attrib0__) {
+/* 000890 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000890 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000890 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000890 */ 					}
+/* 000890 */ 				}
+/* 000890 */ 			}
+/* 000890 */ 		}
+/* 000890 */ 		else {
+/* 000890 */ 		}
+/* 000896 */ 		return (function () {
+/* 000896 */ 			var __accu0__ = render_context.fragment_renderer;
+/* 000896 */ 			return __call__ (__accu0__.render_cells, __accu0__, __kwargtrans__ ({cells_model: node.llm_cells_model, render_context: render_context}));
+/* 000896 */ 		}) ();
+/* 000896 */ 	});}
+/* 000896 */ });
+/* 000905 */ export var FeatureProvideCells =  __class__ ('FeatureProvideCells', [Feature], {
+/* 000905 */ 	__module__: __name__,
+/* 000907 */ 	DocumentManager: null,
+/* 000908 */ 	RenderManager: null,
+/* 000910 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
+/* 000910 */ 		if (arguments.length) {
+/* 000910 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000910 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000910 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000910 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000910 */ 					switch (__attrib0__) {
+/* 000910 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000910 */ 					}
+/* 000910 */ 				}
+/* 000910 */ 			}
+/* 000910 */ 		}
+/* 000910 */ 		else {
+/* 000910 */ 		}
+/* 000913 */ 		return __call__ (dict, null, __kwargtrans__ ({environments: [__call__ (CellsEnvironment, null)]}));
+/* 000913 */ 	});}
+/* 000913 */ });
 /* 000010 */ 
 //# sourceMappingURL=llm.feature.cells.map

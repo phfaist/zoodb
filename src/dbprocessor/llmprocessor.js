@@ -160,7 +160,7 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
 
             const formatted_ref_llm_text_fn =
                   optionsrefs.formatted_ref_llm_text_fn
-                  || ( (objid, obj) => ((obj.name||{}).llm_text || objid) )
+                  || ( (objid, obj) => obj?.name?.llm_text || objid )
             ;
 
             for (const [objid,obj] of Object.entries(objectsdb)) {
