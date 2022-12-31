@@ -225,9 +225,12 @@ export class SearchableTextProcessor extends ZooDbProcessorBase
 
     process_zoo_update_objects(db_objects)
     {
+        debug('process_zoo_update_objects(), updating searchable text.');
         for (const object_type of this.searchable_text_fieldset.object_types) {
             const thistype_objects_db = db_objects[object_type];
             if (thistype_objects_db !== undefined) {
+                debug(`updating ${Object.keys(thistype_objects_db).length} objects `
+                      + `of type ‘${object_type}’`);
                 this._process_objects_db(object_type, thistype_objects_db);
             }
         }

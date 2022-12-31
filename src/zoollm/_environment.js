@@ -167,7 +167,6 @@ export class RefResolver
 
 
 
-
 export class CitationsProvider
 {
     constructor()
@@ -206,19 +205,28 @@ export class CitationsProvider
     get_citation_full_text_llm(cite_prefix, cite_key, resource_info)
     {
         if (!this.citations_database.hasOwnProperty(cite_prefix)) {
-            throw new Error(
-                `There is no citation registered for prefix ‘${cite_prefix}’ in query `
-                + `for ‘${cite_prefix}:${cite_key}’ in ${resource_info}`
-            );
+            return this.handle_unresolved_citation({
+                cite_prefix, cite_key, resource_info,
+                message:
+                    `There is no citation registered for prefix ‘${cite_prefix}’ in query `
+                    + `for ‘${cite_prefix}:${cite_key}’ in ${resource_info}`
+            });
+            
         }
         if (!this.citations_database[cite_prefix].hasOwnProperty(cite_key)) {
-            throw new Error(
-                `There is no citation registered for key ‘${cite_prefix}:${cite_key}’ `
-                + `in ${resource_info}`
-            );
+            return this.handle_unresolved_citation({
+                cite_prefix, cite_key, resource_info,
+                message:
+                    `There is no citation registered for key ‘${cite_prefix}:${cite_key}’ `
+                    + `in ${resource_info}`
+            });
         }
-
         return this.citations_database[cite_prefix][cite_key];
+    }
+
+    handle_unresolved_citation({ cite_prefix, cite_key, message, resource_info })
+    {
+        throw new Error(message);
     }
 };
 
