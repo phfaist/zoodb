@@ -149,14 +149,14 @@ export class RefResolver
         return ref_instance;
     }
 
-    // load/save DB
-    dump_ref_instance_database()
+    // load/save references DB
+    dump_database()
     {
         return {
             ref_instance_database: this.ref_instance_database
         };
     }
-    load_ref_instance_database(data)
+    load_database(data)
     {
         this.ref_instance_database = data.ref_instance_database;
     }
@@ -228,9 +228,22 @@ export class CitationsProvider
     {
         // no, this will prevent processing with further citations providers!
         //throw new Error(message);
-        console.error(`Can't find citation ‘${cite_prefix}:${cite_key}’: ${message}`);
+        debug(`Can't find citation ‘${cite_prefix}:${cite_key}’: ${message}`);
         return null;
     }
+
+    // load/save references DB
+    dump_database()
+    {
+        return {
+            citations_database: this.citations_database,
+        };
+    }
+    load_database(data)
+    {
+        this.citations_database = citations_database;
+    }
+
 };
 
 

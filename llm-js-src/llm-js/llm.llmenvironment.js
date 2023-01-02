@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-01-02 19:06:32
+/* 000001 */ // Transcrypt'ed from Python, 2023-01-02 19:15:53
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
 /* 000006 */ var unique_object_id = {};
@@ -15,7 +15,7 @@
 /* 000007 */ __nest__ (logging, '', __module_logging__);
 /* 000006 */ import * as __module_re__ from './re.js';
 /* 000006 */ __nest__ (re, '', __module_re__);
-/* 000006 */ export {latexnodes, LatexWalkerParseErrorFormatter, LLMDocument, LLMFragment, LatexWalkerParseError, latexwalker, latexnodes_nodes};
+/* 000006 */ export {latexnodes, latexwalker, LatexWalkerParseErrorFormatter, LLMFragment, LLMDocument, latexnodes_nodes, LatexWalkerParseError};
 /* 000001 */ var __name__ = 'llm.llmenvironment';
 /* 000008 */ export var logger = (function () {
 /* 000008 */ 	var __accu0__ = logging;

@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-01-02 19:06:33
+/* 000001 */ // Transcrypt'ed from Python, 2023-01-02 19:15:54
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
@@ -11,7 +11,7 @@
 /* 000007 */ __nest__ (logging, '', __module_logging__);
 /* 000006 */ import * as __module_re__ from './re.js';
 /* 000006 */ __nest__ (re, '', __module_re__);
-/* 000006 */ export {LLMArgumentSpec, fmthelpers, ParsedArgumentsInfo, Feature, LLMMacroSpecBase};
+/* 000006 */ export {LLMMacroSpecBase, LLMArgumentSpec, Feature, fmthelpers, ParsedArgumentsInfo};
 /* 000001 */ var __name__ = 'llm.feature.endnotes';
 /* 000008 */ export var logger = (function () {
 /* 000008 */ 	var __accu0__ = logging;
@@ -611,59 +611,59 @@
 /* 000302 */ 					continue;
 /* 000302 */ 				}
 /* 000306 */ 				var has_endnotes = true;
-/* 000308 */ 				if (__t__ (include_headings_at_level !== null)) {
-/* 000309 */ 					var heading_nodelist = (function () {
-/* 000309 */ 						var __accu0__ = self.render_context.doc.environment;
-/* 000309 */ 						return __call__ (__accu0__.make_fragment, __accu0__, encat.heading_title, __kwargtrans__ ({is_block_level: false, what: '{} heading title'.format (encat.category_name)}));
-/* 000309 */ 					}) ();
-/* 000314 */ 					var heading_target_id = null;
-/* 000315 */ 					if (__t__ (set_headings_target_ids)) {
-/* 000316 */ 						var heading_target_id = '{}-{}'.format (target_id, encat.category_name);
-/* 000316 */ 					}
-/* 000317 */ 					(function () {
-/* 000317 */ 						var __accu0__ = blocks;
-/* 000318 */ 						return __call__ (__accu0__.append, __accu0__, (function () {
-/* 000318 */ 							var __accu1__ = fragment_renderer;
-/* 000318 */ 							return __call__ (__accu1__.render_heading, __accu1__, heading_nodelist.nodes, __kwargtrans__ ({render_context: self.render_context, heading_level: include_headings_at_level, target_id: heading_target_id}));
-/* 000318 */ 						}) ());
-/* 000318 */ 					}) ();
-/* 000318 */ 				}
-/* 000325 */ 				(function () {
-/* 000325 */ 					var __accu0__ = blocks;
-/* 000326 */ 					return __call__ (__accu0__.append, __accu0__, (function () {
-/* 000326 */ 						var __accu1__ = self;
-/* 000326 */ 						return __call__ (__accu1__.render_endnotes_category, __accu1__, encat);
-/* 000326 */ 					}) ());
-/* 000326 */ 				}) ();
-/* 000326 */ 			}
-/* 000329 */ 			if (__t__ (!__t__ ((has_endnotes)))) {
-/* 000330 */ 				return (function () {
-/* 000330 */ 					var __accu0__ = fragment_renderer;
-/* 000330 */ 					return __call__ (__accu0__.render_nothing, __accu0__, __kwargtrans__ ({annotations: ['no-endnotes']}));
-/* 000330 */ 				}) ();
-/* 000330 */ 			}
-/* 000334 */ 			if (__t__ (endnotes_heading_title !== null)) {
-/* 000336 */ 				var heading_title_nodelist = (function () {
-/* 000336 */ 					var __accu0__ = self.render_context.doc.environment;
-/* 000336 */ 					return __call__ (__accu0__.make_fragment, __accu0__, endnotes_heading_title, __kwargtrans__ ({is_block_level: false, what: 'endnotes heading title'.format ()}));
-/* 000336 */ 				}) ();
-/* 000341 */ 				(function () {
-/* 000341 */ 					var __accu0__ = blocks;
-/* 000343 */ 					return __call__ (__accu0__.insert, __accu0__, 0, (function () {
-/* 000343 */ 						var __accu1__ = fragment_renderer;
-/* 000343 */ 						return __call__ (__accu1__.render_heading, __accu1__, heading_title_nodelist.nodes, __kwargtrans__ ({render_context: self.render_context, heading_level: endnotes_heading_level}));
-/* 000343 */ 					}) ());
-/* 000343 */ 				}) ();
-/* 000343 */ 			}
-/* 000351 */ 			return (function () {
-/* 000351 */ 				var __accu0__ = fragment_renderer;
-/* 000352 */ 				return __call__ (__accu0__.render_semantic_block, __accu0__, (function () {
-/* 000352 */ 					var __accu1__ = fragment_renderer;
-/* 000352 */ 					return __call__ (__accu1__.render_join_blocks, __accu1__, blocks);
-/* 000352 */ 				}) (), __kwargtrans__ ({role: 'endnotes', annotations: annotations, target_id: target_id}));
-/* 000352 */ 			}) ();
-/* 000352 */ 		});}
-/* 000352 */ 	})
-/* 000352 */ });
+/* 000308 */ 				if (__t__ (__t__ (include_headings_at_level !== null) && include_headings_at_level !== false)) {
+/* 000310 */ 					var heading_nodelist = (function () {
+/* 000310 */ 						var __accu0__ = self.render_context.doc.environment;
+/* 000310 */ 						return __call__ (__accu0__.make_fragment, __accu0__, encat.heading_title, __kwargtrans__ ({is_block_level: false, what: '{} heading title'.format (encat.category_name)}));
+/* 000310 */ 					}) ();
+/* 000315 */ 					var heading_target_id = null;
+/* 000316 */ 					if (__t__ (set_headings_target_ids)) {
+/* 000317 */ 						var heading_target_id = '{}-{}'.format (target_id, encat.category_name);
+/* 000317 */ 					}
+/* 000318 */ 					(function () {
+/* 000318 */ 						var __accu0__ = blocks;
+/* 000319 */ 						return __call__ (__accu0__.append, __accu0__, (function () {
+/* 000319 */ 							var __accu1__ = fragment_renderer;
+/* 000319 */ 							return __call__ (__accu1__.render_heading, __accu1__, heading_nodelist.nodes, __kwargtrans__ ({render_context: self.render_context, heading_level: include_headings_at_level, target_id: heading_target_id}));
+/* 000319 */ 						}) ());
+/* 000319 */ 					}) ();
+/* 000319 */ 				}
+/* 000326 */ 				(function () {
+/* 000326 */ 					var __accu0__ = blocks;
+/* 000327 */ 					return __call__ (__accu0__.append, __accu0__, (function () {
+/* 000327 */ 						var __accu1__ = self;
+/* 000327 */ 						return __call__ (__accu1__.render_endnotes_category, __accu1__, encat);
+/* 000327 */ 					}) ());
+/* 000327 */ 				}) ();
+/* 000327 */ 			}
+/* 000330 */ 			if (__t__ (!__t__ ((has_endnotes)))) {
+/* 000331 */ 				return (function () {
+/* 000331 */ 					var __accu0__ = fragment_renderer;
+/* 000331 */ 					return __call__ (__accu0__.render_nothing, __accu0__, __kwargtrans__ ({annotations: ['no-endnotes']}));
+/* 000331 */ 				}) ();
+/* 000331 */ 			}
+/* 000335 */ 			if (__t__ (endnotes_heading_title !== null)) {
+/* 000337 */ 				var heading_title_nodelist = (function () {
+/* 000337 */ 					var __accu0__ = self.render_context.doc.environment;
+/* 000337 */ 					return __call__ (__accu0__.make_fragment, __accu0__, endnotes_heading_title, __kwargtrans__ ({is_block_level: false, what: 'endnotes heading title'.format ()}));
+/* 000337 */ 				}) ();
+/* 000342 */ 				(function () {
+/* 000342 */ 					var __accu0__ = blocks;
+/* 000344 */ 					return __call__ (__accu0__.insert, __accu0__, 0, (function () {
+/* 000344 */ 						var __accu1__ = fragment_renderer;
+/* 000344 */ 						return __call__ (__accu1__.render_heading, __accu1__, heading_title_nodelist.nodes, __kwargtrans__ ({render_context: self.render_context, heading_level: endnotes_heading_level}));
+/* 000344 */ 					}) ());
+/* 000344 */ 				}) ();
+/* 000344 */ 			}
+/* 000352 */ 			return (function () {
+/* 000352 */ 				var __accu0__ = fragment_renderer;
+/* 000353 */ 				return __call__ (__accu0__.render_semantic_block, __accu0__, (function () {
+/* 000353 */ 					var __accu1__ = fragment_renderer;
+/* 000353 */ 					return __call__ (__accu1__.render_join_blocks, __accu1__, blocks);
+/* 000353 */ 				}) (), __kwargtrans__ ({role: 'endnotes', annotations: annotations, target_id: target_id}));
+/* 000353 */ 			}) ();
+/* 000353 */ 		});}
+/* 000353 */ 	})
+/* 000353 */ });
 /* 000006 */ 
 //# sourceMappingURL=llm.feature.endnotes.map
