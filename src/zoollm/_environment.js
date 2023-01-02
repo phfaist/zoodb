@@ -226,7 +226,10 @@ export class CitationsProvider
 
     handle_unresolved_citation({ cite_prefix, cite_key, message, resource_info })
     {
-        throw new Error(message);
+        // no, this will prevent processing with further citations providers!
+        //throw new Error(message);
+        console.error(`Can't find citation ‘${cite_prefix}:${cite_key}’: ${message}`);
+        return null;
     }
 };
 
