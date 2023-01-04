@@ -146,7 +146,7 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
         // Remember that target_href's can still be adjusted at a later stage by
         // setting a target_href_resolver in the zoo llm environment's
         // ref_resolver instance.
-        return `zoodbobjectref:///${object_type}:${object_id}`;
+        return `zoodbobjectref:/${object_type}:${object_id}`;
     }
     
     async process_ref_targets_objects()

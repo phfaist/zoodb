@@ -4,8 +4,12 @@ const debug = debug_module('zoodb.dbprocessor.llmcontent');
 import { ZooDbProcessorBase } from './base.js';
 
 import { getfield } from '../util/getfield.js';
-import { iter_object_fields_recursive } from '../util/objectinspector.js';
-import { ZooLLMResourceInfo, $$kw, repr, LLMDataDumper, is_llm_fragment } from '../zoollm/index.js';
+import {
+    iter_object_fields_recursive, iter_schema_fields_recursive
+} from '../util/objectinspector.js';
+import {
+    ZooLLMResourceInfo, $$kw, repr, LLMDataDumper, is_llm_fragment
+} from '../zoollm/index.js';
 
 
 function parse_schema_llm_options(schema)
@@ -101,20 +105,66 @@ export class LLMSimpleContentCompiler extends ZooDbProcessorBase
     // ----
 
     /**
+     * Compile the given LLM content `llm_content` according to the options
+     * `llm_options`.
+     *
+     * The fragment's `resource_info` and `what` properties are set according to
+     * `object_type`, `object`, and `fieldname`.  We'll inspect `object._zoodb`
+     * to get information like object ID, source file name, etc.
+     *
+     * The newly created LLM fragment is returned.  The `object` itself and its
+     * properties are NOT modified.
+     *
+     *  The LLM options should be an object as is returned by
+     * `parse_schema_llm_options()`.  It specifies whether or not the fragment
+     * is parsed in standalone mode.
+     *
+     * If you specify `llm_options` (not nullish), then the arguments
+     * `fieldschema` and `object_schema` are not used.  If you don't specify
+     * `llm_options` (nullish), the `fieldschema` option is used to parse the
+     * LLM options.  If `llm_options` and `fieldschema` are both not specified
+     * (nullish) then we find the corresponding field schema in `object_schema`
+     * using the `fieldname` argument.
      *
      * Note: the API guarantees that compile_llm() and compile_object() also
      * work if no zoodb is set, and can be used w/o zoodb if you want to compile
      * a single ad hoc object.
      */
-    compile_llm( llm_content, { object_type, llm_options, object, fieldname } )
+    compile_llm( llm_content, {
+        llm_options,
+        fieldschema,
+        object_schema,
+        object_type,
+        object,
+        fieldname,
+    } )
     {
         if (is_llm_fragment(llm_content)) {
             // it's already compiled!
             return llm_content;
         }
 
-        const object_id = object._zoodb.id;
-        const source_file_path = object._zoodb.source_file_path;
+        if (llm_options == null) {
+            if (fieldschema == null) {
+                // is there a better way to do this??
+                let fldlist = iter_schema_fields_recursive(object_schema);
+                for (const fld of fldlist) {
+                    if (fld.fieldname === fieldname) {
+                        fieldschema = fld.fieldschema;
+                        break;
+                    }
+                }
+                if (fieldschema == null) {
+                    throw new Error(
+                        `Couldn't find field schema for ‘${fieldname}’ in object_schema`
+                    );
+                }
+            }
+            llm_options = parse_schema_llm_options(fieldschema);
+        }
+
+        const object_id = object?._zoodb.id;
+        const source_file_path = object?._zoodb?.source_file_path;
 
         const resource_info = new ZooLLMResourceInfo(
             object_type,
@@ -122,16 +172,16 @@ export class LLMSimpleContentCompiler extends ZooDbProcessorBase
             source_file_path,
         );
 
-        const what = resource_info.toString();
+        const what = resource_info.toString() + ` .${fieldname}`;
 
-        llm_content = llm_content || '';
+        llm_content ??= '';
 
         let fragment = null;
         try {
             fragment = this.config.llm_environment.make_fragment(
                 llm_content,
                 $$kw({
-                    standalone_mode: llm_options.standalone,
+                    standalone_mode: llm_options.standalone ?? false,
                     resource_info: resource_info,
                     what: what,
                 })

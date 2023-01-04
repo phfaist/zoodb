@@ -124,22 +124,18 @@ export class RefResolver
     {
         //debug(`RefResolver: resolving ref ‘${ref_type}:${ref_label}’ ...`);
 
-        if (!this.ref_instance_database.hasOwnProperty(ref_type)) {
-            // no such reference type
-            debug(`No such reference type in ref instance database — ${ref_type}`);
-            return null;
-        }
-        if (!this.ref_instance_database[ref_type].hasOwnProperty(ref_label)) {
-            // no such reference.
-            return null;
-        }
+        const ref_instance = this.ref_instance_database?.[ref_type]?.[ref_label];
 
-        const ref_instance = this.ref_instance_database[ref_type][ref_label];
+        if (ref_instance == null) {
+            // no such reference type
+            debug(`No such reference in ref instance database — ${ref_type}:${ref_label}`);
+            return null;
+        }
 
         // debug(`Got ref ‘${ref_type}:${ref_label}’: ${repr(ref_instance)}`);
 
         if (this.target_href_resolver != null) {
-            return RefInstance( $$kw(
+            return new RefInstance( $$kw(
                 Object.assign({}, ref_instance.asdict(), {
                     target_href: this.target_href_resolver(ref_instance, render_context)
                 })
@@ -152,13 +148,23 @@ export class RefResolver
     // load/save references DB
     dump_database()
     {
+        // RefInstance objects are exported correctly because RefInstance was
+        // given a .toJSON() method (patched above).
         return {
-            ref_instance_database: this.ref_instance_database
+            ref_instance_database: this.ref_instance_database,
         };
     }
     load_database(data)
     {
-        this.ref_instance_database = data.ref_instance_database;
+        // create RefInstance object instances
+        let ridb = {};
+        for (const [ref_type, ref_type_db] of Object.entries(data.ref_instance_database)) {
+            ridb[ref_type] = {};
+            for (const [ref_label, ref_instance_data] of Object.entries(ref_type_db)) {
+                ridb[ref_type][ref_label] = new RefInstance( $$kw(ref_instance_data) );
+            }
+        }
+        this.ref_instance_database = ridb;
     }
 
 };
@@ -235,13 +241,25 @@ export class CitationsProvider
     // load/save references DB
     dump_database()
     {
+        let db = {};
+
+        for (const [cite_prefix, prefix_db] of Object.entries(this.citations_database)) {
+            db[cite_prefix] = {};
+            for (let [cite_key, citation_text] of Object.entries(prefix_db)) {
+                if (is_llm_fragment(citation_text)) {
+                    citation_text = citation_text.llm_text;
+                }
+                db[cite_prefix][cite_key] = citation_text;
+            }
+        }
+
         return {
-            citations_database: this.citations_database,
+            citations_database: db,
         };
     }
     load_database(data)
     {
-        this.citations_database = citations_database;
+        this.citations_database = data.citations_database;
     }
 
 };
