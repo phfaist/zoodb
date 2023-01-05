@@ -28,6 +28,9 @@ export { LLMDataDumper, LLMDataLoader } from './llm-js/llm.llmdump.js';
 export * from './_fragmentrenderers.js';
 
 
+// fn_unique_object_id utility
+export { fn_unique_object_id } from './llm-js/unique_object_id.js';
+
 
 // utilities for rendering:
 
@@ -81,3 +84,5 @@ export function value_not_empty(value)
     }
     return false;
 }
+
+

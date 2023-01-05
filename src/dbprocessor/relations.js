@@ -107,14 +107,15 @@ class ZooRelation
         const target_object = zoodb.objects[this.to_object_type][target_obj_id];
         
         let rel_object_copy_nopkfld =
-            Object.fromEntries( Object.entries(relation_object).filter(  (ropair) => {
-                const [relobjkey, relobjval] = ropair;
-                return relobjkey != this.relation_primary_key_field;
-            } ) );
+            Object.fromEntries( Object.entries(relation_object).filter(
+                ([relobjkey, relobjval]) => (relobjkey != this.relation_primary_key_field)
+            ) );
         
         if (this.relation_add_object_field) {
             relation_object[this.relation_add_object_field] = target_object;
         }
+
+        //debug('relations: Set relation object', {obj, relation_object, target_object});
 
         if (this.use_backreference
             && (typeof process_object_types == 'undefined'
@@ -130,6 +131,9 @@ class ZooRelation
                 throw new Error(`Invalid field: in backreference: in relation object `
                                 +`in ${this.object_type}`);
             }
+
+            //debug('relations: Adding backreference',
+            //      {target_object, backref_object, backref_field: this.backref_field});
 
             concatlistfield(target_object, this.backref_field, [ backref_object ]);
 

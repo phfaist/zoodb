@@ -11,7 +11,8 @@ import * as llm_fragmentrenderer_text from './llm-js/llm.fragmentrenderer.text.j
 function _is_local_url(urlstring)
 {
     return urlstring.startsWith('#')
-        || ( urlstring.startsWith('/') && ! urlstring.startsWith('//') );
+        || ( urlstring.startsWith('/') && ! urlstring.startsWith('//') )
+        || urlstring.startsWith('javascript:');
 }
 
 

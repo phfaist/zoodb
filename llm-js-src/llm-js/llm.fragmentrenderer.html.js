@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-01-02 19:15:54
+/* 000001 */ // Transcrypt'ed from Python, 2023-01-05 22:41:20
 /* 000006 */ var html = {};
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
@@ -208,10 +208,7 @@
 /* 000158 */ 		if (__t__ (!__t__ ((target_href)))) {
 /* 000159 */ 			var target_href = '#';
 /* 000159 */ 		}
-/* 000161 */ 		var attrs = dict ({'href': (function () {
-/* 000161 */ 			var __accu0__ = self;
-/* 000161 */ 			return __call__ (__accu0__.htmlescape, __accu0__, target_href);
-/* 000161 */ 		}) ()});
+/* 000160 */ 		var attrs = dict ({'href': target_href});
 /* 000163 */ 		if (__t__ (__call__ (callable, null, self.use_link_target_blank))) {
 /* 000164 */ 			if (__t__ ((function () {
 /* 000164 */ 				var __accu0__ = self;
