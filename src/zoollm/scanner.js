@@ -230,6 +230,22 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
 
         if (node.hasOwnProperty('llm_referenceable_infos'))
         {
+            let extra_attributes = {};
+            // special treatment for some nodes, to add additional information
+            // to the encountered referenceable info object structure
+            if (node.environmentname === 'defterm') {
+                extra_attributes.defterm_body_llm =
+                    node.latex_walker.llm_environment.make_fragment(
+                        node.nodelist,
+                        $$kw({
+                            is_block_level: true,
+                            resource_info: node.latex_walker.resource_info,
+                            what: `defterm body`,
+                        })
+                    )
+                ;
+            }
+
             // it's something referenceable, like a defterm or a section heading
             for (const referenceable_info of node.llm_referenceable_infos) {
 
@@ -241,7 +257,8 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
                     encountered_in: {
                         resource_info: node.latex_walker.resource_info,
                         what: node.latex_walker.what,
-                    }
+                    },
+                    ... extra_attributes,
                 } );
 
             }
