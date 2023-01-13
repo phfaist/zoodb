@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: '${{ matrix.node-version }}'
 
-      - run: 'ls && rm -rf .yarnrc* yarn* .yarn*'
+      - run: 'ls -lhA && rm -rf .yarnrc* yarn* .yarn* .cache*'
   
       - name: 'Enable Yarn'
         run: 'corepack enable'
