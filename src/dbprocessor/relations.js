@@ -8,7 +8,7 @@ import { ZooDbProcessorBase } from './base.js';
 
 // -----------------------------------------------
 
-class ZooRelation
+export class ZooRelation
 {
     constructor(object_type, relation_spec, zoodb)
     {
