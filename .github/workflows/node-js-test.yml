@@ -31,8 +31,6 @@ jobs:
         with:
           node-version: '${{ matrix.node-version }}'
 
-      - run: 'ls -lhA && ls -lhA ~ && rm -rf .yarnrc* yarn* .yarn* ~/.cache*'
-  
       - name: 'Enable Yarn'
         run: 'corepack enable'
         working-directory: ./zoodb_checkout/

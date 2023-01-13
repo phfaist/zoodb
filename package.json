@@ -4,6 +4,7 @@
     "version": "0.1.0",
     "author": "Philippe Faist",
     "license": "MIT",
+    "packageManager": "yarn@3.3.0",
     "dependencies": {
         "@apidevtools/json-schema-ref-parser": "^9.0.9",
         "base32-encode": "^2.0.0",
