@@ -22,16 +22,31 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: 'Install Node.JS (${{ matrix.node-version }})'
-      uses: actions/setup-node@v3
-      with:
-        node-version: '${{ matrix.node-version }}'
-        cache: 'yarn'
-
-    - run: 'corepack enable'
-    
-    - run: 'yarn'
-
-    - run: 'yarn test'
+      - uses: actions/checkout@v3
+      
+      - name: 'Install Node.JS (${{ matrix.node-version }})'
+        uses: actions/setup-node@v3
+        with:
+          node-version: '${{ matrix.node-version }}'
+  
+      # Cache Yarn Modules
+      - name: 'Get yarn cache directory path'
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+        shell: bash
+        #working-directory: .
+  
+      - name: 'Restore yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: '${{ steps.yarn-cache-dir-path.outputs.dir }}'
+          key: 'yarn-cache-folder-${{ hashFiles("**/yarn.lock", ".yarnrc.yml") }}'
+          restore-keys: |
+            yarn-cache-folder-
+  
+      - run: 'corepack enable'
+      
+      - run: 'yarn'
+  
+      - run: 'yarn test'
+  
