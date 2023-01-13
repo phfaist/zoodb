@@ -29,6 +29,12 @@ jobs:
         with:
           node-version: '${{ matrix.node-version }}'
   
+      - name: 'Enable Yarn'
+        run: 'corepack enable'
+      
+      - name: 'Inspect Yarn version'
+        run: 'yarn --version'
+      
       # Cache Yarn Modules
       - name: 'Get yarn cache directory path'
         id: yarn-cache-dir-path
@@ -44,8 +50,6 @@ jobs:
           restore-keys: |
             yarn-cache-folder-
   
-      - run: 'corepack enable'
-      
       - run: 'yarn'
   
       - run: 'yarn test'
