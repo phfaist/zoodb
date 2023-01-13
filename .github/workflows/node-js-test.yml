@@ -18,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['18', 'latest']
+        node-version: ['latest']
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -33,9 +33,11 @@ jobs:
   
       - name: 'Enable Yarn'
         run: 'corepack enable'
+        working-directory: ./zoodb_checkout
       
       - name: 'Inspect Yarn version'
         run: 'yarn --version'
+        working-directory: ./zoodb_checkout
       
       # Cache Yarn Modules
       - name: 'Get yarn cache directory path'
