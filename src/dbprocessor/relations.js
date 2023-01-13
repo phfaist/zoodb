@@ -17,6 +17,14 @@ class ZooRelation
 
         this.object_field = relation_spec.object_field;
         this.to_object_type = relation_spec.to_object_type;
+
+        // TODO -- Option not to link to the actual object to avoid making the
+        // data structure too complicated when not needed; e.g. for spaces where
+        // we only specify space_id w/o actually populating in the space object
+        // which doesn't contain any interesting info by itself
+        //
+        //this.check_valid_ref_only = relation_spec.check_valid_ref_only ?? false;
+
         this.relation_add_object_field = relation_spec.relation_add_object_field;
         this.relation_primary_key_field = relation_spec.relation_primary_key_field;
 

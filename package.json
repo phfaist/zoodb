@@ -24,6 +24,12 @@
         "url": "^0.11.0"
     },
     "main": "./src/index.js",
+    "devDependencies": {
+        "mocha": "^10.2.0"
+    },
+    "scripts": {
+        "test": "mocha"
+    },
     "exports": {
         ".": "./src/index.js",
         "./citationmanager": "./src/citationmanager/index.js",
