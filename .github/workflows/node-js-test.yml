@@ -26,25 +26,26 @@ jobs:
         with:
           path: ./zoodb_checkout
       
-      - name: 'Install Node.JS (${{ matrix.node-version }})'
-        uses: actions/setup-node@v3
+        #name: 'Install Node.JS (${{ matrix.node-version }})'
+      - uses: actions/setup-node@v3
         with:
-          node-version: '${{ matrix.node-version }}'
+          #cache: 'yarn'
+          node-version: 'latest' #'${{ matrix.node-version }}'
   
       - name: 'Enable Yarn'
         run: 'corepack enable'
-        working-directory: ./zoodb_checkout
+        working-directory: ./zoodb_checkout/
       
       - name: 'Inspect Yarn version'
         run: 'yarn --version'
-        working-directory: ./zoodb_checkout
+        working-directory: ./zoodb_checkout/
       
       # Cache Yarn Modules
       - name: 'Get yarn cache directory path'
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
         shell: bash
-        working-directory: ./zoodb_checkout
+        working-directory: ./zoodb_checkout/
   
       - name: 'Restore yarn cache'
         uses: actions/cache@v3
@@ -55,7 +56,7 @@ jobs:
             yarn-cache-folder-
   
       - run: 'yarn'
-        working-directory: ./zoodb_checkout
+        working-directory: ./zoodb_checkout/
   
       - run: 'yarn test'
-        working-directory: ./zoodb_checkout  
+        working-directory: ./zoodb_checkout/
