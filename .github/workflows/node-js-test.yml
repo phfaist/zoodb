@@ -23,6 +23,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          path: ./zoodb_checkout
       
       - name: 'Install Node.JS (${{ matrix.node-version }})'
         uses: actions/setup-node@v3
@@ -40,7 +42,7 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
         shell: bash
-        #working-directory: .
+        working-directory: ./zoodb_checkout
   
       - name: 'Restore yarn cache'
         uses: actions/cache@v3
@@ -51,6 +53,7 @@ jobs:
             yarn-cache-folder-
   
       - run: 'yarn'
+        working-directory: ./zoodb_checkout
   
       - run: 'yarn test'
-  
+        working-directory: ./zoodb_checkout  
