@@ -134,7 +134,7 @@ export class ZooRelation
 
         let target_object = null;
         if (target_obj_id != null) {
-            target_object = zoodb.objects[this.to_object_type][target_obj_id];
+            target_object = zoodb.objects[this.to_object_type][target_obj_id] ?? null;
         }
         
         if ( target_object == null) {
