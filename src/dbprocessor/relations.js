@@ -148,7 +148,7 @@ export class ZooRelation
         let rel_object_copy_nopkfld = null;
         if (this.value_is_shorthand_object_id) {
             rel_object_copy_nopkfld = {
-                [object_type + '_id']: relation_object,
+                [this.to_object_type + '_id']: relation_object,
             };
         } else {
             rel_object_copy_nopkfld = Object.fromEntries(
