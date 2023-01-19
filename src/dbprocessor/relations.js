@@ -127,7 +127,7 @@ export class ZooRelation
         if (target_obj_id == null && !this.allow_null) {
             throw new Error(
                 `Target object ID in reference cannot be null in `
-                + `${this.object_type} ‘${obj._zoodb.id}’ .${this.relation_object_field}: `
+                + `${this.object_type} ‘${obj._zoodb.id}’ .${this.object_field}: `
                 + ` ${JSON.stringify(relation_object)}`
             );
         }
