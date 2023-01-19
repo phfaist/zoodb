@@ -18,6 +18,8 @@ export class ZooRelation
         this.object_field = relation_spec.object_field;
         this.to_object_type = relation_spec.to_object_type;
 
+        this.allow_null = relation_spec.allow_null ?? false;
+
         // TODO -- Option not to link to the actual object to avoid making the
         // data structure too complicated when not needed; e.g. for spaces where
         // we only specify space_id w/o actually populating in the space object
@@ -28,13 +30,18 @@ export class ZooRelation
         this.relation_add_object_field = relation_spec.relation_add_object_field;
         this.relation_primary_key_field = relation_spec.relation_primary_key_field;
 
+        // 'true' is a special value indicates that the relation object is
+        // itself the target ID, not an object containing a key with the primary
+        // ID
+        this.value_is_shorthand_object_id = (this.relation_primary_key_field === true);
+
         const backreference = this.relation_spec.backreference;
         if (backreference) {
             this.use_backreference = true;
             this.backref_relation_primary_key_field =
-                backreference.relation_primary_key_field || (this.object_type + '_id');
+                backreference.relation_primary_key_field ?? (this.object_type + '_id');
             this.backref_relation_object_field =
-                backreference.relation_object_field || this.object_type;
+                backreference.relation_object_field ?? this.object_type;
             this.backref_field = backreference.field;
         } else {
             this.use_backreference = false;
@@ -49,7 +56,7 @@ export class ZooRelation
 
         const relation_field_schema =
               get_field_schema(this.zoodb.schema(this.object_type), this.object_field);
-        if (relation_field_schema.type == 'array') {
+        if (relation_field_schema.type === 'array') {
             this.source_has_multiple_relations = true;
             this.fully_specified_relation_add_object_field =
                 this.object_field + '.[].' + this.relation_add_object_field;
@@ -60,6 +67,16 @@ export class ZooRelation
         }
     }
 
+    /** Return information about which fields of which object will be set as a
+     * consequence of processing this relation object.
+     *
+     * Return a dictionary where keys are object types, and values are a
+     * dictionary ``{ fieldname, msg, }``, where `fieldname` is the name of a
+     * field of that object type that will be set automatically by this relation
+     * instance and `msg` is an error message that you can display if the user
+     * accidentally set that field instead of letting it be set automatically.
+     *
+     */
     get_computed_fields()
     {
         let computed_fields = {}
@@ -71,7 +88,7 @@ export class ZooRelation
         // backreferences too
         if (this.use_backreference) {
             computed_fields[this.to_object_type] =
-                ( computed_fields[this.to_object_type] || [] ).concat([
+                ( computed_fields[this.to_object_type] ?? [] ).concat([
                     { fieldname: this.backref_field,
                       msg: `This field will be determined automatically.` }
                 ]);
@@ -83,7 +100,7 @@ export class ZooRelation
     get_object_relation_objects(obj)
     {
         if (this.source_has_multiple_relations) {
-            return getfield(obj, this.object_field) || [];
+            return getfield(obj, this.object_field) ?? [];
         } else {
             return [ getfield(obj, this.object_field) ];
         }
@@ -99,11 +116,27 @@ export class ZooRelation
     _process_single_relation(obj, relation_object, options)
     {
         let zoodb = this.zoodb;
-        const {process_object_types} = options;
+        const { process_object_types } = options;
 
-        const target_obj_id = relation_object[this.relation_primary_key_field];
+        const target_obj_id = 
+              this.value_is_shorthand_object_id
+              ? relation_object
+              : relation_object[this.relation_primary_key_field]
+        ;
 
-        if ( !zoodb.objects[this.to_object_type].hasOwnProperty( target_obj_id ) ) {
+        if (target_obj_id == null && !this.allow_null) {
+            throw new Error(
+                `Target object ID in reference cannot be null in `
+                + `‘${JSON.stringify(relation_object)}’`
+            );
+        }
+
+        let target_object = null;
+        if (target_obj_id != null) {
+            target_object = zoodb.objects[this.to_object_type][target_obj_id];
+        }
+        
+        if ( target_object == null) {
             throw new Error(
                 `In ${this.object_type} object ‘${obj._zoodb.id}’ `
                 + `(‘${obj._zoodb.source_file_path}’): Invalid reference in `
@@ -112,22 +145,29 @@ export class ZooRelation
             );
         }
 
-        const target_object = zoodb.objects[this.to_object_type][target_obj_id];
+        let rel_object_copy_nopkfld = null;
+        if (this.value_is_shorthand_object_id) {
+            rel_object_copy_nopkfld = {
+                [object_type + '_id']: relation_object,
+            };
+        } else {
+            rel_object_copy_nopkfld = Object.fromEntries(
+                Object.entries(relation_object).filter(
+                    ([relobjkey, relobjval]) => (relobjkey != this.relation_primary_key_field)
+                )
+            );
+        }
         
-        let rel_object_copy_nopkfld =
-            Object.fromEntries( Object.entries(relation_object).filter(
-                ([relobjkey, relobjval]) => (relobjkey != this.relation_primary_key_field)
-            ) );
-        
-        if (this.relation_add_object_field) {
+        if (this.relation_add_object_field != null) {
             relation_object[this.relation_add_object_field] = target_object;
         }
 
         //debug('relations: Set relation object', {obj, relation_object, target_object});
 
         if (this.use_backreference
-            && (typeof process_object_types == 'undefined'
-                || process_object_types.includes(this.to_object_type))) {
+            && (process_object_types == null
+                || process_object_types.includes(this.to_object_type))
+            && target_object != null) {
 
             const backref_object = Object.assign({}, rel_object_copy_nopkfld);
 
@@ -175,7 +215,7 @@ export class RelationsPopulator extends ZooDbProcessorBase
         // get all the relation objects.
         this.relations = Object.fromEntries(
             this.config.object_types.map( (object_type) => {
-                const rels = (this.zoodb.schema(object_type)._zoo_relations || []).map(
+                const rels = (this.zoodb.schema(object_type)._zoo_relations ?? []).map(
                     (relation_spec) =>
                         new ZooRelation(object_type, relation_spec, this.zoodb)
                 );
@@ -267,7 +307,7 @@ export class RelationsPopulator extends ZooDbProcessorBase
                 const computed_fields = relation.get_computed_fields();
                 for (const [fld_object_type, fld_infos] of Object.entries(computed_fields)) {
                     all_relations_computed_fields[fld_object_type] =
-                        ( all_relations_computed_fields[fld_object_type] || [] )
+                        ( all_relations_computed_fields[fld_object_type] ?? [] )
                         .concat( fld_infos );
                 }
             }
