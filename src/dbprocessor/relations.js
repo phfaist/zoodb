@@ -137,7 +137,7 @@ export class ZooRelation
             target_object = zoodb.objects[this.to_object_type][target_obj_id] ?? null;
         }
         
-        if ( target_object == null) {
+        if ( target_obj_id != null && target_object == null ) {
             throw new Error(
                 `In ${this.object_type} object ‘${obj._zoodb.id}’ `
                 + `(‘${obj._zoodb.source_file_path}’): Invalid reference in `
