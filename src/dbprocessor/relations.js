@@ -10,10 +10,12 @@ import { ZooDbProcessorBase } from './base.js';
 
 export class ZooRelation
 {
-    constructor(object_type, relation_spec, zoodb)
+    constructor({object_type, relation_spec, zoodb})
     {
         this.object_type = object_type;
         this.relation_spec = relation_spec;
+
+        this.zoodb = zoodb;
 
         this.object_field = relation_spec.object_field;
         this.to_object_type = relation_spec.to_object_type;
@@ -47,8 +49,6 @@ export class ZooRelation
             this.use_backreference = false;
         }
 
-        this.zoodb = zoodb;
-        
         if ( !this.zoodb.objects.hasOwnProperty(this.to_object_type) ) {
             throw new Error(`Invalid _zoo_relation definition in ‘${this.object_type}’: `
                             + `There is no such object type ‘${this.to_object_type}’`);
@@ -127,7 +127,8 @@ export class ZooRelation
         if (target_obj_id == null && !this.allow_null) {
             throw new Error(
                 `Target object ID in reference cannot be null in `
-                + `‘${JSON.stringify(relation_object)}’`
+                + `${this.object_type} ‘${obj._zoodb.id}’ .${this.relation_object_field}: `
+                + ` ${JSON.stringify(relation_object)}`
             );
         }
 
@@ -217,7 +218,7 @@ export class RelationsPopulator extends ZooDbProcessorBase
             this.config.object_types.map( (object_type) => {
                 const rels = (this.zoodb.schema(object_type)._zoo_relations ?? []).map(
                     (relation_spec) =>
-                        new ZooRelation(object_type, relation_spec, this.zoodb)
+                        new ZooRelation({object_type, relation_spec, zoodb: this.zoodb})
                 );
                 return [object_type, rels];
             } )
