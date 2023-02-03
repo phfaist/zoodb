@@ -44,6 +44,7 @@
         "./zoollm/citationcompiler": "./src/zoollm/citationcompiler.js",
         "./zoollm/scanner": "./src/zoollm/scanner.js",
         "./util": "./src/util/index.js",
+        "./util/*": "./src/util/*.js",
         "./search/searchindex": "./src/search/searchindex.js",
         "./search/searchwidget": "./src/search/searchwidget.js"
     },
