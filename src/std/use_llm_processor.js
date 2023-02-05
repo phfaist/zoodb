@@ -85,7 +85,6 @@ export function use_llm_processor(_this)
                     new LLMGraphicsResourceProcessor({
                         zoo_llm_environment: _this.zoo_llm_environment,
                         fs,
-                        fsRootFilePath: fs_data_dir,
                     }),
                 ],
             },
