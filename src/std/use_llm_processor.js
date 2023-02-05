@@ -42,14 +42,14 @@ export function use_llm_processor(_this)
                 arxiv: new CitationSourceArxiv({
                     override_arxiv_dois_file:
                         llm_processor_options.citations?.override_arxiv_dois_file,
-                    fs: _this.config.fs,
+                    fs: llm_processor_options.fs,
                 }),
                 doi: new CitationSourceDoi(),
                 manual: new CitationSourceManual(),
                 preset: new CitationSourceBibliographyFile({
                     bibliography_files:
                         llm_processor_options.citations?.preset_bibliography_files,
-                    fs: _this.config.fs,
+                    fs: llm_processor_options.fs,
                 }),
             },
             default_user_agent:
@@ -69,7 +69,7 @@ export function use_llm_processor(_this)
                         llm_processor_options.resource_collector?.figure_filename_extensions
                         ?? [ '', '.svg', '.png', '.jpeg', '.jpg' ],
                     //target_directory: './_output_resource_graphics_files/',
-                    fs: _this.config.fs,
+                    fs: llm_processor_options.fs,
                     source_directory:
                         llm_processor_options.resource_collector?.graphics_resources_fs_data_dir
                 }),
@@ -78,7 +78,7 @@ export function use_llm_processor(_this)
                 'graphics_path': [
                     new LLMGraphicsResourceProcessor({
                         zoo_llm_environment: _this.zoo_llm_environment,
-                        fs: _this.config.fs,
+                        fs: llm_processor_options.fs,
                     }),
                 ],
             },
