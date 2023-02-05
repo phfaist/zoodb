@@ -1,0 +1,12 @@
+
+person_id: danielle
+
+name: 'Danielle Aaliz-Bibby'
+
+biography: |-
+  Danielle's biography will appear here.
+  
+relations:
+  parents:
+    - person_id: alice
+    - person_id: bob

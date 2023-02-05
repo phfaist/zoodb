@@ -61,20 +61,28 @@ export function value_not_empty(value)
 
 export function make_render_shorthands({render_context, render_value_options})
 {
+    if (render_context == null) {
+        throw new Error(`render_context is not defined`);
+    }
+
     render_value_options = Object.assign({
         list_joiner: '',
         list_item_wrapper: (x) => `<span class="paragraph-in-list">${x}</span>`,
     }, render_value_options ?? {});
 
     const ne = value_not_empty;
+
     const rdr = (x) => render_value(x, render_context, render_value_options);
+
+    const rdrblock = (x) => x.render(render_context, $$kw({ is_block_level: true }));
+
     const ref = (object_type, object_id, {display_llm}={}) => {
         const refsmgr = render_context.feature_render_manager('refs');
         return refsmgr.render_ref(object_type, object_id, display_llm ?? null,
                                   null, render_context);
     };
 
-    return { ne, rdr, ref };
+    return { ne, rdr, rdrblock, ref };
 }
 
 

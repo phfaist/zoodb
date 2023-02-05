@@ -1,0 +1,9 @@
+{
+    "name": "peopledb_website",
+    "private": true,
+    "packageManager": "yarn@3.3.0",
+    "dependencies": {
+        "@11ty/eleventy": "beta",
+        "@phfaist/zoodb": "link:../.."
+    }
+}

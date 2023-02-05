@@ -1,0 +1,12 @@
+---
+title: "People DB home"
+---
+
+
+<p>List of people:</p>
+
+<ul>
+{% for person_page in collections.person %}
+<li><a href="{{person_page.url}}">{{ person_page.data.title }}</a></li>
+{% endfor %}
+</ul>

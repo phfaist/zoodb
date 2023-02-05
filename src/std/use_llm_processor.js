@@ -75,9 +75,9 @@ export function use_llm_processor(_this)
                         ?? [ '', '.svg', '.png', '.jpeg', '.jpg' ],
                     //target_directory: './_output_resource_graphics_files/',
                     fs,
-                    fsRootFilePath: fs_data_dir,
                     source_directory:
                         llm_options.resources?.graphics_resources_fs_data_dir
+                        ?? fs_data_dir
                 }),
             },
             resource_processors: {

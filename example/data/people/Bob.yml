@@ -1,0 +1,10 @@
+
+person_id: bob
+
+name: 'Bob Bibby'
+
+biography: |
+  Bob's biography goes here.
+
+relations:
+  spouse: alice

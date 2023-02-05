@@ -1,0 +1,10 @@
+
+person_id: alice
+
+name: 'Alice Aaliz'
+
+biography: |
+  Alice's biography goes here.
+
+relations:
+  spouse: bob
