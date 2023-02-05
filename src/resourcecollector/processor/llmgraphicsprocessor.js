@@ -34,13 +34,6 @@ export class LLMGraphicsResourceProcessor
         this.zoo_llm_environment = options.zoo_llm_environment;
 
         this.fs = options.fs;
-        this.fsRootFilePath = options.fsRootFilePath;
-
-        if (this.fsRootFilePath != null) {
-            this._fs_path = (x) => path.join(this.fsRootFilePath, x);
-        } else {
-            this._fs_path = (x) => x;
-        }
 
         if (this.fs == null) {
             throw new Error(
@@ -54,8 +47,11 @@ export class LLMGraphicsResourceProcessor
 
     async process(target_info, source)
     {
+        // observe that filename (full_source_path) already includes any data
+        // dir / source dir set by the retriever, so don't prefix and data dir
+        // at this point.
         const filename = target_info.full_source_path;
-        const stream = this.fs.createReadStream( this._fs_path(filename) );
+        const stream = this.fs.createReadStream( filename );
 
         let grdata = await parse_image_metadata(filename, stream);
         //debug(`DEBUG - got grdata = ${JSON.stringify(grdata)}`);

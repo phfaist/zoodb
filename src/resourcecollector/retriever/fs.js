@@ -78,6 +78,8 @@ export class FilesystemResourceRetriever
 
         // Find the file. We might have to try different extensions, for instance.
         const {resolved_source, full_source_path} = resolved_info;
+
+        debug(`retrieving ‘${source}’ (resolved at ‘${full_source_path}’)`);
         
         const target_name = this.rename_file_template(
             new FilesystemPropertiesAccessor(resolved_source, full_source_path, this.fs)
