@@ -15,7 +15,7 @@ export class CitationSourceArxiv extends CitationSourceBase
 {
     constructor(options)
     {
-        options ||= {};
+        options ??= {};
         const chain_to_doi = options.chain_to_doi ?? true;
 
         const override_options = {
@@ -37,8 +37,8 @@ export class CitationSourceArxiv extends CitationSourceBase
         this.chain_to_doi = chain_to_doi;
         this.data_for_versionless_arxivid = {};
 
-        this.override_arxiv_dois_file = this.options.override_arxiv_dois_file || null;
-        this.override_arxiv_dois = this.options.override_arxiv_dois || {};
+        this.override_arxiv_dois_file = this.options.override_arxiv_dois_file ?? null;
+        this.override_arxiv_dois = this.options.override_arxiv_dois ?? {};
     }
 
     add_retrieve(ids)

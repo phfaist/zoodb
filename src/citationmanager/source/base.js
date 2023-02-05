@@ -39,7 +39,7 @@ export class CitationSourceBase
         // recursive, so make sure that any sub-option trees are assigned
         // correctly, too.
         options ||= {};
-        this.options = Object.assign(
+        this.options = loMerge(
             {
                 fs: {
                     readFileSync(fname) {
@@ -51,32 +51,32 @@ export class CitationSourceBase
                         );
                     }
                 },
-                fsRootFilePath: '',
+                fsRootFilePath: null,
             },
             default_options ?? {},
             options,
             override_options ?? {},
         );
-        this.options.cache_store_options = Object.assign(
-            {},
-            default_options.cache_store_options ?? {},
-            options.cache_store_options ?? {},
-            override_options.cache_store_options ?? {}
-        );
+
+        if (this.options.fsRootFilePath != null && this.options.fsRootFilePath != '') {
+            this._file_root = `//${this.options.fsRootFilePath}/`;
+        } else {
+            this._file_root = '';
+        }
 
         this.total_queried = 0;
 
-        this.chunk_size = this.options.chunk_size || 512;
-        this.chunk_retrieve_delay_ms = this.options.chunk_retrieve_delay_ms || 1000;
+        this.chunk_size = this.options.chunk_size ?? 512;
+        this.chunk_retrieve_delay_ms = this.options.chunk_retrieve_delay_ms ?? 1000;
 
         // When we queried all the IDs but the _retrieve_more_done flag is not set,
         // we wait this amount of time (ms) before checking if we have new IDs
         // to retrieve or if we're done
-        this.waiting_poll_timeout_ms = this.options.waiting_poll_timeout_ms || 500;
+        this.waiting_poll_timeout_ms = this.options.waiting_poll_timeout_ms ?? 500;
 
         this.cite_prefix = this.options.cite_prefix;
         this.chains_to_sources = this.options.chains_to_sources || [];
-        this.source_name = this.options.source_name || '<unknown source>';
+        this.source_name = this.options.source_name ?? '<unknown source>';
 
         // e.g. { cache_duration_ms: ... }.  Subclasses should remember to pass
         // this option on in calls to this.citation_manager.store_citation(...,
@@ -193,7 +193,7 @@ export class CitationSourceBase
     fetch_url(url, fetch_options=undefined)
     {
         // convert simple fs paths to file:/// URLs
-        const urlobj = new URL(url, `file:${this.options.fsRootFilePath}`);
+        const urlobj = new URL(url, `file:${this._file_root}`);
         debug(`Fetching URL ‘${urlobj}’ ...`);
         if (urlobj.protocol === 'file:') {
             // a local file.
