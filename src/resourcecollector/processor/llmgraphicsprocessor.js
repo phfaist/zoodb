@@ -1,6 +1,7 @@
-
 import debug_module from 'debug';
 const debug = debug_module('zoodb.resourcecollector.processor.llmgraphicsprocessor');
+
+import path from 'path';
 
 import { GraphicsResource, $$kw } from '../../zoollm/index.js';
 
