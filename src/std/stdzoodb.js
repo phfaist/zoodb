@@ -26,8 +26,6 @@ export class StandardZooDb extends ZooDb
 
                 use_llm_environment: null,
                 zoo_llm_environment_options: null,
-                llm_allow_unresolved_references: false,
-                llm_allow_unresolved_citations: false,
 
                 use_llm_processor: null,
                 llm_options: {
@@ -41,6 +39,9 @@ export class StandardZooDb extends ZooDb
                         default_user_agent: null,
                     },
                     
+                    allow_unresolved_references: false,
+                    allow_unresolved_citations: false,
+
                     resources: {
                         rename_figure_template: null,
                         figure_filename_extensions: null,

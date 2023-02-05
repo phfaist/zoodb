@@ -63,7 +63,7 @@ export function use_llm_environment(_this)
     //
     // Maybe allow unresolved references, for an incomplete zoo?
     //
-    if (_this.config.llm_allow_unresolved_references) {
+    if (_this.config.llm_options?.allow_unresolved_references) {
         zoo_llm_environment.feature_refs.add_external_ref_resolver(
             {
                 get_ref(ref_type, ref_label, resource_info, render_context) {
@@ -81,7 +81,7 @@ export function use_llm_environment(_this)
     //
     // Maybe allow unresolved citations?
     //
-    if (_this.config.llm_allow_unresolved_citations) {
+    if (_this.config.llm_options?.allow_unresolved_citations) {
         zoo_llm_environment.feature_citations.add_external_citations_provider(
             {
                 get_citation_full_text_llm(cite_prefix, cite_key, resource_info)
