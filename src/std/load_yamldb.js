@@ -39,7 +39,7 @@ export class StandardZooDbYamlDataLoader
             objects: this.config.objects,
 
             object_defaults: { },
-            root_data_dir: this.zoodb.fsRootFilePath,
+            root_data_dir: this.zoodb.fs_data_dir,
             schemas: this.config.schemas,
         });
 
@@ -47,7 +47,7 @@ export class StandardZooDbYamlDataLoader
         this._first_load_done = false;
     }
 
-    async load({data_dir, schema_root})
+    async load()
     {
         if (this._currently_loading) {
             console.error("The zoo is already currently being loaded! Will not "
@@ -59,7 +59,7 @@ export class StandardZooDbYamlDataLoader
             return this.reload();
         }
 
-        debug(`Loading YAML data from ‘${data_dir}’`);
+        debug(`Loading YAML data from ‘${this.zoodb.fs_data_dir}’`);
 
         this._currently_loading = true;
 
