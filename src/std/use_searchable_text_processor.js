@@ -1,7 +1,7 @@
 import debug_mod from 'debug';
 const debug = debug_mod("zoodb.std.use_searchable_text_processor");
 
-import loMerge from 'lodash/merge';
+import loMerge from 'lodash/merge.js';
 
 import {
     SearchableTextFieldset,

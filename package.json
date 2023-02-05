@@ -47,7 +47,9 @@
         "./util": "./src/util/index.js",
         "./util/*": "./src/util/*.js",
         "./search/searchindex": "./src/search/searchindex.js",
-        "./search/searchwidget": "./src/search/searchwidget.js"
+        "./search/searchwidget": "./src/search/searchwidget.js",
+        "./std": "./src/std/index.js",
+        "./std/*": "./src/std/*.js",
     },
     "COMMENTED_OUT_NOT_SUPPORTED_BY_PARCEL__imports": {
         "#llm-js/*": "./llm-js-src/llm-js/*"

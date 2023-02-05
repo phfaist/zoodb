@@ -17,7 +17,7 @@ import { FilesystemResourceRetriever } from '../resourcecollector/retriever/fs.j
 
 import { LLMGraphicsResourceProcessor } from '../resourcecollector/processor/llmgraphicsprocessor.js';
 
-import loMerge from 'lodash/merge';
+import loMerge from 'lodash/merge.js';
 
 
 

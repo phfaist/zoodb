@@ -9,7 +9,7 @@ import {
 
 import { split_prefix_label } from '../util/prefixlabel.js';
 
-import loMerge from 'lodash/merge';
+import loMerge from 'lodash/merge.js';
 
 
 export function default_target_href_resolver(ref_instance, render_context,

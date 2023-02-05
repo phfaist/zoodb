@@ -3,7 +3,7 @@ const debug = debug_mod("zoodb.std.stdzoodb");
 
 import { ZooDb } from '../_zoodb.js';
 
-import loMerge from 'lodash/merge';
+import loMerge from 'lodash/merge.js';
 
 // -----------------------------------------------------------------------------
 
