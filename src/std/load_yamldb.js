@@ -19,6 +19,8 @@ export class StandardZooDbYamlDataLoader
 {
     constructor(config)
     {
+        this.config = config ?? {};
+
         this._currently_loading = null;
         this._first_load_done = null;
 
