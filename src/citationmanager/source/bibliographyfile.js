@@ -36,7 +36,7 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
             throw new Error(`You need to specify option {bibliography_files: ...}`);
         }
         this.bibliography_files_url = this.bibliography_files.map( (bibfile) => {
-            const url = new URL(bibfile, `file://${path.resolve('.')}/`);
+            const url = new URL(bibfile, `file://${this.options.fsRootFilePath}/`);
             if (url.protocol !== 'file:') {
                 this.have_remote = true;
             }
