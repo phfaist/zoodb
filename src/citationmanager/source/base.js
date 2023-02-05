@@ -54,6 +54,8 @@ export class CitationSourceBase
                     }
                 },
                 fsRootFilePath: null,
+
+                cache_store_options: {},
             },
             default_options ?? {},
             options,
