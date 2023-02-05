@@ -27,6 +27,13 @@ export class FilesystemResourceRetriever
     constructor(options={})
     {
         this.fs = options.fs;
+        this.fsRootFilePath = options.fsRootFilePath ?? null;
+
+        if (this.fsRootFilePath != null) {
+            this._fs_path = (x) => path.join(this.fsRootFilePath, x);
+        } else {
+            this._fs_path = (x) => x;
+        }
 
         this.copy_to_target_directory = options.copy_to_target_directory ?? false;
 
@@ -42,7 +49,8 @@ export class FilesystemResourceRetriever
 
         if (this.copy_to_target_directory) {
             //this.mkdir_promise = 
-            this.fs.mkdirSync(this.target_directory, { recursive: true });
+            this.fs.mkdirSync( this._fs_path(this.target_directory),
+                               { recursive: true } );
         }
         //  else {
         //     this.mkdir_promise = null;
@@ -55,7 +63,7 @@ export class FilesystemResourceRetriever
             const resolved_source = source + extension;
             const full_source_path = path.resolve(this.source_directory, resolved_source);
             try {
-                this.fs.accessSync( full_source_path );
+                this.fs.accessSync( this._fs_path(full_source_path) );
                 // file exists!
                 debug(`located ‘${source}’ at ‘${full_source_path}’`);
                 return { resolved_source: resolved_source,
@@ -88,7 +96,7 @@ export class FilesystemResourceRetriever
         if (this.copy_to_target_directory) {
             // actually copy the file (await in case we have to process it after
             // retrieval...)
-            this.fs.copyFileSync(full_source_path, target_full_path);
+            this.fs.copyFileSync( this._fs_path(full_source_path), target_full_path);
         }
 
         return {
@@ -107,11 +115,12 @@ export class FilesystemResourceRetriever
 
 class FilesystemPropertiesAccessor
 {
-    constructor(resolved_source, full_source_path, fs)
+    constructor(resolved_source, full_source_path, fs, _fs_path)
     {
         this.resolved_source = resolved_source;
         this.full_source_path = full_source_path;
         this.fs = fs;
+        this._fs_path = _fs_path;
     }
 
     fullname()
@@ -147,7 +156,7 @@ class FilesystemPropertiesAccessor
     binary_hash()
     {
         return sha256().update(
-            this.fs.readFileSync(this.full_source_path)
+            this.fs.readFileSync( this._fs_path(this.full_source_path) )
         ).digest();
     }
 
@@ -155,7 +164,7 @@ class FilesystemPropertiesAccessor
     hexhash(len)
     {
         const res = sha256().update(
-            this.fs.readFileSync(this.full_source_path)
+            this.fs.readFileSync( this._fs_path(this.full_source_path) )
         ).digest('hex');
         if (len) {
             return res.slice(0, len);

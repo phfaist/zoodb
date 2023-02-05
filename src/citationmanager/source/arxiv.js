@@ -1,5 +1,3 @@
-//import fs from 'fs';
-
 import jsyaml from 'js-yaml';
 
 import FeedParser from 'feedparser';

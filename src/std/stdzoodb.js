@@ -18,6 +18,10 @@ export class StandardZooDb extends ZooDb
             {
                 continue_with_errors: false,
 
+                // for any filesystem access, mostly for llm_processor
+                fs: null,
+                fs_data_dir: null,
+
                 use_relations_populator: null,
 
                 use_llm_environment: null,
@@ -26,9 +30,7 @@ export class StandardZooDb extends ZooDb
                 llm_allow_unresolved_citations: false,
 
                 use_llm_processor: null,
-                llm_processor_options: {
-
-                    fs: null,
+                llm_options: {
 
                     refs: {},
 
@@ -39,10 +41,11 @@ export class StandardZooDb extends ZooDb
                         default_user_agent: null,
                     },
                     
-                    resource_collector: {
+                    resources: {
                         rename_figure_template: null,
                         figure_filename_extensions: null,
                         graphics_resources_fs_data_dir: null,
+                        resource_file_extensions: null,
                     },
                 },
 
@@ -52,14 +55,9 @@ export class StandardZooDb extends ZooDb
                     object_types: [], // ['code',]  // only e.g. search for codes
                 },
 
-                zoo_permalinks: {}, //{ object:, graphics_resource: }
+                zoo_permalinks: null, //{ object:, graphics_resource: }
+                // e.g.  graphics_resource:  (gresource) => `/fig/${gresource.src_url}`,
 
-                zoo_graphics_resource_permalink:
-                    (graphics_resource) => `/fig/${graphics_resource.src_url}`,
-
-                //zoo_graphics_resource_image_max_zoom_factor: 2,
-
-                resource_file_extensions: null,
             },
             config,
         );
@@ -124,6 +122,24 @@ export class StandardZooDb extends ZooDb
         for (const [k,v] of Object.entries(_this)) {
             this[k] = v;
         }
+
+        this.zoo_loader = null;
+    }
+
+    install_zoo_loader( zoo_loader )
+    {
+        this.zoo_loader = zoo_loader;
+        this.zoo_loader.initialize(this);
+    }
+
+    async load(options=null)
+    {
+        // also use load() for reload updated data, etc.
+
+        if (this.zoo_loader == null) {
+            throw new Error(`No zoo loader installed, use StandardZooDb#install_zoo_loader()`);
+        }
+        await this.zoo_loader.load(options);
     }
 
 };

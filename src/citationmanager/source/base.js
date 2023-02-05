@@ -1,7 +1,6 @@
 import debug_module from 'debug';
 const debug = debug_module('zoodb.citationmanager.sources.base');
 
-//import fs from 'fs';
 import fetch from 'node-fetch';
 
 

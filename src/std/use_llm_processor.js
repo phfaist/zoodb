@@ -31,7 +31,10 @@ export function use_llm_processor(_this)
         throw new Error(`Cannot use ‘use_llm_processor()’ with no zoo_llm_environment set.`);
     }
 
-    const llm_processor_options = _this.config.llm_processor_options ?? {};
+    const llm_options = _this.config.llm_options ?? {};
+
+    const fs = _this.config.fs;
+    const fs_data_dir = _this.config.fs_data_dir;
 
     let llm_processor_config = {
         zoo_llm_environment: _this.zoo_llm_environment,
@@ -41,21 +44,23 @@ export function use_llm_processor(_this)
             sources: {
                 arxiv: new CitationSourceArxiv({
                     override_arxiv_dois_file:
-                        llm_processor_options.citations?.override_arxiv_dois_file,
-                    fs: llm_processor_options.fs,
+                        llm_options.citations?.override_arxiv_dois_file,
+                    fs,
+                    fsRootFilePath: fs_data_dir,
                 }),
                 doi: new CitationSourceDoi(),
                 manual: new CitationSourceManual(),
                 preset: new CitationSourceBibliographyFile({
                     bibliography_files:
-                        llm_processor_options.citations?.preset_bibliography_files,
-                    fs: llm_processor_options.fs,
+                        llm_options.citations?.preset_bibliography_files,
+                    fs,
+                    fsRootFilePath: fs_data_dir,
                 }),
             },
             default_user_agent:
-              llm_processor_options.citations?.default_user_agent
+              llm_options.citations?.default_user_agent
               ?? `zoodb-bibliography-build-script/0.1 (https://github.com/phfaist/zoodb)`,
-            csl_style: llm_processor_options.citations.csl_style,
+            csl_style: llm_options.citations.csl_style,
         },
         resource_collector_options: {
             resource_types: ['graphics_path'],
@@ -63,22 +68,24 @@ export function use_llm_processor(_this)
                 graphics_path: new FilesystemResourceRetriever({
                     copy_to_target_directory: false,
                     rename_file_template:
-                        llm_processor_options.resource_collector?.rename_figure_template
+                        llm_options.resources?.rename_figure_template
                         ?? default_figure_template_name,
                     extensions:
-                        llm_processor_options.resource_collector?.figure_filename_extensions
+                        llm_options.resources?.figure_filename_extensions
                         ?? [ '', '.svg', '.png', '.jpeg', '.jpg' ],
                     //target_directory: './_output_resource_graphics_files/',
-                    fs: llm_processor_options.fs,
+                    fs,
+                    fsRootFilePath: fs_data_dir,
                     source_directory:
-                        llm_processor_options.resource_collector?.graphics_resources_fs_data_dir
+                        llm_options.resources?.graphics_resources_fs_data_dir
                 }),
             },
             resource_processors: {
                 'graphics_path': [
                     new LLMGraphicsResourceProcessor({
                         zoo_llm_environment: _this.zoo_llm_environment,
-                        fs: llm_processor_options.fs,
+                        fs,
+                        fsRootFilePath: fs_data_dir,
                     }),
                 ],
             },
