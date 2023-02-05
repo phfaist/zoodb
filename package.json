@@ -16,6 +16,7 @@
         "hash.js": "^1.1.7",
         "js-yaml": "^4.1.0",
         "jsonschema": "^1.4.1",
+        "lodash": "^4.17.21",
         "lunr": "^2.3.9",
         "node-fetch": "^3.2.10",
         "parse-full-name": "^1.2.6",
