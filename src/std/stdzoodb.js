@@ -37,14 +37,14 @@ export class StandardZooDb extends ZooDb
                         override_arxiv_dois_file: null,
                         preset_bibliography_files: [],
                         default_user_agent: null,
-                    }
+                    },
                     
                     resource_collector: {
                         rename_figure_template: null,
                         figure_filename_extensions: null,
                         graphics_resources_fs_data_dir: null,
                     },
-                }
+                },
 
                 use_searchable_text_processor: null,
 
@@ -59,7 +59,7 @@ export class StandardZooDb extends ZooDb
 
                 //zoo_graphics_resource_image_max_zoom_factor: 2,
 
-                resource_file_extensions: null
+                resource_file_extensions: null,
             },
             config,
         );
