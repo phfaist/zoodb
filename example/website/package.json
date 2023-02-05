@@ -7,6 +7,7 @@
         "@phfaist/zoodb": "link:../.."
     },
     "scripts": {
-        "dev": "eleventy --serve"
+        "dev": "eleventy --serve",
+        "build": "eleventy"
     }
 }
