@@ -39,7 +39,7 @@ export class StandardZooDbYamlDataLoader
             objects: this.config.objects,
 
             object_defaults: { },
-            root_data_dir: this.zoodb.fs_data_dir,
+            root_data_dir: this.zoodb.config.fs_data_dir,
             schemas: this.config.schemas,
         });
 
@@ -59,7 +59,7 @@ export class StandardZooDbYamlDataLoader
             return this.reload();
         }
 
-        debug(`Loading YAML data from ‘${this.zoodb.fs_data_dir}’`);
+        debug(`Loading YAML data from ‘${this.zoodb.config.fs_data_dir}’`);
 
         this._currently_loading = true;
 
