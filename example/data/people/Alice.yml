@@ -6,5 +6,10 @@ name: 'Alice Aaliz'
 biography: |
   Alice's biography goes here.
 
+  Alice is happy:
+  \begin{figure}
+  \includegraphics{images/Smiley}
+  \end{figure}
+
 relations:
   spouse: bob
