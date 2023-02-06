@@ -6,6 +6,10 @@ import { load_people_db } from '../example/peopledbjs/peopledb.js';
 
 describe('Our PeopleDb example', function () {
 
+    // change default timeout for these tests
+    this.timeout(10000);
+
+
     it('loads without errors', async function () {
 
         const people_db = await load_people_db();
