@@ -13,7 +13,7 @@ YAML files.
   only need to enable it by running ``corepack enable``.
 
 * Install eleventy and other JS dependencies.  In the present folder, run:
-  ```
+```
 > yarn
 ```
 
