@@ -38,7 +38,7 @@ const render = async (data) => {
 <article>
 <h1>${ rdr(person.name) }</h1>
 
-<div style="font-style: italic">${ rdrblock(person.biography) }</div>`;
+<div style="margin: 1.5rem 0px">${ rdrblock(person.biography) }</div>`;
 
         const relations = person.relations ?? {};
 

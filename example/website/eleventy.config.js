@@ -23,6 +23,8 @@ module.exports = (eleventyConfig) => {
 
     eleventyConfig.setTemplateFormats(['html','md','njk','11ty.js']);
 
+    eleventyConfig.addPassthroughCopy({ "stylesheets": "stylesheets" })
+
 
     return {
         htmlTemplateEngine: "njk",

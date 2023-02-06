@@ -7,8 +7,8 @@ biography: |
   Bob's biography goes here.
 
   Bob likes to cite papers like this one~\cite{arXiv:1902.07714}.  Bob also
-  likes to talk a lot to \ref{person:alice} (his
-  \hyperref[person:alice]{spouse}).
+  \textbf{loves} to talk a lot about math (like \(\int f(x) dx = z\)) to
+  \ref{person:alice} (his \hyperref[person:alice]{spouse}).
 
 relations:
   spouse: alice
