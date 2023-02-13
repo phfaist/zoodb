@@ -7,6 +7,6 @@ title: "People DB home"
 
 <ul>
 {% for person_page in collections.person %}
-<li><a href="{{person_page.url}}">{{ person_page.data.title }}</a></li>
+<li><a href="{{person_page.url | hrefUrl}}">{{ person_page.data.title }}</a></li>
 {% endfor %}
 </ul>

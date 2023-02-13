@@ -403,7 +403,7 @@ export class CitationCompiler
             if (this.add_cite_links.doi && doi) {
                 const doiurl = `https://doi.org/${encodeURIComponent(doi)}`;
                 result_formatted += ' ' + this.produce_link[this.output_format](
-                    `https://doi.org/${encodeURIComponent(doi)}`,
+                    doiurl,
                     this.format_link_text.doi(doi)
                 );
                 has_link = true;

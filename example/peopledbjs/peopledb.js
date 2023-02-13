@@ -25,6 +25,11 @@ const __dirname = path.dirname(__filename);
 const example_root_dir = path.resolve(__dirname, '..');
 
 
+// -------------------------------------
+
+const csl_filename = path.join(__dirname, 'american-physical-society-et-al--patched.csl');
+
+
 // -----------------------------------------------------------------------------
 
 
@@ -64,10 +69,7 @@ export class PeopleDb extends StandardZooDb
                 },
 
                 citations: {
-                    csl_style: fs.readFileSync(
-                        path.join(__dirname, 'american-physical-society-et-al.csl'),
-                        { encoding: 'utf-8', },
-                    ),
+                    csl_style: fs.readFileSync( csl_filename, { encoding: 'utf-8', }, ),
                     override_arxiv_dois_file:
                         'citations_info/override_arxiv_dois.yml',
                     preset_bibliography_files: [

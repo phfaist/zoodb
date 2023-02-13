@@ -10,5 +10,8 @@ biography: |
   \textbf{loves} to talk a lot about math (like \(\int f(x) dx = z\)) to
   \ref{person:alice} (his \hyperref[person:alice]{spouse}).
 
+  Citations can be combined like
+  this~\cite{doi:10.1147/rd.53.0183,doi:10.1007/BF02084158,manual:{Author Name, \emph{Journal with no DOI} (1923), \href{https://example.com/}{URL}.}}
+
 relations:
   spouse: alice

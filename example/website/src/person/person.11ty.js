@@ -38,50 +38,49 @@ const render = async (data) => {
 <article>
 <h1>${ rdr(person.name) }</h1>
 
+<h2>Biography</h2>
 <div style="margin: 1.5rem 0px">${ rdrblock(person.biography) }</div>`;
 
         const relations = person.relations ?? {};
 
         if (relations.spouse != null) {
             s += sqzhtml`
-<div>Spouse: ${ ref('person', relations.spouse) }</div>`;
+<h2>Spouse</h2>
+<p>${ ref('person', relations.spouse) }</p>`;
         }
 
         if (relations.parents != null && relations.parents.length) {
             s += sqzhtml`
-<div>
-  <p>Parents:</p>
-  <ul>`;
+<h2>Parents</h2>
+<ul>`;
             for (const parent_relation of relations.parents) {
                 s += sqzhtml`
     <li>${ ref('person', parent_relation.person_id) }</li>
   `;
             }
             s += sqzhtml`
-  </ul>
-</div>`;
+</ul>
+`;
         }
 
         if (relations.children != null && relations.children.length) {
             s += sqzhtml`
-<div>
-  <p>Children:</p>
-  <ul>`;
+<h2>Children</h2>
+<ul>`;
             for (const child_relation of relations.children) {
                 s += sqzhtml`
-    <li>${ ref('person', child_relation.person_id) }</li>
+    <li><p>${ ref('person', child_relation.person_id) }</p></li>
   `;
             }
             s += sqzhtml`
-  </ul>
-</div>`;
+</ul>
+`;
         }
 
         if (relations.friends != null && relations.friends.length) {
             s += sqzhtml`
-<div>
-  <p>Friends:</p>
-  <ul>`;
+<h2>Friends</h2>
+<ul>`;
             for (const friend_relation of relations.friends) {
 
                 let friend_detail_text = '';
@@ -93,8 +92,8 @@ const render = async (data) => {
     <li>${ ref('person', friend_relation.person_id) }${ friend_detail_text }</li>`;
             }
             s += sqzhtml`
-  </ul>
-</div>`;
+</ul>
+`;
         }
 
         s += sqzhtml`

@@ -23,6 +23,17 @@ module.exports = (eleventyConfig) => {
 
     eleventyConfig.setTemplateFormats(['html','md','njk','11ty.js']);
 
+    eleventyConfig.addFilter("hrefUrl", function (pagePermalink) {
+        if (pagePermalink == null || pagePermalink === '') {
+            return '';
+        }
+        let hrefUrl = eleventyConfig.getFilter('url')(pagePermalink);
+        if (hrefUrl.endsWith('.html')) {
+            return hrefUrl.slice(0, -5);
+        }
+        return hrefUrl;
+    });
+
     eleventyConfig.addPassthroughCopy({ "stylesheets": "stylesheets" })
 
 

@@ -1,0 +1,22 @@
+html, body {
+    background-color: rgb(220,220,240);
+    width: 100%;
+}
+
+
+header, main, footer {
+    margin: 0px auto;
+    max-width: 930px;
+    background-color: white;
+    padding: 15px;
+}
+
+header {
+    margin-bottom: 1rem;
+}
+
+footer {
+    font-size: 0.92rem;
+    font-style: italic;
+    margin-top: 1rem;
+}

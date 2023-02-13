@@ -42,9 +42,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@11ty/eleventy@npm:beta":
-  version: 2.0.0-beta.3
-  resolution: "@11ty/eleventy@npm:2.0.0-beta.3"
+"@11ty/eleventy@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@11ty/eleventy@npm:2.0.0"
   dependencies:
     "@11ty/dependency-tree": ^2.0.1
     "@11ty/eleventy-dev-server": ^1.0.3
@@ -88,7 +88,7 @@ __metadata:
     slugify: ^1.6.5
   bin:
     eleventy: cmd.js
-  checksum: 164eef5d7289f83df678755205db744dce4ab8e9475301bc7b49a8d6f3be62598134950529eeec2e274b0c592472c38f4f0ccb985aef92eda356ecd81033cefc
+  checksum: 3a1fabbda86c2e3ca60e2e04104af51446e94b8f22f611cd094b33faa8e9082e1dcccf44e983e76397177484b41c9ab1d4ad04a44d0099a136a8c194b4325998
   languageName: node
   linkType: hard
 
@@ -1921,7 +1921,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "peopledb_website@workspace:."
   dependencies:
-    "@11ty/eleventy": beta
+    "@11ty/eleventy": ^2.0.0
     "@phfaist/zoodb": "link:../.."
   languageName: unknown
   linkType: soft

@@ -2,46 +2,17 @@
 <html>
 <head>
 <title>{{ page.title }}</title>
+<link rel="stylesheet" href="/stylesheets/main.css" />
 <link rel="stylesheet" href="/stylesheets/llm.css" />
-<script type="text/javascript">
-MathJax = {
-    tex: {
-        inlineMath: [['\\(', '\\)']],
-        displayMath: [['\\[', '\\]']],
-        processEnvironments: true,
-        processRefs: true,
-
-        // equation numbering on
-        tags: 'ams'
-    },
-    options: {
-        // all MathJax content is marked with CSS classes
-        // skipHtmlTags: 'body',
-        // processHtmlClass: 'display-math|inline-math',
-    },
-    startup: {
-        pageReady: function() {
-            // override the default "typeset everything on the page" behavior to
-            // only typeset whatever we have explicitly marked as math
-            return typesetPageMathPromise();
-        }
-    }
-};
-function typesetPageMathPromise()
-{
-    var elements = document.querySelectorAll('.display-math, .inline-math');
-    return MathJax.typesetPromise(elements);
-}
-</script>
+{% include 'useMathjaxScript.njk' %}
 </head>
 <body>
 
-{{ content | safe }}
+{% include 'header.njk' %}
 
-<footer>
-<a href="/">Home</a>
-</footer>
+<main>{{ content | safe }}</main>
 
+{% include 'footer.njk' %}
 
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
