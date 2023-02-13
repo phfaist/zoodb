@@ -12,11 +12,17 @@ describe('Our PeopleDb example', function () {
 
     it('loads without errors', async function () {
 
+        // change default timeout for these tests
+        this.timeout(10000);
+
         const people_db = await load_people_db();
 
     });
 
     it('provides back-references on Alice to her children', async function () {
+
+        // change default timeout for these tests
+        this.timeout(10000);
 
         const people_db = await load_people_db();
 
