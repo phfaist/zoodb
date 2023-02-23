@@ -39,7 +39,7 @@ export function use_llm_processor(_this)
     let llm_processor_config = {
         zoo_llm_environment: _this.zoo_llm_environment,
         llm_error_policy: _this.llm_error_policy,
-        refs: {},
+        refs: llm_options.refs ?? {},
         citations: {
             sources: {
                 arxiv: new CitationSourceArxiv({
