@@ -64,6 +64,7 @@ export class StandardZooDb extends ZooDb
         );
 
         debug(`StandardZooDb: Using config =`, _this.config);
+        debug(`StandardZooDb: config's llm_options are =`, _this.config.llm_options);
 
         if (_this.config.zoo_permalinks == null) {
             throw new Error(
