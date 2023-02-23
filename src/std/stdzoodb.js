@@ -63,6 +63,8 @@ export class StandardZooDb extends ZooDb
             config,
         );
 
+        debug(`StandardZooDb: Using config =`, _this.config);
+
         if (_this.config.zoo_permalinks == null) {
             throw new Error(
                 `StandardZooDb: The zoo_permalinks: config property is not set`
