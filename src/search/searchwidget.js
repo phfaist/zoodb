@@ -138,6 +138,7 @@ export class SearchWidget
               <code>term^10</code> to &quot;boost&quot; the term, i.e., to make
               it contribute more to the final match score.
             </p>`;
+        this.dom_container.appendChild(instructions_widget);
 
         // add a tippy widget for some simple instructions
         this.tippy_instance = tippy(

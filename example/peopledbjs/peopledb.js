@@ -34,17 +34,11 @@ const csl_filename = path.join(__dirname, 'american-physical-society-et-al--patc
 // -----------------------------------------------------------------------------
 
 
-const permalinks = {
+// import the permalinks
+import { permalinks } from './permalinks.js';
 
-    // Oops, I didn't mean to refer to people as "objects" and definitely not to
-    // collect them in a "zoo" ... :/
 
-    // e.g., "/person/alice"
-    object: (object_type, object_id) => `/${object_type}/${object_id}`,
-
-    // will be used for, e.g., pictures
-    graphics_resource: (graphics_resource) => `/pic/${graphics_resource.src_url}`,
-};
+// -----------------------------------------------------------------------------
 
 
 export class PeopleDb extends StandardZooDb
