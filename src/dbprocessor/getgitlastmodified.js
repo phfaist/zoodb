@@ -94,7 +94,7 @@ export class GetGitLastModifiedDbProcessor extends ZooDbProcessorBase
     process_object(object_type, objid, obj)
     {
         const { source_file_path } = obj._zoodb ?? {};
-        debug(`Processing ${object_type} ‘${objid}’ - source_file_path=‘${source_file_path}’`);
+        //debug(`Processing ${object_type} ‘${objid}’ - source_file_path=‘${source_file_path}’`);
         if (source_file_path != null) {
             const full_file_path = path.resolve(this.data_dir, source_file_path);
             const object_date = getGitLastUpdatedDate(full_file_path);
