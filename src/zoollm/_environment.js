@@ -150,6 +150,11 @@ export class RefResolver
     {
         // RefInstance objects are exported correctly because RefInstance was
         // given a .toJSON() method (patched above).
+
+        // FIXME: If RefInstance objects have LLM Fragment instances as
+        // formatted text, export only the llm_text property so that it can be
+        // serialized into JSON.
+
         return {
             ref_instance_database: this.ref_instance_database,
         };

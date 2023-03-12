@@ -20,3 +20,9 @@ footer {
     font-style: italic;
     margin-top: 1rem;
 }
+
+
+.last-edit {
+    color: #aaa;
+    font-style: italic;
+}

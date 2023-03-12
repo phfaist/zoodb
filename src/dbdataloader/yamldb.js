@@ -32,6 +32,7 @@ const default_resource_file_extensions = [
     ".indd",
     ".afdesign",
     ".afpub",
+    ".psd",
     ".png",
     ".jpeg",
     ".jpg"
@@ -102,7 +103,7 @@ const zoodbdataloader = new ZooDbDataLoader({
       schema_add_extension: '.json',
     },
     options: {
-    normalize_id_for_uniqueness_check: (object_id) => object_id.toLowerCase()
+      normalize_id_for_uniqueness_check: (object_id) => object_id.toLowerCase()
     },
   });
 

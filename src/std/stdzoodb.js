@@ -24,6 +24,8 @@ export class StandardZooDb extends ZooDb
 
                 use_relations_populator: null,
 
+                use_gitlastmodified_processor: null,
+
                 use_llm_environment: null,
                 zoo_llm_environment_options: null,
 
@@ -63,7 +65,11 @@ export class StandardZooDb extends ZooDb
             config,
         );
 
-        debug(`StandardZooDb: Using config =`, _this.config);
+        debug(`StandardZooDb: Using config =`,
+              // stringify .fs property otherwise dumping Node's module in
+              // console is very long
+              Object.assign({}, _this.config, {fs: `(((${_this.config.fs})))`}),
+             );
         debug(`StandardZooDb: config's llm_options are =`, _this.config.llm_options);
 
         if (_this.config.zoo_permalinks == null) {
@@ -90,6 +96,14 @@ export class StandardZooDb extends ZooDb
             _this.zoodb_processors.push(_this.zoo_relations_populator);
         } else {
             _this.zoo_relations_populator = null;
+        }
+
+        if (_this.config.use_gitlastmodified_processor) {
+            _this.zoo_gitlastmodified_processor =
+                _this.config.use_gitlastmodified_processor(_this);
+            _this.zoodb_processors.push( _this.zoo_gitlastmodified_processor );
+        } else {
+            _this.zoo_gitlastmodified_processor = null;
         }
 
         _this.llm_error_policy = (_this.config.continue_with_errors ? 'continue' : 'abort');

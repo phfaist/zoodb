@@ -6,6 +6,7 @@ import loMerge from 'lodash/merge.js';
 import { StandardZooDb } from '@phfaist/zoodb/std/stdzoodb';
 
 import { use_relations_populator } from '@phfaist/zoodb/std/use_relations_populator';
+import { use_gitlastmodified_processor } from '@phfaist/zoodb/std/use_gitlastmodified_processor';
 import { use_llm_environment } from '@phfaist/zoodb/std/use_llm_environment';
 import { use_llm_processor } from '@phfaist/zoodb/std/use_llm_processor';
 import { use_searchable_text_processor } from '@phfaist/zoodb/std/use_searchable_text_processor';
@@ -56,6 +57,7 @@ export class PeopleDb extends StandardZooDb
             fs_data_dir: path.join(example_root_dir, 'data'),
 
             use_relations_populator,
+            use_gitlastmodified_processor,
             use_llm_environment,
             use_llm_processor,
             use_searchable_text_processor,

@@ -10,11 +10,18 @@ const data = async () => {
             addAllPagesToCollections: true,
             alias: 'person',
         },
+        date: '2000-01-01', // should be ignored
         tags: 'person',
         eleventyComputed: {
             permalink: (data) =>
                 data.peopledb.zoo_object_permalink('person', data.person.person_id) + '.html',
             title: (data) => zoollm.render_text_standalone(data.person.name),
+            date: (data) => {
+                // injection hack to get correct page date property!
+                // https://github.com/11ty/eleventy/issues/2199#issuecomment-1027362151
+                data.page.date = new Date(data.person._zoodb.git_last_modified_date);
+                return data.page.date;
+            }
         },
     };
 };
@@ -98,6 +105,8 @@ const render = async (data) => {
 
         s += sqzhtml`
 <RENDER_ENDNOTES/>
+
+<p class="last-edit">Last modified: ${ data.page.date.toString() }</p>
 </article>`;
         
         return s;

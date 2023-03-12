@@ -1,5 +1,5 @@
 import debug_module from 'debug';
-const debug = debug_module('zoodb.dbprocessor.llmcontent');
+const debug = debug_module('zoodb.dbprocessor.llmsimplecontent');
 
 import { ZooDbProcessorBase } from './base.js';
 
