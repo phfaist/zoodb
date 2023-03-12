@@ -66,9 +66,10 @@ export class StandardZooDb extends ZooDb
         );
 
         debug(`StandardZooDb: Using config =`,
+              _this.config,
               // stringify .fs property otherwise dumping Node's module in
               // console is very long
-              Object.assign({}, _this.config, {fs: `(((${_this.config.fs})))`}),
+              // Object.assign({}, _this.config, {fs: `(((${_this.config.fs})))`}),
              );
         debug(`StandardZooDb: config's llm_options are =`, _this.config.llm_options);
 
