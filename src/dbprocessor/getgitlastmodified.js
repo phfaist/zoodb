@@ -14,8 +14,8 @@ import { ZooDbProcessorBase } from './base.js';
  * https://github.com/vuejs/vuepress/blob/89440ce552675859189ed4ab254ce19c4bba5447/packages/%40vuepress/plugin-last-updated/index.js
  * MIT licensed: https://github.com/vuejs/vuepress/blob/89440ce552675859189ed4ab254ce19c4bba5447/LICENSE
  */
-function getGitLastUpdatedTimeStamp(filePath) {
-    debug(`Getting GIT modification time stamp for ${filePath}`);
+function getGitLastUpdatedDate(filePath) {
+    //debug(`Getting GIT modification time stamp for ${filePath}`);
     const timestamp = (
         parseInt(
             spawnSync(
@@ -31,7 +31,7 @@ function getGitLastUpdatedTimeStamp(filePath) {
         ) * 1000
     );
     const dateObject = new Date(timestamp);
-    debug(`  -> date = ${dateObject.toISOString()}`);
+    //debug(`  -> date = ${dateObject.toISOString()}`);
     return dateObject;
 }
 
@@ -50,8 +50,17 @@ export class GetGitLastModifiedDbProcessor extends ZooDbProcessorBase
             throw new Error(`No data dir specified for getting git-last-modified information`);
         }
 
-        debug(`Creating GetGitLastModifiedDbProcessor (data_dir=‘${this.data_dir}’)`);
+        this._latest_modification_date = null;
+
+        debug(`Creating GetGitLastModifiedDbProcessor with data_dir ‘${this.data_dir}’`);
     }
+
+    get_latest_modification_date()
+    {
+        return this._latest_modification_date;
+    }
+
+    // ---
 
     initialize_zoo()
     {
@@ -88,9 +97,13 @@ export class GetGitLastModifiedDbProcessor extends ZooDbProcessorBase
         debug(`Processing ${object_type} ‘${objid}’ - source_file_path=‘${source_file_path}’`);
         if (source_file_path != null) {
             const full_file_path = path.resolve(this.data_dir, source_file_path);
-            const object_date = getGitLastUpdatedTimeStamp(full_file_path);
+            const object_date = getGitLastUpdatedDate(full_file_path);
             if (object_date != null) {
                 obj._zoodb.git_last_modified_date = object_date;
+                if (this._latest_modification_date == null
+                    || object_date > this._latest_modification_date) {
+                    this._latest_modification_date = object_date;
+                }
             }
         }
     }
