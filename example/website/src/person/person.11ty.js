@@ -11,7 +11,7 @@ const data = async () => {
             alias: 'person',
         },
         date: '2000-01-01', // should be ignored
-        tags: 'person',
+        tags: ['allPages', 'person'],
         eleventyComputed: {
             permalink: (data) =>
                 data.peopledb.zoo_object_permalink('person', data.person.person_id) + '.html',

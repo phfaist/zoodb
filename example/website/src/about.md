@@ -1,5 +1,7 @@
 ---
 title: "About People DB"
+tags:
+  - 'allPages'
 ---
 
 # About this example website
