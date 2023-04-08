@@ -7,17 +7,21 @@ import {$$kw, repr} from './llm-js/py.js';
 import {__class__, __super__, __get__, isinstance} from './llm-js/org.transcrypt.__runtime__.js';
 
 import { ParsingState, ParsingStateDelta } from './llm-js/pylatexenc.latexnodes.js';
+import * as macrospec from './llm-js/pylatexenc.macrospec.js';
 
 import { LLMFragment } from './llm-js/llm.llmfragment.js';
 
+import * as llmenvironment from './llm-js/llm.llmenvironment.js';
 import {
+    LLMEnvironment,
     LLMParsingState,
     LLMParsingStateDeltaSetBlockLevel,
 } from './llm-js/llm.llmenvironment.js';
 
-import * as llmstd from './llm-js/llm.llmstd.js';
-
 import * as llm_feature from './llm-js/llm.feature.js';
+import * as llm_feature_baseformatting from './llm-js/llm.feature.baseformatting.js';
+import * as llm_feature_href from './llm-js/llm.feature.href.js';
+import * as llm_feature_verbatim from './llm-js/llm.feature.verbatim.js';
 import * as llm_feature_math from './llm-js/llm.feature.math.js';
 import * as llm_feature_headings from './llm-js/llm.feature.headings.js';
 import * as llm_feature_endnotes from './llm-js/llm.feature.endnotes.js';
@@ -426,7 +430,7 @@ export function zoollm_default_options(footnote_counter_formatter='alph')
 
 export var ZooLLMEnvironment = __class__(
     'ZooLLMEnvironment', // class name
-    [ llmstd.LLMStandardEnvironment ], // base classes
+    [ LLMEnvironment ], // base classes
     {
         // static members
 
@@ -434,6 +438,10 @@ export var ZooLLMEnvironment = __class__(
         (self, zoollm_options) {
 
             zoollm_options = Object.assign({}, zoollm_default_options(), zoollm_options);
+
+            const parsing_state = llmenvironment.standard_parsing_state($$kw(
+                zoollm_options.parsing_state_options ?? {}
+            ));
 
             self.citations_provider =
                 zoollm_options.citations_provider ?? new CitationsProvider();
@@ -446,6 +454,13 @@ export var ZooLLMEnvironment = __class__(
 
 
             debug("ZooLLMEnvironment.__init__(): creating feature class instances ...");
+
+            self.feature_baseformatting =
+                new llm_feature_baseformatting.FeatureBaseFormatting();
+
+            self.feature_href = new llm_feature_href.FeatureHref();
+
+            self.feature_verbatim = new llm_feature_verbatim.FeatureVerbatim();
 
             self.feature_math = new llm_feature_math.FeatureMath();
 
@@ -478,6 +493,9 @@ export var ZooLLMEnvironment = __class__(
                 zoollm_options.defterm_render_defterm_with_term_suffix;
 
             const features =  [
+                self.feature_baseformatting,
+                self.feature_href,
+                self.feature_verbatim,
                 self.feature_math,
                 self.feature_headings,
                 self.feature_refs,
@@ -510,10 +528,21 @@ export var ZooLLMEnvironment = __class__(
             __super__(ZooLLMEnvironment, '__init__')(
                 self,
                 features,
+                parsing_state,
+                new macrospec.LatexContextDb(),
                 // $$kw({
                 //     parsing_mode_deltas: parsing_mode_deltas,
                 // })
             );
+
+
+            const parsing_state_event_handler = 
+                  new llmenvironment.LLMLatexWalkerMathContextParsingStateEventHandler();
+
+            self.parsing_state_event_handler = parsing_state_event_handler
+
+            self.environment_get_parse_error_message =
+                llmenvironment.standard_environment_get_parse_error_message;
             
             // environment set up.
         });}

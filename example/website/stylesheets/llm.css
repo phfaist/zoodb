@@ -20,6 +20,8 @@ a:hover {
   color: #22228a;
 }
 
+/* ------------------------------------------------------ */
+
 .emph, .textit {
   font-style: italic;
 }
@@ -139,23 +141,26 @@ figure.float figcaption > span {
 
 table {
   margin: 1em 0px 1em 0px;
-  border-collapse: collapse;
-  border-top: solid 1pt;
-  border-bottom: solid 1pt;
+  border-collapse: separate;
+  border-spacing: 0px;
+  /*border-top: solid 1pt;
+  border-bottom: solid 1pt;*/
 }
 figure.float .float-contents table {
   margin: 0px auto;
 }
 td {
   padding: 0.3em 0.5em;
+  border: none 0px;
 }
 th {
   padding: 0.3em 0.5em;
+  border: none 0px;
 }
-th.cellstyle-H {
+.cellstyle-H {
   border-bottom: solid .5pt;
 }
-th.cellstyle-rH {
+.cellstyle-rH {
 }
 .cellstyle-l {
   text-align: left;
@@ -185,6 +190,31 @@ th.cellstyle-rH {
   border-right: solid .5pt;
 }
 
+.celltbledge-top {
+  border-top: solid 1pt;
+}
+.celltbledge-bottom {
+  border-bottom: solid 1pt;
+}
+
+.verbatimcode {
+  font-family: monospace;
+  font-size: 0.9em;
+  background-color: rgba(127,127,127,0.25);
+  border-radius: 2px;
+  padding: 1px 2px;
+  display: inline-block;
+  white-space: pre-wrap;
+}
+.verbatima {
+  font-style: italic;
+}
+.verbatimcode-environment {
+  display: block;
+  margin: 0.75em 0px 1em;
+  white-space: pre;
+}
+
 .defterm {
   font-style: italic;
 }
@@ -201,17 +231,15 @@ th.cellstyle-rH {
   overflow-x: auto;
 }
 
-.citation {
+.endnotes, .citations {
   font-size: 0.8em;
   display: inline-block;
   vertical-align: 0.3em;
   margin-top: -0.3em;
 }
+.citation {
+}
 .footnote {
-  font-size: 0.8em;
-  display: inline-block;
-  vertical-align: 0.3em;
-  margin-top: -0.3em;
 }
 dl.citation-list > dt, dl.footnote-list > dt {
   font-size: 0.8em;
@@ -219,3 +247,5 @@ dl.citation-list > dt, dl.footnote-list > dt {
   vertical-align: 0.3em;
   margin-top: -0.3em;
 }
+
+/* ------------------------------------------------------ */

@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-01-05 22:41:20
+/* 000001 */ // Transcrypt'ed from Python, 2023-04-09 00:31:36
 /* 000006 */ var logging = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000014 */ import {Feature} from './llm.feature._base.js';
@@ -8,7 +8,7 @@
 /* 000009 */ import {LatexWalkerParseError, ParsedArgumentsInfo} from './pylatexenc.latexnodes.js';
 /* 000006 */ import * as __module_logging__ from './logging.js';
 /* 000006 */ __nest__ (logging, '', __module_logging__);
-/* 000006 */ export {latexnodes_parsers, LLMArgumentSpec, Feature, LLMMacroSpecBase, LatexWalkerParseError, ParsedArgumentsInfo};
+/* 000006 */ export {LLMArgumentSpec, Feature, LatexWalkerParseError, latexnodes_parsers, ParsedArgumentsInfo, LLMMacroSpecBase};
 /* 000001 */ var __name__ = 'llm.feature.graphics';
 /* 000007 */ export var logger = (function () {
 /* 000007 */ 	var __accu0__ = logging;
@@ -214,34 +214,36 @@
 /* 000127 */ 		}) ();
 /* 000129 */ 		return (function () {
 /* 000129 */ 			var __accu0__ = fragment_renderer;
-/* 000129 */ 			return __call__ (__accu0__.render_graphics_block, __accu0__, graphics_resource);
+/* 000129 */ 			return __call__ (__accu0__.render_graphics_block, __accu0__, graphics_resource, render_context);
 /* 000129 */ 		}) ();
 /* 000129 */ 	});}
 /* 000129 */ });
 /* 000141 */ export var FeatureSimplePathGraphicsResourceProvider =  __class__ ('FeatureSimplePathGraphicsResourceProvider', [Feature], {
 /* 000141 */ 	__module__: __name__,
-/* 000145 */ 	feature_name: 'graphics_resource_provider',
-/* 000145 */ 	RenderManager: __class__ ('RenderManager', [Feature.RenderManager], {
-/* 000145 */ 		__module__: __name__,
-/* 000147 */ 		get get_graphics_resource () {return __get__ (this, function (self, graphics_path, resource_info) {
-/* 000147 */ 			if (arguments.length) {
-/* 000147 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000147 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000147 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000147 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000147 */ 						switch (__attrib0__) {
-/* 000147 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000147 */ 							case 'graphics_path': var graphics_path = __allkwargs0__ [__attrib0__]; break;
-/* 000147 */ 							case 'resource_info': var resource_info = __allkwargs0__ [__attrib0__]; break;
-/* 000147 */ 						}
-/* 000147 */ 					}
-/* 000147 */ 				}
-/* 000147 */ 			}
-/* 000147 */ 			else {
-/* 000147 */ 			}
-/* 000149 */ 			return __call__ (GraphicsResource, null, __kwargtrans__ ({src_url: graphics_path}));
-/* 000149 */ 		});}
-/* 000149 */ 	})
-/* 000149 */ });
+/* 000143 */ 	feature_name: 'graphics_resource_provider',
+/* 000146 */ 	feature_title: 'Include external graphics',
+/* 000146 */ 	RenderManager: __class__ ('RenderManager', [Feature.RenderManager], {
+/* 000146 */ 		__module__: __name__,
+/* 000148 */ 		get get_graphics_resource () {return __get__ (this, function (self, graphics_path, resource_info) {
+/* 000148 */ 			if (arguments.length) {
+/* 000148 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000148 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000148 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000148 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000148 */ 						switch (__attrib0__) {
+/* 000148 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000148 */ 							case 'graphics_path': var graphics_path = __allkwargs0__ [__attrib0__]; break;
+/* 000148 */ 							case 'resource_info': var resource_info = __allkwargs0__ [__attrib0__]; break;
+/* 000148 */ 						}
+/* 000148 */ 					}
+/* 000148 */ 				}
+/* 000148 */ 			}
+/* 000148 */ 			else {
+/* 000148 */ 			}
+/* 000150 */ 			return __call__ (GraphicsResource, null, __kwargtrans__ ({src_url: graphics_path}));
+/* 000150 */ 		});}
+/* 000150 */ 	})
+/* 000150 */ });
+/* 000155 */ export var FeatureClass = FeatureSimplePathGraphicsResourceProvider;
 /* 000006 */ 
 //# sourceMappingURL=llm.feature.graphics.map

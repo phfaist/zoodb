@@ -1,11 +1,11 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-01-05 22:41:20
+/* 000001 */ // Transcrypt'ed from Python, 2023-04-09 00:31:35
 /* 000036 */ var logging = {};
 /* 000036 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000041 */ import {LatexArgumentSpec, ParsedArguments, get_updated_parsing_state_from_delta} from './pylatexenc.latexnodes.js';
 /* 000039 */ import {LatexParserBase, get_standard_argument_parser} from './pylatexenc.latexnodes.parsers.js';
 /* 000036 */ import * as __module_logging__ from './logging.js';
 /* 000036 */ __nest__ (logging, '', __module_logging__);
-/* 000036 */ export {get_standard_argument_parser, LatexParserBase, get_updated_parsing_state_from_delta, ParsedArguments, LatexArgumentSpec};
+/* 000036 */ export {LatexArgumentSpec, get_standard_argument_parser, ParsedArguments, get_updated_parsing_state_from_delta, LatexParserBase};
 /* 000001 */ var __name__ = 'pylatexenc.macrospec._argumentsparser';
 /* 000037 */ export var logger = (function () {
 /* 000037 */ 	var __accu0__ = logging;
@@ -118,15 +118,15 @@
 /* 000151 */ 			var __left0__ = __getitem__ (__iterable0__, __index0__);
 /* 000151 */ 			var argj = __left0__ [0];
 /* 000151 */ 			var arg = __left0__ [1];
-/* 000153 */ 			(function () {
-/* 000153 */ 				var __accu0__ = logger;
-/* 000153 */ 				return __call__ (__accu0__.debug, __accu0__, 'Parsing argument %d / %s', argj, arg.parser);
-/* 000153 */ 			}) ();
-/* 000155 */ 			var peeked_token = (function () {
-/* 000155 */ 				var __accu0__ = token_reader;
-/* 000155 */ 				return __call__ (__accu0__.peek_token_or_none, __accu0__, __kwargtrans__ ({parsing_state: parsing_state}));
+/* 000153 */ 			var arg_node_parser = arg.parser;
+/* 000155 */ 			(function () {
+/* 000155 */ 				var __accu0__ = logger;
+/* 000155 */ 				return __call__ (__accu0__.debug, __accu0__, 'Parsing argument %d / %s', argj, arg_node_parser);
 /* 000155 */ 			}) ();
-/* 000157 */ 			var arg_node_parser = arg.parser;
+/* 000157 */ 			var peeked_token = (function () {
+/* 000157 */ 				var __accu0__ = token_reader;
+/* 000157 */ 				return __call__ (__accu0__.peek_token_or_none, __accu0__, __kwargtrans__ ({parsing_state: parsing_state}));
+/* 000157 */ 			}) ();
 /* 000159 */ 			if (__t__ (__call__ (isinstance, null, arg_node_parser, _basestring))) {
 /* 000160 */ 				var arg_node_parser = __call__ (get_standard_argument_parser, null, arg_node_parser);
 /* 000160 */ 			}

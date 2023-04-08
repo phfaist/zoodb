@@ -200,7 +200,8 @@ export class ZooLLMScanner extends LatexNodesVisitorJS
         {
             // it's a citation node with citations to track
             node.llmarg_cite_items.forEach( (cite_item) => {
-                const [cite_prefix, cite_key] = cite_item;
+                const cite_prefix = cite_item.prefix;
+                const cite_key = cite_item.key;
                 this._register_encountered('citations', {
                     cite_prefix: cite_prefix,
                     cite_key: cite_key,

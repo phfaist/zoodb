@@ -1,143 +1,141 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-01-05 22:41:21
+/* 000001 */ // Transcrypt'ed from Python, 2023-04-09 00:31:37
 /* 000007 */ var logging = {};
-/* 000007 */ var re = {};
 /* 000007 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
-/* 000030 */ import {Feature} from './llm.feature._base.js';
-/* 000027 */ import * as fmthelpers from './llm.fmthelpers.js';
-/* 000022 */ import {LLMArgumentSpec, LLMParsingStateDeltaSetBlockLevel} from './llm.llmenvironment.js';
-/* 000021 */ import {LLMEnvironmentSpecBase} from './llm.llmspecinfo.js';
-/* 000015 */ import {LatexEnvironmentBodyContentsParser, MacroSpec, ParsingStateDeltaExtendLatexContextDb} from './pylatexenc.macrospec.js';
-/* 000014 */ import * as latexnodes_nodes from './pylatexenc.latexnodes.nodes.js';
-/* 000013 */ import * as latexnodes_parsers from './pylatexenc.latexnodes.parsers.js';
-/* 000012 */ import {ParsedArgumentsInfo} from './pylatexenc.latexnodes.js';
-/* 000010 */ import * as __module_re__ from './re.js';
-/* 000010 */ __nest__ (re, '', __module_re__);
+/* 000029 */ import {Feature} from './llm.feature._base.js';
+/* 000026 */ import * as counter from './llm.counter.js';
+/* 000021 */ import {LLMArgumentSpec, LLMParsingStateDeltaSetBlockLevel} from './llm.llmenvironment.js';
+/* 000020 */ import {LLMEnvironmentSpecBase, LLMSpecInfoParagraphBreak} from './llm.llmspecinfo.js';
+/* 000014 */ import {LatexEnvironmentBodyContentsParser, MacroSpec, ParsingStateDeltaExtendLatexContextDb} from './pylatexenc.macrospec.js';
+/* 000013 */ import * as latexnodes_nodes from './pylatexenc.latexnodes.nodes.js';
+/* 000012 */ import * as latexnodes_parsers from './pylatexenc.latexnodes.parsers.js';
+/* 000011 */ import {LatexWalkerParseError, ParsedArgumentsInfo} from './pylatexenc.latexnodes.js';
 /* 000007 */ import * as __module_logging__ from './logging.js';
 /* 000007 */ __nest__ (logging, '', __module_logging__);
-/* 000007 */ export {LLMParsingStateDeltaSetBlockLevel, LLMEnvironmentSpecBase, latexnodes_parsers, ParsedArgumentsInfo, LLMArgumentSpec, Feature, fmthelpers, latexnodes_nodes, MacroSpec, LatexEnvironmentBodyContentsParser, ParsingStateDeltaExtendLatexContextDb};
+/* 000007 */ export {LLMArgumentSpec, LLMSpecInfoParagraphBreak, MacroSpec, LLMEnvironmentSpecBase, LatexEnvironmentBodyContentsParser, latexnodes_nodes, Feature, LatexWalkerParseError, latexnodes_parsers, ParsedArgumentsInfo, counter, ParsingStateDeltaExtendLatexContextDb, LLMParsingStateDeltaSetBlockLevel};
 /* 000001 */ var __name__ = 'llm.feature.enumeration';
 /* 000008 */ export var logger = (function () {
 /* 000008 */ 	var __accu0__ = logging;
 /* 000008 */ 	return __call__ (__accu0__.getLogger, __accu0__, __name__);
 /* 000008 */ }) ();
-/* 000036 */ export var _default_enumeration_counter_formatter = [dict ({'template': '${arabic}.'}), dict ({'template': '(${roman})'}), dict ({'template': '${alph}-'})];
-/* 000043 */ export var Enumeration =  __class__ ('Enumeration', [LLMEnvironmentSpecBase], {
-/* 000043 */ 	__module__: __name__,
-/* 000060 */ 	is_block_level: true,
-/* 000062 */ 	body_contents_is_block_level: true,
-/* 000064 */ 	allowed_in_standalone_mode: true,
-/* 000066 */ 	get __init__ () {return __get__ (this, function (self, environmentname) {
-/* 000066 */ 		var counter_formatter = null;
-/* 000066 */ 		var annotations = null;
-/* 000066 */ 		var kwargs = dict ();
-/* 000066 */ 		if (arguments.length) {
-/* 000066 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000066 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000066 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000066 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000066 */ 					switch (__attrib0__) {
-/* 000066 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000066 */ 						case 'environmentname': var environmentname = __allkwargs0__ [__attrib0__]; break;
-/* 000066 */ 						case 'counter_formatter': var counter_formatter = __allkwargs0__ [__attrib0__]; break;
-/* 000066 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
-/* 000066 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000066 */ 					}
-/* 000066 */ 				}
-/* 000066 */ 				delete kwargs.__kwargtrans__;
-/* 000066 */ 			}
-/* 000066 */ 		}
-/* 000066 */ 		else {
-/* 000066 */ 		}
-/* 000076 */ 		__call__ (__call__ (__super__, null, Enumeration, '__init__'), null, self, __kwargtrans__ (__mergekwargtrans__ ({environmentname: environmentname, arguments_spec_list: [__call__ (LLMArgumentSpec, null, (function () {
-/* 000076 */ 			var __accu0__ = latexnodes_parsers;
-/* 000076 */ 			return __call__ (__accu0__.LatexCharsGroupParser, __accu0__, __kwargtrans__ ({delimiters: tuple (['[', ']']), optional: true}));
-/* 000076 */ 		}) (), __kwargtrans__ ({argname: 'tag_template'}))]}, kwargs)));
-/* 000085 */ 		if (__t__ (counter_formatter === null)) {
-/* 000086 */ 			var counter_formatter = _default_enumeration_counter_formatter;
-/* 000086 */ 		}
-/* 000087 */ 		self.counter_formatter = counter_formatter;
-/* 000088 */ 		self.annotations = annotations;
-/* 000091 */ 		self.body_parsing_state_delta = __call__ (LLMParsingStateDeltaSetBlockLevel, null, __kwargtrans__ ({is_block_level: self.is_block_level}));
-/* 000091 */ 	});},
-/* 000094 */ 	get make_body_parser () {return __get__ (this, function (self, token, nodeargd, arg_parsing_state_delta) {
-/* 000094 */ 		if (arguments.length) {
-/* 000094 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000094 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000094 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000094 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000094 */ 					switch (__attrib0__) {
-/* 000094 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000094 */ 						case 'token': var token = __allkwargs0__ [__attrib0__]; break;
-/* 000094 */ 						case 'nodeargd': var nodeargd = __allkwargs0__ [__attrib0__]; break;
-/* 000094 */ 						case 'arg_parsing_state_delta': var arg_parsing_state_delta = __allkwargs0__ [__attrib0__]; break;
-/* 000094 */ 					}
-/* 000094 */ 				}
-/* 000094 */ 			}
-/* 000094 */ 		}
-/* 000094 */ 		else {
-/* 000094 */ 		}
-/* 000101 */ 		return __call__ (LatexEnvironmentBodyContentsParser, null, __kwargtrans__ ({environmentname: token.arg, contents_parsing_state_delta: __call__ (ParsingStateDeltaExtendLatexContextDb, null, __kwargtrans__ ({extend_latex_context: __call__ (dict, null, __kwargtrans__ ({macros: [__call__ (MacroSpec, null, 'item', __kwargtrans__ ({arguments_spec_list: [__call__ (LLMArgumentSpec, null, '[', __kwargtrans__ ({argname: 'custom_tag'}))]}))]}))}))}));
-/* 000101 */ 	});},
-/* 000108 */ 	get postprocess_parsed_node () {return __get__ (this, function (self, node) {
-/* 000108 */ 		if (arguments.length) {
-/* 000108 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000108 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000108 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000108 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000108 */ 					switch (__attrib0__) {
-/* 000108 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000108 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000108 */ 					}
-/* 000108 */ 				}
-/* 000108 */ 			}
-/* 000108 */ 		}
-/* 000108 */ 		else {
-/* 000108 */ 		}
-/* 000110 */ 		// pass;
-/* 000113 */ 		var item_nodelists = (function () {
-/* 000113 */ 			var __accu0__ = node.nodelist;
-/* 000113 */ 			return __call__ (__accu0__.split_at_node, __accu0__, (function __lambda__ (n) {
-/* 000113 */ 				if (arguments.length) {
-/* 000113 */ 					var __ilastarg0__ = arguments.length - 1;
-/* 000113 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000113 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000113 */ 						for (var __attrib0__ in __allkwargs0__) {
-/* 000113 */ 							switch (__attrib0__) {
-/* 000113 */ 								case 'n': var n = __allkwargs0__ [__attrib0__]; break;
-/* 000113 */ 							}
-/* 000113 */ 						}
-/* 000113 */ 					}
-/* 000113 */ 				}
-/* 000113 */ 				else {
-/* 000113 */ 				}
-/* 000114 */ 				return __t__ ((function () {
-/* 000114 */ 					var __accu1__ = n;
-/* 000114 */ 					return __call__ (__accu1__.isNodeType, __accu1__, latexnodes_nodes.LatexMacroNode);
-/* 000114 */ 				}) ()) && __eq__ (n.macroname, 'item');
-/* 000114 */ 			}), __kwargtrans__ ({keep_separators: true}));
-/* 000114 */ 		}) ();
-/* 000118 */ 		var enumeration_items = [];
-/* 000119 */ 		var __iterable0__ = __call__ (enumerate, null, item_nodelists);
-/* 000119 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000119 */ 			var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000119 */ 			var j = __left0__ [0];
-/* 000119 */ 			var item_nodelist = __left0__ [1];
-/* 000120 */ 			if (__t__ (!__t__ ((item_nodelist)))) {
-/* 000120 */ 				continue;
-/* 000120 */ 			}
-/* 000122 */ 			var item_macro = __getitem__ (item_nodelist, 0);
-/* 000123 */ 			if (__t__ (item_macro === null)) {
-/* 000123 */ 				continue;
-/* 000123 */ 			}
-/* 000126 */ 			if (__t__ (__t__ (__eq__ (j, 0)) && __t__ ((function () {
-/* 000126 */ 				var __accu0__ = item_macro;
-/* 000126 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexCharsNode);
-/* 000127 */ 			}) ()) && __eq__ ((function () {
-/* 000127 */ 				var __accu0__ = item_macro.chars;
-/* 000127 */ 				return __call__ (__accu0__.strip, __accu0__);
-/* 000127 */ 			}) (), ''))) {
-/* 000127 */ 				continue;
-/* 000127 */ 			}
+/* 000035 */ export var _default_enumeration_counter_formatter = [dict ({'template': '${arabic}.'}), dict ({'template': '(${roman})'}), dict ({'template': '${alph}-'})];
+/* 000042 */ export var Enumeration =  __class__ ('Enumeration', [LLMEnvironmentSpecBase], {
+/* 000042 */ 	__module__: __name__,
+/* 000059 */ 	is_block_level: true,
+/* 000061 */ 	body_contents_is_block_level: true,
+/* 000063 */ 	allowed_in_standalone_mode: true,
+/* 000065 */ 	get __init__ () {return __get__ (this, function (self, environmentname) {
+/* 000065 */ 		var counter_formatter = null;
+/* 000065 */ 		var annotations = null;
+/* 000065 */ 		var kwargs = dict ();
+/* 000065 */ 		if (arguments.length) {
+/* 000065 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000065 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000065 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000065 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000065 */ 					switch (__attrib0__) {
+/* 000065 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000065 */ 						case 'environmentname': var environmentname = __allkwargs0__ [__attrib0__]; break;
+/* 000065 */ 						case 'counter_formatter': var counter_formatter = __allkwargs0__ [__attrib0__]; break;
+/* 000065 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
+/* 000065 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000065 */ 					}
+/* 000065 */ 				}
+/* 000065 */ 				delete kwargs.__kwargtrans__;
+/* 000065 */ 			}
+/* 000065 */ 		}
+/* 000065 */ 		else {
+/* 000065 */ 		}
+/* 000075 */ 		__call__ (__call__ (__super__, null, Enumeration, '__init__'), null, self, __kwargtrans__ (__mergekwargtrans__ ({environmentname: environmentname, arguments_spec_list: [__call__ (LLMArgumentSpec, null, (function () {
+/* 000075 */ 			var __accu0__ = latexnodes_parsers;
+/* 000075 */ 			return __call__ (__accu0__.LatexCharsGroupParser, __accu0__, __kwargtrans__ ({delimiters: tuple (['[', ']']), optional: true}));
+/* 000083 */ 		}) (), __kwargtrans__ ({argname: 'tag_template'}))], body_parsing_state_delta: __call__ (LLMParsingStateDeltaSetBlockLevel, null, __kwargtrans__ ({is_block_level: self.is_block_level}))}, kwargs)));
+/* 000086 */ 		if (__t__ (counter_formatter === null)) {
+/* 000087 */ 			var counter_formatter = _default_enumeration_counter_formatter;
+/* 000087 */ 		}
+/* 000088 */ 		self.counter_formatter = counter_formatter;
+/* 000089 */ 		self.annotations = annotations;
+/* 000089 */ 	});},
+/* 000092 */ 	get make_body_parser () {return __get__ (this, function (self, token, nodeargd, arg_parsing_state_delta) {
+/* 000092 */ 		if (arguments.length) {
+/* 000092 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000092 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000092 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000092 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000092 */ 					switch (__attrib0__) {
+/* 000092 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000092 */ 						case 'token': var token = __allkwargs0__ [__attrib0__]; break;
+/* 000092 */ 						case 'nodeargd': var nodeargd = __allkwargs0__ [__attrib0__]; break;
+/* 000092 */ 						case 'arg_parsing_state_delta': var arg_parsing_state_delta = __allkwargs0__ [__attrib0__]; break;
+/* 000092 */ 					}
+/* 000092 */ 				}
+/* 000092 */ 			}
+/* 000092 */ 		}
+/* 000092 */ 		else {
+/* 000092 */ 		}
+/* 000099 */ 		return __call__ (LatexEnvironmentBodyContentsParser, null, __kwargtrans__ ({environmentname: token.arg, contents_parsing_state_delta: __call__ (ParsingStateDeltaExtendLatexContextDb, null, __kwargtrans__ ({extend_latex_context: __call__ (dict, null, __kwargtrans__ ({macros: [__call__ (MacroSpec, null, 'item', __kwargtrans__ ({arguments_spec_list: [__call__ (LLMArgumentSpec, null, '[', __kwargtrans__ ({argname: 'custom_tag'}))]}))]}))}))}));
+/* 000099 */ 	});},
+/* 000106 */ 	get postprocess_parsed_node () {return __get__ (this, function (self, node) {
+/* 000106 */ 		if (arguments.length) {
+/* 000106 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000106 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000106 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000106 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000106 */ 					switch (__attrib0__) {
+/* 000106 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000106 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000106 */ 					}
+/* 000106 */ 				}
+/* 000106 */ 			}
+/* 000106 */ 		}
+/* 000106 */ 		else {
+/* 000106 */ 		}
+/* 000109 */ 		var item_nodelists = (function () {
+/* 000109 */ 			var __accu0__ = node.nodelist;
+/* 000109 */ 			return __call__ (__accu0__.split_at_node, __accu0__, (function __lambda__ (n) {
+/* 000109 */ 				if (arguments.length) {
+/* 000109 */ 					var __ilastarg0__ = arguments.length - 1;
+/* 000109 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000109 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000109 */ 						for (var __attrib0__ in __allkwargs0__) {
+/* 000109 */ 							switch (__attrib0__) {
+/* 000109 */ 								case 'n': var n = __allkwargs0__ [__attrib0__]; break;
+/* 000109 */ 							}
+/* 000109 */ 						}
+/* 000109 */ 					}
+/* 000109 */ 				}
+/* 000109 */ 				else {
+/* 000109 */ 				}
+/* 000110 */ 				return __t__ ((function () {
+/* 000110 */ 					var __accu1__ = n;
+/* 000110 */ 					return __call__ (__accu1__.isNodeType, __accu1__, latexnodes_nodes.LatexMacroNode);
+/* 000110 */ 				}) ()) && __eq__ (n.macroname, 'item');
+/* 000110 */ 			}), __kwargtrans__ ({keep_separators: true}));
+/* 000110 */ 		}) ();
+/* 000114 */ 		var enumeration_items = [];
+/* 000115 */ 		var __iterable0__ = __call__ (enumerate, null, item_nodelists);
+/* 000115 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000115 */ 			var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000115 */ 			var j = __left0__ [0];
+/* 000115 */ 			var item_nodelist = __left0__ [1];
+/* 000116 */ 			if (__t__ (!__t__ ((item_nodelist)))) {
+/* 000116 */ 				continue;
+/* 000116 */ 			}
+/* 000118 */ 			var item_macro = __getitem__ (item_nodelist, 0);
+/* 000119 */ 			if (__t__ (item_macro === null)) {
+/* 000119 */ 				continue;
+/* 000119 */ 			}
+/* 000123 */ 			if (__t__ (__t__ (__eq__ (j, 0)) && (__t__ (__t__ ((function () {
+/* 000123 */ 				var __accu0__ = item_macro;
+/* 000123 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexCharsNode);
+/* 000124 */ 			}) ()) && __eq__ ((function () {
+/* 000124 */ 				var __accu0__ = item_macro.chars;
+/* 000124 */ 				return __call__ (__accu0__.strip, __accu0__);
+/* 000125 */ 			}) (), '')) || __t__ ((function () {
+/* 000125 */ 				var __accu0__ = item_macro;
+/* 000125 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexSpecialsNode);
+/* 000126 */ 			}) ()) && __call__ (isinstance, null, item_macro.spec, LLMSpecInfoParagraphBreak)))) {
+/* 000126 */ 				continue;
+/* 000126 */ 			}
 /* 000130 */ 			if (__t__ (__t__ (!__t__ (((function () {
 /* 000130 */ 				var __accu0__ = item_macro;
 /* 000130 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexMacroNode);
@@ -208,7 +206,7 @@
 /* 000175 */ 			var counter_formatter_spec = tag_template_chars;
 /* 000175 */ 		}
 /* 000177 */ 		var counter_formatter = (function () {
-/* 000177 */ 			var __accu0__ = fmthelpers;
+/* 000177 */ 			var __accu0__ = counter;
 /* 000177 */ 			return __call__ (__accu0__.parse_counter_formatter, __accu0__, counter_formatter_spec, __kwargtrans__ ({str_use_tag_template: true}));
 /* 000177 */ 		}) ();
 /* 000182 */ 		var items_custom_tags = dict ({});
@@ -278,68 +276,73 @@
 /* 000210 */ 		return result;
 /* 000210 */ 	});}
 /* 000210 */ });
-/* 000214 */ export var default_enumeration_environments = dict ({'itemize': dict ({'counter_formatter': ['•', '-', '▸']}), 'enumerate': dict ({'counter_formatter': null})});
-/* 000223 */ export var FeatureEnumeration =  __class__ ('FeatureEnumeration', [Feature], {
-/* 000223 */ 	__module__: __name__,
-/* 000230 */ 	feature_name: 'enumeration',
-/* 000232 */ 	DocumentManager: null,
-/* 000233 */ 	RenderManager: null,
-/* 000235 */ 	get __init__ () {return __get__ (this, function (self, enumeration_environments) {
-/* 000235 */ 		if (typeof enumeration_environments == 'undefined' || (enumeration_environments != null && enumeration_environments.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000235 */ 			var enumeration_environments = null;
-/* 000235 */ 		};
-/* 000235 */ 		if (arguments.length) {
-/* 000235 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000235 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000235 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000235 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000235 */ 					switch (__attrib0__) {
-/* 000235 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000235 */ 						case 'enumeration_environments': var enumeration_environments = __allkwargs0__ [__attrib0__]; break;
-/* 000235 */ 					}
-/* 000235 */ 				}
-/* 000235 */ 			}
-/* 000235 */ 		}
-/* 000235 */ 		else {
-/* 000235 */ 		}
-/* 000236 */ 		__call__ (__call__ (__super__, null, FeatureEnumeration, '__init__'), null, self);
-/* 000237 */ 		if (__t__ (enumeration_environments === null)) {
-/* 000238 */ 			var enumeration_environments = default_enumeration_environments;
+/* 000215 */ export var FeatureEnumeration =  __class__ ('FeatureEnumeration', [Feature], {
+/* 000215 */ 	__module__: __name__,
+/* 000222 */ 	feature_name: 'enumeration',
+/* 000223 */ 	feature_title: 'Enumeration and itemization lists',
+/* 000225 */ 	feature_default_config: dict ({'enumeration_environments': dict ({'itemize': dict ({'counter_formatter': ['•', '-', '▸']}), 'enumerate': dict ({'counter_formatter': null})})}),
+/* 000235 */ 	DocumentManager: null,
+/* 000236 */ 	RenderManager: null,
+/* 000238 */ 	get __init__ () {return __get__ (this, function (self, enumeration_environments) {
+/* 000238 */ 		if (typeof enumeration_environments == 'undefined' || (enumeration_environments != null && enumeration_environments.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000238 */ 			var enumeration_environments = null;
+/* 000238 */ 		};
+/* 000238 */ 		if (arguments.length) {
+/* 000238 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000238 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000238 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000238 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000238 */ 					switch (__attrib0__) {
+/* 000238 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000238 */ 						case 'enumeration_environments': var enumeration_environments = __allkwargs0__ [__attrib0__]; break;
+/* 000238 */ 					}
+/* 000238 */ 				}
+/* 000238 */ 			}
 /* 000238 */ 		}
-/* 000239 */ 		self.enumeration_environments = enumeration_environments;
-/* 000239 */ 	});},
-/* 000241 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
-/* 000241 */ 		if (arguments.length) {
-/* 000241 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000241 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000241 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000241 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000241 */ 					switch (__attrib0__) {
-/* 000241 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000241 */ 					}
-/* 000241 */ 				}
-/* 000241 */ 			}
-/* 000241 */ 		}
-/* 000241 */ 		else {
-/* 000241 */ 		}
-/* 000242 */ 		return __call__ (dict, null, __kwargtrans__ ({environments: (function () {
-/* 000242 */ 			var __accu0__ = [];
-/* 000249 */ 			var __iterable0__ = (function () {
-/* 000249 */ 				var __accu1__ = self.enumeration_environments;
-/* 000249 */ 				return __call__ (__accu1__.py_items, __accu1__);
-/* 000249 */ 			}) ();
-/* 000249 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000249 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000249 */ 				var envname = __left0__ [0];
-/* 000249 */ 				var envinfo = __left0__ [1];
-/* 000249 */ 				(function () {
-/* 000249 */ 					var __accu1__ = __accu0__;
-/* 000244 */ 					return __call__ (__accu1__.append, __accu1__, __call__ (Enumeration, null, __kwargtrans__ ({environmentname: envname, counter_formatter: __getitem__ (envinfo, 'counter_formatter'), annotations: [envname]})));
-/* 000244 */ 				}) ();
-/* 000244 */ 			}
-/* 000244 */ 			return __accu0__;
-/* 000244 */ 		}) ()}));
-/* 000244 */ 	});}
-/* 000244 */ });
+/* 000238 */ 		else {
+/* 000238 */ 		}
+/* 000239 */ 		__call__ (__call__ (__super__, null, FeatureEnumeration, '__init__'), null, self);
+/* 000240 */ 		if (__t__ (enumeration_environments === null)) {
+/* 000245 */ 			var enumeration_environments = (function () {
+/* 000245 */ 				var __accu0__ = self.feature_default_config;
+/* 000245 */ 				return __call__ (__accu0__.py_get, __accu0__, 'enumeration_environments', dict ({}));
+/* 000245 */ 			}) ();
+/* 000245 */ 		}
+/* 000246 */ 		self.enumeration_environments = enumeration_environments;
+/* 000246 */ 	});},
+/* 000248 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
+/* 000248 */ 		if (arguments.length) {
+/* 000248 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000248 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000248 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000248 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000248 */ 					switch (__attrib0__) {
+/* 000248 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000248 */ 					}
+/* 000248 */ 				}
+/* 000248 */ 			}
+/* 000248 */ 		}
+/* 000248 */ 		else {
+/* 000248 */ 		}
+/* 000249 */ 		return __call__ (dict, null, __kwargtrans__ ({environments: (function () {
+/* 000249 */ 			var __accu0__ = [];
+/* 000256 */ 			var __iterable0__ = (function () {
+/* 000256 */ 				var __accu1__ = self.enumeration_environments;
+/* 000256 */ 				return __call__ (__accu1__.py_items, __accu1__);
+/* 000256 */ 			}) ();
+/* 000256 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000256 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000256 */ 				var envname = __left0__ [0];
+/* 000256 */ 				var envinfo = __left0__ [1];
+/* 000256 */ 				(function () {
+/* 000256 */ 					var __accu1__ = __accu0__;
+/* 000251 */ 					return __call__ (__accu1__.append, __accu1__, __call__ (Enumeration, null, __kwargtrans__ ({environmentname: envname, counter_formatter: __getitem__ (envinfo, 'counter_formatter'), annotations: [envname]})));
+/* 000251 */ 				}) ();
+/* 000251 */ 			}
+/* 000251 */ 			return __accu0__;
+/* 000251 */ 		}) ()}));
+/* 000251 */ 	});}
+/* 000251 */ });
+/* 000263 */ export var FeatureClass = FeatureEnumeration;
 /* 000007 */ 
 //# sourceMappingURL=llm.feature.enumeration.map
