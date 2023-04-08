@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-04-09 00:31:34
+/* 000001 */ // Transcrypt'ed from Python, 2023-04-09 01:44:39
 /* 000001 */ var __name__ = 'org.transcrypt.__runtime__';
 /* 000003 */ export var __envir__ = {};
 /* 000003 */ __envir__.interpreter_name = 'python';
@@ -2588,7 +2588,7 @@
 
 
 
-/*** PhF/LLM - BEGIN CUSTOM PATCHES ***/
+/*** PhF/PYLATEXENC - BEGIN CUSTOM PATCHES ***/
 
 //
 // Patch Transcrypt's implemnetations of some builtin object methods.
@@ -2664,4 +2664,8 @@ __eq__ = function (a, b) {
     }
 };
 
-/*** PhF/LLM - END CUSTOM PATCHES ***/
+
+
+
+
+/*** PhF/PYLATEXENC - END CUSTOM PATCHES ***/
