@@ -50,8 +50,8 @@ export class CitationSourceDoi extends CitationSourceBase
             }),
         } );
         if (response.status !== 200) {
-            console.error(`Error while fetching DOI ‘${doi}’`, response);
-            throw new Error('Fetching DOI citation ‘${doi}’ - bad status code.');
+            console.error(`Error while fetching DOI ‘${doi}’ →`, response);
+            throw new Error(`Fetching DOI citation ‘${doi}’ - bad status code.`);
         }
 
         let csljsondata = await response.json();

@@ -143,6 +143,7 @@ export class CitationDatabaseManager
                     cite_prefix: d.chained.cite_prefix,
                     cite_key: d.chained.cite_key,
                     encountered_in: {
+                        resource_info: d.chained.encountered_in?.resource_info,
                         what: `Chained from ‘${cite_prefix}:${cite_key}’`,
                     }
                 });
