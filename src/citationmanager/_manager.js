@@ -217,7 +217,7 @@ export class CitationDatabaseManager
                                 ?? '(unknown)'
                             );
                             const source_where =
-                                  encountered_citation.encountered_in.what ?? '(unknown)';
+                                  a_citation_to_retrieve.encountered_in.what ?? '(unknown)';
                             console.error(
                                 `Citation ‘${cite_prefix}:${cite_key}’ was encountered in: `
                                 + `‘${source_path}’ → ‘${source_where}’`
