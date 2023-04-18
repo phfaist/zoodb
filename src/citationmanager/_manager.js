@@ -188,7 +188,9 @@ export class CitationDatabaseManager
         }
 
         try {
+
             await Promise.all( Object.values(source_run_promises) );
+
         } catch (e) {
             //console.error(`Error while fetching citations`);
 
