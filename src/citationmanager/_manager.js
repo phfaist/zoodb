@@ -114,6 +114,10 @@ export class CitationDatabaseManager
         let keys_to_retrieve = Object.fromEntries(
             Object.keys(this.sources).map( (cite_prefix) => [cite_prefix, new Set()] )
         );
+        let all_citations_to_retrieve_by_prefix = Object.fromEntries(
+            Object.keys(this.sources).map( (cite_prefix) => [cite_prefix, [] ] )
+        );
+
         let process_citations = [...citations];
         while (process_citations.length)
         {
@@ -132,6 +136,7 @@ export class CitationDatabaseManager
             const d = this.cache.get( `${cite_prefix}:${cite_key}` );
             if (d === null) {
                 keys_to_retrieve[cite_prefix].add( cite_key );
+                all_citations_to_retrieve_by_prefix[cite_prefix].push( c );
             }
             // if we already have an entry for this citation, there's no need to
             // retrieve it.
@@ -182,7 +187,44 @@ export class CitationDatabaseManager
             }
         }
 
-        await Promise.all( Object.values(source_run_promises) );
+        try {
+            await Promise.all( Object.values(source_run_promises) );
+        } catch (e) {
+            //console.error(`Error while fetching citations`);
+
+            // find the failures in `all_citations_to_retrieve_by_prefix` to
+            // report usage locations
+
+            const failure_citation_fetch = e.failure_citation_fetch;
+            if (failure_citation_fetch != null) {
+                const { cite_prefix, cite_keys } = failure_citation_fetch;
+                console.error(`Source ‘${cite_prefix}’ failed to fetch IDs:`, cite_keys);
+                for (const cite_key of cite_keys) {
+                    // find where this id is used???
+                    for (const a_citation_to_retrieve
+                         of all_citations_to_retrieve_by_prefix[cite_key]) {
+
+                        if (a_citation_to_retrieve.cite_prefix === cite_prefix
+                            && a_citation_to_retrieve.cite_key === cite_key
+                            && a_citation_to_retrieve.encountered_in != null) {
+                            const source_path = (
+                                a_citation_to_retrieve.encountered_in
+                                    .resource_info?.source_path
+                                ?? '(unknown)'
+                            );
+                            const source_where =
+                                  encountered_citation.encountered_in.what ?? '(unknown)';
+                            console.error(
+                                `Citation ‘${cite_prefix}:${cite_key}’ was encountered in: `
+                                + `‘${source_path}’ → ‘${source_where}’`
+                            );
+                        }
+                    }
+                }
+            }
+
+            throw e;
+        }
     }
 
 
