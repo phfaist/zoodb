@@ -144,7 +144,15 @@ export class CitationSourceBase
 
                     // retrieve the chunk
                     last_chunk_retrieve_hrtime = process.hrtime();
-                    await this.run_retrieve_chunk(ids);
+                    try {
+                        await this.run_retrieve_chunk(ids);
+                    } catch (e) {
+                        e.failure_citation_fetch = {
+                            source_name: this.source_name,
+                            ids: ids,
+                        };
+                        throw e;
+                    }
 
                     // bookkeeping & logging
                     this.total_queried += ids.length;

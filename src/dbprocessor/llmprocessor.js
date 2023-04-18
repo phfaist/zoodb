@@ -229,7 +229,33 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
         // make sure we purge any entries from earlier possible zoo processings
         this.citation_manager.purge_expired();
 
-        await this.citation_manager.retrieve_citations( encountered_citations );
+        try {
+
+            await this.citation_manager.retrieve_citations( encountered_citations );
+
+        } catch (e) {
+            console.error(`Error while fetching citations.`);
+
+            failure_citation_fetch = e.failure_citation_fetch;
+            if (failure_citation_fetch != null) {
+                const { source_name, ids } = failure_citation_fetch;
+                console.error(`Source ‘${source_name}’ failed to fetch IDs:`, ids);
+                for (const id of ids) {
+                    // find where this id is used???
+                    for (const encountered_citation of encountered_citations) {
+                        if (encountered_citation.cite_prefix === source_name
+                            && encountered_citation.cite_key === id) {
+                            console.error(
+                                `Citation ‘${source_name}:${id}’ was encountered in `,
+                                encountered_citation.encountered_in?.resource_info?.source_path
+                            );
+                        }
+                    }
+                }
+            }
+
+            throw e;
+        }
 
         // citations database ready
         debug("Citation database ready!")
