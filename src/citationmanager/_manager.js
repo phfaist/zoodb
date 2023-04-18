@@ -196,8 +196,8 @@ export class CitationDatabaseManager
 
             // find the failures in `all_citations_to_retrieve_by_prefix` to
             // report usage locations
-            debug('error, will for failed citation search in ',
-                  { all_citations_to_retrieve_by_prefix } );
+            // debug('error, will for failed citation search in ',
+            //       { all_citations_to_retrieve_by_prefix } );
 
             const failure_citation_fetch = e.failure_citation_fetch;
             if (failure_citation_fetch != null) {
