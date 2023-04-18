@@ -148,8 +148,8 @@ export class CitationSourceBase
                         await this.run_retrieve_chunk(ids);
                     } catch (e) {
                         e.failure_citation_fetch = {
-                            source_name: this.source_name,
-                            ids: ids,
+                            cite_prefix: this.source_name,
+                            cite_keys: ids,
                         };
                         throw e;
                     }

@@ -248,7 +248,8 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
                             && encountered_citation.cite_key === cite_key) {
                             console.error(
                                 `Citation ‘${cite_prefix}:${cite_key}’ was encountered in `,
-                                encountered_citation.encountered_in?.resource_info?.source_path
+                                 (encountered_citation.encountered_in
+                                  ?.resource_info?.source_path) ?? '(unknown)'
                             );
                         }
                     }
