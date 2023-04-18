@@ -236,7 +236,7 @@ export class ZooLLMProcessor extends ZooDbProcessorBase
         } catch (e) {
             console.error(`Error while fetching citations.`);
 
-            failure_citation_fetch = e.failure_citation_fetch;
+            const failure_citation_fetch = e.failure_citation_fetch;
             if (failure_citation_fetch != null) {
                 const { source_name, ids } = failure_citation_fetch;
                 console.error(`Source ‘${source_name}’ failed to fetch IDs:`, ids);
