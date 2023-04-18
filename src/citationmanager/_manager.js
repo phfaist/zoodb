@@ -206,7 +206,7 @@ export class CitationDatabaseManager
                 for (const cite_key of cite_keys) {
                     // find where this id is used???
                     for (const a_citation_to_retrieve
-                         of all_citations_to_retrieve_by_prefix[cite_key]) {
+                         of all_citations_to_retrieve_by_prefix[cite_prefix]) {
 
                         if (a_citation_to_retrieve.cite_prefix === cite_prefix
                             && a_citation_to_retrieve.cite_key === cite_key
