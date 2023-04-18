@@ -50,7 +50,7 @@ export class CitationSourceDoi extends CitationSourceBase
             }),
         } );
         if (response.status !== 200) {
-            console.error(result);
+            console.error(response);
             throw new Error('Fetching DOI citation - bad status code.');
         }
 
