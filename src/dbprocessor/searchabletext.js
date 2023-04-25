@@ -177,7 +177,7 @@ export class SearchableTextFieldset
         }
 
         // convert any special fields to text with a user-defined function
-        // (eg. for LLM).  Also combine array fields into a single string.
+        // (eg. for FLM).  Also combine array fields into a single string.
         const doc = this.assemble_doc_text_values(doc_values);
                 
         //debug(`crafted searchable doc =`, doc);

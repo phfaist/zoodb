@@ -1,6 +1,6 @@
 const data = async () => {
 
-    const zoollm = await import('@phfaist/zoodb/zoollm');
+    const zooflm = await import('@phfaist/zoodb/zooflm');
 
     return {
         pagination: {
@@ -15,7 +15,7 @@ const data = async () => {
         eleventyComputed: {
             permalink: (data) =>
                 data.peopledb.zoo_object_permalink('person', data.person.person_id) + '.html',
-            title: (data) => zoollm.render_text_standalone(data.person.name),
+            title: (data) => zooflm.render_text_standalone(data.person.name),
             date: (data) => {
                 // injection hack to get correct page date property!
                 // https://github.com/11ty/eleventy/issues/2199#issuecomment-1027362151
@@ -30,14 +30,14 @@ const render = async (data) => {
 
     const { person, peopledb } = data;
 
-    const zoo_llm_environment = peopledb.zoo_llm_environment;
+    const zoo_flm_environment = peopledb.zoo_flm_environment;
 
-    const zoollm = await import('@phfaist/zoodb/zoollm');
+    const zooflm = await import('@phfaist/zoodb/zooflm');
     const { sqzhtml } = await import('@phfaist/zoodb/util/sqzhtml');
 
     const render_doc_fn = (render_context) => {
 
-        const { ne, rdr, rdrblock, ref } = zoollm.make_render_shorthands({ render_context });
+        const { ne, rdr, rdrblock, ref } = zooflm.make_render_shorthands({ render_context });
 
         let s = '';
 
@@ -112,8 +112,8 @@ const render = async (data) => {
         return s;
     }
 
-    return zoollm.make_and_render_document({
-        zoo_llm_environment,
+    return zooflm.make_and_render_document({
+        zoo_flm_environment,
         render_doc_fn,
         //doc_metadata: {},
         render_endnotes: {

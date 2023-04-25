@@ -8,8 +8,8 @@ import {
     SearchableTextProcessor,
 } from '../dbprocessor/searchabletext.js';
 import {
-    LLMSearchableDocTextValuesAssembler,
-} from '../dbprocessor/searchabletextllm.js';
+    FLMSearchableDocTextValuesAssembler,
+} from '../dbprocessor/searchabletextflm.js';
 
 
 
@@ -18,8 +18,8 @@ export function use_searchable_text_processor(_this)
     const searchable_text_options = _this.config.searchable_text_options ?? {};
 
     const searchable_text_doc_values_assembler =
-          new LLMSearchableDocTextValuesAssembler({
-              zoo_llm_environment: _this.zoo_llm_environment,
+          new FLMSearchableDocTextValuesAssembler({
+              zoo_flm_environment: _this.zoo_flm_environment,
           });
     _this.searchable_text_fieldset = new SearchableTextFieldset({
         field_name_title: 'name',

@@ -35,7 +35,7 @@ properties:
 
   name:
     type: string
-    _llm: standalone
+    _flm: standalone
     _single_line_string: True
     _description: >-
       The name of the code.  It is listed in multiple places, so don't make it
@@ -43,7 +43,7 @@ properties:
 
   biography:
     type: string
-    _llm: full
+    _flm: full
     _description: >-
       A short biography of this person.
 
@@ -84,7 +84,7 @@ properties:
 
             friend_detail:
               type: string
-              _llm: full
+              _flm: full
               _description: >-
                 Describe how these two people got to know each other as friends.
           
@@ -103,7 +103,7 @@ properties:
           type: object
           properties:
             friend_detail:
-              _llm: full
+              _flm: full
             # (we also have further autopopulated relation object fields
             # including 'person_id', no need to specify them here)
         

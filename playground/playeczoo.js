@@ -10,14 +10,14 @@ const logger = {
 };
 
 import * as zoodbrelations from '@phfaist/zoodb/dbprocessor/relations';
-import { ZooLLMProcessor } from '@phfaist/zoodb/dbprocessor/llmprocessor';
+import { ZooFLMProcessor } from '@phfaist/zoodb/dbprocessor/flmprocessor';
 
-import * as zoollm from '@phfaist/zoodb/zoollm';
-const {$$kw, repr} = zoollm;
+import * as zooflm from '@phfaist/zoodb/zooflm';
+const {$$kw, repr} = zooflm;
 
-// import * as zoollmscanner from '@phfaist/zoodb/zoollm/scanner.js';
-// import { CitationCompiler, install_csl_llm_output_format }
-//     from '@phfaist/zoodb/zoollm/citationcompiler.js';
+// import * as zooflmscanner from '@phfaist/zoodb/zooflm/scanner.js';
+// import { CitationCompiler, install_csl_flm_output_format }
+//     from '@phfaist/zoodb/zooflm/citationcompiler.js';
 
 import { CitationSourceArxiv } from '@phfaist/zoodb/citationmanager/source/arxiv';
 import { CitationSourceDoi } from '@phfaist/zoodb/citationmanager/source/doi';
@@ -26,7 +26,7 @@ import { CitationSourceBibliographyFile } from '@phfaist/zoodb/citationmanager/s
 
 import { FilesystemResourceRetriever } from '@phfaist/zoodb/resourcecollector/retriever/fs';
 
-import { LLMGraphicsResourceProcessor } from '@phfaist/zoodb/resourcecollector/processor/llmgraphicsprocessor';
+import { FLMGraphicsResourceProcessor } from '@phfaist/zoodb/resourcecollector/processor/flmgraphicsprocessor';
 
 
 
@@ -75,21 +75,21 @@ let zoo_relations_populator = new zoodbrelations.RelationsPopulator();
 
 
 //
-// Process all Zoo LLM Content. Fetch citations, resolve some references, etc.
+// Process all Zoo FLM Content. Fetch citations, resolve some references, etc.
 //
 
-// see if we can mix in some LLM processing
-let zoollmenviron = new zoollm.ZooLLMEnvironment();
+// see if we can mix in some FLM processing
+let zooflmenviron = new zooflm.ZooFLMEnvironment();
 
 
 const cslfn = 'eczoo-bib-style.csl';
 let csl_style = fs.readFileSync(`playground/${cslfn}`).toString();
 
-let zoo_llm_processor = new ZooLLMProcessor({
-    zoo_llm_environment: zoollmenviron,
+let zoo_flm_processor = new ZooFLMProcessor({
+    zoo_flm_environment: zooflmenviron,
     refs: {
         code: {
-            formatted_ref_llm_text_fn: (codeid, code) => code.name.llm_text,
+            formatted_ref_flm_text_fn: (codeid, code) => code.name.flm_text,
         },
     },
     citations: {
@@ -122,8 +122,8 @@ let zoo_llm_processor = new ZooLLMProcessor({
         },
         resource_processors: {
             'graphics_path': [
-                new LLMGraphicsResourceProcessor({
-                    zoo_llm_environment: zoollmenviron,
+                new FLMGraphicsResourceProcessor({
+                    zoo_flm_environment: zooflmenviron,
                     fs,
                 }),
             ],
@@ -140,7 +140,7 @@ let zoodb = new ZooDb(
         // database processors:
         processors: [
             zoo_relations_populator,
-            zoo_llm_processor
+            zoo_flm_processor
         ],
     }
 );
@@ -150,13 +150,13 @@ await zoodb.load_data( await loader.load() );
 logger.info("Zoo is now loaded!");
 
 
-zoollmenviron.graphics_collection.src_url_resolver = (graphics_resource, render_context) => {
+zooflmenviron.graphics_collection.src_url_resolver = (graphics_resource, render_context) => {
     const src_url = path.join('./_output_resource_graphics_files/', graphics_resource.src_url);
     return { src_url, srcset: null };
 };
 
 // target_href resolver
-zoollmenviron.external_ref_resolver.target_href_resolver = (ref_instance, render_context) => {
+zooflmenviron.external_ref_resolver.target_href_resolver = (ref_instance, render_context) => {
     if (ref_instance.target_href) {
         return ref_instance.target_href;
     }
@@ -180,14 +180,14 @@ const test_render_code = () => {
 
     logger.debug(
         "Simple standalone text rendering: ‘%s’",
-        mycode.name.render_standalone(new zoollm.ZooTextFragmentRenderer())
+        mycode.name.render_standalone(new zooflm.ZooTextFragmentRenderer())
     );
 
     logger.debug('mycode.name =', mycode.name);
 
     // full html rendering?
 
-    let doc = zoollmenviron.make_document(
+    let doc = zooflmenviron.make_document(
         (render_context) => {
             const thecode = mycode;
             return `
@@ -198,7 +198,7 @@ ${thecode.description.render(render_context)}
 ${thecode.protection.render(render_context)}
 `;
         } );
-    let [rendered_html, render_context] = doc.render( new zoollm.ZooHtmlFragmentRenderer() );
+    let [rendered_html, render_context] = doc.render( new zooflm.ZooHtmlFragmentRenderer() );
     rendered_html += `
 <h2>References</h2>
 ${render_context.feature_render_manager('endnotes').render_endnotes()}
@@ -210,7 +210,7 @@ ${render_context.feature_render_manager('endnotes').render_endnotes()}
 <!doctype html>
 <html>
 <head>
-  <title>LLM Document</title>
+  <title>FLM Document</title>
   <style type="text/css">
 /* ------------------ */
 html, body {

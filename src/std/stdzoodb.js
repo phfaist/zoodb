@@ -18,7 +18,7 @@ export class StandardZooDb extends ZooDb
             {
                 continue_with_errors: false,
 
-                // for any filesystem access, mostly for llm_processor
+                // for any filesystem access, mostly for flm_processor
                 fs: null,
                 fs_data_dir: null,
 
@@ -26,11 +26,11 @@ export class StandardZooDb extends ZooDb
 
                 use_gitlastmodified_processor: null,
 
-                use_llm_environment: null,
-                zoo_llm_environment_options: null,
+                use_flm_environment: null,
+                zoo_flm_environment_options: null,
 
-                use_llm_processor: null,
-                llm_options: {
+                use_flm_processor: null,
+                flm_options: {
 
                     refs: {},
 
@@ -71,7 +71,7 @@ export class StandardZooDb extends ZooDb
               // console is very long
               // Object.assign({}, _this.config, {fs: `(((${_this.config.fs})))`}),
              );
-        debug(`StandardZooDb: config's llm_options are =`, _this.config.llm_options);
+        debug(`StandardZooDb: config's flm_options are =`, _this.config.flm_options);
 
         if (_this.config.zoo_permalinks == null) {
             throw new Error(
@@ -81,12 +81,12 @@ export class StandardZooDb extends ZooDb
 
         // NOTE! read-only property, assining to this property won't take effect
         // later on because the property value is used already here in
-        // use_llm_environment().
+        // use_flm_environment().
         _this.zoo_object_permalink = _this.config.zoo_permalinks.object;
 
-        _this.zoo_llm_environment = null;
-        if (_this.config.use_llm_environment) {
-            _this.zoo_llm_environment = _this.config.use_llm_environment(_this);
+        _this.zoo_flm_environment = null;
+        if (_this.config.use_flm_environment) {
+            _this.zoo_flm_environment = _this.config.use_flm_environment(_this);
         }
 
         _this.zoodb_processors = [];
@@ -107,16 +107,16 @@ export class StandardZooDb extends ZooDb
             _this.zoo_gitlastmodified_processor = null;
         }
 
-        _this.llm_error_policy = (_this.config.continue_with_errors ? 'continue' : 'abort');
-        debug(`llm_error_policy = ${_this.llm_error_policy}`);
+        _this.flm_error_policy = (_this.config.continue_with_errors ? 'continue' : 'abort');
+        debug(`flm_error_policy = ${_this.flm_error_policy}`);
 
         //
-        // LLM Processor
+        // FLM Processor
         //
-        _this.zoo_llm_processor = null;
-        if (_this.config.use_llm_processor) {
-            _this.zoo_llm_processor = _this.config.use_llm_processor(_this);
-            _this.zoodb_processors.push(_this.zoo_llm_processor);
+        _this.zoo_flm_processor = null;
+        if (_this.config.use_flm_processor) {
+            _this.zoo_flm_processor = _this.config.use_flm_processor(_this);
+            _this.zoodb_processors.push(_this.zoo_flm_processor);
         }
 
         //

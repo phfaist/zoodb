@@ -35,7 +35,7 @@ export class StandardZooDbYamlDataLoader
 
         this.yamldb_loader = new YamlDbZooDataLoader({
             resource_file_extensions:
-                this.zoodb.config.llm_options.resources.resource_file_extensions,
+                this.zoodb.config.flm_options.resources.resource_file_extensions,
             objects: this.config.objects,
 
             object_defaults: { },

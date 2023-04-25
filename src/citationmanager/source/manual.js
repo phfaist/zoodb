@@ -38,7 +38,7 @@ export class CitationSourceManual extends CitationSourceBase
                 this.cite_prefix, key,
                 {
                     _ready_formatted: {
-                        llm: key
+                        flm: key
                     }
                 },
                 this.cache_store_options,

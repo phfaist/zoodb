@@ -41,9 +41,9 @@
         "./resourcecollector": "./src/resourcecollector/index.js",
         "./resourcecollector/retriever/*": "./src/resourcecollector/retriever/*.js",
         "./resourcecollector/processor/*": "./src/resourcecollector/processor/*.js",
-        "./zoollm": "./src/zoollm/index.js",
-        "./zoollm/citationcompiler": "./src/zoollm/citationcompiler.js",
-        "./zoollm/scanner": "./src/zoollm/scanner.js",
+        "./zooflm": "./src/zooflm/index.js",
+        "./zooflm/citationcompiler": "./src/zooflm/citationcompiler.js",
+        "./zooflm/scanner": "./src/zooflm/scanner.js",
         "./util": "./src/util/index.js",
         "./util/*": "./src/util/*.js",
         "./search/searchindex": "./src/search/searchindex.js",
@@ -52,6 +52,6 @@
         "./std/*": "./src/std/*.js"
     },
     "COMMENTED_OUT_NOT_SUPPORTED_BY_PARCEL__imports": {
-        "#llm-js/*": "./llm-js-src/llm-js/*"
+        "#flm-js/*": "./flm-js-src/flm-js/*"
     }
 }
