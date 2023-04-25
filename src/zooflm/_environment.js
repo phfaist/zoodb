@@ -541,8 +541,8 @@ export var ZooFLMEnvironment = __class__(
 
             self.parsing_state_event_handler = parsing_state_event_handler
 
-            self.environment_get_parse_error_message =
-                flmenvironment.standard_environment_get_parse_error_message;
+            self.environment_get_located_error_message =
+                flmenvironment.standard_environment_get_located_error_message;
             
             // environment set up.
         });}
