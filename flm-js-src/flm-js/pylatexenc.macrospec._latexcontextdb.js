@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-04-25 12:01:29
+/* 000001 */ // Transcrypt'ed from Python, 2023-05-11 01:03:02
 /* 000037 */ var logging = {};
 /* 000037 */ var unique_object_id = {};
 /* 000037 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
@@ -694,404 +694,376 @@
 /* 000448 */ 			}
 /* 000448 */ 		}
 /* 000448 */ 		});},
-/* 000452 */ 	get filter_context () {return __get__ (this, function (self) {
-/* 000452 */ 		var kwargs = dict ();
-/* 000452 */ 		if (arguments.length) {
-/* 000452 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000452 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000452 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000452 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000452 */ 					switch (__attrib0__) {
-/* 000452 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000452 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000452 */ 					}
-/* 000452 */ 				}
-/* 000452 */ 				delete kwargs.__kwargtrans__;
-/* 000452 */ 			}
-/* 000452 */ 			var args = tuple ([].slice.apply (arguments).slice (1, __ilastarg0__ + 1));
-/* 000452 */ 		}
-/* 000452 */ 		else {
-/* 000452 */ 			var args = tuple ();
-/* 000452 */ 		}
-/* 000459 */ 		(function () {
-/* 000459 */ 			var __accu0__ = _util;
-/* 000459 */ 			return __call__ (__accu0__.pylatexenc_deprecated_3, __accu0__, '`LatexContextDb.filter_context()` was renamed to `filtered_context()`.');
-/* 000459 */ 		}) ();
-/* 000461 */ 		return (function () {
-/* 000461 */ 			var __accu0__ = self;
-/* 000461 */ 			return __call__ (__accu0__.filtered_context, __accu0__, ...args, __kwargtrans__ (kwargs));
-/* 000461 */ 		}) ();
-/* 000461 */ 	});},
-/* 000464 */ 	get filtered_context () {return __get__ (this, function (self, keep_categories, exclude_categories, keep_which, create_class) {
-/* 000464 */ 		if (typeof keep_categories == 'undefined' || (keep_categories != null && keep_categories.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000464 */ 			var keep_categories = [];
-/* 000464 */ 		};
-/* 000464 */ 		if (typeof exclude_categories == 'undefined' || (exclude_categories != null && exclude_categories.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000464 */ 			var exclude_categories = [];
-/* 000464 */ 		};
-/* 000464 */ 		if (typeof keep_which == 'undefined' || (keep_which != null && keep_which.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000464 */ 			var keep_which = [];
-/* 000464 */ 		};
-/* 000464 */ 		if (typeof create_class == 'undefined' || (create_class != null && create_class.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000464 */ 			var create_class = null;
-/* 000464 */ 		};
-/* 000464 */ 		if (arguments.length) {
-/* 000464 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000464 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000464 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000464 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000464 */ 					switch (__attrib0__) {
-/* 000464 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000464 */ 						case 'keep_categories': var keep_categories = __allkwargs0__ [__attrib0__]; break;
-/* 000464 */ 						case 'exclude_categories': var exclude_categories = __allkwargs0__ [__attrib0__]; break;
-/* 000464 */ 						case 'keep_which': var keep_which = __allkwargs0__ [__attrib0__]; break;
-/* 000464 */ 						case 'create_class': var create_class = __allkwargs0__ [__attrib0__]; break;
-/* 000464 */ 					}
-/* 000464 */ 				}
-/* 000464 */ 			}
-/* 000464 */ 		}
-/* 000464 */ 		else {
-/* 000464 */ 		}
-/* 000492 */ 		if (__t__ (create_class === null)) {
-/* 000493 */ 			var create_class = self.__class__;
-/* 000493 */ 		}
-/* 000495 */ 		var new_context = __call__ (create_class, null);
-/* 000497 */ 		new_context.unknown_macro_spec = self.unknown_macro_spec;
-/* 000498 */ 		new_context.unknown_environment_spec = self.unknown_environment_spec;
-/* 000499 */ 		new_context.unknown_specials_spec = self.unknown_specials_spec;
-/* 000501 */ 		var keep_macros = __t__ (!__t__ ((keep_which))) || __in__ ('macros', keep_which);
-/* 000502 */ 		var keep_environments = __t__ (!__t__ ((keep_which))) || __in__ ('environments', keep_which);
-/* 000503 */ 		var keep_specials = __t__ (!__t__ ((keep_which))) || __in__ ('specials', keep_which);
-/* 000505 */ 		var __iterable0__ = self.category_list;
-/* 000505 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000505 */ 			var cat = __getitem__ (__iterable0__, __index0__);
-/* 000506 */ 			if (__t__ (__t__ (keep_categories) && !__in__ (cat, keep_categories))) {
-/* 000506 */ 				continue;
-/* 000506 */ 			}
-/* 000508 */ 			if (__t__ (__t__ (exclude_categories) && __in__ (cat, exclude_categories))) {
-/* 000508 */ 				continue;
-/* 000508 */ 			}
-/* 000512 */ 			(function () {
-/* 000512 */ 				var __accu0__ = new_context;
-/* 000514 */ 				return __call__ (__accu0__.add_context_category, __accu0__, cat, __kwargtrans__ ({macros: (__t__ (keep_macros) ? (function () {
-/* 000514 */ 					var __accu1__ = __getitem__ (__getitem__ (self.d, cat), 'macros');
-/* 000514 */ 					return __call__ (__accu1__.py_values, __accu1__);
-/* 000515 */ 				}) () : []), environments: (__t__ (keep_environments) ? (function () {
-/* 000515 */ 					var __accu1__ = __getitem__ (__getitem__ (self.d, cat), 'environments');
-/* 000515 */ 					return __call__ (__accu1__.py_values, __accu1__);
-/* 000516 */ 				}) () : []), specials: (__t__ (keep_specials) ? (function () {
-/* 000516 */ 					var __accu1__ = __getitem__ (__getitem__ (self.d, cat), 'specials');
-/* 000516 */ 					return __call__ (__accu1__.py_values, __accu1__);
-/* 000516 */ 				}) () : [])}));
-/* 000516 */ 			}) ();
-/* 000516 */ 		}
-/* 000519 */ 		return new_context;
-/* 000519 */ 	});},
-/* 000521 */ 	get _get_new_autogen_category () {return __get__ (this, function (self) {
-/* 000521 */ 		if (arguments.length) {
-/* 000521 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000521 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000521 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000521 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000521 */ 					switch (__attrib0__) {
-/* 000521 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000521 */ 					}
-/* 000521 */ 				}
-/* 000521 */ 			}
-/* 000521 */ 		}
-/* 000521 */ 		else {
-/* 000521 */ 		}
-/* 000522 */ 		while (__t__ (true)) {
-/* 000523 */ 			var category = __add__ (_autogen_category_prefix, __call__ (str, null, self._autogen_category_counter));
-/* 000524 */ 			if (__t__ (!__in__ (category, self.category_list))) {
-/* 000524 */ 				break;
-/* 000524 */ 			}
-/* 000526 */ 			self._autogen_category_counter = __call__ (__iadd__, null, self._autogen_category_counter, 1);
+/* 000469 */ 	get filtered_context () {return __get__ (this, function (self, keep_categories, exclude_categories, keep_which, create_class) {
+/* 000469 */ 		if (typeof keep_categories == 'undefined' || (keep_categories != null && keep_categories.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000469 */ 			var keep_categories = [];
+/* 000469 */ 		};
+/* 000469 */ 		if (typeof exclude_categories == 'undefined' || (exclude_categories != null && exclude_categories.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000469 */ 			var exclude_categories = [];
+/* 000469 */ 		};
+/* 000469 */ 		if (typeof keep_which == 'undefined' || (keep_which != null && keep_which.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000469 */ 			var keep_which = [];
+/* 000469 */ 		};
+/* 000469 */ 		if (typeof create_class == 'undefined' || (create_class != null && create_class.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000469 */ 			var create_class = null;
+/* 000469 */ 		};
+/* 000469 */ 		if (arguments.length) {
+/* 000469 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000469 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000469 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000469 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000469 */ 					switch (__attrib0__) {
+/* 000469 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000469 */ 						case 'keep_categories': var keep_categories = __allkwargs0__ [__attrib0__]; break;
+/* 000469 */ 						case 'exclude_categories': var exclude_categories = __allkwargs0__ [__attrib0__]; break;
+/* 000469 */ 						case 'keep_which': var keep_which = __allkwargs0__ [__attrib0__]; break;
+/* 000469 */ 						case 'create_class': var create_class = __allkwargs0__ [__attrib0__]; break;
+/* 000469 */ 					}
+/* 000469 */ 				}
+/* 000469 */ 			}
+/* 000469 */ 		}
+/* 000469 */ 		else {
+/* 000469 */ 		}
+/* 000502 */ 		if (__t__ (create_class === null)) {
+/* 000503 */ 			var create_class = self.__class__;
+/* 000503 */ 		}
+/* 000505 */ 		var new_context = __call__ (create_class, null);
+/* 000507 */ 		new_context.unknown_macro_spec = self.unknown_macro_spec;
+/* 000508 */ 		new_context.unknown_environment_spec = self.unknown_environment_spec;
+/* 000509 */ 		new_context.unknown_specials_spec = self.unknown_specials_spec;
+/* 000511 */ 		var keep_macros = __t__ (!__t__ ((keep_which))) || __in__ ('macros', keep_which);
+/* 000512 */ 		var keep_environments = __t__ (!__t__ ((keep_which))) || __in__ ('environments', keep_which);
+/* 000513 */ 		var keep_specials = __t__ (!__t__ ((keep_which))) || __in__ ('specials', keep_which);
+/* 000515 */ 		var __iterable0__ = self.category_list;
+/* 000515 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000515 */ 			var cat = __getitem__ (__iterable0__, __index0__);
+/* 000516 */ 			if (__t__ (__t__ (keep_categories) && !__in__ (cat, keep_categories))) {
+/* 000516 */ 				continue;
+/* 000516 */ 			}
+/* 000518 */ 			if (__t__ (__t__ (exclude_categories) && __in__ (cat, exclude_categories))) {
+/* 000518 */ 				continue;
+/* 000518 */ 			}
+/* 000522 */ 			(function () {
+/* 000522 */ 				var __accu0__ = new_context;
+/* 000524 */ 				return __call__ (__accu0__.add_context_category, __accu0__, cat, __kwargtrans__ ({macros: (__t__ (keep_macros) ? (function () {
+/* 000524 */ 					var __accu1__ = __getitem__ (__getitem__ (self.d, cat), 'macros');
+/* 000524 */ 					return __call__ (__accu1__.py_values, __accu1__);
+/* 000525 */ 				}) () : []), environments: (__t__ (keep_environments) ? (function () {
+/* 000525 */ 					var __accu1__ = __getitem__ (__getitem__ (self.d, cat), 'environments');
+/* 000525 */ 					return __call__ (__accu1__.py_values, __accu1__);
+/* 000526 */ 				}) () : []), specials: (__t__ (keep_specials) ? (function () {
+/* 000526 */ 					var __accu1__ = __getitem__ (__getitem__ (self.d, cat), 'specials');
+/* 000526 */ 					return __call__ (__accu1__.py_values, __accu1__);
+/* 000526 */ 				}) () : [])}));
+/* 000526 */ 			}) ();
 /* 000526 */ 		}
-/* 000528 */ 		return tuple ([self._autogen_category_counter, category]);
-/* 000528 */ 	});},
-/* 000530 */ 	get extended_with () {return __get__ (this, function (self, category, macros, environments, specials, create_class) {
-/* 000530 */ 		if (typeof category == 'undefined' || (category != null && category.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000530 */ 			var category = null;
-/* 000530 */ 		};
-/* 000530 */ 		if (typeof macros == 'undefined' || (macros != null && macros.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000530 */ 			var macros = null;
-/* 000530 */ 		};
-/* 000530 */ 		if (typeof environments == 'undefined' || (environments != null && environments.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000530 */ 			var environments = null;
-/* 000530 */ 		};
-/* 000530 */ 		if (typeof specials == 'undefined' || (specials != null && specials.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000530 */ 			var specials = null;
-/* 000530 */ 		};
-/* 000530 */ 		if (typeof create_class == 'undefined' || (create_class != null && create_class.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000530 */ 			var create_class = null;
-/* 000530 */ 		};
-/* 000530 */ 		var kwargs = dict ();
-/* 000530 */ 		if (arguments.length) {
-/* 000530 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000530 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000530 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000530 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000530 */ 					switch (__attrib0__) {
-/* 000530 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000530 */ 						case 'category': var category = __allkwargs0__ [__attrib0__]; break;
-/* 000530 */ 						case 'macros': var macros = __allkwargs0__ [__attrib0__]; break;
-/* 000530 */ 						case 'environments': var environments = __allkwargs0__ [__attrib0__]; break;
-/* 000530 */ 						case 'specials': var specials = __allkwargs0__ [__attrib0__]; break;
-/* 000530 */ 						case 'create_class': var create_class = __allkwargs0__ [__attrib0__]; break;
-/* 000530 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000530 */ 					}
-/* 000530 */ 				}
-/* 000530 */ 				delete kwargs.__kwargtrans__;
-/* 000530 */ 			}
-/* 000530 */ 		}
-/* 000530 */ 		else {
-/* 000530 */ 		}
-/* 000544 */ 		if (__t__ (__in__ (category, self.category_list))) {
-/* 000545 */ 			var __except0__ = ValueError;
-/* 000545 */ 			__except0__.__cause__ = null;
-/* 000545 */ 			throw __except0__;
-/* 000545 */ 		}
-/* 000547 */ 		if (__t__ (!__t__ ((self.frozen)))) {
-/* 000548 */ 			var __except0__ = __call__ (RuntimeError, null, "You can only call extended_with() on frozen objects, because extended objects keep references to the original objects' data");
-/* 000548 */ 			__except0__.__cause__ = null;
-/* 000548 */ 			throw __except0__;
-/* 000548 */ 		}
-/* 000553 */ 		if (__t__ (create_class === null)) {
-/* 000554 */ 			var create_class = self.__class__;
-/* 000554 */ 		}
-/* 000556 */ 		var new_context = __call__ (create_class, null);
-/* 000559 */ 		new_context.unknown_macro_spec = (function () {
-/* 000559 */ 			var __accu0__ = kwargs;
-/* 000559 */ 			return __call__ (__accu0__.py_pop, __accu0__, 'unknown_macro_spec', self.unknown_macro_spec);
-/* 000559 */ 		}) ();
-/* 000561 */ 		new_context.unknown_environment_spec = (function () {
-/* 000561 */ 			var __accu0__ = kwargs;
-/* 000561 */ 			return __call__ (__accu0__.py_pop, __accu0__, 'unknown_environment_spec', self.unknown_environment_spec);
-/* 000561 */ 		}) ();
-/* 000563 */ 		new_context.unknown_specials_spec = (function () {
-/* 000563 */ 			var __accu0__ = kwargs;
-/* 000563 */ 			return __call__ (__accu0__.py_pop, __accu0__, 'unknown_specials_spec', self.unknown_specials_spec);
-/* 000563 */ 		}) ();
-/* 000565 */ 		if (__t__ (macros === null)) {
-/* 000565 */ 			var macros = [];
-/* 000565 */ 		}
-/* 000566 */ 		if (__t__ (environments === null)) {
-/* 000566 */ 			var environments = [];
-/* 000566 */ 		}
-/* 000567 */ 		if (__t__ (specials === null)) {
-/* 000567 */ 			var specials = [];
-/* 000567 */ 		}
-/* 000570 */ 		var new_category_dicts = dict ({'macros': __call__ (dict, null, (function () {
-/* 000570 */ 			var __accu0__ = [];
-/* 000570 */ 			var __iterable0__ = macros;
-/* 000570 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000570 */ 				var m = __getitem__ (__iterable0__, __index0__);
-/* 000570 */ 				(function () {
-/* 000570 */ 					var __accu1__ = __accu0__;
-/* 000570 */ 					return __call__ (__accu1__.append, __accu1__, tuple ([m.macroname, m]));
-/* 000570 */ 				}) ();
-/* 000570 */ 			}
-/* 000570 */ 			return __accu0__;
-/* 000571 */ 		}) ()), 'environments': __call__ (dict, null, (function () {
-/* 000571 */ 			var __accu0__ = [];
-/* 000571 */ 			var __iterable0__ = environments;
-/* 000571 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000571 */ 				var e = __getitem__ (__iterable0__, __index0__);
-/* 000571 */ 				(function () {
-/* 000571 */ 					var __accu1__ = __accu0__;
-/* 000571 */ 					return __call__ (__accu1__.append, __accu1__, tuple ([e.environmentname, e]));
-/* 000571 */ 				}) ();
-/* 000571 */ 			}
-/* 000571 */ 			return __accu0__;
-/* 000572 */ 		}) ()), 'specials': __call__ (dict, null, (function () {
-/* 000572 */ 			var __accu0__ = [];
-/* 000572 */ 			var __iterable0__ = specials;
-/* 000572 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000572 */ 				var s = __getitem__ (__iterable0__, __index0__);
-/* 000572 */ 				(function () {
-/* 000572 */ 					var __accu1__ = __accu0__;
-/* 000572 */ 					return __call__ (__accu1__.append, __accu1__, tuple ([s.specials_chars, s]));
-/* 000572 */ 				}) ();
-/* 000572 */ 			}
-/* 000572 */ 			return __accu0__;
-/* 000572 */ 		}) ())});
-/* 000575 */ 		new_context.category_list = self.category_list;
-/* 000584 */ 		if (__t__ (__t__ (category === null) && __t__ (__gt__ (__call__ (len, null, self.category_list), 0)) && (function () {
-/* 000584 */ 			var __accu0__ = __getitem__ (self.category_list, 0);
-/* 000584 */ 			return __call__ (__accu0__.startswith, __accu0__, _autogen_category_prefix);
-/* 000584 */ 		}) ())) {
-/* 000587 */ 			var cat = __getitem__ (self.category_list, 0);
-/* 000588 */ 			var dd = __call__ (dict, null, self.d);
-/* 000589 */ 			var d_cat = __getitem__ (dd, cat);
-/* 000598 */ 			var d_cat = __call__ (dict, null, __kwargtrans__ ({macros: __call__ (dict, null, __getitem__ (d_cat, 'macros')), environments: __call__ (dict, null, __getitem__ (d_cat, 'environments')), specials: __call__ (dict, null, __getitem__ (d_cat, 'specials'))}));
-/* 000600 */ 			(function () {
-/* 000600 */ 				var __accu0__ = __getitem__ (d_cat, 'macros');
-/* 000600 */ 				return __call__ (__accu0__.py_update, __accu0__, __getitem__ (new_category_dicts, 'macros'));
-/* 000600 */ 			}) ();
-/* 000601 */ 			(function () {
-/* 000601 */ 				var __accu0__ = __getitem__ (d_cat, 'environments');
-/* 000601 */ 				return __call__ (__accu0__.py_update, __accu0__, __getitem__ (new_category_dicts, 'environments'));
-/* 000601 */ 			}) ();
-/* 000602 */ 			(function () {
-/* 000602 */ 				var __accu0__ = __getitem__ (d_cat, 'specials');
-/* 000602 */ 				return __call__ (__accu0__.py_update, __accu0__, __getitem__ (new_category_dicts, 'specials'));
-/* 000602 */ 			}) ();
-/* 000605 */ 			__setitem__ (dd, cat, d_cat);
-/* 000606 */ 			new_context.d = dd;
-/* 000608 */ 			new_context.lookup_chain_maps = dict ({'macros': (function () {
-/* 000608 */ 				var __accu0__ = _util;
-/* 000608 */ 				return __call__ (__accu0__.ChainMap, __accu0__, __getitem__ (d_cat, 'macros'), ...__getslice__ (__getitem__ (self.lookup_chain_maps, 'macros').maps, 1, null, 1));
-/* 000612 */ 			}) (), 'environments': (function () {
-/* 000612 */ 				var __accu0__ = _util;
-/* 000612 */ 				return __call__ (__accu0__.ChainMap, __accu0__, __getitem__ (d_cat, 'environments'), ...__getslice__ (__getitem__ (self.lookup_chain_maps, 'environments').maps, 1, null, 1));
-/* 000616 */ 			}) (), 'specials': (function () {
-/* 000616 */ 				var __accu0__ = _util;
-/* 000616 */ 				return __call__ (__accu0__.ChainMap, __accu0__, __getitem__ (d_cat, 'specials'), ...__getslice__ (__getitem__ (self.lookup_chain_maps, 'specials').maps, 1, null, 1));
-/* 000616 */ 			}) ()});
-/* 000621 */ 			new_context._autogen_category_counter = self._autogen_category_counter;
-/* 000624 */ 			new_context.frozen = true;
-/* 000625 */ 			(function () {
-/* 000625 */ 				var __accu0__ = logger;
-/* 000625 */ 				return __call__ (__accu0__.debug, __accu0__, 'Latex Context DB %r ---> extended with %r [extend auto-cat %s] ---> %r', self, (function () {
-/* 000625 */ 					var __accu1__ = [];
-/* 000628 */ 					var __iterable0__ = (function () {
-/* 000628 */ 						var __accu2__ = new_category_dicts;
-/* 000628 */ 						return __call__ (__accu2__.py_items, __accu2__);
-/* 000628 */ 					}) ();
-/* 000628 */ 					for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000628 */ 						var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000628 */ 						var k = __left0__ [0];
-/* 000628 */ 						var v = __left0__ [1];
-/* 000628 */ 						(function () {
-/* 000628 */ 							var __accu2__ = __accu1__;
-/* 000628 */ 							return __call__ (__accu2__.append, __accu2__, [k, __call__ (list, null, (function () {
-/* 000628 */ 								var __accu3__ = v;
-/* 000628 */ 								return __call__ (__accu3__.py_keys, __accu3__);
-/* 000628 */ 							}) ())]);
-/* 000628 */ 						}) ();
-/* 000628 */ 					}
-/* 000628 */ 					return dict (__accu1__);
-/* 000628 */ 				}) (), cat, new_context);
-/* 000628 */ 			}) ();
-/* 000632 */ 			return new_context;
-/* 000632 */ 		}
-/* 000634 */ 		if (__t__ (category === null)) {
-/* 000635 */ 			var __left0__ = (function () {
-/* 000635 */ 				var __accu0__ = self;
-/* 000635 */ 				return __call__ (__accu0__._get_new_autogen_category, __accu0__);
-/* 000635 */ 			}) ();
-/* 000635 */ 			var a = __left0__ [0];
-/* 000635 */ 			var category = __left0__ [1];
-/* 000636 */ 			new_context._autogen_category_counter = __add__ (a, 1);
-/* 000636 */ 		}
-/* 000637 */ 		else {
-/* 000638 */ 			new_context._autogen_category_counter = self._autogen_category_counter;
-/* 000638 */ 		}
-/* 000641 */ 		var dd = __call__ (dict, null, self.d);
-/* 000642 */ 		__setitem__ (dd, category, new_category_dicts);
-/* 000644 */ 		new_context.category_list = __add__ ([category], self.category_list);
-/* 000646 */ 		new_context.d = dd;
-/* 000654 */ 		new_context.lookup_chain_maps = dict ({'macros': (function () {
-/* 000654 */ 			var __accu0__ = __getitem__ (self.lookup_chain_maps, 'macros');
-/* 000654 */ 			return __call__ (__accu0__.new_child, __accu0__, __getitem__ (new_category_dicts, 'macros'));
-/* 000657 */ 		}) (), 'environments': (function () {
-/* 000657 */ 			var __accu0__ = __getitem__ (self.lookup_chain_maps, 'environments');
-/* 000657 */ 			return __call__ (__accu0__.new_child, __accu0__, __getitem__ (new_category_dicts, 'environments'));
-/* 000660 */ 		}) (), 'specials': (function () {
-/* 000660 */ 			var __accu0__ = __getitem__ (self.lookup_chain_maps, 'specials');
-/* 000660 */ 			return __call__ (__accu0__.new_child, __accu0__, __getitem__ (new_category_dicts, 'specials'));
-/* 000660 */ 		}) ()});
-/* 000664 */ 		new_context.frozen = true;
-/* 000666 */ 		(function () {
-/* 000666 */ 			var __accu0__ = logger;
-/* 000666 */ 			return __call__ (__accu0__.debug, __accu0__, 'Latex Context DB %r ---> extended with %r [new cat %s] ---> %r', self, (function () {
-/* 000666 */ 				var __accu1__ = [];
-/* 000669 */ 				var __iterable0__ = (function () {
-/* 000669 */ 					var __accu2__ = new_category_dicts;
-/* 000669 */ 					return __call__ (__accu2__.py_items, __accu2__);
-/* 000669 */ 				}) ();
-/* 000669 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000669 */ 					var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000669 */ 					var k = __left0__ [0];
-/* 000669 */ 					var v = __left0__ [1];
-/* 000669 */ 					(function () {
-/* 000669 */ 						var __accu2__ = __accu1__;
-/* 000669 */ 						return __call__ (__accu2__.append, __accu2__, [k, __call__ (list, null, (function () {
-/* 000669 */ 							var __accu3__ = v;
-/* 000669 */ 							return __call__ (__accu3__.py_keys, __accu3__);
-/* 000669 */ 						}) ())]);
-/* 000669 */ 					}) ();
-/* 000669 */ 				}
-/* 000669 */ 				return dict (__accu1__);
-/* 000669 */ 			}) (), category, new_context);
-/* 000669 */ 		}) ();
-/* 000675 */ 		return new_context;
-/* 000675 */ 	});}
-/* 000675 */ });
-/* 000681 */ export var ParsingStateDeltaExtendLatexContextDb =  __class__ ('ParsingStateDeltaExtendLatexContextDb', [ParsingStateDelta], {
-/* 000681 */ 	__module__: __name__,
-/* 000694 */ 	get __init__ () {return __get__ (this, function (self, extend_latex_context) {
-/* 000694 */ 		var kwargs = dict ();
-/* 000694 */ 		if (arguments.length) {
-/* 000694 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000694 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000694 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000694 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000694 */ 					switch (__attrib0__) {
-/* 000694 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000694 */ 						case 'extend_latex_context': var extend_latex_context = __allkwargs0__ [__attrib0__]; break;
-/* 000694 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000694 */ 					}
-/* 000694 */ 				}
-/* 000694 */ 				delete kwargs.__kwargtrans__;
-/* 000694 */ 			}
-/* 000694 */ 		}
-/* 000694 */ 		else {
-/* 000694 */ 		}
-/* 000695 */ 		__call__ (__call__ (__super__, null, ParsingStateDeltaExtendLatexContextDb, '__init__'), null, self, __kwargtrans__ (__mergekwargtrans__ ({_fields: tuple (['extend_latex_context', 'set_attributes'])}, kwargs)));
-/* 000699 */ 		self.extend_latex_context = extend_latex_context;
-/* 000699 */ 	});},
-/* 000701 */ 	get get_updated_parsing_state () {return __get__ (this, function (self, parsing_state, latex_walker) {
-/* 000701 */ 		if (arguments.length) {
-/* 000701 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000701 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000701 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000701 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000701 */ 					switch (__attrib0__) {
-/* 000701 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000701 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
-/* 000701 */ 						case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
-/* 000701 */ 					}
-/* 000701 */ 				}
-/* 000701 */ 			}
-/* 000701 */ 		}
-/* 000701 */ 		else {
-/* 000701 */ 		}
-/* 000703 */ 		if (__t__ (self.extend_latex_context)) {
-/* 000705 */ 			if (__t__ (self.set_attributes)) {
-/* 000706 */ 				var set_attributes = self.set_attributes;
-/* 000706 */ 			}
-/* 000707 */ 			else {
-/* 000708 */ 				var set_attributes = dict ({});
-/* 000708 */ 			}
-/* 000710 */ 			var latex_context = (function () {
-/* 000710 */ 				var __accu0__ = parsing_state.latex_context;
-/* 000710 */ 				return __call__ (__accu0__.extended_with, __accu0__, __kwargtrans__ (__mergekwargtrans__ ({category: null}, self.extend_latex_context)));
-/* 000710 */ 			}) ();
-/* 000715 */ 			return (function () {
-/* 000715 */ 				var __accu0__ = parsing_state;
-/* 000715 */ 				return __call__ (__accu0__.sub_context, __accu0__, __kwargtrans__ (__mergekwargtrans__ ({latex_context: latex_context}, set_attributes)));
-/* 000715 */ 			}) ();
-/* 000715 */ 		}
-/* 000719 */ 		else if (__t__ (self.set_attributes)) {
-/* 000720 */ 			return (function () {
-/* 000720 */ 				var __accu0__ = parsing_state;
-/* 000720 */ 				return __call__ (__accu0__.sub_context, __accu0__, __kwargtrans__ (self.set_attributes));
+/* 000529 */ 		return new_context;
+/* 000529 */ 	});},
+/* 000531 */ 	get _get_new_autogen_category () {return __get__ (this, function (self) {
+/* 000531 */ 		if (arguments.length) {
+/* 000531 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000531 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000531 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000531 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000531 */ 					switch (__attrib0__) {
+/* 000531 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000531 */ 					}
+/* 000531 */ 				}
+/* 000531 */ 			}
+/* 000531 */ 		}
+/* 000531 */ 		else {
+/* 000531 */ 		}
+/* 000532 */ 		while (__t__ (true)) {
+/* 000533 */ 			var category = __add__ (_autogen_category_prefix, __call__ (str, null, self._autogen_category_counter));
+/* 000534 */ 			if (__t__ (!__in__ (category, self.category_list))) {
+/* 000534 */ 				break;
+/* 000534 */ 			}
+/* 000536 */ 			self._autogen_category_counter = __call__ (__iadd__, null, self._autogen_category_counter, 1);
+/* 000536 */ 		}
+/* 000538 */ 		return tuple ([self._autogen_category_counter, category]);
+/* 000538 */ 	});},
+/* 000540 */ 	get extended_with () {return __get__ (this, function (self, category, macros, environments, specials, create_class) {
+/* 000540 */ 		if (typeof category == 'undefined' || (category != null && category.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000540 */ 			var category = null;
+/* 000540 */ 		};
+/* 000540 */ 		if (typeof macros == 'undefined' || (macros != null && macros.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000540 */ 			var macros = null;
+/* 000540 */ 		};
+/* 000540 */ 		if (typeof environments == 'undefined' || (environments != null && environments.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000540 */ 			var environments = null;
+/* 000540 */ 		};
+/* 000540 */ 		if (typeof specials == 'undefined' || (specials != null && specials.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000540 */ 			var specials = null;
+/* 000540 */ 		};
+/* 000540 */ 		if (typeof create_class == 'undefined' || (create_class != null && create_class.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000540 */ 			var create_class = null;
+/* 000540 */ 		};
+/* 000540 */ 		var kwargs = dict ();
+/* 000540 */ 		if (arguments.length) {
+/* 000540 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000540 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000540 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000540 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000540 */ 					switch (__attrib0__) {
+/* 000540 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000540 */ 						case 'category': var category = __allkwargs0__ [__attrib0__]; break;
+/* 000540 */ 						case 'macros': var macros = __allkwargs0__ [__attrib0__]; break;
+/* 000540 */ 						case 'environments': var environments = __allkwargs0__ [__attrib0__]; break;
+/* 000540 */ 						case 'specials': var specials = __allkwargs0__ [__attrib0__]; break;
+/* 000540 */ 						case 'create_class': var create_class = __allkwargs0__ [__attrib0__]; break;
+/* 000540 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000540 */ 					}
+/* 000540 */ 				}
+/* 000540 */ 				delete kwargs.__kwargtrans__;
+/* 000540 */ 			}
+/* 000540 */ 		}
+/* 000540 */ 		else {
+/* 000540 */ 		}
+/* 000554 */ 		if (__t__ (__in__ (category, self.category_list))) {
+/* 000555 */ 			var __except0__ = ValueError;
+/* 000555 */ 			__except0__.__cause__ = null;
+/* 000555 */ 			throw __except0__;
+/* 000555 */ 		}
+/* 000557 */ 		if (__t__ (!__t__ ((self.frozen)))) {
+/* 000558 */ 			var __except0__ = __call__ (RuntimeError, null, "You can only call extended_with() on frozen objects, because extended objects keep references to the original objects' data");
+/* 000558 */ 			__except0__.__cause__ = null;
+/* 000558 */ 			throw __except0__;
+/* 000558 */ 		}
+/* 000563 */ 		if (__t__ (create_class === null)) {
+/* 000564 */ 			var create_class = self.__class__;
+/* 000564 */ 		}
+/* 000566 */ 		var new_context = __call__ (create_class, null);
+/* 000569 */ 		new_context.unknown_macro_spec = (function () {
+/* 000569 */ 			var __accu0__ = kwargs;
+/* 000569 */ 			return __call__ (__accu0__.py_pop, __accu0__, 'unknown_macro_spec', self.unknown_macro_spec);
+/* 000569 */ 		}) ();
+/* 000571 */ 		new_context.unknown_environment_spec = (function () {
+/* 000571 */ 			var __accu0__ = kwargs;
+/* 000571 */ 			return __call__ (__accu0__.py_pop, __accu0__, 'unknown_environment_spec', self.unknown_environment_spec);
+/* 000571 */ 		}) ();
+/* 000573 */ 		new_context.unknown_specials_spec = (function () {
+/* 000573 */ 			var __accu0__ = kwargs;
+/* 000573 */ 			return __call__ (__accu0__.py_pop, __accu0__, 'unknown_specials_spec', self.unknown_specials_spec);
+/* 000573 */ 		}) ();
+/* 000575 */ 		if (__t__ (macros === null)) {
+/* 000575 */ 			var macros = [];
+/* 000575 */ 		}
+/* 000576 */ 		if (__t__ (environments === null)) {
+/* 000576 */ 			var environments = [];
+/* 000576 */ 		}
+/* 000577 */ 		if (__t__ (specials === null)) {
+/* 000577 */ 			var specials = [];
+/* 000577 */ 		}
+/* 000580 */ 		var new_category_dicts = dict ({'macros': __call__ (dict, null, (function () {
+/* 000580 */ 			var __accu0__ = [];
+/* 000580 */ 			var __iterable0__ = macros;
+/* 000580 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000580 */ 				var m = __getitem__ (__iterable0__, __index0__);
+/* 000580 */ 				(function () {
+/* 000580 */ 					var __accu1__ = __accu0__;
+/* 000580 */ 					return __call__ (__accu1__.append, __accu1__, tuple ([m.macroname, m]));
+/* 000580 */ 				}) ();
+/* 000580 */ 			}
+/* 000580 */ 			return __accu0__;
+/* 000581 */ 		}) ()), 'environments': __call__ (dict, null, (function () {
+/* 000581 */ 			var __accu0__ = [];
+/* 000581 */ 			var __iterable0__ = environments;
+/* 000581 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000581 */ 				var e = __getitem__ (__iterable0__, __index0__);
+/* 000581 */ 				(function () {
+/* 000581 */ 					var __accu1__ = __accu0__;
+/* 000581 */ 					return __call__ (__accu1__.append, __accu1__, tuple ([e.environmentname, e]));
+/* 000581 */ 				}) ();
+/* 000581 */ 			}
+/* 000581 */ 			return __accu0__;
+/* 000582 */ 		}) ()), 'specials': __call__ (dict, null, (function () {
+/* 000582 */ 			var __accu0__ = [];
+/* 000582 */ 			var __iterable0__ = specials;
+/* 000582 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000582 */ 				var s = __getitem__ (__iterable0__, __index0__);
+/* 000582 */ 				(function () {
+/* 000582 */ 					var __accu1__ = __accu0__;
+/* 000582 */ 					return __call__ (__accu1__.append, __accu1__, tuple ([s.specials_chars, s]));
+/* 000582 */ 				}) ();
+/* 000582 */ 			}
+/* 000582 */ 			return __accu0__;
+/* 000582 */ 		}) ())});
+/* 000585 */ 		new_context.category_list = self.category_list;
+/* 000594 */ 		if (__t__ (__t__ (category === null) && __t__ (__gt__ (__call__ (len, null, self.category_list), 0)) && (function () {
+/* 000594 */ 			var __accu0__ = __getitem__ (self.category_list, 0);
+/* 000594 */ 			return __call__ (__accu0__.startswith, __accu0__, _autogen_category_prefix);
+/* 000594 */ 		}) ())) {
+/* 000597 */ 			var cat = __getitem__ (self.category_list, 0);
+/* 000598 */ 			var dd = __call__ (dict, null, self.d);
+/* 000599 */ 			var d_cat = __getitem__ (dd, cat);
+/* 000608 */ 			var d_cat = __call__ (dict, null, __kwargtrans__ ({macros: __call__ (dict, null, __getitem__ (d_cat, 'macros')), environments: __call__ (dict, null, __getitem__ (d_cat, 'environments')), specials: __call__ (dict, null, __getitem__ (d_cat, 'specials'))}));
+/* 000610 */ 			(function () {
+/* 000610 */ 				var __accu0__ = __getitem__ (d_cat, 'macros');
+/* 000610 */ 				return __call__ (__accu0__.py_update, __accu0__, __getitem__ (new_category_dicts, 'macros'));
+/* 000610 */ 			}) ();
+/* 000611 */ 			(function () {
+/* 000611 */ 				var __accu0__ = __getitem__ (d_cat, 'environments');
+/* 000611 */ 				return __call__ (__accu0__.py_update, __accu0__, __getitem__ (new_category_dicts, 'environments'));
+/* 000611 */ 			}) ();
+/* 000612 */ 			(function () {
+/* 000612 */ 				var __accu0__ = __getitem__ (d_cat, 'specials');
+/* 000612 */ 				return __call__ (__accu0__.py_update, __accu0__, __getitem__ (new_category_dicts, 'specials'));
+/* 000612 */ 			}) ();
+/* 000615 */ 			__setitem__ (dd, cat, d_cat);
+/* 000616 */ 			new_context.d = dd;
+/* 000618 */ 			new_context.lookup_chain_maps = dict ({'macros': (function () {
+/* 000618 */ 				var __accu0__ = _util;
+/* 000618 */ 				return __call__ (__accu0__.ChainMap, __accu0__, __getitem__ (d_cat, 'macros'), ...__getslice__ (__getitem__ (self.lookup_chain_maps, 'macros').maps, 1, null, 1));
+/* 000622 */ 			}) (), 'environments': (function () {
+/* 000622 */ 				var __accu0__ = _util;
+/* 000622 */ 				return __call__ (__accu0__.ChainMap, __accu0__, __getitem__ (d_cat, 'environments'), ...__getslice__ (__getitem__ (self.lookup_chain_maps, 'environments').maps, 1, null, 1));
+/* 000626 */ 			}) (), 'specials': (function () {
+/* 000626 */ 				var __accu0__ = _util;
+/* 000626 */ 				return __call__ (__accu0__.ChainMap, __accu0__, __getitem__ (d_cat, 'specials'), ...__getslice__ (__getitem__ (self.lookup_chain_maps, 'specials').maps, 1, null, 1));
+/* 000626 */ 			}) ()});
+/* 000631 */ 			new_context._autogen_category_counter = self._autogen_category_counter;
+/* 000634 */ 			new_context.frozen = true;
+/* 000635 */ 			(function () {
+/* 000635 */ 				var __accu0__ = logger;
+/* 000635 */ 				return __call__ (__accu0__.debug, __accu0__, 'Latex Context DB %r ---> extended with %r [extend auto-cat %s] ---> %r', self, (function () {
+/* 000635 */ 					var __accu1__ = [];
+/* 000638 */ 					var __iterable0__ = (function () {
+/* 000638 */ 						var __accu2__ = new_category_dicts;
+/* 000638 */ 						return __call__ (__accu2__.py_items, __accu2__);
+/* 000638 */ 					}) ();
+/* 000638 */ 					for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000638 */ 						var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000638 */ 						var k = __left0__ [0];
+/* 000638 */ 						var v = __left0__ [1];
+/* 000638 */ 						(function () {
+/* 000638 */ 							var __accu2__ = __accu1__;
+/* 000638 */ 							return __call__ (__accu2__.append, __accu2__, [k, __call__ (list, null, (function () {
+/* 000638 */ 								var __accu3__ = v;
+/* 000638 */ 								return __call__ (__accu3__.py_keys, __accu3__);
+/* 000638 */ 							}) ())]);
+/* 000638 */ 						}) ();
+/* 000638 */ 					}
+/* 000638 */ 					return dict (__accu1__);
+/* 000638 */ 				}) (), cat, new_context);
+/* 000638 */ 			}) ();
+/* 000642 */ 			return new_context;
+/* 000642 */ 		}
+/* 000644 */ 		if (__t__ (category === null)) {
+/* 000645 */ 			var __left0__ = (function () {
+/* 000645 */ 				var __accu0__ = self;
+/* 000645 */ 				return __call__ (__accu0__._get_new_autogen_category, __accu0__);
+/* 000645 */ 			}) ();
+/* 000645 */ 			var a = __left0__ [0];
+/* 000645 */ 			var category = __left0__ [1];
+/* 000646 */ 			new_context._autogen_category_counter = __add__ (a, 1);
+/* 000646 */ 		}
+/* 000647 */ 		else {
+/* 000648 */ 			new_context._autogen_category_counter = self._autogen_category_counter;
+/* 000648 */ 		}
+/* 000651 */ 		var dd = __call__ (dict, null, self.d);
+/* 000652 */ 		__setitem__ (dd, category, new_category_dicts);
+/* 000654 */ 		new_context.category_list = __add__ ([category], self.category_list);
+/* 000656 */ 		new_context.d = dd;
+/* 000664 */ 		new_context.lookup_chain_maps = dict ({'macros': (function () {
+/* 000664 */ 			var __accu0__ = __getitem__ (self.lookup_chain_maps, 'macros');
+/* 000664 */ 			return __call__ (__accu0__.new_child, __accu0__, __getitem__ (new_category_dicts, 'macros'));
+/* 000667 */ 		}) (), 'environments': (function () {
+/* 000667 */ 			var __accu0__ = __getitem__ (self.lookup_chain_maps, 'environments');
+/* 000667 */ 			return __call__ (__accu0__.new_child, __accu0__, __getitem__ (new_category_dicts, 'environments'));
+/* 000670 */ 		}) (), 'specials': (function () {
+/* 000670 */ 			var __accu0__ = __getitem__ (self.lookup_chain_maps, 'specials');
+/* 000670 */ 			return __call__ (__accu0__.new_child, __accu0__, __getitem__ (new_category_dicts, 'specials'));
+/* 000670 */ 		}) ()});
+/* 000674 */ 		new_context.frozen = true;
+/* 000676 */ 		(function () {
+/* 000676 */ 			var __accu0__ = logger;
+/* 000676 */ 			return __call__ (__accu0__.debug, __accu0__, 'Latex Context DB %r ---> extended with %r [new cat %s] ---> %r', self, (function () {
+/* 000676 */ 				var __accu1__ = [];
+/* 000679 */ 				var __iterable0__ = (function () {
+/* 000679 */ 					var __accu2__ = new_category_dicts;
+/* 000679 */ 					return __call__ (__accu2__.py_items, __accu2__);
+/* 000679 */ 				}) ();
+/* 000679 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000679 */ 					var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000679 */ 					var k = __left0__ [0];
+/* 000679 */ 					var v = __left0__ [1];
+/* 000679 */ 					(function () {
+/* 000679 */ 						var __accu2__ = __accu1__;
+/* 000679 */ 						return __call__ (__accu2__.append, __accu2__, [k, __call__ (list, null, (function () {
+/* 000679 */ 							var __accu3__ = v;
+/* 000679 */ 							return __call__ (__accu3__.py_keys, __accu3__);
+/* 000679 */ 						}) ())]);
+/* 000679 */ 					}) ();
+/* 000679 */ 				}
+/* 000679 */ 				return dict (__accu1__);
+/* 000679 */ 			}) (), category, new_context);
+/* 000679 */ 		}) ();
+/* 000685 */ 		return new_context;
+/* 000685 */ 	});}
+/* 000685 */ });
+/* 000691 */ export var ParsingStateDeltaExtendLatexContextDb =  __class__ ('ParsingStateDeltaExtendLatexContextDb', [ParsingStateDelta], {
+/* 000691 */ 	__module__: __name__,
+/* 000704 */ 	get __init__ () {return __get__ (this, function (self, extend_latex_context) {
+/* 000704 */ 		var kwargs = dict ();
+/* 000704 */ 		if (arguments.length) {
+/* 000704 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000704 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000704 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000704 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000704 */ 					switch (__attrib0__) {
+/* 000704 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000704 */ 						case 'extend_latex_context': var extend_latex_context = __allkwargs0__ [__attrib0__]; break;
+/* 000704 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000704 */ 					}
+/* 000704 */ 				}
+/* 000704 */ 				delete kwargs.__kwargtrans__;
+/* 000704 */ 			}
+/* 000704 */ 		}
+/* 000704 */ 		else {
+/* 000704 */ 		}
+/* 000705 */ 		__call__ (__call__ (__super__, null, ParsingStateDeltaExtendLatexContextDb, '__init__'), null, self, __kwargtrans__ (__mergekwargtrans__ ({_fields: tuple (['extend_latex_context', 'set_attributes'])}, kwargs)));
+/* 000709 */ 		self.extend_latex_context = extend_latex_context;
+/* 000709 */ 	});},
+/* 000711 */ 	get get_updated_parsing_state () {return __get__ (this, function (self, parsing_state, latex_walker) {
+/* 000711 */ 		if (arguments.length) {
+/* 000711 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000711 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000711 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000711 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000711 */ 					switch (__attrib0__) {
+/* 000711 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000711 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 000711 */ 						case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
+/* 000711 */ 					}
+/* 000711 */ 				}
+/* 000711 */ 			}
+/* 000711 */ 		}
+/* 000711 */ 		else {
+/* 000711 */ 		}
+/* 000713 */ 		if (__t__ (self.extend_latex_context)) {
+/* 000715 */ 			if (__t__ (self.set_attributes)) {
+/* 000716 */ 				var set_attributes = self.set_attributes;
+/* 000716 */ 			}
+/* 000717 */ 			else {
+/* 000718 */ 				var set_attributes = dict ({});
+/* 000718 */ 			}
+/* 000720 */ 			var latex_context = (function () {
+/* 000720 */ 				var __accu0__ = parsing_state.latex_context;
+/* 000720 */ 				return __call__ (__accu0__.extended_with, __accu0__, __kwargtrans__ (__mergekwargtrans__ ({category: null}, self.extend_latex_context)));
 /* 000720 */ 			}) ();
-/* 000720 */ 		}
-/* 000724 */ 		return parsing_state;
-/* 000724 */ 	});}
-/* 000724 */ });
+/* 000725 */ 			return (function () {
+/* 000725 */ 				var __accu0__ = parsing_state;
+/* 000725 */ 				return __call__ (__accu0__.sub_context, __accu0__, __kwargtrans__ (__mergekwargtrans__ ({latex_context: latex_context}, set_attributes)));
+/* 000725 */ 			}) ();
+/* 000725 */ 		}
+/* 000729 */ 		else if (__t__ (self.set_attributes)) {
+/* 000730 */ 			return (function () {
+/* 000730 */ 				var __accu0__ = parsing_state;
+/* 000730 */ 				return __call__ (__accu0__.sub_context, __accu0__, __kwargtrans__ (self.set_attributes));
+/* 000730 */ 			}) ();
+/* 000730 */ 		}
+/* 000734 */ 		return parsing_state;
+/* 000734 */ 	});}
+/* 000734 */ });
 /* 000037 */ 
 //# sourceMappingURL=pylatexenc.macrospec._latexcontextdb.map

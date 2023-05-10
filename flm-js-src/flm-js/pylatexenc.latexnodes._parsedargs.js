@@ -1,5 +1,5 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-04-25 12:01:28
-/* 000288 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
+/* 000001 */ // Transcrypt'ed from Python, 2023-05-11 01:03:01
+/* 000286 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000001 */ var __name__ = 'pylatexenc.latexnodes._parsedargs';
 /* 000039 */ export var _basestring = str;
 /* 000057 */ export var LatexArgumentSpec =  __class__ ('LatexArgumentSpec', [object], {
@@ -187,27 +187,27 @@
 /* 000269 */ 		}
 /* 000269 */ 		else {
 /* 000269 */ 		}
-/* 000282 */ 		return __call__ (dict, null, __kwargtrans__ ({arguments_spec_list: self.arguments_spec_list, argnlist: self.argnlist}));
-/* 000282 */ 	});},
-/* 000287 */ 	get __repr__ () {return __get__ (this, function (self) {
-/* 000287 */ 		if (arguments.length) {
-/* 000287 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000287 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000287 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000287 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000287 */ 					switch (__attrib0__) {
-/* 000287 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000287 */ 					}
-/* 000287 */ 				}
-/* 000287 */ 			}
-/* 000287 */ 		}
-/* 000287 */ 		else {
-/* 000287 */ 		}
-/* 000288 */ 		return (function () {
-/* 000288 */ 			var __accu0__ = '{}(arguments_spec_list={!r}, argnlist={!r})';
-/* 000288 */ 			return __call__ (__accu0__.format, __accu0__, self.__class__.__name__, self.arguments_spec_list, self.argnlist);
-/* 000288 */ 		}) ();
-/* 000288 */ 	});}
-/* 000288 */ });
-/* 000288 */ 
+/* 000280 */ 		return __call__ (dict, null, __kwargtrans__ ({arguments_spec_list: self.arguments_spec_list, argnlist: self.argnlist}));
+/* 000280 */ 	});},
+/* 000285 */ 	get __repr__ () {return __get__ (this, function (self) {
+/* 000285 */ 		if (arguments.length) {
+/* 000285 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000285 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000285 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000285 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000285 */ 					switch (__attrib0__) {
+/* 000285 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000285 */ 					}
+/* 000285 */ 				}
+/* 000285 */ 			}
+/* 000285 */ 		}
+/* 000285 */ 		else {
+/* 000285 */ 		}
+/* 000286 */ 		return (function () {
+/* 000286 */ 			var __accu0__ = '{}(arguments_spec_list={!r}, argnlist={!r})';
+/* 000286 */ 			return __call__ (__accu0__.format, __accu0__, self.__class__.__name__, self.arguments_spec_list, self.argnlist);
+/* 000286 */ 		}) ();
+/* 000286 */ 	});}
+/* 000286 */ });
+/* 000286 */ 
 //# sourceMappingURL=pylatexenc.latexnodes._parsedargs.map

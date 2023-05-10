@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-04-25 12:01:30
+/* 000001 */ // Transcrypt'ed from Python, 2023-05-11 01:03:02
 /* 000006 */ var html = {};
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
@@ -1144,214 +1144,239 @@
 /* 000654 */ 			while (__t__ (__lt__ (col_j, __call__ (len, null, __getitem__ (cells_model.grid_data, row_j))))) {
 /* 000656 */ 				var grid_cell_data = __getitem__ (__getitem__ (cells_model.grid_data, row_j), col_j);
 /* 000658 */ 				if (__t__ (__t__ (grid_cell_data === null) || __getitem__ (grid_cell_data, 'cell') === null)) {
-/* 000661 */ 					(function () {
-/* 000661 */ 						var __accu0__ = row_items;
-/* 000661 */ 						return __call__ (__accu0__.append, __accu0__, (function () {
-/* 000661 */ 							var __accu1__ = self;
-/* 000661 */ 							return __call__ (__accu1__.wrap_in_tag, __accu1__, 'td', '', __kwargtrans__ ({class_names: ['cell-empty']}));
-/* 000661 */ 						}) ());
-/* 000661 */ 					}) ();
-/* 000666 */ 					var col_j = __call__ (__iadd__, null, col_j, 1);
-/* 000666 */ 					continue;
-/* 000666 */ 				}
-/* 000669 */ 				if (__t__ (__getitem__ (grid_cell_data, 'is_topleft'))) {
-/* 000671 */ 					var cell = __getitem__ (grid_cell_data, 'cell');
-/* 000672 */ 					var rendered_cell_contents = (function () {
-/* 000672 */ 						var __accu0__ = self;
-/* 000672 */ 						return __call__ (__accu0__.render_nodelist, __accu0__, cell.content_nodes, __kwargtrans__ ({render_context: render_context}));
-/* 000672 */ 					}) ();
-/* 000676 */ 					var clsnames = __add__ (['cell'], (function () {
-/* 000676 */ 						var __accu0__ = [];
-/* 000676 */ 						var __iterable0__ = cell.styles;
-/* 000676 */ 						for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000676 */ 							var sty = __getitem__ (__iterable0__, __index0__);
-/* 000676 */ 							(function () {
-/* 000676 */ 								var __accu1__ = __accu0__;
-/* 000676 */ 								return __call__ (__accu1__.append, __accu1__, 'cellstyle-{}'.format (sty));
-/* 000676 */ 							}) ();
-/* 000676 */ 						}
-/* 000676 */ 						return __accu0__;
-/* 000676 */ 					}) ());
-/* 000677 */ 					if (__t__ (__eq__ (row_j, 0))) {
-/* 000678 */ 						(function () {
-/* 000678 */ 							var __accu0__ = clsnames;
-/* 000678 */ 							return __call__ (__accu0__.append, __accu0__, 'celltbledge-top');
-/* 000678 */ 						}) ();
-/* 000678 */ 					}
-/* 000679 */ 					if (__t__ (__eq__ (col_j, 0))) {
-/* 000680 */ 						(function () {
-/* 000680 */ 							var __accu0__ = clsnames;
-/* 000680 */ 							return __call__ (__accu0__.append, __accu0__, 'celltbledge-left');
-/* 000680 */ 						}) ();
-/* 000680 */ 					}
-/* 000681 */ 					if (__t__ (__eq__ (cell.placement.row_range.end, tabheight))) {
-/* 000682 */ 						(function () {
-/* 000682 */ 							var __accu0__ = clsnames;
-/* 000682 */ 							return __call__ (__accu0__.append, __accu0__, 'celltbledge-bottom');
-/* 000682 */ 						}) ();
-/* 000682 */ 					}
-/* 000683 */ 					if (__t__ (__eq__ (cell.placement.col_range.end, tabwidth))) {
-/* 000684 */ 						(function () {
-/* 000684 */ 							var __accu0__ = clsnames;
-/* 000684 */ 							return __call__ (__accu0__.append, __accu0__, 'celltbledge-right');
-/* 000684 */ 						}) ();
-/* 000684 */ 					}
-/* 000685 */ 					var tagname = 'td';
-/* 000686 */ 					if (__t__ (__t__ (__in__ ('H', cell.styles)) || __in__ ('rH', cell.styles))) {
-/* 000687 */ 						var tagname = 'th';
+/* 000661 */ 					var clsnames = [];
+/* 000662 */ 					if (__t__ (__eq__ (row_j, 0))) {
+/* 000663 */ 						(function () {
+/* 000663 */ 							var __accu0__ = clsnames;
+/* 000663 */ 							return __call__ (__accu0__.append, __accu0__, 'celltbledge-top');
+/* 000663 */ 						}) ();
+/* 000663 */ 					}
+/* 000664 */ 					if (__t__ (__eq__ (col_j, 0))) {
+/* 000665 */ 						(function () {
+/* 000665 */ 							var __accu0__ = clsnames;
+/* 000665 */ 							return __call__ (__accu0__.append, __accu0__, 'celltbledge-left');
+/* 000665 */ 						}) ();
+/* 000665 */ 					}
+/* 000666 */ 					if (__t__ (__eq__ (row_j, __sub__ (tabheight, 1)))) {
+/* 000667 */ 						(function () {
+/* 000667 */ 							var __accu0__ = clsnames;
+/* 000667 */ 							return __call__ (__accu0__.append, __accu0__, 'celltbledge-bottom');
+/* 000667 */ 						}) ();
+/* 000667 */ 					}
+/* 000668 */ 					if (__t__ (__eq__ (col_j, __sub__ (tabwidth, 1)))) {
+/* 000669 */ 						(function () {
+/* 000669 */ 							var __accu0__ = clsnames;
+/* 000669 */ 							return __call__ (__accu0__.append, __accu0__, 'celltbledge-right');
+/* 000669 */ 						}) ();
+/* 000669 */ 					}
+/* 000670 */ 					(function () {
+/* 000670 */ 						var __accu0__ = row_items;
+/* 000670 */ 						return __call__ (__accu0__.append, __accu0__, (function () {
+/* 000670 */ 							var __accu1__ = self;
+/* 000670 */ 							return __call__ (__accu1__.wrap_in_tag, __accu1__, 'td', '', __kwargtrans__ ({class_names: __add__ (['cell-empty'], clsnames)}));
+/* 000670 */ 						}) ());
+/* 000670 */ 					}) ();
+/* 000675 */ 					var col_j = __call__ (__iadd__, null, col_j, 1);
+/* 000675 */ 					continue;
+/* 000675 */ 				}
+/* 000678 */ 				if (__t__ (__getitem__ (grid_cell_data, 'is_topleft'))) {
+/* 000680 */ 					var cell = __getitem__ (grid_cell_data, 'cell');
+/* 000681 */ 					var rendered_cell_contents = (function () {
+/* 000681 */ 						var __accu0__ = self;
+/* 000681 */ 						return __call__ (__accu0__.render_nodelist, __accu0__, cell.content_nodes, __kwargtrans__ ({render_context: render_context}));
+/* 000681 */ 					}) ();
+/* 000685 */ 					var clsnames = __add__ (['cell'], (function () {
+/* 000685 */ 						var __accu0__ = [];
+/* 000685 */ 						var __iterable0__ = cell.styles;
+/* 000685 */ 						for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000685 */ 							var sty = __getitem__ (__iterable0__, __index0__);
+/* 000685 */ 							(function () {
+/* 000685 */ 								var __accu1__ = __accu0__;
+/* 000685 */ 								return __call__ (__accu1__.append, __accu1__, 'cellstyle-{}'.format (sty));
+/* 000685 */ 							}) ();
+/* 000685 */ 						}
+/* 000685 */ 						return __accu0__;
+/* 000685 */ 					}) ());
+/* 000686 */ 					if (__t__ (__eq__ (row_j, 0))) {
+/* 000687 */ 						(function () {
+/* 000687 */ 							var __accu0__ = clsnames;
+/* 000687 */ 							return __call__ (__accu0__.append, __accu0__, 'celltbledge-top');
+/* 000687 */ 						}) ();
 /* 000687 */ 					}
-/* 000688 */ 					var attrs = dict ({});
-/* 000689 */ 					var cplc = cell.placement;
-/* 000690 */ 					if (__t__ (__ne__ (cplc.col_range.end, __add__ (cplc.col_range.start, 1)))) {
-/* 000693 */ 						__setitem__ (attrs, 'colspan', __call__ (str, null, __sub__ (cplc.col_range.end, cplc.col_range.start)));
+/* 000688 */ 					if (__t__ (__eq__ (col_j, 0))) {
+/* 000689 */ 						(function () {
+/* 000689 */ 							var __accu0__ = clsnames;
+/* 000689 */ 							return __call__ (__accu0__.append, __accu0__, 'celltbledge-left');
+/* 000689 */ 						}) ();
+/* 000689 */ 					}
+/* 000690 */ 					if (__t__ (__eq__ (cell.placement.row_range.end, tabheight))) {
+/* 000691 */ 						(function () {
+/* 000691 */ 							var __accu0__ = clsnames;
+/* 000691 */ 							return __call__ (__accu0__.append, __accu0__, 'celltbledge-bottom');
+/* 000691 */ 						}) ();
+/* 000691 */ 					}
+/* 000692 */ 					if (__t__ (__eq__ (cell.placement.col_range.end, tabwidth))) {
+/* 000693 */ 						(function () {
+/* 000693 */ 							var __accu0__ = clsnames;
+/* 000693 */ 							return __call__ (__accu0__.append, __accu0__, 'celltbledge-right');
+/* 000693 */ 						}) ();
 /* 000693 */ 					}
-/* 000694 */ 					if (__t__ (__ne__ (cplc.row_range.end, __add__ (cplc.row_range.start, 1)))) {
-/* 000696 */ 						__setitem__ (attrs, 'rowspan', __call__ (str, null, __sub__ (cplc.row_range.end, cplc.row_range.start)));
+/* 000694 */ 					var tagname = 'td';
+/* 000695 */ 					if (__t__ (__t__ (__in__ ('H', cell.styles)) || __in__ ('rH', cell.styles))) {
+/* 000696 */ 						var tagname = 'th';
 /* 000696 */ 					}
-/* 000697 */ 					(function () {
-/* 000697 */ 						var __accu0__ = row_items;
-/* 000698 */ 						return __call__ (__accu0__.append, __accu0__, (function () {
-/* 000698 */ 							var __accu1__ = self;
-/* 000698 */ 							return __call__ (__accu1__.wrap_in_tag, __accu1__, tagname, rendered_cell_contents, __kwargtrans__ ({attrs: attrs, class_names: clsnames}));
-/* 000698 */ 						}) ());
-/* 000698 */ 					}) ();
-/* 000705 */ 					var col_j = cplc.col_range.end;
-/* 000705 */ 					continue;
-/* 000705 */ 				}
-/* 000710 */ 				var col_j = __call__ (__iadd__, null, col_j, 1);
-/* 000710 */ 			}
-/* 000712 */ 			(function () {
-/* 000712 */ 				var __accu0__ = data_items;
-/* 000712 */ 				return __call__ (__accu0__.append, __accu0__, row_items);
-/* 000712 */ 			}) ();
-/* 000713 */ 			var row_j = __call__ (__iadd__, null, row_j, 1);
-/* 000713 */ 		}
-/* 000715 */ 		var table_attrs = dict ({});
-/* 000716 */ 		if (__t__ (target_id !== null)) {
-/* 000717 */ 			__setitem__ (table_attrs, 'id', target_id);
-/* 000717 */ 		}
-/* 000719 */ 		var s = (function () {
-/* 000719 */ 			var __accu0__ = self;
-/* 000721 */ 			return __call__ (__accu0__.wrap_in_tag, __accu0__, 'table', (function () {
-/* 000721 */ 				var __accu1__ = '';
-/* 000721 */ 				return __call__ (__accu1__.join, __accu1__, (function () {
-/* 000721 */ 					var __accu2__ = [];
-/* 000721 */ 					var __iterable0__ = data_items;
-/* 000721 */ 					for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000723 */ 						var row_items = __getitem__ (__iterable0__, __index0__);
-/* 000723 */ 						(function () {
-/* 000723 */ 							var __accu3__ = __accu2__;
-/* 000722 */ 							return __call__ (__accu3__.append, __accu3__, __add__ (__add__ ('<tr>', (function () {
-/* 000722 */ 								var __accu4__ = '';
-/* 000722 */ 								return __call__ (__accu4__.join, __accu4__, row_items);
-/* 000722 */ 							}) ()), '</tr>'));
-/* 000722 */ 						}) ();
-/* 000722 */ 					}
-/* 000722 */ 					return __accu2__;
-/* 000722 */ 				}) ());
-/* 000722 */ 			}) (), __kwargtrans__ ({attrs: table_attrs, class_names: ['cells']}));
-/* 000722 */ 		}) ();
-/* 000728 */ 		return s;
-/* 000728 */ 	});}
-/* 000728 */ });
-/* 000734 */ export var _rx_delayed_markers = (function () {
-/* 000734 */ 	var __accu0__ = re;
-/* 000734 */ 	return __call__ (__accu0__.compile, __accu0__, '<FLM:DLYD:(?P<key>\\d+)\\s*/>');
-/* 000734 */ }) ();
-/* 000741 */ export var _html_css_global = '\np, ul, ol {\n  margin: 1em 0px;\n}\np:first-child, ul:first-child, ol:first-child {\n  margin-top: 0px;\n}\np:last-child, ul:last-child, ol:last-child {\n  margin-bottom: 0px;\n}\ndd > p, dd > p:first-child, dd > p:last-child {\n  margin: 0.33em 0px;\n}\n\na, a:link, a:hover, a:active, a:visited {\n  color: #3232c8;\n  text-decoration: none;\n}\na:hover {\n  color: #22228a;\n}\n';
-/* 000764 */ export var _html_css_content = "\n.emph, .textit {\n  font-style: italic;\n}\n.textbf {\n  font-weight: bold;\n}\n\nh1 {\n  font-size: 1.6rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh2 {\n  font-size: 1.3rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh3 {\n  font-size: 1rem;\n  font-weight: bold;\n  margin: 1em 0px;\n}\n\n.heading-level-4 {\n  font-style: italic;\n  display: inline;\n}\n.heading-level-4::after {\n  display: inline-block;\n  margin: 0px .12em;\n  content: '—';\n}\n\n.heading-level-5 {\n  font-style: italic;\n  font-size: .9em;\n  display: inline;\n}\n.heading-level-5::after {\n  display: inline-block;\n  margin-right: .12em;\n  content: '';\n}\n\n.heading-level-6 {\n  font-style: italic;\n  font-size: .8em;\n  display: inline;\n}\n.heading-level-6::after {\n  display: inline-block;\n  margin-right: .06em;\n  content: '';\n}\n\n\n.heading-level-theorem {\n  font-weight: bold;\n  display: inline-block;\n}\n.heading-level-theorem::after {\n  font-weight: bold;\n  display: inline-block;\n  margin: 0px .12em 0px 0px;\n  content: '.';\n}\n\ndiv.theoremlike, div.definitionlike, div.prooflike {\n  margin: 1em 0px;\n}\n\ndiv.prooflike > p > .heading-level-theorem,\ndiv.prooflike > p > .heading-level-theorem::after {\n  font-weight: normal;\n  font-style: italic;\n}\n\n\ndl.enumeration {\n  display: block;\n  margin-left: 2.5em;\n}\ndl.enumeration > dt {\n  float: left;\n  clear: left;\n  display: inline-block;\n  /*margin: 0px; */\n  margin-left: -2.5em;\n  width: 2.0em;\n  min-width: 2.0em;\n  max-width: 2.0em;\n  margin-right: 0.5em;\n  text-align: right;\n}\ndl.enumeration > dd {\n  /*display: inline-block;\n  width: 100%;*/\n  border: 0px;\n  padding: 0px;\n  margin: 0px;\n}\n\nfigure.float {\n  width: 100%;\n  border-width: 1px 0px 1px 0px;\n  border-style: solid none solid none;\n  border-color: rgba(120, 120, 140, 0.15);\n  margin: 0.5rem 0px;\n  padding: 0.5rem 0px;\n}\n\nfigure.float .float-contents {\n  width: 100%;\n  max-width: 100%;\n  overflow-x: auto;\n}\n\nfigure.float .float-contents img {\n  display: block;\n  margin: 0pt auto;\n  padding: 0pt;\n  border: 0pt;\n  margin: 0px auto;\n}\n\nfigure.float figcaption {\n  display: block;\n  margin-top: 0.5em;\n  margin: 0.75em 2em 0px;\n  text-align: center;\n}\n\nfigure.float figcaption > span {\n  display: inline-block;\n  font-style: italic;\n  text-align: left;\n}\n\ntable {\n  margin: 1em 0px 1em 0px;\n  border-collapse: separate;\n  border-spacing: 0px;\n  /*border-top: solid 1pt;\n  border-bottom: solid 1pt;*/\n}\nfigure.float .float-contents table {\n  margin: 0px auto;\n}\ntd {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\nth {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\n.cellstyle-H {\n  border-bottom: solid .5pt;\n}\n.cellstyle-rH {\n}\n.cellstyle-l {\n  text-align: left;\n}\n.cellstyle-c {\n  text-align: center;\n}\n.cellstyle-r {\n  text-align: right;\n}\n.cellstyle-green {\n  background-color: rgba(69, 255, 69, 0.31); /*rgb(200,255,200);*/\n}\n.cellstyle-blue {\n  background-color: rgba(79, 142, 255, 0.27); /*rgb(200,220,255);*/\n}\n.cellstyle-yellow {\n  background-color: rgba(255, 255, 49, 0.33); /*rgb(255,255,200);*/\n}\n.cellstyle-red {\n  background-color: rgba(255,120,120,0.30);  /*rgb(255,200,200);*/\n}\n.cellstyle-lvert {\n  border-left: solid .5pt;\n}\n.cellstyle-rvert {\n  border-right: solid .5pt;\n}\n\n.celltbledge-top {\n  border-top: solid 1pt;\n}\n.celltbledge-bottom {\n  border-bottom: solid 1pt;\n}\n\n.verbatimcode {\n  font-family: monospace;\n  font-size: 0.9em;\n  background-color: rgba(127,127,127,0.25);\n  border-radius: 2px;\n  padding: 1px 2px;\n  display: inline-block;\n  white-space: pre-wrap;\n}\n.verbatima {\n  font-style: italic;\n}\n.verbatimcode-environment {\n  display: block;\n  margin: 0.75em 0px 1em;\n  white-space: pre;\n}\n\n.defterm {\n  font-style: italic;\n}\n\n.defterm .defterm-term {\n  font-style: italic;\n  font-weight: bold;\n}\n\n.display-math {\n  width: 100%;\n  max-width: 100%;\n  display: block;\n  overflow-x: auto;\n}\n\n.endnotes, .citations {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\n.citation {\n}\n.footnote {\n}\ndl.citation-list > dt, dl.footnote-list > dt {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\n";
-/* 001016 */ export var _html_js_mathjax = '\nMathJax = {\n    tex: {\n        inlineMath: [[\'\\\\(\', \'\\\\)\']],\n        displayMath: [[\'\\\\[\', \'\\\\]\']],\n        processEnvironments: true,\n        processRefs: true,\n\n        // equation numbering on\n        tags: \'ams\'\n    },\n    options: {\n        // all MathJax content is marked with CSS classes\n        // skipHtmlTags: \'body\',\n        // processHtmlClass: \'display-math|inline-math\',\n    },\n    startup: {\n        pageReady: function() {\n            // override the default "typeset everything on the page" behavior to\n            // only typeset whatever we have explicitly marked as math\n            return typesetPageMathPromise();\n        }\n    }\n};\nfunction typesetPageMathPromise()\n{\n    var elements = document.querySelectorAll(\'.display-math, .inline-math\');\n    return MathJax.typesetPromise(elements);\n}\n';
-/* 001047 */ export var _html_body_end_js_scripts_mathjax = '\n<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>\n<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>\n';
-/* 001055 */ export var get_html_css_global = function (html_fragment_renderer) {
-/* 001055 */ 	if (arguments.length) {
-/* 001055 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001055 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001055 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001055 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001055 */ 				switch (__attrib0__) {
-/* 001055 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001055 */ 				}
-/* 001055 */ 			}
-/* 001055 */ 		}
-/* 001055 */ 	}
-/* 001055 */ 	else {
-/* 001055 */ 	}
-/* 001056 */ 	return _html_css_global;
-/* 001056 */ };
-/* 001058 */ export var get_html_css_content = function (html_fragment_renderer) {
-/* 001058 */ 	if (arguments.length) {
-/* 001058 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001058 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001058 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001058 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001058 */ 				switch (__attrib0__) {
-/* 001058 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001058 */ 				}
-/* 001058 */ 			}
-/* 001058 */ 		}
-/* 001058 */ 	}
-/* 001058 */ 	else {
-/* 001058 */ 	}
-/* 001059 */ 	return _html_css_content;
-/* 001059 */ };
-/* 001061 */ export var get_html_js = function (html_fragment_renderer) {
-/* 001061 */ 	if (arguments.length) {
-/* 001061 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001061 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001061 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001061 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001061 */ 				switch (__attrib0__) {
-/* 001061 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001061 */ 				}
-/* 001061 */ 			}
-/* 001061 */ 		}
-/* 001061 */ 	}
-/* 001061 */ 	else {
-/* 001061 */ 	}
-/* 001062 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
-/* 001063 */ 		return _html_js_mathjax;
-/* 001063 */ 	}
-/* 001064 */ 	return '';
-/* 001064 */ };
-/* 001066 */ export var get_html_body_end_js_scripts = function (html_fragment_renderer) {
-/* 001066 */ 	if (arguments.length) {
-/* 001066 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001066 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001066 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001066 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001066 */ 				switch (__attrib0__) {
-/* 001066 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001066 */ 				}
-/* 001066 */ 			}
-/* 001066 */ 		}
-/* 001066 */ 	}
-/* 001066 */ 	else {
-/* 001066 */ 	}
-/* 001067 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
-/* 001068 */ 		return _html_body_end_js_scripts_mathjax;
-/* 001068 */ 	}
-/* 001069 */ 	return '';
-/* 001069 */ };
-/* 001075 */ export var FragmentRendererInformation =  __class__ ('FragmentRendererInformation', [object], {
-/* 001075 */ 	__module__: __name__,
-/* 001076 */ 	FragmentRendererClass: HtmlFragmentRenderer,
-/* 001079 */ 	get get_style_information () {return function (fragment_renderer) {
-/* 001079 */ 		if (arguments.length) {
-/* 001079 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001079 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001079 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001079 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001079 */ 					switch (__attrib0__) {
-/* 001079 */ 						case 'fragment_renderer': var fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001079 */ 					}
-/* 001079 */ 				}
-/* 001079 */ 			}
-/* 001079 */ 		}
-/* 001079 */ 		else {
-/* 001079 */ 		}
-/* 001084 */ 		return dict ({'css_global': __call__ (get_html_css_global, null, fragment_renderer), 'css_content': __call__ (get_html_css_content, null, fragment_renderer), 'js': __call__ (get_html_js, null, fragment_renderer), 'body_end_js_scripts': __call__ (get_html_body_end_js_scripts, null, fragment_renderer)});
-/* 001084 */ 	};},
-/* 001087 */ 	format_name: 'html'
-/* 001087 */ });
+/* 000697 */ 					var attrs = dict ({});
+/* 000698 */ 					var cplc = cell.placement;
+/* 000699 */ 					if (__t__ (__ne__ (cplc.col_range.end, __add__ (cplc.col_range.start, 1)))) {
+/* 000702 */ 						__setitem__ (attrs, 'colspan', __call__ (str, null, __sub__ (cplc.col_range.end, cplc.col_range.start)));
+/* 000702 */ 					}
+/* 000703 */ 					if (__t__ (__ne__ (cplc.row_range.end, __add__ (cplc.row_range.start, 1)))) {
+/* 000705 */ 						__setitem__ (attrs, 'rowspan', __call__ (str, null, __sub__ (cplc.row_range.end, cplc.row_range.start)));
+/* 000705 */ 					}
+/* 000706 */ 					(function () {
+/* 000706 */ 						var __accu0__ = row_items;
+/* 000707 */ 						return __call__ (__accu0__.append, __accu0__, (function () {
+/* 000707 */ 							var __accu1__ = self;
+/* 000707 */ 							return __call__ (__accu1__.wrap_in_tag, __accu1__, tagname, rendered_cell_contents, __kwargtrans__ ({attrs: attrs, class_names: clsnames}));
+/* 000707 */ 						}) ());
+/* 000707 */ 					}) ();
+/* 000714 */ 					var col_j = cplc.col_range.end;
+/* 000714 */ 					continue;
+/* 000714 */ 				}
+/* 000719 */ 				var col_j = __call__ (__iadd__, null, col_j, 1);
+/* 000719 */ 			}
+/* 000721 */ 			(function () {
+/* 000721 */ 				var __accu0__ = data_items;
+/* 000721 */ 				return __call__ (__accu0__.append, __accu0__, row_items);
+/* 000721 */ 			}) ();
+/* 000722 */ 			var row_j = __call__ (__iadd__, null, row_j, 1);
+/* 000722 */ 		}
+/* 000724 */ 		var table_attrs = dict ({});
+/* 000725 */ 		if (__t__ (target_id !== null)) {
+/* 000726 */ 			__setitem__ (table_attrs, 'id', target_id);
+/* 000726 */ 		}
+/* 000728 */ 		var s = (function () {
+/* 000728 */ 			var __accu0__ = self;
+/* 000730 */ 			return __call__ (__accu0__.wrap_in_tag, __accu0__, 'table', (function () {
+/* 000730 */ 				var __accu1__ = '';
+/* 000730 */ 				return __call__ (__accu1__.join, __accu1__, (function () {
+/* 000730 */ 					var __accu2__ = [];
+/* 000730 */ 					var __iterable0__ = data_items;
+/* 000730 */ 					for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000732 */ 						var row_items = __getitem__ (__iterable0__, __index0__);
+/* 000732 */ 						(function () {
+/* 000732 */ 							var __accu3__ = __accu2__;
+/* 000731 */ 							return __call__ (__accu3__.append, __accu3__, __add__ (__add__ ('<tr>', (function () {
+/* 000731 */ 								var __accu4__ = '';
+/* 000731 */ 								return __call__ (__accu4__.join, __accu4__, row_items);
+/* 000731 */ 							}) ()), '</tr>'));
+/* 000731 */ 						}) ();
+/* 000731 */ 					}
+/* 000731 */ 					return __accu2__;
+/* 000731 */ 				}) ());
+/* 000731 */ 			}) (), __kwargtrans__ ({attrs: table_attrs, class_names: ['cells']}));
+/* 000731 */ 		}) ();
+/* 000737 */ 		return s;
+/* 000737 */ 	});}
+/* 000737 */ });
+/* 000743 */ export var _rx_delayed_markers = (function () {
+/* 000743 */ 	var __accu0__ = re;
+/* 000743 */ 	return __call__ (__accu0__.compile, __accu0__, '<FLM:DLYD:(?P<key>\\d+)\\s*/>');
+/* 000743 */ }) ();
+/* 000750 */ export var _html_css_global = '\np, ul, ol {\n  margin: 1em 0px;\n}\np:first-child, ul:first-child, ol:first-child {\n  margin-top: 0px;\n}\np:last-child, ul:last-child, ol:last-child {\n  margin-bottom: 0px;\n}\ndd > p, dd > p:first-child, dd > p:last-child {\n  margin: 0.33em 0px;\n}\n\na, a:link, a:hover, a:active, a:visited {\n  color: #3232c8;\n  text-decoration: none;\n}\na:hover {\n  color: #22228a;\n}\n';
+/* 000773 */ export var _html_css_content = "\n.emph, .textit {\n  font-style: italic;\n}\n.textbf {\n  font-weight: bold;\n}\n\nh1 {\n  font-size: 1.6rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh2 {\n  font-size: 1.3rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh3 {\n  font-size: 1rem;\n  font-weight: bold;\n  margin: 1em 0px;\n}\n\n.heading-level-4 {\n  font-style: italic;\n  display: inline;\n}\n.heading-level-4::after {\n  display: inline-block;\n  margin: 0px .12em;\n  content: '—';\n}\n\n.heading-level-5 {\n  font-style: italic;\n  font-size: .9em;\n  display: inline;\n}\n.heading-level-5::after {\n  display: inline-block;\n  margin-right: .12em;\n  content: '';\n}\n\n.heading-level-6 {\n  font-style: italic;\n  font-size: .8em;\n  display: inline;\n}\n.heading-level-6::after {\n  display: inline-block;\n  margin-right: .06em;\n  content: '';\n}\n\n\n.heading-level-theorem {\n  font-weight: bold;\n  display: inline-block;\n}\n.heading-level-theorem::after {\n  font-weight: bold;\n  display: inline-block;\n  margin: 0px .12em 0px 0px;\n  content: '.';\n}\n\ndiv.theoremlike, div.definitionlike, div.prooflike {\n  margin: 1em 0px;\n}\n\ndiv.prooflike > p > .heading-level-theorem,\ndiv.prooflike > p > .heading-level-theorem::after {\n  font-weight: normal;\n  font-style: italic;\n}\n\n\ndl.enumeration {\n  display: block;\n  margin-left: 2.5em;\n}\ndl.enumeration > dt {\n  float: left;\n  clear: left;\n  display: inline-block;\n  /*margin: 0px; */\n  margin-left: -2.5em;\n  width: 2.0em;\n  min-width: 2.0em;\n  max-width: 2.0em;\n  margin-right: 0.5em;\n  text-align: right;\n}\ndl.enumeration > dd {\n  /*display: inline-block;\n  width: 100%;*/\n  border: 0px;\n  padding: 0px;\n  margin: 0px;\n}\n\nfigure.float {\n  width: 100%;\n  border-width: 1px 0px 1px 0px;\n  border-style: solid none solid none;\n  border-color: rgba(120, 120, 140, 0.15);\n  margin: 0.5rem 0px;\n  padding: 0.5rem 0px;\n}\n\nfigure.float .float-contents {\n  width: 100%;\n  max-width: 100%;\n  overflow-x: auto;\n}\n\nfigure.float .float-contents img {\n  display: block;\n  margin: 0pt auto;\n  padding: 0pt;\n  border: 0pt;\n  margin: 0px auto;\n}\n\nfigure.float figcaption {\n  display: block;\n  margin-top: 0.5em;\n  margin: 0.75em 2em 0px;\n  text-align: center;\n}\n\nfigure.float figcaption > span {\n  display: inline-block;\n  font-style: italic;\n  text-align: left;\n}\n\ntable {\n  margin: 1em 0px 1em 0px;\n  border-collapse: separate;\n  border-spacing: 0px;\n  /*border-top: solid 1pt;\n  border-bottom: solid 1pt;*/\n}\nfigure.float .float-contents table {\n  margin: 0px auto;\n}\ntd {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\nth {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\n.cellstyle-H {\n  border-bottom: solid .5pt;\n}\n.cellstyle-rH {\n}\n.cellstyle-l {\n  text-align: left;\n}\n.cellstyle-c {\n  text-align: center;\n}\n.cellstyle-r {\n  text-align: right;\n}\n.cellstyle-green {\n  background-color: rgba(69, 255, 69, 0.31); /*rgb(200,255,200);*/\n}\n.cellstyle-blue {\n  background-color: rgba(79, 142, 255, 0.27); /*rgb(200,220,255);*/\n}\n.cellstyle-yellow {\n  background-color: rgba(255, 255, 49, 0.33); /*rgb(255,255,200);*/\n}\n.cellstyle-red {\n  background-color: rgba(255,120,120,0.30);  /*rgb(255,200,200);*/\n}\n.cellstyle-lvert {\n  border-left: solid .5pt;\n}\n.cellstyle-rvert {\n  border-right: solid .5pt;\n}\n\n.celltbledge-top {\n  border-top: solid 1pt;\n}\n.celltbledge-bottom {\n  border-bottom: solid 1pt;\n}\n\n.verbatimcode {\n  font-family: monospace;\n  font-size: 0.9em;\n  background-color: rgba(127,127,127,0.25);\n  border-radius: 2px;\n  padding: 1px 2px;\n  display: inline-block;\n  white-space: pre-wrap;\n}\n.verbatima {\n  font-style: italic;\n}\n.verbatimcode-environment {\n  display: block;\n  margin: 0.75em 0px 1em;\n  white-space: pre;\n}\n\n.defterm {\n  font-style: italic;\n}\n\n.defterm .defterm-term {\n  font-style: italic;\n  font-weight: bold;\n}\n\n.display-math {\n  width: 100%;\n  max-width: 100%;\n  display: block;\n  overflow-x: auto;\n}\n\n.endnotes, .citations {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\n.citation {\n}\n.footnote {\n}\ndl.citation-list > dt, dl.footnote-list > dt {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\n";
+/* 001025 */ export var _html_js_mathjax = '\nMathJax = {\n    tex: {\n        inlineMath: [[\'\\\\(\', \'\\\\)\']],\n        displayMath: [[\'\\\\[\', \'\\\\]\']],\n        processEnvironments: true,\n        processRefs: true,\n\n        // equation numbering on\n        tags: \'ams\'\n    },\n    options: {\n        // all MathJax content is marked with CSS classes\n        // skipHtmlTags: \'body\',\n        // processHtmlClass: \'display-math|inline-math\',\n    },\n    startup: {\n        pageReady: function() {\n            // override the default "typeset everything on the page" behavior to\n            // only typeset whatever we have explicitly marked as math\n            return typesetPageMathPromise();\n        }\n    }\n};\nfunction typesetPageMathPromise()\n{\n    var elements = document.querySelectorAll(\'.display-math, .inline-math\');\n    return MathJax.typesetPromise(elements);\n}\n';
+/* 001056 */ export var _html_body_end_js_scripts_mathjax = '\n<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>\n<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>\n';
+/* 001064 */ export var get_html_css_global = function (html_fragment_renderer) {
+/* 001064 */ 	if (arguments.length) {
+/* 001064 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001064 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001064 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001064 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001064 */ 				switch (__attrib0__) {
+/* 001064 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001064 */ 				}
+/* 001064 */ 			}
+/* 001064 */ 		}
+/* 001064 */ 	}
+/* 001064 */ 	else {
+/* 001064 */ 	}
+/* 001065 */ 	return _html_css_global;
+/* 001065 */ };
+/* 001067 */ export var get_html_css_content = function (html_fragment_renderer) {
+/* 001067 */ 	if (arguments.length) {
+/* 001067 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001067 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001067 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001067 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001067 */ 				switch (__attrib0__) {
+/* 001067 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001067 */ 				}
+/* 001067 */ 			}
+/* 001067 */ 		}
+/* 001067 */ 	}
+/* 001067 */ 	else {
+/* 001067 */ 	}
+/* 001068 */ 	return _html_css_content;
+/* 001068 */ };
+/* 001070 */ export var get_html_js = function (html_fragment_renderer) {
+/* 001070 */ 	if (arguments.length) {
+/* 001070 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001070 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001070 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001070 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001070 */ 				switch (__attrib0__) {
+/* 001070 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001070 */ 				}
+/* 001070 */ 			}
+/* 001070 */ 		}
+/* 001070 */ 	}
+/* 001070 */ 	else {
+/* 001070 */ 	}
+/* 001071 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
+/* 001072 */ 		return _html_js_mathjax;
+/* 001072 */ 	}
+/* 001073 */ 	return '';
+/* 001073 */ };
+/* 001075 */ export var get_html_body_end_js_scripts = function (html_fragment_renderer) {
+/* 001075 */ 	if (arguments.length) {
+/* 001075 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001075 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001075 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001075 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001075 */ 				switch (__attrib0__) {
+/* 001075 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001075 */ 				}
+/* 001075 */ 			}
+/* 001075 */ 		}
+/* 001075 */ 	}
+/* 001075 */ 	else {
+/* 001075 */ 	}
+/* 001076 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
+/* 001077 */ 		return _html_body_end_js_scripts_mathjax;
+/* 001077 */ 	}
+/* 001078 */ 	return '';
+/* 001078 */ };
+/* 001084 */ export var FragmentRendererInformation =  __class__ ('FragmentRendererInformation', [object], {
+/* 001084 */ 	__module__: __name__,
+/* 001085 */ 	FragmentRendererClass: HtmlFragmentRenderer,
+/* 001088 */ 	get get_style_information () {return function (fragment_renderer) {
+/* 001088 */ 		if (arguments.length) {
+/* 001088 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001088 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001088 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001088 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001088 */ 					switch (__attrib0__) {
+/* 001088 */ 						case 'fragment_renderer': var fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001088 */ 					}
+/* 001088 */ 				}
+/* 001088 */ 			}
+/* 001088 */ 		}
+/* 001088 */ 		else {
+/* 001088 */ 		}
+/* 001093 */ 		return dict ({'css_global': __call__ (get_html_css_global, null, fragment_renderer), 'css_content': __call__ (get_html_css_content, null, fragment_renderer), 'js': __call__ (get_html_js, null, fragment_renderer), 'body_end_js_scripts': __call__ (get_html_body_end_js_scripts, null, fragment_renderer)});
+/* 001093 */ 	};},
+/* 001096 */ 	format_name: 'html'
+/* 001096 */ });
 /* 000006 */ 
 //# sourceMappingURL=flm.fragmentrenderer.html.map
