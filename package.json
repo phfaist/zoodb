@@ -49,7 +49,8 @@
         "./search/searchindex": "./src/search/searchindex.js",
         "./search/searchwidget": "./src/search/searchwidget.js",
         "./std": "./src/std/index.js",
-        "./std/*": "./src/std/*.js"
+        "./std/*": "./src/std/*.js",
+        "./flm-js/*": "./flm-js-src/flm-js/*.js"
     },
     "COMMENTED_OUT_NOT_SUPPORTED_BY_PARCEL__imports": {
         "#flm-js/*": "./flm-js-src/flm-js/*"
