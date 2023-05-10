@@ -60,7 +60,10 @@ export function use_flm_processor(_this)
             default_user_agent:
               flm_options.citations?.default_user_agent
               ?? `zoodb-bibliography-build-script/0.1 (https://github.com/phfaist/zoodb)`,
-            csl_style: flm_options.citations.csl_style,
+            csl_style: flm_options.citations?.csl_style,
+            cache_file: flm_options.citations?.cache_file,
+            cache_entry_default_duration_ms:
+                flm_options.citations?.cache_entry_default_duration_ms
         },
         resource_collector_options: {
             resource_types: ['graphics_path'],
