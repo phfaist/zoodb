@@ -13,10 +13,11 @@ export function render_value(x, render_context, render_value_options = {})
         return '';
     }
 
-    const { list_joiner, list_item_wrapper } = Object.assign(
+    const { list_joiner, list_item_wrapper, list_full_wrapper } = Object.assign(
         {
             list_joiner: '\n',
-            list_item_wrapper: ((x)=>x)
+            list_item_wrapper: ((x)=>x),
+            list_full_wrapper: ((x)=>x),
         },
         render_value_options
     );
@@ -28,9 +29,11 @@ export function render_value(x, render_context, render_value_options = {})
         return render_context.fragment_renderer.render_verbatim( Number(x).toString() );
     }
     if (x && x.length) { // is an array
-        return x.map( (value) => list_item_wrapper(
-            render_value(value, render_context, render_value_options)
-        ) ).join(list_joiner);
+        return list_full_wrapper(
+            x.map( (value) => list_item_wrapper(
+                render_value(value, render_context, render_value_options)
+            ) ).join(list_joiner)
+        );
     }
     if (x && 'render' in x) { // has a render method -> e.g., flm fragment
         return x.render(render_context);
