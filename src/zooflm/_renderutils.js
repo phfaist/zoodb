@@ -106,7 +106,8 @@ export function make_and_render_document({
     fragment_renderer ??= new ZooHtmlFragmentRenderer();
 
     render_endnotes_integrate_string ??= (rendered_content, rendered_endnotes) => 
-        rendered_content.replace('<RENDER_ENDNOTES/>', rendered_endnotes) ;
+        rendered_content.replace('<RENDER_ENDNOTES/>', rendered_endnotes)
+        ;
 
     let kwargs = {};
     if (doc_metadata != null) {
@@ -116,10 +117,9 @@ export function make_and_render_document({
         kwargs.feature_document_options = feature_document_options;
     }
 
-    const doc = zoo_flm_environment.make_document( render_doc_fn, $$kw(kwargs) );
-    try {
-        let [rendered_content, render_context] =
-            doc.render( fragment_renderer, feature_render_options );
+    const internal_render_doc_fn = (render_context) => {
+        const rendered_content = render_doc_fn(render_context);
+        let rendered_endnotes = null;
         if (render_endnotes) {
             let endnotes_kwargs = {
                 endnotes_heading_title: 'References',
@@ -129,10 +129,20 @@ export function make_and_render_document({
             if (typeof render_endnotes === 'object') {
                 Object.assign(endnotes_kwargs, render_endnotes);
             }
-            const rendered_endnotes =
+            rendered_endnotes =
                 render_context.feature_render_manager('endnotes').render_endnotes($$kw(
                     endnotes_kwargs,
                 ));
+        }
+        return {rendered_content, rendered_endnotes};
+    };
+
+    const doc = zoo_flm_environment.make_document( render_doc_fn, $$kw(kwargs) );
+    try {
+        let [rendered_content_data, render_context] =
+            doc.render( fragment_renderer, feature_render_options );
+        let {rendered_content, rendered_endnotes} = rendered_content_data;
+        if (rendered_endnotes != null) {
             rendered_content = render_endnotes_integrate_string(
                 rendered_content,
                 rendered_endnotes,
