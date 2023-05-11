@@ -94,6 +94,7 @@ export function make_and_render_document({
     render_doc_fn,
     doc_metadata,
     render_endnotes,
+    render_endnotes_integrate_string,
     fragment_renderer,
     flm_error_policy,
     feature_document_options,
@@ -103,6 +104,9 @@ export function make_and_render_document({
     // argument defaults
     flm_error_policy ??= 'abort';
     fragment_renderer ??= new ZooHtmlFragmentRenderer();
+
+    render_endnotes_integrate_string ??= (rendered_content, rendered_endnotes) => 
+        rendered_content.replace('<RENDER_ENDNOTES/>', rendered_endnotes) ;
 
     let kwargs = {};
     if (doc_metadata != null) {
@@ -114,7 +118,7 @@ export function make_and_render_document({
 
     const doc = zoo_flm_environment.make_document( render_doc_fn, $$kw(kwargs) );
     try {
-        let [rendered_html, render_context] =
+        let [rendered_content, render_context] =
             doc.render( fragment_renderer, feature_render_options );
         if (render_endnotes) {
             let endnotes_kwargs = {
@@ -127,11 +131,14 @@ export function make_and_render_document({
             }
             const rendered_endnotes =
                 render_context.feature_render_manager('endnotes').render_endnotes($$kw(
-                    endnotes_kwargs
+                    endnotes_kwargs,
                 ));
-            rendered_html = rendered_html.replace('<RENDER_ENDNOTES/>', rendered_endnotes);
+            rendered_content = render_endnotes_integrate_string(
+                rendered_content,
+                rendered_endnotes,
+            );
         }
-        return rendered_html;
+        return rendered_content;
     } catch (err) {
         let errstr = '<??>';
         try {
