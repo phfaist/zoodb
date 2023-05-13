@@ -31,6 +31,15 @@ function getGitLastUpdatedDate(filePath) {
         ) * 1000
     );
     const dateObject = new Date(timestamp);
+
+    try {
+        // make sure the date is valid!
+        dateObject.toISOString();
+    } catch(err) {
+        console.warning(`Failed to find GIT last modified time for ‘${filePath}’!`);
+        return new Date();
+    }
+
     //debug(`  -> date = ${dateObject.toISOString()}`);
     return dateObject;
 }
