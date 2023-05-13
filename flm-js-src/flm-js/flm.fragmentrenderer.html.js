@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-05-13 11:42:38
+/* 000001 */ // Transcrypt'ed from Python, 2023-05-13 11:51:22
 /* 000006 */ var html = {};
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
