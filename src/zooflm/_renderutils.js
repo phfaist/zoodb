@@ -134,7 +134,8 @@ export function make_and_render_document({
                     endnotes_kwargs,
                 ));
         }
-        return {rendered_content, rendered_endnotes};
+        // need dict() because flm will test for dict instance ...
+        return dict({rendered_content, rendered_endnotes});
     };
 
     const doc = zoo_flm_environment.make_document( internal_render_doc_fn, $$kw(kwargs) );
