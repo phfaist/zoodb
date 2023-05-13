@@ -36,7 +36,7 @@ function getGitLastUpdatedDate(filePath) {
         // make sure the date is valid!
         dateObject.toISOString();
     } catch(err) {
-        console.warning(`Failed to find GIT last modified time for ‘${filePath}’!`);
+        console.error(`Failed to find GIT last modified time for ‘${filePath}’!`);
         return new Date();
     }
 
