@@ -3,7 +3,7 @@ import debug_module from 'debug';
 const debug = debug_module('zoodb.zooflm._renderutils');
 
 // provide $$kw({...}) and repr() to importers
-import { $$kw, repr } from './flm-js/py.js';
+import { $$kw, repr, dict } from './flm-js/py.js';
 
 import { ZooHtmlFragmentRenderer } from './_fragmentrenderers.js';
 
