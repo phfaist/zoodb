@@ -137,7 +137,7 @@ export function make_and_render_document({
         return {rendered_content, rendered_endnotes};
     };
 
-    const doc = zoo_flm_environment.make_document( render_doc_fn, $$kw(kwargs) );
+    const doc = zoo_flm_environment.make_document( internal_render_doc_fn, $$kw(kwargs) );
     try {
         let [rendered_content_data, render_context] =
             doc.render( fragment_renderer, feature_render_options );
