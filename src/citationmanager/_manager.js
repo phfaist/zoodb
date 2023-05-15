@@ -129,7 +129,7 @@ export class CitationDatabaseManager
             if (!keys_to_retrieve.hasOwnProperty(cite_prefix)) {
                 throw new Error(
                     `No source registered for cite prefix ‘${cite_prefix}’ `
-                    `(citation encountered in ${c.encountered_in.what})`
+                    + `(citation encountered in ${c.encountered_in?.what})`
                 );
             }
 
