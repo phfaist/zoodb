@@ -148,7 +148,7 @@ export class CitationDatabaseManager
                     cite_prefix: d.chained.cite_prefix,
                     cite_key: d.chained.cite_key,
                     encountered_in: {
-                        resource_info: d.chained.encountered_in?.resource_info,
+                        resource_info: c.encountered_in?.resource_info,
                         what: `Chained from ‘${cite_prefix}:${cite_key}’`,
                     }
                 });
@@ -196,7 +196,7 @@ export class CitationDatabaseManager
 
             // find the failures in `all_citations_to_retrieve_by_prefix` to
             // report usage locations
-            // debug('error, will for failed citation search in ',
+            // debug('error, will look for failed citation search in ',
             //       { all_citations_to_retrieve_by_prefix } );
 
             const failure_citation_fetch = e.failure_citation_fetch;
@@ -219,8 +219,8 @@ export class CitationDatabaseManager
                             const source_where =
                                   a_citation_to_retrieve.encountered_in.what ?? '(unknown)';
                             console.error(
-                                `Citation of ${cite_prefix}:${cite_key} was encountered in: `
-                                + `‘${source_path}’ → ‘${source_where}’`
+                                `Citation of ‘${cite_prefix}:${cite_key}’ was encountered in: `
+                                + `‘${source_path}’ → ${source_where}`
                             );
                         }
                     }
