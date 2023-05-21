@@ -92,6 +92,28 @@ export class PeopleDb extends StandardZooDb
         }, config));
     }
 
+
+
+    //
+    // simple example of ZooDb validation -- check that spouses always report
+    // the other spouse as their spouse
+    //
+    async validate()
+    {
+        for (const [person_id, person] of Object.entries(this.objects.person)) {
+            if (person.relations != null && person.relations.spouse != null) {
+                // remember, person.relations.spouse is the ID of the spouse
+                // person, not the person object itself
+                const other_person = this.objects.person[person.relations.spouse];
+                if (other_person?.relations?.spouse !== person_id) {
+                    throw new Error(
+                        `Person ‘${person_id}’ lists ‘${person.relations.spouse}’ as their `
+                        + `spouse but not the other way around`
+                    );
+                }
+            }
+        }
+    }
 };
 
 

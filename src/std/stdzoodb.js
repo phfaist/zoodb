@@ -161,6 +161,16 @@ export class StandardZooDb extends ZooDb
         await this.zoo_loader.load(options);
     }
 
+
+    /**
+     * Can be used to validate the zoo.  E.g., enforce any constraints, sanity
+     * checks, etc.
+     *
+     */
+    async validate()
+    {
+    }
+
 };
 
 

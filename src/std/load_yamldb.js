@@ -68,9 +68,17 @@ export class StandardZooDbYamlDataLoader
         //
         await this.zoodb.load_data( await this.yamldb_loader.load() );
 
-        debug("Zoo is now loaded!");
         this._currently_loading = false;
         this._first_load_done = true;
+
+        debug("Validating Zoo ...");
+
+        //
+        // & validate its contents
+        //
+        await this.zoodb.validate();
+
+        debug("Zoo is now loaded!");
     }
 
     async reload()
@@ -83,11 +91,17 @@ export class StandardZooDbYamlDataLoader
         this._currently_loading = true;
 
         try {
+
             debug("Reloading Zoo!");
             const { dbdata, reload_info } = await this.yamldb_loader.reload(this.zoodb.db);
             await this.zoodb.update_objects(reload_info.reloaded_objects);
+
+            debug("Re-Validating Zoo");
+            await this.zoodb.validate();
+
             debug("Finished reloading Zoo.");
             return true;
+
         } catch (err) {
             console.error('ERROR RELOADING DATA: ', err);
         } finally {
