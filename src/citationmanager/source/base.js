@@ -119,7 +119,7 @@ export class CitationSourceBase
         try {
             this._running = true;
 
-            this.source_initialize_run();
+            await this.source_initialize_run();
 
             let last_chunk_retrieve_hrtime = null;
 
@@ -171,7 +171,7 @@ export class CitationSourceBase
                 }
             }
 
-            this.source_finalize_run();
+            await this.source_finalize_run();
         } finally {
             this._running = false;
         }
@@ -201,8 +201,8 @@ export class CitationSourceBase
         return 'ZooDB-Citations-Fetcher/0.1 (https://github.com/phfaist/zoodb)';
     }
 
-    // helper for fetch()
-    fetch_url(url, fetch_options=undefined)
+    // helper for fetch() -- use await!
+    async fetch_url(url, fetch_options=undefined)
     {
         // convert simple fs paths to file:/// URLs
         const urlobj = new URL(url, `file:${this._file_root}`);
@@ -211,18 +211,18 @@ export class CitationSourceBase
             // a local file.
             return this.options.fs.readFileSync(urlobj.pathname);
         }
-        return fetch(urlobj.href, fetch_options);
+        return await fetch(urlobj.href, fetch_options);
     }
 
 
     // -------------
 
     // can be reimplemented
-    source_initialize_run()
+    async source_initialize_run()
     {
     }
 
-    source_finalize_run()
+    async source_finalize_run()
     {
     }
 

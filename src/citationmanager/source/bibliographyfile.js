@@ -54,7 +54,7 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
         }
     }
 
-    source_initialize_run()
+    async source_initialize_run()
     {
         this.bibdata = {};
         
@@ -63,7 +63,7 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
             let newbibdata = {};
 
             // load bibliography file to memory
-            const bib_data_contents = this.fetch_url( bib_file_url );
+            const bib_data_contents = await this.fetch_url( bib_file_url );
             if ( /\.ya?ml$/i.test( bib_file_url ) ) {
                 newbibdata = jsyaml.load( bib_data_contents );
             } else {
@@ -82,7 +82,7 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
                 throw new Error(
                     `No such citation key ‘${key}’ in `
                     + `‘${this.bibliography_files.join('’,‘')}’ `
-                    + `(for prefix ‘{this.cite_prefix}’)`
+                    + `(for prefix ‘${this.cite_prefix}’)`
                 );
             }
             this.citation_manager.store_citation(
