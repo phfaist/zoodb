@@ -13,6 +13,9 @@ import {
 
 
 
+/**
+ *  Doc............
+ */
 export function use_searchable_text_processor(_this)
 {
     const searchable_text_options = _this.config.searchable_text_options ?? {};

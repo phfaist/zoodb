@@ -1,0 +1,13 @@
+{
+    "sourceType": "module",
+    "source": {
+        "include": [],
+        "exclude": [],
+        "includePattern": ".+\\.js(x?)$"
+    },
+    "plugins": [ ],
+    "opts": {
+        "recurse": true
+    },
+    "recurseDepth": 10
+}

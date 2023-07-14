@@ -13,7 +13,7 @@ const debug = debug_module('zoodb.resourcecollector.retriever.fs');
 
 
 /**
- * ........
+ * Doc........
  *
  * `options.fs` should be an object providing the methods `accessSync()` and
  * `readFileSync()` (the `readFileSync()` method is in fact only needed if the

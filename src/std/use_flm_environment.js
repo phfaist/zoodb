@@ -11,7 +11,9 @@ import { split_prefix_label } from '../util/prefixlabel.js';
 
 import loMerge from 'lodash/merge.js';
 
-
+/**
+ * Doc........
+ */
 export function default_target_href_resolver(ref_instance, render_context,
                                              { zoo_object_permalink })
 {
@@ -39,6 +41,9 @@ export function default_target_href_resolver(ref_instance, render_context,
 
 
 
+/**
+ * Doc...........
+ */
 export function use_flm_environment(_this)
 {
     const zoo_flm_environment_options = loMerge(

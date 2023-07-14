@@ -111,6 +111,16 @@ const dbdata = zoodbdataloader.load();
 */
 
 
+/**
+ * Load schemas and object data from a collection of YAML (or JSON) source
+ * files.
+ *
+ * Includes validation of the input object data against the provided schemas.
+ *
+ * Doc........
+ *
+ * Configuration options .............
+ */
 export class YamlDbZooDataLoader
 {
 

@@ -17,7 +17,13 @@ import { CitationDatabaseManager } from '../citationmanager/index.js';
 import { ResourceCollector } from '../resourcecollector/index.js';
 
 
-
+/**
+ * Database processor that compiles FLM content in object fields all while
+ * providing the relevant infrastructure to handle cross-references between
+ * objects, collect external resources, and manage citations (fetching,
+ * compiling, formatting).
+ *
+ */
 export class ZooFLMProcessor extends ZooDbProcessorBase
 {
     constructor(options)

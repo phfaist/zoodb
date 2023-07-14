@@ -26,10 +26,13 @@ function default_assemble_doc_text_values(doc_values) {
 
 
 /**
- * 
- * The SearchIndex assumes that you have processed your database using the
- * MakeSearchableText database processor.
+ * An object holding an index for the zoo database, which can be used for
+ * searching with the `Lunr` library.
  *
+ * The SearchIndex assumes that you have processed your database using the
+ * :class:`SearchableTextProcessor` database processor.
+ *
+ * TODO Doc.......... explain how this works!
  */
 export class SearchIndex
 {

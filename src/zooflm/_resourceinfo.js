@@ -1,5 +1,18 @@
 import path from 'path';
 
+/**
+ * Store information about which source file an FLM fragment was encountered in.
+ * Useful to find resources (eg. graphics files) with relative paths as well as
+ * to track errors.  Objects of this type will be set in the `resource_info`
+ * fields of FLM fragments.
+ *
+ * .. attribute:: object_type
+ *
+ * .. attribute:: object_id
+ *
+ * .. attribute:: source_path
+ *
+ */
 export class ZooFLMResourceInfo
 {
     /// source_path is used to resolve access to external files like graphics

@@ -14,9 +14,14 @@ node_modules-*
 !.yarn/versions
 
 
+doc/_build
+
+
 # playground test files
 zoo_dbdata_output*.json
 downloaded_citationinfo_cache.json
 _output_resource_graphics_files/
 out_test.html
 out_test_2.html
+
+

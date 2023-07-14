@@ -47,7 +47,18 @@ function getGitLastUpdatedDate(filePath) {
 
 
 
-
+/**
+ * Use `git` to inspect the last modification time of a source file associated
+ * with a given object.
+ *
+ * Objects' meta field ``obj._zoodb.git_last_modified_date`` is set to a
+ * relevant JavaScript ``Date`` instance.
+ *
+ * Options: ``{ data_dir: ...}``
+ *
+ * - `data_dir` is the folder relative to which we should interpret source file
+ *   paths.
+ */
 export class GetGitLastModifiedDbProcessor extends ZooDbProcessorBase
 {
     constructor(options)
@@ -64,6 +75,10 @@ export class GetGitLastModifiedDbProcessor extends ZooDbProcessorBase
         debug(`Creating GetGitLastModifiedDbProcessor with data_dir ‘${this.data_dir}’`);
     }
 
+    /**
+     * If called after processing the zoo, this method returns the latest
+     * encountered modification date of a source file path.
+     */
     get_latest_modification_date()
     {
         return this._latest_modification_date;

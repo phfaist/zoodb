@@ -15,6 +15,9 @@ import { YamlDbZooDataLoader } from '@phfaist/zoodb/dbdataloader/yamldb';
 
 // -----------------------------------------------------------------------------
 
+/**
+ * Doc........
+ */
 export class StandardZooDbYamlDataLoader
 {
     constructor(config)

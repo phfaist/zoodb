@@ -57,6 +57,13 @@ function escape_html(x)
 
 
 
+/**
+ * Extend the global CSL object (the citation formatter library) to enable FLM
+ * code output.
+ *
+ * If you use the :class:`ZooFLMProcessor` (in most cases you should), then this
+ * function is called automatically and you shouldn't worry about it.
+ */
 export function install_csl_flm_output_format(zooflmenviron)
 {
     if (CSL.Output.Formats.hasOwnProperty('flm')) {
@@ -231,6 +238,9 @@ const _default_format_link_text = {
 
 
 
+/**
+ * Format citations into FLM code using a citation manager.
+ */
 export class CitationCompiler
 {
     constructor(options)

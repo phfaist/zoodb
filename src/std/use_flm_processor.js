@@ -25,6 +25,11 @@ const default_figure_template_name =
       (f) => `fig-${f.basenameshort()}.${f.b32hash(4)}${f.lowerext()}`;
 
 
+/**
+ * Doc................
+ *
+ * Lots of options to document!.......
+ */
 export function use_flm_processor(_this)
 {
     if (_this.zoo_flm_environment == null) {

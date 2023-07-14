@@ -8,6 +8,21 @@ import { ZooDbProcessorBase } from './base.js';
 
 // -----------------------------------------------
 
+/**
+ * An instance of a relation in the database.
+ *
+ * @param object_type - The type of the object from which the relation is
+ *     originating
+ *
+ * @param relation_spec - The *relation specification object* containing
+ *    information about how this relation works (other object types,
+ *    one-to-many, many-to-many, backreferences, etc.).  This is the content of
+ *    the items of the `_zoo_relations:` field in the object schema (see
+ *    :ref:`object-schemas` and see above).
+ *
+ * @param zoodb - The ZooDb instance where to look for other objects being
+ *    referenced.
+ */
 export class ZooRelation
 {
     constructor({object_type, relation_spec, zoodb})
@@ -199,6 +214,11 @@ export class ZooRelation
 // -----------------------------------------------
 
 
+/**
+ * A database processor that turns relevant object fields into references to
+ * other objects, and possibly adds back-references, according to relations
+ * specified in the object type's schema.
+ */
 export class RelationsPopulator extends ZooDbProcessorBase
 {
     constructor(config)

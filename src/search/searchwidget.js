@@ -45,6 +45,47 @@ function default_resolve_href(object_type, object_id, doc) {
 }
 
 
+/**
+ * Manage an HTML widget that can search contents in the zoo, given an index
+ * object (see :class:`SearchIndex`).
+ *
+ * The `search_index` argument is the :class:`SearchIndex` instance.
+ *
+ * The `options` argument is an object which can contain the following keys:
+ *
+ * - ``dom_container:`` the DOM container (e.g., returned by
+ *   `document.getElementById()`) where to install the search widget.  If a
+ *   string is given here and it begins with '#', then it is assumed to specify
+ *   the ID of a DOM container which is looked up using
+ *   `document.getElementById()`.
+ *
+ * - ``initial_search_query:`` a search query to initialize the widget with.
+ *   Set to null, false, or an empty string to start with a blank widget.
+ *
+ * - ``auto_fuzz_min_word_length:`` Auto-fuzz will apply a fuzziness tolerance
+ *   (edit distance tolerance) to all search terms that have a minimal length.
+ *   Set `auto_fuzz_min_word_length` to specify the search term length starting
+ *   from which we apply an automatic edit distance tolerance.
+ *
+ * - ``auto_fuzz_distance:`` Auto-fuzz will apply a fuzziness tolerance (edit
+ *   distance tolerance) to all search terms that have a minimal length.  Set
+ *   `auto_fuzz_distance` to specify the edit distance tolerance that is
+ *   automatically enabled for search terms that whose length is at least
+ *   `auto_fuzz_min_word_length`.
+ *
+ * - ``context_length:`` The number of characters of content to include in the
+ *   search results before, and after, occurrences of the search term in
+ *   documents.
+ *
+ * - ``resolve_href:`` a callback accepting arguments `(object_type, object_id,
+ *   doc)` that returns an URL where we should go to if we want to look up the
+ *   given object specified by its type and id.  (The `doc` argument provides
+ *   the stored field values of that object, which we used for the search.)
+ *
+ * - ``getMathJax:`` to support MathJax, set this property to a function that
+ *   returns a MathJax instance.
+ *
+ */
 export class SearchWidget
 {
     constructor(search_index, options = {})

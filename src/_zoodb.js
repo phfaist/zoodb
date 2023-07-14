@@ -2,8 +2,18 @@ import debug_module from 'debug';
 const debug = debug_module('zoodb._zoodb');
 
 
+/**
+ * The main database class.
+ */
 export class ZooDb
 {
+    /**
+     * Constructor.  Pass the database processors you want to install here.  See
+     * module :ref:`zoodb.dbprocessor`.
+     *
+     * @param {} processors - list of DB processors to install
+     *
+     */
     constructor({ processors, })
     {
         this.processors = processors ?? [];
@@ -17,6 +27,10 @@ export class ZooDb
         this.raw_data_db = {};
     }
 
+    /**
+     * Get the schema associated with a given `object_type`.  Returns the schema
+     * object.
+     */
     schema(object_type)
     {
         if (!this.db.schemas.hasOwnProperty(object_type)) {
@@ -27,13 +41,30 @@ export class ZooDb
         return this.db.schemas[object_type];
     }
 
+    /**
+     * A list of object types that are stored in this database (read-only
+     * property).
+     */
     get object_types() { return Object.keys(this.db.objects); }
 
+    /**
+     * Read-only properties to access the dictionary of schemas.
+     */
     get schemas() { return this.db.schemas; }
+    /**
+     * Read-only properties to access the dictionary of objects.  Access objects
+     * as ``stored_object = zoodbobject.objects[object_type][object_id]``.
+     */
     get objects() { return this.db.objects; }
 
     // ---
 
+    /**
+     * Produce a serializable data dump of the contents of the database.
+     *
+     * This method will call all database processors' `process_data_dump()`
+     * methods to ensure that the database is prepared for serialization.
+     */
     data_dump(options = {})
     {
         let data = { db: this.db };
@@ -45,12 +76,21 @@ export class ZooDb
         return data;
     }
     
+    // internal. 
     raw_data_db_dump()
     {
         return {db: this.raw_data_db};
     }
 
 
+    /**
+     * Initialize the database processors and then directly load objects whose
+     * data is given in the argument dictionary `db`.  We ensure that the
+     * objects are copies of the probvided data, by serializing them &
+     * deserializing them again from JSON.
+     *
+     * @param {Object} db - an object with keys 'schemas' and 'objects'.
+     */
     async load_data(db)
     {
         debug('zoodb load_data');
@@ -126,6 +166,7 @@ export class ZooDb
         // debug(`Finally, this.db.objects=`, this.db.objects);
     }
 
+    // internal.
     update_object(object_db, object_id, new_object)
     {
         object_db[object_id] = new_object;

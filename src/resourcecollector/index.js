@@ -2,7 +2,11 @@ import debug_module from 'debug';
 const debug = debug_module('zoodb.resourcecollector');
 
 
-
+/**
+ * Main manager class for collecting external resources.
+ *
+ * Needs doc!!!..................
+ */
 export class ResourceCollector
 {
     constructor(options)

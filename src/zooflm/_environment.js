@@ -63,12 +63,24 @@ for (const Cls of [SectionCommandSpec,
 
 
 
+/**
+ * Test whether or not `obj` is an instance of an FLM fragment.
+ *
+ * We expose this function instead of having to expose both "isinstance" and
+ * "FLMFragment".  We thus avoid having to use Transcrypt interface tools to
+ * check if an object is a FLM fragment instance.
+ */
 export function is_flm_fragment(obj)
 {
     return isinstance(obj, FLMFragment);
 }
 
 
+/**
+ * Manager for cross-references.
+ *
+ * Doc...........
+ */
 export class RefResolver
 {
     constructor(options)
@@ -182,6 +194,13 @@ export class RefResolver
 
 
 
+/**
+ * Simple citations provider (for flm interface) that looks up a citation in a
+ * given citation database.  A convenient way to set up the database is to use a
+ * :class:`CitationManager`.
+ *
+ * Doc...........
+ */
 export class CitationsProvider
 {
     constructor()
@@ -383,7 +402,9 @@ export const FeatureZooGraphicsCollection = __class__(
 
 
 
-
+/**
+ * Return a default set of options for an FLM environment.
+ */
 export function zooflm_default_options(footnote_counter_formatter='alph')
 {
     return {

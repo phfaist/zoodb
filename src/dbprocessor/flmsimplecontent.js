@@ -40,19 +40,34 @@ function parse_schema_flm_options(schema)
 
 
 /**
+ * A class that can compile FLM content fields into FLM fragments.
+ *
+ * Configuration options (`config` argument):
+ *
+ * - ``flm_environment`` - the environment object to use to create fragments
+ *
+ * - ``content_scanner`` - if set, it is assumed to be a :class:`ZooFLMScanner`
+ *   instance, and all compiled FLM fragments are scanned.
+ *
+ * - ``flm_error_policy`` - one of 'abort' (the default) or 'continue'.  If
+ *   'abort', then any errors that arise when compile FLM content cause a JS
+ *   exception/error to be thrown.  If 'continue', then a warning is triggered,
+ *   and the fragment contents is set to a text that contains a human-readable
+ *   description of the error.  (The 'continue' is meant for use, for instance,
+ *   in a visual editor application that provides an instant preview of the
+ *   typed FLM code.)
  *
  * Parsing of DB fields follows the schema's _flm field.  The value of that
  * field can be:
  *
- *   - <dict>  --> enable FLM with given options
+ * - a dictionary --> enable FLM with given options.  The options can be:
+ *   ``enabled:`` true|false and ``standalone:`` true|false.
  *
  * A few shortcuts:
- *   - 'full'          --> parse as full FLM content
- *   - 'standalone'    --> shortcut for " - { standalone: true }"
  *
- * Options can be:
- *   - enabled: true|false
- *   - standalone: true|false
+ * - 'full'          --> parse as full FLM content
+ *
+ * - 'standalone'    --> shortcut for ``{ standalone: true }``
  *
  */
 export class FLMSimpleContentCompiler extends ZooDbProcessorBase
@@ -115,7 +130,7 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
      * The newly created FLM fragment is returned.  The `object` itself and its
      * properties are NOT modified.
      *
-     *  The FLM options should be an object as is returned by
+     * The FLM options should be an object as is returned by
      * `parse_schema_flm_options()`.  It specifies whether or not the fragment
      * is parsed in standalone mode.
      *

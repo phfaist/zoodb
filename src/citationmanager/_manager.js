@@ -11,6 +11,10 @@ import { Cache } from './_cache.js';
 const one_day = 1000 * 3600 * 24;
 
 
+
+/**
+ * Manage a database of bibliographic references.
+ */
 export class CitationDatabaseManager
 {
     /**

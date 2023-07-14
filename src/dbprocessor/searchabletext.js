@@ -69,6 +69,9 @@ function searchable_field_name(fieldname, fieldschema)
 // -----------------------------------------------------------------------------
 
 
+/**
+ * Doc.........
+ */
 export class SearchableTextFieldset
 {
     constructor(config)
@@ -189,7 +192,7 @@ export class SearchableTextFieldset
 
 
 /**
- *
+ * Doc...........
  */
 export class SearchableTextProcessor extends ZooDbProcessorBase
 {

@@ -15,7 +15,10 @@ const graphics_type_by_format = {
 };
 
 
-
+/**
+ * Process graphics to extract physical image dimensions, resolution, and other
+ * information.
+ */
 export class FLMGraphicsResourceProcessor
 {
     constructor(options)

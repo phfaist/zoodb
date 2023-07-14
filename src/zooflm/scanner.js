@@ -73,7 +73,15 @@ const make_scanned_types_empty = () => ({
 });
 
 
-// extends latexnodes_nodes.LatexNodesVisitor
+
+/**
+ * Visitor object that registers any encountered definitions of referenceable
+ * things (labels), references to external resources, and bibliographic
+ * citations.
+ *
+ * Interface-wise, this class can be thought of as extending
+ * `pylatexenc.latexnodes.nodes.LatexNodesVisitor`.
+ */
 export class ZooFLMScanner extends LatexNodesVisitorJS
 {
     constructor(options)
@@ -291,6 +299,15 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
 
 
 
+/**
+ * Run a :class:`ZooFLMScanner` object on all FLM fields of a given object
+ *
+ * @param visitor - the :class:`ZooFLMScanner` object instance
+ * @param obj - the object with the data fields; it should conform to the given `schema`
+ * @param schema - the object schema, accessible for instance in a ZooDb
+ *      object instance as `zoodb_instance.schema(object_type)`
+ * @param what - brief label/description of object this is, only used for debug messages
+ */
 export function visitor_scan_object(visitor, obj, schema, what=undefined)
 {
     debug(`Scanning object's FLM content (${what})`);
@@ -313,6 +330,20 @@ export function visitor_scan_object(visitor, obj, schema, what=undefined)
     }
 }
 
+/**
+ * Run a :class:`ZooFLMScanner` object on all FLM fields of a zoo instance.
+ *
+ * The (optional) `options` argument is of the form ``{ object_types: ..., }``.
+ * The option `object_types` is an array of object types to which the scanner
+ * will be applied; if false or null then all existing object types are used.
+ *
+ * @param visitor - the :class:`ZooFLMScanner` object instance
+ * @param zoodbdata - the ZooDb instance or database content.  Schemas and
+ *     objects for a given `object_type` are accessed as `.schemas[object_type]` and
+ *     `.objects[object_type]`.
+ * @param options - an object, see above
+ *
+ */
 export function visitor_scan_zoo(visitor, zoodbdata, options)
 {
     options = options || {};

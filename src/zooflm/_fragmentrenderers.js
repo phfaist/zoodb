@@ -56,12 +56,22 @@ export const ZooTextFragmentRenderer = __class__(
 );
 
 
+/**
+ * Utility to render a standalone fragment to HTML.  No document instance or
+ * render context is required.  This function will create a
+ * :class:`ZooHtmlFragmentRenderer` instance under the hood.
+ */
 export function render_html_standalone(fragment)
 {
     const html_renderer = new ZooHtmlFragmentRenderer();
     return fragment.render_standalone(html_renderer);
 }
 
+/**
+ * Utility to render a standalone fragment to HTML.  No document instance or
+ * render context is required.  This function will create a
+ * :class:`ZooTextFragmentRenderer` instance under the hood.
+ */
 export function render_text_standalone(fragment)
 {
     const text_renderer = new ZooTextFragmentRenderer();
