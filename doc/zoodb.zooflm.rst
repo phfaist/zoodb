@@ -7,13 +7,34 @@ exposed in the modules described here.
 
 
 
-Utilities
----------
+The python-transpiled interface
+-------------------------------
 
+This part of the ZooDb library incorporates the `FLM python sources
+<https://github.com/phfaist/flm>`_ transpiled into JavaScript using `Transcrypt
+<https://transcrypt.org/>`_.  While this detail shouldn't matter for most uses,
+there are some important differences to keep in mind:
 
-To pass keyword arguments, to generate descriptive string representations
-(e.g. for debugging), as well as to implement other behavior in interface with
-python-Transcrypted code, we can get access to use the following utilities.
+- You can't use JavaScript class (prototype) inheritance with the python-based
+  classes.  (Callbacks won't work, the parent class won't call the child method,
+  etc.)  If you really need to subclass one of the classes from python's
+  interface (or further derived classes like :class:`ZooFLMEnvironment`), you
+  need to do it `the Transcrypt way
+  <https://www.transcrypt.org/docs/html/what_why.html#id2>`_.
+
+- To pass keyword arguments, use the syntax ``function(arg1, arg2, $$kw( {
+  keyword_arg1: ..., keyword_arg2: ... } ))``.  The ``$kw(...)`` argument should
+  be the last argument in the call.
+
+- You cannot use the JS syntax ``x instanceof y`` with python-transcrypted
+  classes.  Instead, you can import the ``isinstance()`` utility to check
+  instances the python way, ``isinstance(x, y)``.  To check whether an object is
+  a FLM fragment instance, use :func:`is_flm_fragment()`.
+
+- You can convert objects to some representative string using the `repr()`
+  function.
+
+The relevant functions can be imported as follows:
 
 .. code::
 
@@ -22,11 +43,7 @@ python-Transcrypted code, we can get access to use the following utilities.
    } from '@phfaist/zoodb/zooflm';
 
 
-Todo, doc.......
-
-- how to use $$kw............
-
-- how to create subclasses..........
+- explain how to create subclasses..........
 
 
 
