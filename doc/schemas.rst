@@ -63,8 +63,10 @@ expected to be provided when loading the object raw data.
 BUG/FIXME: Enforce no values in `_auto_populated` fields at validation time!!
 
 
-Flexible Latex-like Markup (FLM) strings
-----------------------------------------
+.. _zoodb-schemas-flmcontent:
+
+FLM content strings
+-------------------
 
 String values can be marked to be parsed as Flexible Latex-like Markup (FLM)
 content.  Use the schema field `_flm:` to indicate that this is the case.

@@ -102,6 +102,7 @@ Rendering content
 
    import {
        ZooHtmlFragmentRenderer, ZooTextFragmentRenderer,
+       html_fragmentrenderer_get_style_information,
        render_html_standalone, render_text_standalone
    } from '@phfaist/zoodb/zooflm';
 
@@ -110,6 +111,11 @@ Rendering content
 
    Subclass of FLM's `flm.fragmentrenderer.html.HtmlRenderer` with some options
    tweaked.
+
+
+.. js:autofunction:: src/zooflm/_fragmentrenderers.html_fragmentrenderer_get_style_information
+   :short-name:
+
 
 .. class:: ZooTextFragmentRenderer()
 

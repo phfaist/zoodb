@@ -16,8 +16,6 @@ function _is_local_url(urlstring)
 }
 
 
-
-
 // we need to define these classes the Transcrypt way because we want to inherit
 // a Python-transcrypted class
 
@@ -42,6 +40,22 @@ export const ZooHtmlFragmentRenderer = __class__(
     }
 );
 
+/**
+ * Helper to get the default CSS definitions that is necessary in order to
+ * display HTML-rendered FLM content.
+ *
+ * Returns a dictionary with the keys 'css_global', 'css_content', 'js', and
+ * 'body_end_js_scripts', set to corresponding reasonable definitions and that
+ * can be used in an HTML template.
+ */
+export function html_fragmentrenderer_get_style_information(fragment_renderer)
+{
+    return flm_fragmentrenderer_html.FragmentRendererInformation.get_style_information(
+        fragment_renderer,
+    );
+}
+
+
 export const ZooTextFragmentRenderer = __class__(
     'ZooTextFragmentRenderer', // class name
     [ flm_fragmentrenderer_text.TextFragmentRenderer ], // base classes
@@ -54,6 +68,10 @@ export const ZooTextFragmentRenderer = __class__(
         float_separator_bottom: '', // no bottom marker needed
     }
 );
+
+
+
+
 
 
 /**

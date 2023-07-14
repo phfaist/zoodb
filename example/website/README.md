@@ -12,7 +12,8 @@ YAML files.
   installed & enabled.  This is usually included in the NodeJs distribution; you
   only need to enable it by running ``corepack enable``.
 
-* Install eleventy and other JS dependencies.  In the present folder, run:
+* Install eleventy and other JS dependencies.  To do that, run the following
+  command in the present folder:
 ```
 > yarn
 ```
