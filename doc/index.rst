@@ -14,6 +14,7 @@ This library forms the core of the `Error Correction Zoo
 <https://errorcorrectionzoo.org/>`_.  I might use it to build other zoos in the
 future.  Feel free to use it to build your own zoo, too!
 
+`Github repository: phfaist/zoodb. <https://github.com/phfaist/zoodb>`_
 
 
 .. toctree::

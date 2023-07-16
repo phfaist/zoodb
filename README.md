@@ -13,3 +13,14 @@ Features:
 - Seamless integration into [11ty](https://11ty.dev/)
 - Highly customizable
 - etc.
+
+
+Documentation: Install
+[poetry](https://python-poetry.org/docs/#installing-with-the-official-installer),
+and build the HTML documentation by running:
+
+```bash
+> cd doc/
+> poetry install
+> poetry run make html
+```
