@@ -7,6 +7,19 @@ const debug = debug_module('zoodb.citationmanager.source.bibliographyfile');
 
 import { CitationSourceBase } from './base.js';
 
+
+/**
+ * A citation source which looks up bibliographic citaiton information in one or
+ * several bibliography files, in JSON-CSL citation format.  The files
+ * themselves can be JSON or YAML data files.
+ *
+ * Options:
+ *
+ * - ``bibliography_files`` - A list of JSON/CSL (or YAML/CSL) files in which to
+ *   look for citations.
+ *
+ * - See :class:`CitationSourceBase` for further options.
+ */
 export class CitationSourceBibliographyFile extends CitationSourceBase
 {
     constructor(options)
@@ -88,8 +101,10 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
             this.citation_manager.store_citation(
                 this.cite_prefix, key,
                 d,
-                { cache_duration_ms: this.options.cache_duration_ms },
-                this.cache_store_options
+                Object.assign(
+                    { cache_duration_ms: this.options.cache_duration_ms },
+                    this.cache_store_options
+                )
             );
         }
     }

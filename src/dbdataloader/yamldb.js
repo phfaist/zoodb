@@ -120,6 +120,8 @@ const dbdata = zoodbdataloader.load();
  * Doc........
  *
  * Configuration options .............
+ *
+ * See also :class:`StandardZooDbYamlDataLoader` for a simplified loading.
  */
 export class YamlDbZooDataLoader
 {

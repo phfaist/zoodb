@@ -16,12 +16,13 @@ const data = async () => {
             permalink: (data) =>
                 data.peopledb.zoo_object_permalink('person', data.person.person_id) + '.html',
             title: (data) => zooflm.render_text_standalone(data.person.name),
+            person_name: (data) => zooflm.render_text_standalone(data.person.name),
             date: (data) => {
                 // injection hack to get correct page date property!
                 // https://github.com/11ty/eleventy/issues/2199#issuecomment-1027362151
                 data.page.date = new Date(data.person._zoodb.git_last_modified_date);
                 return data.page.date;
-            }
+            },
         },
     };
 };
@@ -84,11 +85,14 @@ const render = async (data) => {
 `;
         }
 
-        if (relations.friends != null && relations.friends.length) {
+        let friends_all = [].concat(relations.friends ?? [],
+                                    relations.friend_of ?? [])
+
+        if (friends_all.length) {
             s += sqzhtml`
 <h2>Friends</h2>
 <ul>`;
-            for (const friend_relation of relations.friends) {
+            for (const friend_relation of friends_all) {
 
                 let friend_detail_text = '';
                 if (friend_relation.friend_detail) {

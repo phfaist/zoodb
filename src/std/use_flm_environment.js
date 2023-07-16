@@ -42,7 +42,10 @@ export function default_target_href_resolver(ref_instance, render_context,
 
 
 /**
- * Doc...........
+ * Set up the StandardZooDb to set up a :class:`ZooFLMEnvironment` with some
+ * standard features and settings.
+ *
+ * Document options............................
  */
 export function use_flm_environment(_this)
 {

@@ -5,3 +5,7 @@ name: 'Zaphod Ziffy'
 
 biography: |
   Is having a wonderfully ziffy life.
+
+
+# Note that Zaphod's friend relationship with Charlie is already defined in
+# Charlie.yml; no need to specify it here again.

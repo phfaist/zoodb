@@ -86,6 +86,34 @@ FLM environment
    features will be handled under the hood (see :ref:`zoodb-std`).
 
 
+.. js:class:: FeatureZooGraphicsCollection()
+
+   Implements a graphics resource provider feature for FLM, enabling the use of
+   ``\includegraphics{}``.
+
+   The graphics resources must have been detected (e.g., using a
+   :class:`ZooFLMScanner`, perhaps handled via a :class:`ZooFLMProcessor`), and
+   the relevant graphics resource objects must have been compiled/fetched (see
+   `flm.feature.graphics.GraphicsResource`).  You then set those graphics
+   resource instances here to make them visible to the FLM renderers.
+
+   You may set the `src_url_resolver` property to a function/lambda with
+   signature `callback(graphics_resource, render_context)` and returning a URL
+   specifying where the graphics resource should be linked to in the rendered
+   output.  (This property is set e.g. in :func:`use_flm_environment()`.)
+
+   .. js:function:: add_graphics(source_path, graphics_resource)
+
+      Register the given `graphics_resource` object associated with the given
+      `source_path`.
+
+   .. js:function:: set_collection(collection)
+
+      Combines multiple calls to `add_graphics()`.  The `collection` is an array
+      of pairs `[source_path, graphics_resource]`.  The `add_graphics()` method
+      will be called for each pair.
+
+
 .. js:autoclass:: src/zooflm/_resourceinfo.ZooFLMResourceInfo
    :short-name:
    :members:

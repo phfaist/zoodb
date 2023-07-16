@@ -134,8 +134,9 @@ function Cache () {
 
     this.purge_expired = function() {
         let to_remove = [];
+        let now = Date.now();
         for (const [key,data] of Object.entries(_cache)) {
-            if (!isNaN(data.expire) && data.expire < Date.now()) {
+            if (!isNaN(data.expire) && data.expire < now) {
                 // Item has expired, remove it.  (But let's not alter the object while
                 // we're still iterating over it, just to be safe.)
                 to_remove.push(key);
@@ -179,11 +180,13 @@ function Cache () {
     this.exportJson = function() {
         var plainJsCache = {};
 
+        var now = Date.now();
+
         // Discard the `timeout` property.
         // Note: JSON doesn't support `NaN`, so convert it to `'NaN'`.
         for (var key in _cache) {
             var record = _cache[key];
-            if (!isNaN(record.expire) && record.expire < Date.now()) {
+            if (!isNaN(record.expire) && record.expire < now) {
                 // don't export expired entries
                 continue;
             }

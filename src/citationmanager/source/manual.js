@@ -4,6 +4,12 @@ const debug = debug_module('zoodb.citationmanager.source.manual');
 
 import { CitationSourceBase } from './base.js';
 
+/**
+ * A citation "source" which interprets the "ID" directly as the FLM text
+ * content of the citation.
+ *
+ * See :class:`CitationSourceBase` for options.
+ */
 export class CitationSourceManual extends CitationSourceBase
 {
     constructor(options)
@@ -38,7 +44,7 @@ export class CitationSourceManual extends CitationSourceBase
                 this.cite_prefix, key,
                 {
                     _ready_formatted: {
-                        flm: key
+                        flm: key,
                     }
                 },
                 this.cache_store_options,

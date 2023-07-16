@@ -30,6 +30,9 @@ Zoo Standard Setup Tools
 Feature helpers
 ---------------
 
+.. js:autofunction:: src/std/use_relations_populator.use_relations_populator
+   :short-name:
+
 .. js:autofunction:: src/std/use_flm_environment.use_flm_environment
    :short-name:
 
@@ -37,6 +40,12 @@ Feature helpers
    :short-name:
 
 .. js:autofunction:: src/std/use_flm_processor.use_flm_processor
+   :short-name:
+
+.. js:autofunction:: src/std/use_gitlastmodified_processor.use_gitlastmodified_processor
+   :short-name:
+
+.. js:autofunction:: src/std/use_searchable_text_processor.use_searchable_text_processor
    :short-name:
 
 

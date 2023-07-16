@@ -14,7 +14,16 @@ import {
 
 
 /**
- *  Doc............
+ * Set up the StandardZooDb to include a :class:`SearchableTextProcessor`
+ * database processor.
+ *
+ * A :class:`FLMSearchableDocTextValuesAssembler` is created to assemble the
+ * text documents to for searching.  A :class:`SearchableTextFieldset` is
+ * created with standard settings.
+ *
+ * The ``searchable_text_options.object_types`` config option is inspected; set
+ * this to an array of object type names that we'd like to be able to search
+ * for.
  */
 export function use_searchable_text_processor(_this)
 {

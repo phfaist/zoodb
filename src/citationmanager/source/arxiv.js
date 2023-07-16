@@ -11,6 +11,30 @@ const debug = debug_module('zoodb.citationmanager.source.arxiv');
 import { CitationSourceBase } from './base.js';
 
 
+/**
+ * Fetch bibliographic citation information from `the arXiv
+ * <https://arxiv.org/>`_.
+ *
+ * Options:
+ *
+ * - ``chain_to_doi`` - If `true`, then arXiv identifiers that refer to papers
+ *   which have a DOI, i.e., which have been published in some publication
+ *   venue, will be “chained” to the corresponding DOI citation.  See “chained
+ *   citations” in the citation manager object.  The chained citation will have
+ *   the `cite_prefix` set to 'doi'.
+ *
+ * - ``override_arxiv_dois``, ``override_arxiv_dois_file`` - Manually specify a
+ *   list of DOIs that should be associated with certain arXiv IDs.  The
+ *   `override_arxiv_dois` is an object whose keys are arXiv IDs and whose
+ *   values are the corresponding DOI.  For a given arXiv identifier, if it is
+ *   found in this object, then the DOI specified here overrides the DOI value
+ *   that was fetched from the arXiv's API.  Instead of specifying
+ *   `override_arxiv_dois``, you may set `override_arxiv_dois_file` to a local
+ *   path or URL of a JSON or YAML file that contains the mapping of arXiv
+ *   identifiers to a DOI.
+ *
+ * - See :class:`CitationSourceBase` for further options.
+ */
 export class CitationSourceArxiv extends CitationSourceBase
 {
     constructor(options)
@@ -55,13 +79,13 @@ export class CitationSourceArxiv extends CitationSourceBase
 
     }
 
-    source_initialize_run()
+    async source_initialize_run()
     {
         if (this.override_arxiv_dois_file) {
             Object.assign(
                 this.override_arxiv_dois,
                 // should work with both YAML & JSON given that JSON is a YAML 1.2 subset
-                jsyaml.load( this.fetch_url(this.override_arxiv_dois_file) )
+                jsyaml.load( await this.fetch_url(this.override_arxiv_dois_file) )
             );
         }
     }
@@ -71,6 +95,7 @@ export class CitationSourceArxiv extends CitationSourceBase
         debug(`Running arXiv.org API retrieve for a chunk of ${id_list.length} IDs`);
 
         let response = await this.fetch_url( 'https://export.arxiv.org/api/query', {
+            get_response_object: true,
             method: 'post',
             body: `max_results=${id_list.length}&id_list=${id_list.join(',')}`,
             headers: Object.assign({}, this._get_default_headers(), {
@@ -187,14 +212,15 @@ export class CitationSourceArxiv extends CitationSourceBase
         // check if we were meant to look up the entry by ID with or without
         // version number
         if ( this.keys_to_retrieve.includes(arxivid_with_version) ) {
-            // definitly store this entry directly, since this specific version
+            // definitely store this entry directly, since this specific version
             // was requested.
             //
             // If a specific version was requested, we don't chain the citation
             // resolution to the DOI entry, because we want to print the info
             // associated with that specific arXiv version.
             this.citation_manager.store_citation(
-                this.cite_prefix, arxividkey, citeprocjsond, this.cache_store_options
+                this.cite_prefix, arxivid_with_version,
+                citeprocjsond, this.cache_store_options
             );
         }
 

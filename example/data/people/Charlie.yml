@@ -14,5 +14,5 @@ relations:
   friends:
     - person_id: zaphod
       friend_detail: |-
-        Charlie got to know Zaphod in 4th grade at school and have remained
-        inseparable since.
+        Charlie got to know Zaphod in 4th grade at school and the two have
+        remained inseparable since.

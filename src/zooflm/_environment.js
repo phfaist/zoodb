@@ -368,7 +368,7 @@ export const FeatureZooGraphicsCollection = __class__(
             // can set a src_url resolver for generation-time url resolution
             self.src_url_resolver = null;
 
-              //debug("FeatureZooGraphicsCollection constructor.  self = ", self);
+            //debug("FeatureZooGraphicsCollection constructor.  self = ", self);
         });},
 
         // methods

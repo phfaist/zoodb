@@ -47,7 +47,7 @@ html_theme_options = {
     'head_font_family': '"Source Serif 4"',
     'code_font_family': '"Source Code Pro"',
     'github_user': 'phfaist',
-    'github_repo': 'pylatexenc',
+    'github_repo': 'zoodb',
     'github_button': True,
     'github_type': 'star',
     'github_count': 'true',

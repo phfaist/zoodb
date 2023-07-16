@@ -8,6 +8,11 @@ import { CitationSourceBase } from './base.js';
 const one_day = 1000 * 3600 * 24;
 
 
+/**
+ * Fetch bibliographic citation information from a DOI (cf. https://doi.org/).
+ *
+ * See :class:`CitationSourceBase` for options.
+ */
 export class CitationSourceDoi extends CitationSourceBase
 {
     constructor(options)
@@ -43,6 +48,7 @@ export class CitationSourceDoi extends CitationSourceBase
         const doi_encoded = encodeURIComponent(doi);
 
         let response = await this.fetch_url( 'https://doi.org/' + doi_encoded, {
+            get_response_object: true,
             method: 'get',
             headers: Object.assign({}, this._get_default_headers(), {
                 // retrieve https://doi.org/<DOI> with Accept: csl+json type-->

@@ -13,25 +13,35 @@ const one_day = 1000 * 3600 * 24;
 
 
 /**
- * Manage a database of bibliographic references.
+ * Manage a database of bibliographic references, as well as a collection of
+ * source objects that are capable of fetching bibliographic citation
+ * information from various sources.
+ *
+ * The constructor should be given a collection of sources in the first argument
+ * (`sources`).  The `sources` should be an object where the keys correspond to
+ * a `cite_prefix` and where the values are citation source instances (e.g.,
+ * :class:`CitationSourceArxiv` or :class:`CitationSourceBibliographyFile`).
+ *
+ * Possible options:
+ *
+ * - ``cache_file`` - the filesystem path where we should store the citation
+ *   information cache.
+ *
+ * - ``cache_entry_default_duration_ms`` - the default duration of time (in
+ *   milliseconds) that citation information for an entry should be stored
+ *   in cache before being re-queried again from the source.
+ *
+ * - ``default_use_user_agent``, ``default_user_agent`` - specify defaults
+ *   as to whether or not to set a custom user agent when source fetch
+ *   remote content, and if so, then which user agent to specify.
  */
 export class CitationDatabaseManager
 {
-    /**
-     *
-     * Possible options:
-     *
-     * - cache_file
-     *
-     * - cache_entry_default_duration_ms
-     *
-     * - default_use_user_agent, default_user_agent
-     */
     constructor(sources, options)
     {
         this.options = options || {};
 
-        this.sources = Object.assign(sources);
+        this.sources = Object.assign({}, sources);
 
         for (const [cite_prefix, source] of Object.entries(this.sources))
         {
@@ -49,6 +59,10 @@ export class CitationDatabaseManager
               + `cache file ‘${this.cache_file}’`);
     }
 
+    /**
+     * Load citation information from the cache file.  Does nothing if the cache
+     * file does not exist.
+     */
     load_cache()
     {
         if ( fs.existsSync(this.cache_file) ) {
@@ -59,6 +73,9 @@ export class CitationDatabaseManager
         }
     }
 
+    /**
+     * Save the current citation information database to the cache file.
+     */
     save_cache()
     {
         // debug(`Saving database to cache file ‘${this.cache_file}’`);
@@ -66,11 +83,28 @@ export class CitationDatabaseManager
         fs.writeFileSync(this.cache_file, this.cache.exportJson());
     }
 
+    /**
+     * Remove any citation information entries whose expiration time has past.
+     */
     purge_expired()
     {
         this.cache.purge_expired();
     }
 
+    /**
+     * Return the citation information associated with the given citation key/id
+     * with prefix.  The `id` argument is a string of the form
+     * `cite_prefix:cite_key`.
+     *
+     * This method will look up the given id in the citation database and will
+     * follow chained citations as necessary.
+     *
+     * Returns the JSON/CSL object data associated with the given citation
+     * information.
+     *
+     * An `Error` is thrown if the given id is not found in the current
+     * database.
+     */
     get_citation_by_id(id)
     {
         let new_id = id;
@@ -100,17 +134,42 @@ export class CitationDatabaseManager
         }
     }
 
+    /**
+     * Get the citation information object associated with the given
+     * `cite_prefix` and `cite_key`.
+     *
+     * This method is a shorthand for concatenating the citation prefix and key
+     * together with a colon and calling `get_citation_by_id()`.
+     */
     get_citation(cite_prefix, cite_key)
     {
         const id = `${cite_prefix}:${cite_key}`;
         return this.get_citation_by_id(id);
     }
 
+    /**
+     * Return a list of all citation keys available.  The return value is an
+     * array of strings of the form `cite_prefix:cite_key`.
+     */
     keys()
     {
         return this.cache.keys();
     }
 
+    /**
+     * Retrieve a number of citations from the respective sources.
+     *
+     * This method handles dispatching the citation pairs to the correct sources
+     * and calling the relevant methods on the sources (`add_retrieve()`,
+     * `run()`, `add_retrieve_done()`, etc.).
+     *
+     * This method returns a promise.  Make sure you `await` this method if you
+     * want to make sure that the citation manager's database is correctly
+     * populated.
+     *
+     * - `citations` is an array of objects of the form ``{cite_prefix:...,
+     *   cite_key:...}``.
+     */
     async retrieve_citations(citations)
     {
         // group citations by (lowercase) cite_prefix
@@ -236,6 +295,92 @@ export class CitationDatabaseManager
     }
 
 
+    /**
+     * Store citation information for the associated citation prefix and
+     * citation key.
+     *
+     * This method will update the citation database to associate with the
+     * citation prefix/key pair `(cite_prefix, cite_key)` the citation
+     * information provided in `entry_csl_json`.  The citation information in
+     * `entry_csl_json` should be provided as JSON/CSL object data.
+     *
+     * To store a “chained” citation, see `store_citation_chained()`.
+     *
+     * You may specify some options in the fourth argument:
+     *
+     * - ``cache_duration_ms`` - the number of milliseconds which this
+     *   information may be stored in the citation cache.  If it is
+     *   resource-intensive to query this citation information, or if the
+     *   information is not likely to change any time soon, consider setting a
+     *   large value here.  Do this especially if you might be worried about
+     *   hitting rate limits of the API wherever you are fetching the citation
+     *   information.  On the other hand, you might set a shorter cache duration
+     *   for information that is easily fetched or that might change in the near
+     *   future.
+     *
+     */
+    store_citation(cite_prefix, cite_key, entry_csl_json, options={})
+    {
+        const cite_id = `${cite_prefix}:${cite_key}`;
+
+        const {cache_duration_ms} = options;
+
+        //debug(`Storing citation for ‘${cite_prefix}:${cite_key}’`);
+
+        if (entry_csl_json.chained) {
+            const new_cite_prefix = entry_csl_json.chained.cite_prefix;
+            const new_cite_key = entry_csl_json.chained.cite_key;
+
+            if ( ! this.sources.hasOwnProperty(new_cite_prefix) ) {
+                throw new Error(
+                    `No source registered for cite prefix ‘${new_cite_prefix}’ in `
+                    + `chained citation retreival for ‘${cite_prefix}:${cite_key}’`
+                );
+            }
+
+            // if it's a chained citation retreival (e.g., arXiv->DOI), then we
+            // retrieve the chained citation info one as well (unless we happen
+            // to already have it in cache)
+            const chained_citation_obj =
+                  this.cache.get( `${new_cite_prefix}:${new_cite_key}` );
+            if (chained_citation_obj == null) {
+                this.sources[new_cite_prefix].add_retrieve( [ new_cite_key ] );
+            }
+        }
+
+        const entry = Object.assign({}, entry_csl_json, { id: cite_id });
+        //debug(`Storing entry ${JSON.stringify(entry)}`);
+
+        // compute a hash of the object for later convenience (to see if the
+        // citation has changed later)
+        entry._hash = this._compute_entry_hash(entry);
+
+        this.cache.put(
+            cite_id,
+            entry,
+            cache_duration_ms ?? this.cache_entry_default_duration_ms
+        );
+
+        // save cache at each store
+        this.save_cache();
+    }
+
+
+    /**
+     * Store a ‘chained citation.’  The pair `(cite_prefix, cite_key)` is
+     * registered to refer to the same citation information as
+     * `(new_cite_prefix, new_cite_key)` with any properties given in
+     * `set_properties` additionally set.
+     *
+     * An example of a chained citation would be an arXiv reference to a paper
+     * that is published with a DOI.  The arxiv citation source object will
+     * query the citation ``('arxiv', '1234.56789')``; if the corresponding
+     * entry has a valid DOI, then a chained citation is registered to ``('doi',
+     * '10.1234/abcdef')`` with `set_properties` set to ``{ arxivid:
+     * 'arxiv:1234.56789' }``.  As a consequence, a citation to
+     * `arXiv:1234.56789` will use the citation information that was retrieved
+     * from `doi:10.1234/abcdef` with the additional property `arxivid` set.
+     */
     store_citation_chained(cite_prefix, cite_key, new_cite_prefix, new_cite_key,
                            set_properties)
     {
@@ -253,53 +398,10 @@ export class CitationDatabaseManager
         );
     }
 
-    store_citation(cite_prefix, cite_key, entry_csl_json, {cache_duration_ms}={})
-    {
-        const cite_id = `${cite_prefix}:${cite_key}`;
-
-        //debug(`Storing citation for ‘${cite_prefix}:${cite_key}’`);
-
-        if (entry_csl_json.chained) {
-            const new_cite_prefix = entry_csl_json.chained.cite_prefix;
-            const new_cite_key = entry_csl_json.chained.cite_key;
-
-            if ( ! this.sources.hasOwnProperty(new_cite_prefix) ) {
-                throw new Error(
-                    `No source registered for cite prefix ‘${new_cite_prefix}’ in `
-                    + `chained citation retreival for ‘${cite_prefix}:${cite_key}’`
-                );
-            }
-
-            // if it's a chained citation retreival (e.g., arXiv->DOI), then
-            // make we retrieve the chained citation info one as well (unless we
-            // happen to already have it in cache)
-            const chained_citation_obj =
-                  this.cache.get( `${new_cite_prefix}:${new_cite_key}` );
-            if (chained_citation_obj == null) {
-                this.sources[new_cite_prefix].add_retrieve( [ new_cite_key ] );
-            }
-        }
-
-        const entry = Object.assign({}, entry_csl_json, { id: cite_id });
-        //debug(`Storing entry ${JSON.stringify(entry)}`);
-
-        // compute a hash of the object for later convenience (to see if the
-        // citation has changed later)
-        entry._hash = this.compute_entry_hash(entry);
-
-        this.cache.put(
-            cite_id,
-            entry,
-            cache_duration_ms ?? this.cache_entry_default_duration_ms
-        );
-
-        // save cache at each store
-        this.save_cache();
-    }
 
 
 
-    compute_entry_hash(entry)
+    _compute_entry_hash(entry)
     {
         let hasher = sha256();
 

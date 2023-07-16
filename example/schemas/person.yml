@@ -14,11 +14,18 @@ _zoo_relations:
     backreference:
       field: 'relations.children'
 
+  - object_field: 'relations.friends'
+    to_object_type: 'person'
+    relation_primary_key_field: 'person_id'
+    relation_add_object_field: 'person'
+    backreference:
+      field: 'relations.friend_of'
+
   - object_field: 'relations.spouse'
     to_object_type: 'person'
     relation_primary_key_field: true # true === value of 'spouse' is directly the person ID
-    allow_null: true # a person might not to have a spouse
-    backreference: null # Both spouses will declare each other as spouse, no
+    allow_null: true # a person might not have a spouse
+    backreference: null # Both spouses must declare each other as spouse, no
                         # auto back-refs
 
 

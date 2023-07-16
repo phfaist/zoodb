@@ -23,10 +23,10 @@ const render = function(data) {
     content += `
 <ul>`;
 
-    const persons = [... data.collections.person ];
-    persons.sort( (a, b) => (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0)) );
+    const persons_pages = [... data.collections.person ];
+    persons_pages.sort( (a,b) => a.data.person_name.localeCompare(b.data.person_name) )
 
-    for (const person_page of persons) {
+    for (const person_page of persons_pages) {
         content += `
 <li><a href="${ this.hrefUrl(person_page.url) }">${ person_page.data.title }</a></li>`;
     }
