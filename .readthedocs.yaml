@@ -27,6 +27,7 @@ build:
 
     post_install:
       - 'poetry install --directory=doc/'
+      - 'npm install -g jsdoc'
 
 
 # Build documentation with Sphinx
