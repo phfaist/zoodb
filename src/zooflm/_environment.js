@@ -6,7 +6,10 @@ import path from 'path';
 import {$$kw, repr} from './flm-js/py.js';
 import {__class__, __super__, __get__, isinstance} from './flm-js/org.transcrypt.__runtime__.js';
 
-import { ParsingState, ParsingStateDelta } from './flm-js/pylatexenc.latexnodes.js';
+import {
+    ParsingState, ParsingStateDelta,
+    LatexWalkerLocatedError, LatexWalkerLocatedErrorFormatter
+} from './flm-js/pylatexenc.latexnodes.js';
 import * as macrospec from './flm-js/pylatexenc.macrospec.js';
 
 import { FLMFragment } from './flm-js/flm.flmfragment.js';
@@ -32,7 +35,11 @@ import * as flm_feature_defterm from './flm-js/flm.feature.defterm.js';
 import * as flm_feature_graphics from './flm-js/flm.feature.graphics.js';
 
 
-export { FLMParsingState, ParsingStateDelta, FLMParsingStateDeltaSetBlockLevel };
+export {
+    FLMParsingState, ParsingStateDelta, FLMParsingStateDeltaSetBlockLevel,
+    //LatexWalkerError, LatexWalkerLocatedError,
+    LatexWalkerLocatedErrorFormatter
+};
 
 export const SectionCommandSpec = flm_feature_headings.FeatureHeadings.SectionCommandSpec;
 
@@ -66,13 +73,61 @@ for (const Cls of [SectionCommandSpec,
 /**
  * Test whether or not `obj` is an instance of an FLM fragment.
  *
- * We expose this function instead of having to expose both "isinstance" and
- * "FLMFragment".  We thus avoid having to use Transcrypt interface tools to
- * check if an object is a FLM fragment instance.
+ * We expose this function because the standard JS inheritance test `instanceof`
+ * does not work for Python/Transcrypt-based classes.  This strategy avoids
+ * having to expose both "isinstance" and "FLMFragment".  We thus avoid having
+ * to use Transcrypt interface tools to check if an object is a FLM fragment
+ * instance.
  */
 export function is_flm_fragment(obj)
 {
     return isinstance(obj, FLMFragment);
+}
+
+/**
+ * Test whether or not `obj` is an instance of an error object thrown by
+ * pylatexenc (the core library used by FLM).  This error object contains
+ * information about the location of the error in the FLM content, including the
+ * nesting structure in surrounding groups/environments.
+ *
+ * We expose this function because the standard JS inheritance test `instanceof`
+ * does not work for Python/Transcrypt-based classes.  This strategy avoids
+ * having to expose both "isinstance" and "LatexWalkerLocatedError".  We thus
+ * avoid having to use Transcrypt interface tools to check if an object is a FLM
+ * fragment instance.
+ */
+export function is_pylatexenc_located_error(obj)
+{
+    return isinstance(obj, LatexWalkerLocatedError);
+}
+
+/**
+ * Produce a human-readable error message from the given error object, assumed
+ * to be a `LatexWalkerLocatedError` instance, including information about the
+ * location of the error in the FLM content (line number and nesting structure
+ * in groups/environments).  (See also :func:`is_pylatexenc_located_error()`,
+ * :func:`format_pylatexenc_located_error_traceback()` and also
+ * `pylatexenc.latexnodes.LatexWalkerLocatedErrorFormatter`.)
+ */
+export function format_pylatexenc_located_error(obj)
+{
+    let fmt = new LatexWalkerLocatedErrorFormatter(obj);
+    return fmt.to_display_string();
+}
+
+/**
+ * Produce a human-readable “traceback” from the given error object, assumed to
+ * be a `LatexWalkerLocatedError` instance.  The “traceback” means the nesting
+ * structure of FLM/LaTeX groups/environments up to the point where the error
+ * occured, with line number information. (See also
+ * :func:`is_pylatexenc_located_error()`,
+ * :func:`format_pylatexenc_located_error()`, and
+ * `pylatexenc.latexnodes.LatexWalkerLocatedErrorFormatter`.)
+ */
+export function format_pylatexenc_located_error_traceback(obj)
+{
+    let fmt = new LatexWalkerLocatedErrorFormatter(obj);
+    return fmt.format_full_traceback();
 }
 
 

@@ -8,17 +8,24 @@ import {
     iter_object_fields_recursive, iter_schema_fields_recursive
 } from '../util/objectinspector.js';
 import {
-    ZooFLMResourceInfo, $$kw, repr, FLMDataDumper, is_flm_fragment
+    ZooFLMResourceInfo, $$kw, repr, FLMDataDumper,
+    is_flm_fragment, is_pylatexenc_located_error, format_pylatexenc_located_error,
 } from '../zooflm/index.js';
 
 
-function parse_schema_flm_options(schema)
+/**
+ * Utility to normalize the value of the `_flm:` field in a schema.  Returns an
+ * object with the structure ``{ enabled: true|false, standalone: true|false
+ * }``.  The `schema` argument is the schema object for this field, which is
+ * meant to include the property `_flm`.
+ */
+export function parse_schema_flm_options(schema)
 {
-    const schema_flm = schema._flm;
-
-    if (!schema_flm) {
+    if (!schema || !schema._flm) {
         return {enabled: false, standalone: false};
     }
+
+    const schema_flm = schema._flm;
     
     // check for shortcuts
     
@@ -208,23 +215,38 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
                 + `— field ‘${fieldname}’: `,
                 errmsgobj
             );
+            let errmsgstr = null;
+            // if it's a LatexWalkerLocatedError, get a precise error message -> 
+            if (is_pylatexenc_located_error(err)) {
+                errmsgstr = format_pylatexenc_located_error(err);
+            } else {
+                errmsgstr = `${errmsgobj}`;
+            }
             if (this.config.flm_error_policy == 'abort') {
                 debug(`FLM Error & policy is 'abort', aborting compilation`);
-                throw err;
+                throw new Error(`FLM Error compiling ${what}: ${err} --- ${errmsgstr}`);
             } else if (this.config.flm_error_policy == 'continue') {
                 // report the error in the text field itself, as a fake fragment, so
                 // it can be debugged.
                 debug(`Continuing despite FLM Error (flm_error_policy is 'continue')`);
                 fragment = this.config.flm_environment.make_fragment(
                     `\\textbf{FLM ERROR `
-                    +   `(\\begin{verbatimtext}${what} (‘${fieldname}’)\\end{verbatimtext}):} `
-                    + `\\begin{verbatimtext}${errmsgobj}\\end{verbatimtext}`,
+                    +   `(\\begin{verbatimtext}${what} [field ‘${fieldname}’]\\end{verbatimtext}):} `
+                    + '\n\n'
+                    + `\\begin{verbatimtext}${errmsgstr}\\end{verbatimtext}`,
                     $$kw({
                         standalone_mode: true,
                         resource_info: resource_info,
                         what: `ERROR-MESSAGE:${what}`,
                     })
                 );
+                fragment._flm_error_info = {
+                    what: what,
+                    msg: err.msg,
+                    fieldname: fieldname,
+                    message_string: errmsgstr,
+                    error_object: err,
+                };
             } else {
                 throw new Error(
                     `Invalid flm_error_policy: ‘${this.config.flm_error_policy}’, `

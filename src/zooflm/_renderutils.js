@@ -5,6 +5,8 @@ const debug = debug_module('zoodb.zooflm._renderutils');
 // provide $$kw({...}) and repr() to importers
 import { $$kw, repr, dict } from './flm-js/py.js';
 
+import { is_flm_fragment } from './_environment.js';
+
 import { ZooHtmlFragmentRenderer } from './_fragmentrenderers.js';
 
 export function render_value(x, render_context, render_value_options = {})
@@ -35,7 +37,17 @@ export function render_value(x, render_context, render_value_options = {})
             ) ).join(list_joiner)
         );
     }
+    // a fragment that contains error information? -> see flmsimplecontent db processor
+    if (x && '_flm_error_info' in x && x._flm_error_info
+        && render_context.fragment_renderer.render_error_info_message) {
+        const flm_error_info = x._flm_error_info;
+        // use a special method in our custom fragment renderers to render error
+        // messages (see _fragmentrenderers.js)
+        // debug(`Rendering fragment error information -> `, flm_error_info);
+        return render_context.fragment_renderer.render_error_info_message(flm_error_info);
+    }
     if (x && 'render' in x) { // has a render method -> e.g., flm fragment
+        // debug(`Rendering fragment -> `, x.flm_text, x);
         return x.render(render_context);
     }
     debug('Cannot render %O', x);
@@ -50,8 +62,8 @@ export function value_not_empty(value)
     if (value === '') {
         return false;
     }
-    // e.g., flmfragment:
-    if ('is_empty' in value && !value.is_empty()) {
+    // a flmfragment:
+    if (is_flm_fragment(value) && !value.is_empty()) {
         return true;
     }
     // e.g., string or array:

@@ -28,7 +28,6 @@
         margin-top: 0.5em;
     }
 
-
     .search-result {
 
         .search-result-title {
@@ -77,5 +76,21 @@
 
 .sr-highlight {
     background-color: rgba(255,255,200,0.5);
+}
+
+
+// dark mode colors
+.dark .zoodb-search-widget {
+    .search-results-error {
+        color: rgb(255,80,80);
+    }
+    .search-result {
+        .search-result-display-field-name {
+            color: rgba(255,255,255,0.6);
+        }
+    }
+    .sr-highlight {
+        background-color: rgba(255,255,200,0.5);
+    }
 }
 

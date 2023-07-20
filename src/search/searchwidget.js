@@ -5,8 +5,9 @@ import lunr from 'lunr';
 
 import tippy from 'tippy.js';
 
-import 'tippy.js/dist/tippy.css'; // for styling
-import 'tippy.js/themes/light.css';
+// REQUIRE CUSTOM STYLING !!
+// import 'tippy.js/dist/tippy.css'; // for styling
+// import 'tippy.js/themes/light.css';
 
 import './searchwidget.scss';
 
@@ -196,7 +197,7 @@ export class SearchWidget
                 // popperOptions: {
                 //     placement: 'bottom',
                 // },
-                theme: 'light',
+                // theme: 'light',
             }
         );
 

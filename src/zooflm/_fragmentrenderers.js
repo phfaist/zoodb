@@ -2,6 +2,9 @@
 import {$$kw, repr} from './flm-js/py.js';
 import {__class__, __super__, __get__} from './flm-js/org.transcrypt.__runtime__.js';
 
+import {
+    LatexWalkerLocatedErrorFormatter
+} from './flm-js/pylatexenc.latexnodes.js';
 
 import * as flm_fragmentrenderer_html from './flm-js/flm.fragmentrenderer.html.js'; 
 import * as flm_fragmentrenderer_text from './flm-js/flm.fragmentrenderer.text.js';
@@ -37,6 +40,18 @@ export const ZooHtmlFragmentRenderer = __class__(
             return ! _is_local_url(urlstring);
         });},
 
+        get render_error_info_message () {return __get__(this, function
+        (self, flm_error_info)
+        {
+            if (!flm_error_info) {
+                return `[FLM Error; no information provided]`;
+            }
+            const fmt = new LatexWalkerLocatedErrorFormatter(flm_error_info.error_object);
+            const flm_error_info_data = Object.assign(
+                {}, flm_error_info, { error_object: null }
+            );
+            return `<pre class="flm-error-message" data-flm-error-info="${JSON.stringify(flm_error_info_data)}"><span class="flm-error-message-lead">Error: ${flm_error_info.msg}</span>\n<span class="flm-error-message-traceback">${fmt.format_full_traceback()}</pre>`;
+        });},
     }
 );
 
