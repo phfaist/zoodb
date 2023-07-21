@@ -14,6 +14,8 @@ boilerplate code:
    
   import fs from 'fs';
 
+  import loMerge from 'lodash/merge.js';
+
   import { StandardZooDb } from '@phfaist/zoodb/std/stdzoodb';
   
   import {
@@ -50,13 +52,20 @@ boilerplate code:
 
               fs_data_dir: ...., // Set the path where to find the database data!
   
-              // enable these standard features:
+              //
+              // Enable the following standard features.  To disable (i.e., not
+              // enable) any of these features, provide the value `null`: e.g.,
+              // " use_flm_processor: null, ... ".
+              //
               use_relations_populator,
               use_gitlastmodified_processor,
               use_flm_environment,
               use_flm_processor,
               use_searchable_text_processor,
   
+              //
+              // Specify options for FLM text content:
+              //
               flm_options: {
   
                   refs:  {

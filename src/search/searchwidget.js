@@ -188,7 +188,7 @@ export class SearchWidget
             {
                 content: instructions_widget,
                 allowHTML: true,
-                trigger: 'focus',
+                trigger: 'click',
                 interactive: true,
                 interactiveBorder: 30,
                 maxWidth: '450px',

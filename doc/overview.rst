@@ -37,6 +37,13 @@ The `ZooDb` library is geared towards providing the following features:
   a LaTeX-inspired markup language that can include citations, sectioning,
   cross-references, figures, tables, etc., and can be extended at will.
 
+* Each object type have a specific data structure that is specified by a schema,
+  which extends the `JSON Schema <https://json-schema.org/learn/getting-started-step-by-step>`_.
+  The schema ensures that the provided data has the correct structure, that
+  there are no typos in the field names, etc.  We also use it to specify
+  relationships between objects and additional information about the
+  object's fields.
+
 * The internal representation of the database, as a structure of JS objects,
   means that you can do anything from building an internal graph of the database
   to building a full-blown zoo website, as well as provide entire JSON data
