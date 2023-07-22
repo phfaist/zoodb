@@ -7,6 +7,9 @@ const {$$kw, repr} = zooflm;
 import { split_prefix_label } from '../util/index.js';
 
 
+import { Cache, one_day } from '../citationmanager/_cache.js';
+
+
 import CSL from 'citeproc';
 
 //import { Driver } from '@citeproc-rs/wasm'; -- hmmm not sure how to make this work
@@ -240,6 +243,20 @@ const _default_format_link_text = {
 
 /**
  * Format citations into FLM code using a citation manager.
+ *
+ * Options:
+ *
+ * - ``citation_manager``, ``locales``, ``csl_style``, ``add_cite_links``, ``output_format``, ``flm_compile_fragments``, ``flm_environment``, ``format_link_text``,  - ....
+ *
+ *
+ * - ``cache_fs`` - a 'fs'-compatible module object providing filesystem access for the cache.
+ *
+ * - ``cache_file`` - the filesystem path where we should store a cache of the compiled
+ *   citations.
+ *
+ * - ``cache_entry_duration_ms`` - Specify for how long (in milliseconds) to
+ *   keep entries in the cache.
+ *
  */
 export class CitationCompiler
 {
@@ -302,7 +319,18 @@ export class CitationCompiler
             }
         };
 
+        // The database of compiled citations.  Stores FLM fragment instances.
         this.compiled_citations = {};
+
+        // The cache stores the compiled FLM text.
+        this.cache_fs = this.options.cache_fs;
+        this.cache_file =
+            this.options.cache_file || '_zoodb_cache_citations_compiled.json';
+        this.cache_entry_default_duration_ms =
+            this.options.cache_entry_default_duration_ms || 30*one_day;
+
+        this.cache = new Cache();
+        this.load_cache();
     }
 
     produce_link = {
@@ -320,6 +348,44 @@ export class CitationCompiler
         },
     };
 
+
+    /**
+     * Load citation information from the cache file.  Does nothing if the cache
+     * file does not exist.  This method is automatically called by the
+     * constructor.
+     */
+    load_cache()
+    {
+        const fs = this.cache_fs;
+        if ( fs.existsSync(this.cache_file) ) {
+            const json_data = fs.readFileSync(this.cache_file);
+            this.cache.importJson(json_data);
+            this.cache.purge_expired();
+            debug(`Loaded compiled citations cache from ‘${this.cache_file}’ `
+                  + `(${this.cache.size()} items)`);
+
+            // store from cache object to `this.compiled_citations` & compile
+            // FLM fragments as necessary
+            for (const cite_id of this.cache.keys()) {
+                const c = this.cache.get(cite_id);
+                this._save_compiled_citation(c, { put_in_cache: false });
+            }
+        }
+    }
+
+    /**
+     * Save the current citation information database to the cache file.
+     * Automatically done after compiling citations.
+     */
+    save_cache()
+    {
+        const fs = this.cache_fs;
+        debug(`Saving compiled citations to cache file ‘${this.cache_file}’`);
+        fs.writeFileSync(this.cache_file, this.cache.exportJson());
+    }
+
+
+
     * iter_compiled_citations()
     {
         for (const {cite_prefix, cite_key, citation_text}
@@ -334,15 +400,17 @@ export class CitationCompiler
         return citation_text;
     }
 
+    /**
+     *
+     * The argument `compile_citations` is a list of citation keys to compile.
+     * If set to non-null, we'll only compile these citations and not all the
+     * citations of the database.  An empty list signifies to compile nothing.
+     * Each list element should be an object that provides the keys
+     * 'cite_prefix' and 'cite_key'.  (E.g., as returned by
+     * :class:`ZooFLMScanner` via `scanner.get_encountered('citations')`)
+     */
     compile_citations(compile_citations)
     {
-        // compile_citations is a list of citation keys to compile.  If set to
-        // non-null, we'll only compile these citations and not all the
-        // citations of the database.  (Empty list means compile nothing.)  Each
-        // list element should be an object that provides the keys 'cite_prefix'
-        // and 'cite_key'.  (E.g., as returned by ZooFLMScanner objects in
-        // ./scanner.js via `scanner.get_encountered('citations')`)
-
         compile_citations ??= this.citation_manager.keys().map(_split_to_cite_prefix_key);
 
         //debug(`compile_citations:`, compile_citations);
@@ -381,8 +449,7 @@ export class CitationCompiler
                     cite_key,
                     citation_text: obj._ready_formatted[this.output_format],
                 };
-                this.finalize_compiled_citation(c);
-                this.compiled_citations[citeid] = c;
+                this._save_compiled_citation(c);
                 continue;
             }
 
@@ -434,13 +501,36 @@ export class CitationCompiler
                 cite_key,
                 citation_text: result_formatted.trim()
             };
-            this.finalize_compiled_citation(c);
-            this.compiled_citations[citeid] = c;
+            this._save_compiled_citation(c);
         }
+
+        // finally, save our cache
+        this.save_cache();
     }
 
-    finalize_compiled_citation(c)
+    _save_compiled_citation(c, { put_in_cache } = {})
     {
+        const { cite_prefix, cite_key } = c;
+        const cite_id = _compose_id_from_cite_prefix_key(cite_prefix, cite_key);
+        if (put_in_cache ?? true) {
+            const c_cache = {
+                hash: c.hash,
+                cite_prefix,
+                cite_key,
+                citation_text: c.citation_text?.flm_text ?? c.citation_text
+            };
+            this.cache.put(
+                cite_id,
+                c_cache,
+                this.cache_entry_default_duration_ms
+            );
+        }
+
+        // copy object because we might call this function directly with the
+        // cache object (in load_cache()), in which case we don't want the cache
+        // object to be directly modified.
+        c = Object.assign({}, c);
+
         if (this.output_format === 'flm' && this.flm_compile_fragments
             && this.flm_environment != null) {
             c.citation_text = this.flm_environment.make_fragment(
@@ -452,6 +542,8 @@ export class CitationCompiler
                 }),
             )
         }
+
+        this.compiled_citations[cite_id] = c;
     }
 
 };

@@ -8,3 +8,5 @@ _site
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+_zoodb_citations_cache

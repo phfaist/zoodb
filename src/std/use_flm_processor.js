@@ -41,6 +41,12 @@ export function use_flm_processor(_this)
     const fs = _this.config.fs;
     const fs_data_dir = _this.config.fs_data_dir;
 
+    const citations_cache_dir = flm_options.citations?.cache_dir ?? '_zoodb_citations_cache';
+    if ((flm_options.citations.cache_dir_create ?? true)
+        && !fs.existsSync(citations_cache_dir)) {
+        fs.mkdirSync(citations_cache_dir, { recursive: true });
+    }
+
     let flm_processor_config = {
         zoo_flm_environment: _this.zoo_flm_environment,
         flm_error_policy: _this.flm_error_policy,
@@ -66,7 +72,8 @@ export function use_flm_processor(_this)
               flm_options.citations?.default_user_agent
               ?? `zoodb-bibliography-build-script/0.1 (https://github.com/phfaist/zoodb)`,
             csl_style: flm_options.citations?.csl_style,
-            cache_file: flm_options.citations?.cache_file,
+            cache_fs: fs,
+            cache_dir: citations_cache_dir,
             cache_entry_default_duration_ms:
                 flm_options.citations?.cache_entry_default_duration_ms
         },

@@ -1,14 +1,11 @@
 import debug_module from 'debug';
 const debug = debug_module('zoodb.citationmanager');
 
-import fs from 'fs';
+//import fs from 'fs';
 
 import sha256 from 'hash.js/lib/hash/sha/256.js';
 
-import { Cache } from './_cache.js';
-
-
-const one_day = 1000 * 3600 * 24;
+import { Cache, one_day } from './_cache.js';
 
 
 
@@ -23,6 +20,9 @@ const one_day = 1000 * 3600 * 24;
  * :class:`CitationSourceArxiv` or :class:`CitationSourceBibliographyFile`).
  *
  * Possible options:
+ *
+ * - ``cache_fs`` - 'fs'-compatible module object to provide filesystem access
+ *   for accessing the cache.
  *
  * - ``cache_file`` - the filesystem path where we should store the citation
  *   information cache.
@@ -48,7 +48,9 @@ export class CitationDatabaseManager
             source.set_citation_manager( this, cite_prefix );
         }
 
-        this.cache_file = this.options.cache_file || 'downloaded_citationinfo_cache.json';
+        this.cache_fs = options.cache_fs;
+        this.cache_file =
+            this.options.cache_file || '_zoodb_cache_citations_downloaded_info.json';
         this.cache_entry_default_duration_ms =
             this.options.cache_entry_default_duration_ms || 30*one_day;
         this.cache = new Cache();
@@ -61,10 +63,12 @@ export class CitationDatabaseManager
 
     /**
      * Load citation information from the cache file.  Does nothing if the cache
-     * file does not exist.
+     * file does not exist.  This method is automatically called by the
+     * constructor.
      */
     load_cache()
     {
+        const fs = this.cache_fs;
         if ( fs.existsSync(this.cache_file) ) {
             const json_data = fs.readFileSync(this.cache_file);
             this.cache.importJson(json_data);
@@ -78,6 +82,7 @@ export class CitationDatabaseManager
      */
     save_cache()
     {
+        const fs = this.cache_fs;
         // debug(`Saving database to cache file ‘${this.cache_file}’`);
         // to this.cache_file
         fs.writeFileSync(this.cache_file, this.cache.exportJson());

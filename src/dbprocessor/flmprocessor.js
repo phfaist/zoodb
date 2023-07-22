@@ -72,7 +72,9 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
             this.options.citations.sources,
             {
                 default_user_agent: this.options.citations.default_user_agent,
-                cache_file: this.options.citations.cache_file,
+                cache_fs: this.options.citations.cache_fs,
+                cache_file: path.join(this.options.citations.cache_dir ?? '.',
+                                      'cache_downloaded_info.json'),
                 cache_entry_default_duration_ms:
                     this.options.citations.cache_entry_default_duration_ms,
             },
@@ -91,6 +93,9 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
             csl_style: csl_style,
             flm_compile_fragments: true,
             flm_environment: this.zoo_flm_environment,
+            cache_fs: this.options.citations.cache_fs,
+            cache_file: path.join(this.options.citations.cache_dir ?? '.',
+                                  'cache_compiled_citations.json'),
         });
 
         //

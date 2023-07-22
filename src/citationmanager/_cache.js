@@ -244,4 +244,9 @@ function Cache () {
 // module.exports = new Cache();
 // module.exports.Cache = Cache;
 
-export { Cache };
+
+// PhF
+const one_day = 1000 * 3600 * 24;
+
+
+export { Cache, one_day };
