@@ -2,9 +2,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,300;0,500;1,300;1,500&family=Source+Serif+4:ital,wght@0,400;0,600;1,400;1,600&display=swap');
 
 
+
+div.body p, div.body dd, div.body li, div.body blockquote {
+  -moz-hyphens: none;
+  hyphens: none;
+}
+
 div.document {
     margin-top: 10px;
 }
+
 
 
 /* SIDEBAR */
