@@ -505,7 +505,8 @@ export const FeatureZooGraphicsCollection = __class__(
         get load_database() {return __get__(this, function
         (self, data)
         {
-            for (const [source_path, graphics_resource_data] of data.graphics_collection) {
+            for (const [source_path, graphics_resource_data] of
+                 Object.entries(data.graphics_collection)) {
                 self.add_graphics(source_path,
                                   new GraphicsResource($$kw(graphics_resource_data)));
             }

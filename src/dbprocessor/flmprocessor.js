@@ -286,6 +286,10 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
 
         for (const resource of encountered_resources) {
 
+            // TODO -- only collect resources that need to be collected !!!
+            // check any already-collected resources !!!
+            // ...
+
             // debug('resource = ', resource);
 
             const source_directory =
