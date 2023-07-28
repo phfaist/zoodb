@@ -27,3 +27,7 @@ out_test_2.html
 
 # created by test load peopledb in 'yarn test'
 _zoodb_citations_cache
+
+
+# my handy symbolic link to the flm sources' location
+flm-src

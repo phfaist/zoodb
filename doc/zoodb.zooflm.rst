@@ -68,7 +68,7 @@ FLM environment
        FLMParsingState, // flm.flmenvironment.FLMParsingState
        ParsingStateDelta, // pylatexenc.latexnodes.ParsingStateDelta
        FLMParsingStateDeltaSetBlockLevel,
-       SectionCommandSpec, // flm.feature.headings.FeatureHeadings.SectionCommandSpec
+       SectionCommandInfo, // flm.feature.headings.FeatureHeadings.SectionCommandInfo
        EndnoteCategory, // flm.feature.endnotes.EndnoteCategory
        ReferenceableInfo, // flm.feature.refs.ReferenceableInfo
        RefInstance, // flm.feature.refs.RefInstance

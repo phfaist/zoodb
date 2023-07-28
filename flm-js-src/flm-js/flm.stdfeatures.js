@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-05-13 12:17:28
+/* 000001 */ // Transcrypt'ed from Python, 2023-07-28 17:42:14
 /* 000012 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000025 */ import {FeatureTheorems} from './flm.feature.theorems.js';
 /* 000023 */ import {FeatureDefTerm} from './flm.feature.defterm.js';
@@ -13,7 +13,7 @@
 /* 000014 */ import {FeatureVerbatim} from './flm.feature.verbatim.js';
 /* 000013 */ import {FeatureHref} from './flm.feature.href.js';
 /* 000012 */ import {FeatureBaseFormatting} from './flm.feature.baseformatting.js';
-/* 000012 */ export {FeatureDefTerm, FeatureSimplePathGraphicsResourceProvider, FeatureEnumeration, FeatureHref, FeatureVerbatim, FeatureMath, FeatureExternalPrefixedCitations, FeatureFloats, FeatureHeadings, FeatureTheorems, FeatureRefs, EndnoteCategory, FeatureBaseFormatting, FeatureEndnotes};
+/* 000012 */ export {FeatureHref, FeatureDefTerm, FeatureMath, FeatureRefs, EndnoteCategory, FeatureVerbatim, FeatureFloats, FeatureHeadings, FeatureEndnotes, FeatureExternalPrefixedCitations, FeatureBaseFormatting, FeatureEnumeration, FeatureTheorems, FeatureSimplePathGraphicsResourceProvider};
 /* 000001 */ var __name__ = 'flm.stdfeatures';
 /* 000028 */ export var standard_features = function () {
 /* 000028 */ 	var baseformatting = true;
@@ -70,93 +70,93 @@
 /* 000028 */ 	}
 /* 000028 */ 	else {
 /* 000028 */ 	}
-/* 000053 */ 	if (__t__ (footnote_counter_formatter === null)) {
-/* 000054 */ 		var footnote_counter_formatter = 'alph';
-/* 000054 */ 	}
-/* 000055 */ 	if (__t__ (citation_counter_formatter === null)) {
-/* 000056 */ 		var citation_counter_formatter = 'arabic';
-/* 000056 */ 	}
-/* 000058 */ 	var features = [];
-/* 000060 */ 	if (__t__ (baseformatting)) {
-/* 000061 */ 		(function () {
-/* 000061 */ 			var __accu0__ = features;
-/* 000062 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureBaseFormatting, null));
-/* 000062 */ 		}) ();
+/* 000059 */ 	if (__t__ (footnote_counter_formatter === null)) {
+/* 000060 */ 		var footnote_counter_formatter = 'alph';
+/* 000060 */ 	}
+/* 000061 */ 	if (__t__ (citation_counter_formatter === null)) {
+/* 000062 */ 		var citation_counter_formatter = 'arabic';
 /* 000062 */ 	}
-/* 000065 */ 	if (__t__ (href)) {
-/* 000066 */ 		(function () {
-/* 000066 */ 			var __accu0__ = features;
-/* 000067 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureHref, null));
-/* 000067 */ 		}) ();
-/* 000067 */ 	}
-/* 000070 */ 	if (__t__ (verbatim)) {
-/* 000071 */ 		(function () {
-/* 000071 */ 			var __accu0__ = features;
-/* 000072 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureVerbatim, null));
-/* 000072 */ 		}) ();
-/* 000072 */ 	}
-/* 000075 */ 	if (__t__ (math)) {
-/* 000076 */ 		(function () {
-/* 000076 */ 			var __accu0__ = features;
-/* 000077 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureMath, null, __kwargtrans__ ({counter_formatter: eq_counter_formatter})));
-/* 000077 */ 		}) ();
-/* 000077 */ 	}
-/* 000082 */ 	if (__t__ (enumeration_environments)) {
-/* 000083 */ 		(function () {
-/* 000083 */ 			var __accu0__ = features;
-/* 000084 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureEnumeration, null, __kwargtrans__ ({enumeration_environments: enumeration_environments_dict})));
-/* 000084 */ 		}) ();
-/* 000084 */ 	}
-/* 000089 */ 	if (__t__ (headings)) {
-/* 000090 */ 		(function () {
-/* 000090 */ 			var __accu0__ = features;
-/* 000091 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureHeadings, null, __kwargtrans__ ({section_commands_by_level: heading_section_commands_by_level})));
-/* 000091 */ 		}) ();
-/* 000091 */ 	}
-/* 000096 */ 	if (__t__ (refs)) {
-/* 000097 */ 		(function () {
-/* 000097 */ 			var __accu0__ = features;
-/* 000098 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureRefs, null, __kwargtrans__ ({external_ref_resolvers: external_ref_resolvers})));
-/* 000098 */ 		}) ();
-/* 000098 */ 	}
-/* 000103 */ 	if (__t__ (endnotes)) {
-/* 000105 */ 		var endnote_categories = [__call__ (EndnoteCategory, null, __kwargtrans__ ({category_name: 'footnote', counter_formatter: footnote_counter_formatter, heading_title: 'Footnotes', endnote_command: 'footnote'}))];
-/* 000110 */ 		(function () {
-/* 000110 */ 			var __accu0__ = features;
-/* 000111 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureEndnotes, null, __kwargtrans__ ({categories: endnote_categories})));
-/* 000111 */ 		}) ();
-/* 000111 */ 	}
-/* 000114 */ 	if (__t__ (__t__ (citations) && external_citations_providers !== null)) {
-/* 000115 */ 		(function () {
-/* 000115 */ 			var __accu0__ = features;
-/* 000116 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureExternalPrefixedCitations, null, __kwargtrans__ ({external_citations_providers: external_citations_providers, counter_formatter: citation_counter_formatter, citation_delimiters: tuple (['[', ']'])})));
-/* 000116 */ 		}) ();
-/* 000116 */ 	}
-/* 000123 */ 	if (__t__ (use_simple_path_graphics_resource_provider)) {
-/* 000124 */ 		(function () {
-/* 000124 */ 			var __accu0__ = features;
-/* 000125 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureSimplePathGraphicsResourceProvider, null));
-/* 000125 */ 		}) ();
-/* 000125 */ 	}
-/* 000129 */ 	if (__t__ (floats)) {
+/* 000064 */ 	var features = [];
+/* 000066 */ 	if (__t__ (baseformatting)) {
+/* 000067 */ 		(function () {
+/* 000067 */ 			var __accu0__ = features;
+/* 000068 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureBaseFormatting, null));
+/* 000068 */ 		}) ();
+/* 000068 */ 	}
+/* 000071 */ 	if (__t__ (href)) {
+/* 000072 */ 		(function () {
+/* 000072 */ 			var __accu0__ = features;
+/* 000073 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureHref, null));
+/* 000073 */ 		}) ();
+/* 000073 */ 	}
+/* 000076 */ 	if (__t__ (verbatim)) {
+/* 000077 */ 		(function () {
+/* 000077 */ 			var __accu0__ = features;
+/* 000078 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureVerbatim, null));
+/* 000078 */ 		}) ();
+/* 000078 */ 	}
+/* 000081 */ 	if (__t__ (math)) {
+/* 000082 */ 		(function () {
+/* 000082 */ 			var __accu0__ = features;
+/* 000083 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureMath, null, __kwargtrans__ ({counter_formatter: eq_counter_formatter})));
+/* 000083 */ 		}) ();
+/* 000083 */ 	}
+/* 000088 */ 	if (__t__ (enumeration_environments)) {
+/* 000089 */ 		(function () {
+/* 000089 */ 			var __accu0__ = features;
+/* 000090 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureEnumeration, null, __kwargtrans__ ({enumeration_environments: enumeration_environments_dict})));
+/* 000090 */ 		}) ();
+/* 000090 */ 	}
+/* 000095 */ 	if (__t__ (headings)) {
+/* 000096 */ 		(function () {
+/* 000096 */ 			var __accu0__ = features;
+/* 000097 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureHeadings, null, __kwargtrans__ ({section_commands_by_level: heading_section_commands_by_level})));
+/* 000097 */ 		}) ();
+/* 000097 */ 	}
+/* 000102 */ 	if (__t__ (refs)) {
+/* 000103 */ 		(function () {
+/* 000103 */ 			var __accu0__ = features;
+/* 000104 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureRefs, null, __kwargtrans__ ({external_ref_resolvers: external_ref_resolvers})));
+/* 000104 */ 		}) ();
+/* 000104 */ 	}
+/* 000109 */ 	if (__t__ (endnotes)) {
+/* 000111 */ 		var endnote_categories = [__call__ (EndnoteCategory, null, __kwargtrans__ ({category_name: 'footnote', counter_formatter: footnote_counter_formatter, heading_title: 'Footnotes', endnote_command: 'footnote'}))];
+/* 000116 */ 		(function () {
+/* 000116 */ 			var __accu0__ = features;
+/* 000117 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureEndnotes, null, __kwargtrans__ ({categories: endnote_categories})));
+/* 000117 */ 		}) ();
+/* 000117 */ 	}
+/* 000120 */ 	if (__t__ (__t__ (citations) && external_citations_providers !== null)) {
+/* 000121 */ 		(function () {
+/* 000121 */ 			var __accu0__ = features;
+/* 000122 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureExternalPrefixedCitations, null, __kwargtrans__ ({external_citations_providers: external_citations_providers, counter_formatter: citation_counter_formatter, citation_delimiters: tuple (['[', ']'])})));
+/* 000122 */ 		}) ();
+/* 000122 */ 	}
+/* 000129 */ 	if (__t__ (use_simple_path_graphics_resource_provider)) {
 /* 000130 */ 		(function () {
 /* 000130 */ 			var __accu0__ = features;
-/* 000131 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureFloats, null, __kwargtrans__ ({float_types: float_types})));
+/* 000131 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureSimplePathGraphicsResourceProvider, null));
 /* 000131 */ 		}) ();
 /* 000131 */ 	}
-/* 000134 */ 	if (__t__ (defterm)) {
-/* 000135 */ 		(function () {
-/* 000135 */ 			var __accu0__ = features;
-/* 000136 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureDefTerm, null));
-/* 000136 */ 		}) ();
-/* 000136 */ 	}
-/* 000139 */ 	if (__t__ (theorems)) {
-/* 000143 */ 		(function () {
-/* 000143 */ 			var __accu0__ = features;
-/* 000144 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureTheorems, null, __kwargtrans__ ((__t__ (__call__ (isinstance, null, theorems, dict)) ? theorems : dict ({})))));
-/* 000144 */ 		}) ();
-/* 000144 */ 	}
-/* 000147 */ 	return features;
-/* 000147 */ };
+/* 000135 */ 	if (__t__ (floats)) {
+/* 000136 */ 		(function () {
+/* 000136 */ 			var __accu0__ = features;
+/* 000137 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureFloats, null, __kwargtrans__ ({float_types: float_types})));
+/* 000137 */ 		}) ();
+/* 000137 */ 	}
+/* 000140 */ 	if (__t__ (defterm)) {
+/* 000141 */ 		(function () {
+/* 000141 */ 			var __accu0__ = features;
+/* 000142 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureDefTerm, null));
+/* 000142 */ 		}) ();
+/* 000142 */ 	}
+/* 000145 */ 	if (__t__ (theorems)) {
+/* 000149 */ 		(function () {
+/* 000149 */ 			var __accu0__ = features;
+/* 000150 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureTheorems, null, __kwargtrans__ ((__t__ (__call__ (isinstance, null, theorems, dict)) ? theorems : dict ({})))));
+/* 000150 */ 		}) ();
+/* 000150 */ 	}
+/* 000153 */ 	return features;
+/* 000153 */ };
 /* 000012 */ 
 //# sourceMappingURL=flm.stdfeatures.map

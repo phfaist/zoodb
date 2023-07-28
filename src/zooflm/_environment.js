@@ -41,7 +41,7 @@ export {
     LatexWalkerLocatedErrorFormatter
 };
 
-export const SectionCommandSpec = flm_feature_headings.FeatureHeadings.SectionCommandSpec;
+export const SectionCommandInfo = flm_feature_headings.FeatureHeadings.SectionCommandInfo;
 
 export const EndnoteCategory = flm_feature_endnotes.EndnoteCategory;
 
@@ -54,7 +54,7 @@ export const GraphicsResource = flm_feature_graphics.GraphicsResource;
 
 
 // patch some objects that expose .asdict() to also enable .toJSON()
-for (const Cls of [SectionCommandSpec,
+for (const Cls of [SectionCommandInfo,
                    EndnoteCategory,
                    ReferenceableInfo,
                    RefInstance,
@@ -64,6 +64,7 @@ for (const Cls of [SectionCommandSpec,
     // Remember, these are Transcrypt/Python's class objects; don't use the
     // .prototype field because these are not native JavaScript classes using
     // the JS protype chain.
+    debug(`Patching ${Cls}.toJSON ...`);
     Cls.toJSON = function() { return this.asdict(); }
 }
 
@@ -219,15 +220,38 @@ export class RefResolver
     // load/save references DB
     dump_database()
     {
-        // RefInstance objects are exported correctly because RefInstance was
-        // given a .toJSON() method (patched above).
-
-        // FIXME: If RefInstance objects have FLM Fragment instances as
-        // formatted text, export only the flm_text property so that it can be
-        // serialized into JSON.
+        // If RefInstance objects have FLM Fragment instances as formatted text,
+        // export only the flm_text property so that it can be serialized into
+        // JSON.  We need to transverse the ref instance database to fix this.
+        const dump = {};
+        if (this.ref_instance_database) {
+            for (const [ref_type, ref_type_db] of Object.entries(this.ref_instance_database)) {
+                if (!ref_type_db) {
+                    continue;
+                }
+                let d = {}
+                for (const [ref_label, ref_instance] of Object.entries(ref_type_db)) {
+                    let ridata = null;
+                    if (is_flm_fragment(ref_instance.formatted_ref_flm_text)) {
+                        ridata = Object.assign(
+                            {},
+                            ref_instance.asdict(),
+                            {
+                                formatted_ref_flm_text:
+                                    ref_instance.formatted_ref_flm_text.flm_text,
+                            },
+                        );
+                    } else {
+                        ridata = ref_instance.asdict();
+                    }
+                    d[ref_label] = ridata;
+                }
+                dump[ref_type] = d;
+            }
+        }
 
         return {
-            ref_instance_database: this.ref_instance_database,
+            ref_instance_database: dump,
         };
     }
     load_database(data)
@@ -403,7 +427,7 @@ export const FeatureZooGraphicsCollection = __class__(
                         if (src_url === undefined) {
                             throw new Error(`src_url_resolver() did not return { src_url }.`);
                         }
-                        return GraphicsResource($$kw(
+                        return new GraphicsResource($$kw(
                             Object.assign({}, graphics_resource.asdict(),
                                           { src_url, srcset, })
                         ));
@@ -468,10 +492,10 @@ export const FeatureZooGraphicsCollection = __class__(
             return {
                 graphics_collection: Object.fromEntries(
                     Object.entries(self.graphics_collection).map(
-                        (source_path, graphics_resource) => {
+                        ([source_path, graphics_resource]) => {
                             return [
-                                source_path, 
-                                graphics_resource.asdict(),
+                                source_path,
+                                graphics_resource.asdict()
                             ];
                         }
                     )
@@ -483,7 +507,8 @@ export const FeatureZooGraphicsCollection = __class__(
         (self, data)
         {
             for (const [source_path, graphics_resource_data] of data.graphics_collection) {
-                self.add_graphics(source_path, GraphicsResource($$kw(graphics_resource_data)));
+                self.add_graphics(source_path,
+                                  new GraphicsResource($$kw(graphics_resource_data)));
             }
         }); },
     }
@@ -501,9 +526,9 @@ export function zooflm_default_options(footnote_counter_formatter='alph')
 
         heading_section_commands_by_level: {
             // only 'subsection' and 'paragraph' available.
-            2: SectionCommandSpec("section", $$kw({inline: false})),
-            3: SectionCommandSpec("subsection", $$kw({inline: false})),
-            4: SectionCommandSpec("paragraph", $$kw({inline: true})),
+            2: SectionCommandInfo("section", $$kw({inline: false})),
+            3: SectionCommandInfo("subsection", $$kw({inline: false})),
+            4: SectionCommandInfo("paragraph", $$kw({inline: true})),
         },
 
         endnote_categories: [

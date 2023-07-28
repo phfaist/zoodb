@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-05-13 12:17:29
+/* 000001 */ // Transcrypt'ed from Python, 2023-07-28 17:42:13
 /* 000010 */ var logging = {};
 /* 000010 */ var re = {};
 /* 000010 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
@@ -13,7 +13,7 @@
 /* 000012 */ __nest__ (logging, '', __module_logging__);
 /* 000010 */ import * as __module_re__ from './re.js';
 /* 000010 */ __nest__ (re, '', __module_re__);
-/* 000010 */ export {FLMArgumentSpec, latexnodes_parsers, ParsingStateDelta, Feature, ParsedArgumentsInfo, FLMMacroSpecError, LatexArgumentSpec, LatexWalkerLocatedError, macrospec, FLMEnvironmentSpecBase, latexnodes_nodes};
+/* 000010 */ export {latexnodes_nodes, Feature, ParsingStateDelta, ParsedArgumentsInfo, macrospec, FLMEnvironmentSpecBase, LatexArgumentSpec, LatexWalkerLocatedError, latexnodes_parsers, FLMMacroSpecError, FLMArgumentSpec};
 /* 000001 */ var __name__ = 'flm.feature.cells';
 /* 000013 */ export var logger = (function () {
 /* 000013 */ 	var __accu0__ = logging;
@@ -1490,165 +1490,167 @@
 /* 000818 */ 		}
 /* 000819 */ 		__call__ (__call__ (__super__, null, CellsEnvironment, '__init__'), null, self, __kwargtrans__ ({environmentname: environmentname}));
 /* 000819 */ 	});},
-/* 000823 */ 	get make_body_parser () {return __get__ (this, function (self, token, nodeargd, arg_parsing_state_delta) {
-/* 000823 */ 		if (arguments.length) {
-/* 000823 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000823 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000823 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000823 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000823 */ 					switch (__attrib0__) {
-/* 000823 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000823 */ 						case 'token': var token = __allkwargs0__ [__attrib0__]; break;
-/* 000823 */ 						case 'nodeargd': var nodeargd = __allkwargs0__ [__attrib0__]; break;
-/* 000823 */ 						case 'arg_parsing_state_delta': var arg_parsing_state_delta = __allkwargs0__ [__attrib0__]; break;
-/* 000823 */ 					}
-/* 000823 */ 				}
-/* 000823 */ 			}
-/* 000823 */ 		}
-/* 000823 */ 		else {
-/* 000823 */ 		}
-/* 000824 */ 		return (function () {
-/* 000824 */ 			var __accu0__ = macrospec;
-/* 000826 */ 			return __call__ (__accu0__.LatexEnvironmentBodyContentsParser, __accu0__, __kwargtrans__ ({environmentname: token.arg, contents_parsing_state_delta: (function () {
-/* 000826 */ 				var __accu1__ = macrospec;
-/* 000831 */ 				return __call__ (__accu1__.ParsingStateDeltaExtendLatexContextDb, __accu1__, __kwargtrans__ ({extend_latex_context: __call__ (dict, null, __kwargtrans__ ({macros: [__call__ (CellMacro, null), __call__ (CelldataMacroSpec, null), __call__ (LatexTabularRowSeparatorSpec, null)]}))}));
-/* 000837 */ 			}) (), child_parsing_state_delta: __call__ (ParsingStateDelta, null)}));
-/* 000837 */ 		}) ();
-/* 000837 */ 	});},
-/* 000841 */ 	get postprocess_parsed_node () {return __get__ (this, function (self, node) {
-/* 000841 */ 		if (arguments.length) {
-/* 000841 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000841 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000841 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000841 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000841 */ 					switch (__attrib0__) {
-/* 000841 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000841 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000841 */ 					}
-/* 000841 */ 				}
-/* 000841 */ 			}
-/* 000841 */ 		}
-/* 000841 */ 		else {
-/* 000841 */ 		}
-/* 000845 */ 		var cells_model = __call__ (CellsModel, null);
-/* 000847 */ 		var __iterable0__ = node.nodelist;
-/* 000847 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000847 */ 			var n = __getitem__ (__iterable0__, __index0__);
-/* 000848 */ 			if (__t__ ((function () {
-/* 000848 */ 				var __accu0__ = n;
-/* 000848 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexMacroNode);
-/* 000848 */ 			}) ())) {
-/* 000849 */ 				if (__t__ (__eq__ (n.macroname, 'cell'))) {
-/* 000850 */ 					(function () {
-/* 000850 */ 						var __accu0__ = cells_model;
-/* 000850 */ 						return __call__ (__accu0__.add_cell_node, __accu0__, n);
-/* 000850 */ 					}) ();
-/* 000850 */ 					continue;
-/* 000850 */ 				}
-/* 000852 */ 				else if (__t__ (__eq__ (n.macroname, 'celldata'))) {
-/* 000853 */ 					(function () {
-/* 000853 */ 						var __accu0__ = cells_model;
-/* 000853 */ 						return __call__ (__accu0__.add_celldata_node, __accu0__, n);
-/* 000853 */ 					}) ();
-/* 000853 */ 					continue;
-/* 000853 */ 				}
-/* 000855 */ 				else if (__t__ (__eq__ (n.macroname, '\\'))) {
-/* 000856 */ 					(function () {
-/* 000856 */ 						var __accu0__ = cells_model;
-/* 000856 */ 						return __call__ (__accu0__.move_next_row, __accu0__);
-/* 000856 */ 					}) ();
-/* 000856 */ 					continue;
-/* 000856 */ 				}
-/* 000856 */ 			}
-/* 000859 */ 			if (__t__ ((function () {
-/* 000859 */ 				var __accu0__ = n;
-/* 000859 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexCommentNode);
-/* 000859 */ 			}) ())) {
-/* 000859 */ 				continue;
-/* 000859 */ 			}
-/* 000863 */ 			if (__t__ (__t__ ((function () {
-/* 000863 */ 				var __accu0__ = n;
-/* 000863 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexCharsNode);
-/* 000864 */ 			}) ()) && __eq__ (__call__ (len, null, (function () {
-/* 000864 */ 				var __accu0__ = n.chars;
-/* 000864 */ 				return __call__ (__accu0__.strip, __accu0__);
-/* 000864 */ 			}) ()), 0))) {
-/* 000864 */ 				continue;
-/* 000864 */ 			}
-/* 000869 */ 			var __except0__ = __call__ (LatexWalkerLocatedError, null, 'You cannot place ‘{}’ here.  Expected: \\cell, \\celldata, \\\\.'.format (__call__ (_splfysidews, null, (function () {
-/* 000869 */ 				var __accu0__ = n;
-/* 000869 */ 				return __call__ (__accu0__.latex_verbatim, __accu0__);
-/* 000869 */ 			}) ())));
-/* 000869 */ 			__except0__.__cause__ = null;
-/* 000869 */ 			throw __except0__;
-/* 000869 */ 		}
-/* 000873 */ 		(function () {
-/* 000873 */ 			var __accu0__ = cells_model;
-/* 000873 */ 			return __call__ (__accu0__.finalize, __accu0__);
-/* 000873 */ 		}) ();
-/* 000875 */ 		node.flm_cells_model = cells_model;
-/* 000875 */ 	});},
-/* 000878 */ 	get render () {return __get__ (this, function (self, node, render_context) {
-/* 000878 */ 		if (arguments.length) {
-/* 000878 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000878 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000878 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000878 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000878 */ 					switch (__attrib0__) {
-/* 000878 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000878 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000878 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000878 */ 					}
-/* 000878 */ 				}
-/* 000878 */ 			}
-/* 000878 */ 		}
-/* 000878 */ 		else {
-/* 000878 */ 		}
-/* 000884 */ 		return (function () {
-/* 000884 */ 			var __accu0__ = render_context.fragment_renderer;
-/* 000884 */ 			return __call__ (__accu0__.render_cells, __accu0__, __kwargtrans__ ({cells_model: node.flm_cells_model, render_context: render_context}));
-/* 000884 */ 		}) ();
-/* 000884 */ 	});}
-/* 000884 */ });
-/* 000893 */ export var FeatureProvideCells =  __class__ ('FeatureProvideCells', [Feature], {
-/* 000893 */ 	__module__: __name__,
-/* 000895 */ 	feature_name: 'cells',
-/* 000896 */ 	feature_title: 'Typesetting data tables',
-/* 000898 */ 	DocumentManager: null,
-/* 000899 */ 	RenderManager: null,
-/* 000901 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
-/* 000901 */ 		if (arguments.length) {
-/* 000901 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000901 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000901 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000901 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000901 */ 					switch (__attrib0__) {
-/* 000901 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000901 */ 					}
-/* 000901 */ 				}
-/* 000901 */ 			}
-/* 000901 */ 		}
-/* 000901 */ 		else {
-/* 000901 */ 		}
-/* 000904 */ 		return __call__ (dict, null, __kwargtrans__ ({environments: [__call__ (CellsEnvironment, null)]}));
-/* 000904 */ 	});},
-/* 000910 */ 	get add_flm_doc_latex_context_definitions () {return __get__ (this, function (self) {
-/* 000910 */ 		if (arguments.length) {
-/* 000910 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000910 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000910 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000910 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000910 */ 					switch (__attrib0__) {
-/* 000910 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000910 */ 					}
-/* 000910 */ 				}
-/* 000910 */ 			}
-/* 000910 */ 		}
-/* 000910 */ 		else {
-/* 000910 */ 		}
-/* 000923 */ 		return __call__ (dict, null, __kwargtrans__ ({macros: [__call__ (CellMacro, null), __call__ (CelldataMacroSpec, null), __call__ (MergeMacroSpec, null), __call__ (LatexTabularRowSeparatorSpec, null)], specials: [__call__ (LatexTabularColumnSeparatorSpec, null)]}));
-/* 000923 */ 	});}
-/* 000923 */ });
-/* 000927 */ export var FeatureClass = FeatureProvideCells;
+/* 000823 */ 	_fields: tuple (['environmentname']),
+/* 000825 */ 	get make_body_parser () {return __get__ (this, function (self, token, nodeargd, arg_parsing_state_delta) {
+/* 000825 */ 		if (arguments.length) {
+/* 000825 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000825 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000825 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000825 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000825 */ 					switch (__attrib0__) {
+/* 000825 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000825 */ 						case 'token': var token = __allkwargs0__ [__attrib0__]; break;
+/* 000825 */ 						case 'nodeargd': var nodeargd = __allkwargs0__ [__attrib0__]; break;
+/* 000825 */ 						case 'arg_parsing_state_delta': var arg_parsing_state_delta = __allkwargs0__ [__attrib0__]; break;
+/* 000825 */ 					}
+/* 000825 */ 				}
+/* 000825 */ 			}
+/* 000825 */ 		}
+/* 000825 */ 		else {
+/* 000825 */ 		}
+/* 000826 */ 		return (function () {
+/* 000826 */ 			var __accu0__ = macrospec;
+/* 000828 */ 			return __call__ (__accu0__.LatexEnvironmentBodyContentsParser, __accu0__, __kwargtrans__ ({environmentname: token.arg, contents_parsing_state_delta: (function () {
+/* 000828 */ 				var __accu1__ = macrospec;
+/* 000833 */ 				return __call__ (__accu1__.ParsingStateDeltaExtendLatexContextDb, __accu1__, __kwargtrans__ ({extend_latex_context: __call__ (dict, null, __kwargtrans__ ({macros: [__call__ (CellMacro, null), __call__ (CelldataMacroSpec, null), __call__ (LatexTabularRowSeparatorSpec, null)]}))}));
+/* 000839 */ 			}) (), child_parsing_state_delta: __call__ (ParsingStateDelta, null)}));
+/* 000839 */ 		}) ();
+/* 000839 */ 	});},
+/* 000843 */ 	get postprocess_parsed_node () {return __get__ (this, function (self, node) {
+/* 000843 */ 		if (arguments.length) {
+/* 000843 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000843 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000843 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000843 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000843 */ 					switch (__attrib0__) {
+/* 000843 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000843 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000843 */ 					}
+/* 000843 */ 				}
+/* 000843 */ 			}
+/* 000843 */ 		}
+/* 000843 */ 		else {
+/* 000843 */ 		}
+/* 000847 */ 		var cells_model = __call__ (CellsModel, null);
+/* 000849 */ 		var __iterable0__ = node.nodelist;
+/* 000849 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000849 */ 			var n = __getitem__ (__iterable0__, __index0__);
+/* 000850 */ 			if (__t__ ((function () {
+/* 000850 */ 				var __accu0__ = n;
+/* 000850 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexMacroNode);
+/* 000850 */ 			}) ())) {
+/* 000851 */ 				if (__t__ (__eq__ (n.macroname, 'cell'))) {
+/* 000852 */ 					(function () {
+/* 000852 */ 						var __accu0__ = cells_model;
+/* 000852 */ 						return __call__ (__accu0__.add_cell_node, __accu0__, n);
+/* 000852 */ 					}) ();
+/* 000852 */ 					continue;
+/* 000852 */ 				}
+/* 000854 */ 				else if (__t__ (__eq__ (n.macroname, 'celldata'))) {
+/* 000855 */ 					(function () {
+/* 000855 */ 						var __accu0__ = cells_model;
+/* 000855 */ 						return __call__ (__accu0__.add_celldata_node, __accu0__, n);
+/* 000855 */ 					}) ();
+/* 000855 */ 					continue;
+/* 000855 */ 				}
+/* 000857 */ 				else if (__t__ (__eq__ (n.macroname, '\\'))) {
+/* 000858 */ 					(function () {
+/* 000858 */ 						var __accu0__ = cells_model;
+/* 000858 */ 						return __call__ (__accu0__.move_next_row, __accu0__);
+/* 000858 */ 					}) ();
+/* 000858 */ 					continue;
+/* 000858 */ 				}
+/* 000858 */ 			}
+/* 000861 */ 			if (__t__ ((function () {
+/* 000861 */ 				var __accu0__ = n;
+/* 000861 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexCommentNode);
+/* 000861 */ 			}) ())) {
+/* 000861 */ 				continue;
+/* 000861 */ 			}
+/* 000865 */ 			if (__t__ (__t__ ((function () {
+/* 000865 */ 				var __accu0__ = n;
+/* 000865 */ 				return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexCharsNode);
+/* 000866 */ 			}) ()) && __eq__ (__call__ (len, null, (function () {
+/* 000866 */ 				var __accu0__ = n.chars;
+/* 000866 */ 				return __call__ (__accu0__.strip, __accu0__);
+/* 000866 */ 			}) ()), 0))) {
+/* 000866 */ 				continue;
+/* 000866 */ 			}
+/* 000871 */ 			var __except0__ = __call__ (LatexWalkerLocatedError, null, 'You cannot place ‘{}’ here.  Expected: \\cell, \\celldata, \\\\.'.format (__call__ (_splfysidews, null, (function () {
+/* 000871 */ 				var __accu0__ = n;
+/* 000871 */ 				return __call__ (__accu0__.latex_verbatim, __accu0__);
+/* 000871 */ 			}) ())));
+/* 000871 */ 			__except0__.__cause__ = null;
+/* 000871 */ 			throw __except0__;
+/* 000871 */ 		}
+/* 000875 */ 		(function () {
+/* 000875 */ 			var __accu0__ = cells_model;
+/* 000875 */ 			return __call__ (__accu0__.finalize, __accu0__);
+/* 000875 */ 		}) ();
+/* 000877 */ 		node.flm_cells_model = cells_model;
+/* 000877 */ 	});},
+/* 000880 */ 	get render () {return __get__ (this, function (self, node, render_context) {
+/* 000880 */ 		if (arguments.length) {
+/* 000880 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000880 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000880 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000880 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000880 */ 					switch (__attrib0__) {
+/* 000880 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000880 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000880 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000880 */ 					}
+/* 000880 */ 				}
+/* 000880 */ 			}
+/* 000880 */ 		}
+/* 000880 */ 		else {
+/* 000880 */ 		}
+/* 000886 */ 		return (function () {
+/* 000886 */ 			var __accu0__ = render_context.fragment_renderer;
+/* 000886 */ 			return __call__ (__accu0__.render_cells, __accu0__, __kwargtrans__ ({cells_model: node.flm_cells_model, render_context: render_context}));
+/* 000886 */ 		}) ();
+/* 000886 */ 	});}
+/* 000886 */ });
+/* 000895 */ export var FeatureProvideCells =  __class__ ('FeatureProvideCells', [Feature], {
+/* 000895 */ 	__module__: __name__,
+/* 000897 */ 	feature_name: 'cells',
+/* 000898 */ 	feature_title: 'Typesetting data tables',
+/* 000900 */ 	DocumentManager: null,
+/* 000901 */ 	RenderManager: null,
+/* 000903 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
+/* 000903 */ 		if (arguments.length) {
+/* 000903 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000903 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000903 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000903 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000903 */ 					switch (__attrib0__) {
+/* 000903 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000903 */ 					}
+/* 000903 */ 				}
+/* 000903 */ 			}
+/* 000903 */ 		}
+/* 000903 */ 		else {
+/* 000903 */ 		}
+/* 000906 */ 		return __call__ (dict, null, __kwargtrans__ ({environments: [__call__ (CellsEnvironment, null)]}));
+/* 000906 */ 	});},
+/* 000912 */ 	get add_flm_doc_latex_context_definitions () {return __get__ (this, function (self, base_feature_definitions) {
+/* 000912 */ 		if (arguments.length) {
+/* 000912 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000912 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000912 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000912 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000912 */ 					switch (__attrib0__) {
+/* 000912 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000912 */ 						case 'base_feature_definitions': var base_feature_definitions = __allkwargs0__ [__attrib0__]; break;
+/* 000912 */ 					}
+/* 000912 */ 				}
+/* 000912 */ 			}
+/* 000912 */ 		}
+/* 000912 */ 		else {
+/* 000912 */ 		}
+/* 000925 */ 		return __call__ (dict, null, __kwargtrans__ ({macros: [__call__ (CellMacro, null), __call__ (CelldataMacroSpec, null), __call__ (MergeMacroSpec, null), __call__ (LatexTabularRowSeparatorSpec, null)], specials: [__call__ (LatexTabularColumnSeparatorSpec, null)]}));
+/* 000925 */ 	});}
+/* 000925 */ });
+/* 000929 */ export var FeatureClass = FeatureProvideCells;
 /* 000010 */ 
 //# sourceMappingURL=flm.feature.cells.map
