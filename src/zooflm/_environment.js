@@ -64,7 +64,6 @@ for (const Cls of [SectionCommandInfo,
     // Remember, these are Transcrypt/Python's class objects; don't use the
     // .prototype field because these are not native JavaScript classes using
     // the JS protype chain.
-    debug(`Patching ${Cls}.toJSON ...`);
     Cls.toJSON = function() { return this.asdict(); }
 }
 
