@@ -1,6 +1,8 @@
 import debug_module from 'debug';
 const debug = debug_module('zoodb.citationmanager.sources.base');
 
+import process_hrtime from 'browser-process-hrtime';
+
 import loMerge from 'lodash/merge.js';
 
 import fetch from 'node-fetch';
@@ -234,7 +236,7 @@ export class CitationSourceBase
 
                     // if applicable, wait before another chunk retrieve call
                     if (this.chunk_retrieve_delay_ms && last_chunk_retrieve_hrtime !== null) {
-                        const dt = process.hrtime( last_chunk_retrieve_hrtime );
+                        const dt = process_hrtime( last_chunk_retrieve_hrtime );
                         const dt_ms = (1000*dt[0]+dt[1]/1000000);
                         const dt_ms_to_wait = this.chunk_retrieve_delay_ms - dt_ms;
                         if (dt_ms_to_wait > 0) {
@@ -246,7 +248,7 @@ export class CitationSourceBase
                     const ids = this.keys_to_retrieve_remaining.splice(0, this.chunk_size);
 
                     // retrieve the chunk
-                    last_chunk_retrieve_hrtime = process.hrtime();
+                    last_chunk_retrieve_hrtime = process_hrtime();
                     try {
                         await this.run_retrieve_chunk(ids);
                     } catch (e) {

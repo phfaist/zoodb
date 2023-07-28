@@ -8,6 +8,7 @@
     "dependencies": {
         "@apidevtools/json-schema-ref-parser": "^9.0.9",
         "base32-encode": "^2.0.0",
+        "browser-process-hrtime": "^1.0.0",
         "citeproc": "^2.4.62",
         "debug": "^4.3.4",
         "exif-parser": "^0.1.12",
