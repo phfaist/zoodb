@@ -132,8 +132,7 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         await this.process_ref_targets_objects();
         await this.process_ref_targets_referenceables();
 
-        await this.process_fetch_citations();
-        await this.process_compile_citations();
+        await this.process_citations();
 
         await this.process_collect_resources();
 
@@ -234,33 +233,48 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         }
     }
 
-    async process_fetch_citations()
+    async process_citations()
     {
         debug("Fetching citations ...");
 
         const encountered_citations = this.scanner.get_encountered('citations');
 
+        // check to retrieve only citation information for citations we don't
+        // already have in our compiled citations cache.  (If it's already in
+        // the downloaded citations cache, the citation manager will pick it up
+        // automatically.  But the manager doesn't know about the citations
+        // compiler.)
+        const new_citations_to_compile = encountered_citations.filter(
+            ({ cite_prefix, cite_key }) => {
+                if (this.zoo_flm_environment.citations_provider
+                    .has_citation({cite_prefix, cite_key})) {
+                    // don't need to retrieve this citation info, we already
+                    // have the relevant compiled citaiton
+                    return false;
+                }
+                return true;
+            }
+        );
+
         // make sure we purge any entries from earlier possible zoo processings
         this.citation_manager.purge_expired();
 
-        await this.citation_manager.retrieve_citations( encountered_citations );
+        await this.citation_manager.retrieve_citations( new_citations_to_compile );
 
-        // citations database ready
-        debug("Citation database ready!")
-    }
+        //     // citations database ready
+        //     debug("Citation database ready!")
 
-
-    async process_compile_citations()
-    {
         debug('Compiling citations ...');
 
         this.citation_compiler.compile_citations(
-            this.scanner.get_encountered('citations')
+            new_citations_to_compile
         );
 
         this.zoo_flm_environment.citations_provider.set_citations(
             this.citation_compiler.iter_compiled_citations()
         );
+
+        debug("Compiled citations ready!")
     }
 
 

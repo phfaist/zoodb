@@ -291,6 +291,16 @@ export class CitationsProvider
         }
     }
 
+    has_citation({cite_prefix, cite_key})
+    {
+        if (this.citations_database
+            && this.citations_database[cite_prefix]
+            && this.citations_database[cite_prefix][cite_key] != null) {
+            return true;
+        }
+        return false;
+    }
+
     get_citation_full_text_flm(cite_prefix, cite_key, resource_info)
     {
         if (!this.citations_database.hasOwnProperty(cite_prefix)) {
@@ -451,6 +461,31 @@ export const FeatureZooGraphicsCollection = __class__(
             } );
         }); },
 
+
+        // load/save references DB
+        get dump_database() {return __get__(this, function
+        (self) {
+            return {
+                graphics_collection: Object.fromEntries(
+                    Object.entries(self.graphics_collection).map(
+                        (source_path, graphics_resource) => {
+                            return [
+                                source_path, 
+                                graphics_resource.asdict(),
+                            ];
+                        }
+                    )
+                ),
+            };
+        }); },
+
+        get load_database() {return __get__(this, function
+        (self, data)
+        {
+            for (const [source_path, graphics_resource_data] of data.graphics_collection) {
+                self.add_graphics(source_path, GraphicsResource($$kw(graphics_resource_data)));
+            }
+        }); },
     }
 );
 

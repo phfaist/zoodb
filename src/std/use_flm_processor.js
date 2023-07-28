@@ -25,6 +25,36 @@ const default_figure_template_name =
       (f) => `fig-${f.basenameshort()}.${f.b32hash(4)}${f.lowerext()}`;
 
 
+const default_make_resource_retriever_graphics_path = (flm_options_resources,
+                                                       {fs,fs_data_dir,_this}) => {
+    return new FilesystemResourceRetriever({
+        copy_to_target_directory: false,
+        rename_file_template:
+        flm_options_resources?.rename_figure_template
+            ?? default_figure_template_name,
+        extensions:
+            flm_options_resources?.figure_filename_extensions
+            ?? [ '', '.svg', '.png', '.jpeg', '.jpg' ],
+        //target_directory: './_output_resource_graphics_files/',
+        fs,
+        source_directory:
+            flm_options_resources?.graphics_resources_fs_data_dir
+            ?? fs_data_dir
+    });
+};
+
+const default_make_resource_processors_graphics_path = (flm_options_resources,
+                                                        {fs,fs_data_dir,_this}) => {
+    return [
+        new FLMGraphicsResourceProcessor({
+            zoo_flm_environment: _this.zoo_flm_environment,
+            fs,
+        }),
+    ];
+};
+
+
+
 /**
  * Doc................
  *
@@ -46,6 +76,13 @@ export function use_flm_processor(_this)
         && !fs.existsSync(citations_cache_dir)) {
         fs.mkdirSync(citations_cache_dir, { recursive: true });
     }
+
+    const make_resource_retriever_graphics_path =
+          flm_options.resources.make_resource_retriever_graphics_path
+          ?? default_make_resource_retriever_graphics_path;
+    const make_resource_processors_graphics_path =
+          flm_options.resources.make_resource_processors_graphics_path
+          ?? default_make_resource_processors_graphics_path;
 
     let flm_processor_config = {
         zoo_flm_environment: _this.zoo_flm_environment,
@@ -80,28 +117,14 @@ export function use_flm_processor(_this)
         resource_collector_options: {
             resource_types: ['graphics_path'],
             resource_retrievers: {
-                graphics_path: new FilesystemResourceRetriever({
-                    copy_to_target_directory: false,
-                    rename_file_template:
-                        flm_options.resources?.rename_figure_template
-                        ?? default_figure_template_name,
-                    extensions:
-                        flm_options.resources?.figure_filename_extensions
-                        ?? [ '', '.svg', '.png', '.jpeg', '.jpg' ],
-                    //target_directory: './_output_resource_graphics_files/',
-                    fs,
-                    source_directory:
-                        flm_options.resources?.graphics_resources_fs_data_dir
-                        ?? fs_data_dir
-                }),
+                graphics_path:
+                    make_resource_retriever_graphics_path(flm_options.resources ?? {},
+                                                          { fs, fs_data_dir, _this })
             },
             resource_processors: {
-                'graphics_path': [
-                    new FLMGraphicsResourceProcessor({
-                        zoo_flm_environment: _this.zoo_flm_environment,
-                        fs,
-                    }),
-                ],
+                graphics_path:
+                    make_resource_processors_graphics_path(flm_options.resources ?? {},
+                                                           { fs, fs_data_dir, _this })
             },
         }
     };

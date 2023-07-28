@@ -393,7 +393,23 @@ export class CitationCompiler
             yield {cite_prefix, cite_key, citation_text};
         }
     }
+    
+    /**
+     * Return `true` if we have a compiled citation that is associated with the
+     * given `cite_prefix:cite_key`, and `false` otherwise.
+     */
+    has_compiled_citation(cite_prefix, cite_key)
+    {
+        if (this.compiled_citations
+            && this.compiled_citations[`${cite_prefix}:${cite_key}`] != null) {
+            return true;
+        }
+        return false;
+    }
 
+    /**
+     * Retrieve the citation text associated with the given `cite_prefix:cite_key`.
+     */
     get_compiled_citation(cite_prefix, cite_key)
     {
         const {citation_text} = this.compiled_citations[`${cite_prefix}:${cite_key}`];
@@ -414,6 +430,10 @@ export class CitationCompiler
         compile_citations ??= this.citation_manager.keys().map(_split_to_cite_prefix_key);
 
         //debug(`compile_citations:`, compile_citations);
+
+        if (!compile_citations || compile_citations.length == 0) {
+            return;
+        }
 
         //console.log(`Will compile citations for ${JSON.stringify(compile_citations)}`);
 
@@ -436,7 +456,7 @@ export class CitationCompiler
 
             // check if this citation is already compiled and up to date (e.g.,
             // from an earlier run)
-            if (citeid in this.compiled_citations
+            if (this.compiled_citations[citeid] != null
                 && obj._hash == this.compiled_citations[citeid].hash) {
                 // already compiled!
                 continue;
@@ -461,7 +481,10 @@ export class CitationCompiler
             const c_result = cite_processor.makeBibliography();
             //console.log(citeid, 'c_result=', c_result);
 
-            let result_formatted = c_result[1].toString();
+            let result_formatted = null;
+            if (c_result) {
+                result_formatted = c_result[1].toString();
+            }
 
             if (!result_formatted) {
                 throw new Error(`Could not CSL-compile citation text for ‘${citeid}’`);
