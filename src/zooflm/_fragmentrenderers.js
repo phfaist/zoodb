@@ -88,6 +88,11 @@ export const ZooTextFragmentRenderer = __class__(
 
 
 
+//
+// FIXME: MAKE render_**_standalone() methods of the environment, and get the
+// standard fragment renderers as environment attributes!  In this way, users
+// can customize the fragment renderers.
+//
 
 /**
  * Utility to render a standalone fragment to HTML.  No document instance or
@@ -96,8 +101,13 @@ export const ZooTextFragmentRenderer = __class__(
  */
 export function render_html_standalone(fragment)
 {
-    const html_renderer = new ZooHtmlFragmentRenderer();
-    return fragment.render_standalone(html_renderer);
+    try {
+        const html_renderer = new ZooHtmlFragmentRenderer();
+        return fragment.render_standalone(html_renderer);
+    } catch (err) {
+        _report_render_error(err);
+        throw err;
+    }
 }
 
 /**
@@ -107,6 +117,24 @@ export function render_html_standalone(fragment)
  */
 export function render_text_standalone(fragment)
 {
-    const text_renderer = new ZooTextFragmentRenderer();
-    return fragment.render_standalone(text_renderer);
+    try {
+        const text_renderer = new ZooTextFragmentRenderer();
+        return fragment.render_standalone(text_renderer);
+    } catch (err) {
+        _report_render_error(err);
+        throw err;
+    }
+}
+
+
+
+function _report_render_error(err)
+{
+    let errstr = null;
+    try {
+        errstr = ((err && err.__class__ != null) ? repr(err) : ''+err);
+    } catch (tostrerr) {
+        errstr = ''+err;
+    }
+    console.error("\n🚨🚨🚨 FLM RENDERING ERROR 🚨🚨🚨\n\n" + errstr, err);
 }

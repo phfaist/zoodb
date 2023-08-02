@@ -250,6 +250,12 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
                     .has_citation({cite_prefix, cite_key})) {
                     // don't need to retrieve this citation info, we already
                     // have the relevant compiled citaiton
+
+                    // TODO -- Include check to see if the citation might be
+                    // out-of-date!!  Actually, add a configuration flat that
+                    // tells us if we should check (or not) for the information
+                    // to be up-to-date.  The idea is that for an in-browser zoo
+                    // loading, we should skip this check!
                     return false;
                 }
                 return true;
@@ -288,7 +294,12 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
 
             // TODO -- only collect resources that need to be collected !!!
             // check any already-collected resources !!!
-            // ...
+
+            // TODO -- Add a configuration flat that tells us if we should check
+            // (or not) for the collected resources to be up-to-date.  The idea
+            // is that for an in-browser zoo loading, we should skip
+            // checking/loading any known resources!
+            //...
 
             // debug('resource = ', resource);
 

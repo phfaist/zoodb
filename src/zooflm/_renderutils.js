@@ -28,7 +28,10 @@ export function render_value(x, render_context, render_value_options = {})
         return render_context.fragment_renderer.render_verbatim(x);
     }
     if (typeof x === 'number') {
-        return render_context.fragment_renderer.render_verbatim( Number(x).toString() );
+        return render_context.fragment_renderer.render_verbatim( new Number(x).toString() );
+    }
+    if (typeof x === 'boolean') {
+        return render_context.fragment_renderer.render_verbatim( new Boolean(x).toString() );
     }
     if (x && x.length) { // is an array
         return list_full_wrapper(
@@ -38,7 +41,7 @@ export function render_value(x, render_context, render_value_options = {})
         );
     }
     // a fragment that contains error information? -> see flmsimplecontent db processor
-    if (x && '_flm_error_info' in x && x._flm_error_info
+    if (x && x._flm_error_info
         && render_context.fragment_renderer.render_error_info_message) {
         const flm_error_info = x._flm_error_info;
         // use a special method in our custom fragment renderers to render error
@@ -189,4 +192,5 @@ export function make_and_render_document({
         }
     }
 }
+
 

@@ -35,6 +35,9 @@ export class ZooRelation
         this.object_field = relation_spec.object_field;
         this.to_object_type = relation_spec.to_object_type;
 
+        // allow_null is used both for allowing the value of the
+        // target_object_id relation object field to be null but also for the
+        // relation object itself to be null or undefined.
         this.allow_null = relation_spec.allow_null ?? false;
 
         // TODO -- Option not to link to the actual object to avoid making the
@@ -71,6 +74,12 @@ export class ZooRelation
 
         const relation_field_schema =
               get_field_schema(this.zoodb.schema(this.object_type), this.object_field);
+        if (relation_field_schema == null) {
+            throw new Error(
+                `Invalid field ‘${this.object_field}’ in ‘${this.object_type}’ object `
+                + `(in relation to ‘${this.to_object_type}’)`
+            );
+        }
         if (relation_field_schema.type === 'array') {
             this.source_has_multiple_relations = true;
             this.fully_specified_relation_add_object_field =
@@ -114,18 +123,34 @@ export class ZooRelation
 
     get_object_relation_objects(obj)
     {
+        const stuff = getfield(obj, this.object_field);
         if (this.source_has_multiple_relations) {
-            return getfield(obj, this.object_field) ?? [];
+            if (stuff && stuff.length) {
+                return stuff;
+            }
+            return [];
         } else {
-            return [ getfield(obj, this.object_field) ];
+            if (!stuff) {
+                if (!this.allow_null) {
+                    throw new Error(
+                        `Object ${this.object_type} ${obj._zoodb.id}: Relation object data `
+                        + `is invalid (it might be null or undefined).  We expected a single `
+                        + `target object relation because the field ‘${this.object_field}’ `
+                        + `isn't of type array.  If it's a shorthand id field and it can be `
+                        + `null, the relation specification's ‘allow_null’ must be set.`
+                    );
+                }
+                return [];
+            }
+            return [ stuff ];
         }
     }
 
     process_object_relation(obj, options)
     {
-        this.get_object_relation_objects(obj).forEach( (relation_object) => {
+        for (const relation_object of this.get_object_relation_objects(obj)) {
             this._process_single_relation(obj, relation_object, options);
-        } );
+        }
     }
 
     _process_single_relation(obj, relation_object, options)
@@ -133,11 +158,18 @@ export class ZooRelation
         let zoodb = this.zoodb;
         const { process_object_types } = options;
 
-        const target_obj_id = 
-              this.value_is_shorthand_object_id
-              ? relation_object
-              : relation_object[this.relation_primary_key_field]
-        ;
+        let target_obj_id = null;
+        if (this.value_is_shorthand_object_id) {
+            target_obj_id = relation_object;
+        } else {
+            if (!relation_object) {
+                throw new Error(
+                    `Object ${this.object_type} ${obj._zoodb.id}: Relation object data `
+                    + `is invalid (it might be null or undefined).`
+                );
+            }
+            target_obj_id = relation_object[this.relation_primary_key_field];
+        }
 
         if (target_obj_id == null && !this.allow_null) {
             throw new Error(

@@ -563,6 +563,76 @@ export function zooflm_default_options(footnote_counter_formatter='alph')
 
 
 
+export function install_standard_features(self, zooflm_options)
+{
+    self.citations_provider =
+        zooflm_options.citations_provider ?? new CitationsProvider();
+
+    self.ref_resolver =
+        zooflm_options.ref_resolver
+        ?? new RefResolver(zooflm_options.ref_resolver_options);
+
+    self.graphics_collection =
+        zooflm_options.graphics_collection ?? new FeatureZooGraphicsCollection();
+
+
+    debug("install_standard_features: creating feature class instances ...");
+
+
+    self.feature_baseformatting =
+        new flm_feature_baseformatting.FeatureBaseFormatting();
+
+    self.feature_href = new flm_feature_href.FeatureHref();
+
+    self.feature_verbatim = new flm_feature_verbatim.FeatureVerbatim();
+
+    self.feature_math = new flm_feature_math.FeatureMath();
+
+    self.feature_headings = new flm_feature_headings.FeatureHeadings(
+        $$kw({section_commands_by_level:
+              zooflm_options.heading_section_commands_by_level}),
+    );
+    self.feature_refs = new flm_feature_refs.FeatureRefs(
+        [ self.ref_resolver ],
+    );
+
+    self.feature_endnotes = new flm_feature_endnotes.FeatureEndnotes(
+        $$kw({categories: zooflm_options.endnote_categories})
+    );
+    
+    self.feature_citations = new flm_feature_cite.FeatureExternalPrefixedCitations(
+        $$kw({ external_citations_providers: [ self.citations_provider ],
+               counter_formatter: zooflm_options.citation_counter_formatter,
+               citation_delimiters: zooflm_options.citation_delimiters, })
+    );
+
+    self.feature_floats = new flm_feature_floats.FeatureFloats(
+        $$kw({float_types: zooflm_options.float_types})
+    );
+
+    self.feature_defterm = new flm_feature_defterm.FeatureDefTerm();
+    self.feature_defterm.render_defterm_with_term =
+        zooflm_options.defterm_render_defterm_with_term;
+    self.feature_defterm.render_defterm_with_term_suffix =
+        zooflm_options.defterm_render_defterm_with_term_suffix;
+
+    const features =  [
+        self.feature_baseformatting,
+        self.feature_href,
+        self.feature_verbatim,
+        self.feature_math,
+        self.feature_headings,
+        self.feature_refs,
+        self.feature_endnotes,
+        self.feature_citations,
+        self.feature_floats,
+        self.feature_defterm,
+        self.graphics_collection,
+    ];
+
+    return features;
+}
+
 
 export var ZooFLMEnvironment = __class__(
     'ZooFLMEnvironment', // class name
@@ -579,68 +649,7 @@ export var ZooFLMEnvironment = __class__(
                 zooflm_options.parsing_state_options ?? {}
             ));
 
-            self.citations_provider =
-                zooflm_options.citations_provider ?? new CitationsProvider();
-            self.ref_resolver =
-                zooflm_options.ref_resolver
-                ?? new RefResolver(zooflm_options.ref_resolver_options);
-
-            self.graphics_collection =
-                zooflm_options.graphics_collection ?? new FeatureZooGraphicsCollection();
-
-
-            debug("ZooFLMEnvironment.__init__(): creating feature class instances ...");
-
-            self.feature_baseformatting =
-                new flm_feature_baseformatting.FeatureBaseFormatting();
-
-            self.feature_href = new flm_feature_href.FeatureHref();
-
-            self.feature_verbatim = new flm_feature_verbatim.FeatureVerbatim();
-
-            self.feature_math = new flm_feature_math.FeatureMath();
-
-            self.feature_headings = new flm_feature_headings.FeatureHeadings(
-                $$kw({section_commands_by_level:
-                      zooflm_options.heading_section_commands_by_level}),
-            );
-            self.feature_refs = new flm_feature_refs.FeatureRefs(
-                [ self.ref_resolver ],
-            );
-
-            self.feature_endnotes = new flm_feature_endnotes.FeatureEndnotes(
-                $$kw({categories: zooflm_options.endnote_categories})
-            );
-            
-            self.feature_citations = new flm_feature_cite.FeatureExternalPrefixedCitations(
-                $$kw({ external_citations_providers: [ self.citations_provider ],
-                       counter_formatter: zooflm_options.citation_counter_formatter,
-                       citation_delimiters: zooflm_options.citation_delimiters, })
-            );
-
-            self.feature_floats = new flm_feature_floats.FeatureFloats(
-                $$kw({float_types: zooflm_options.float_types})
-            );
-
-            self.feature_defterm = new flm_feature_defterm.FeatureDefTerm();
-            self.feature_defterm.render_defterm_with_term =
-                zooflm_options.defterm_render_defterm_with_term;
-            self.feature_defterm.render_defterm_with_term_suffix =
-                zooflm_options.defterm_render_defterm_with_term_suffix;
-
-            const features =  [
-                self.feature_baseformatting,
-                self.feature_href,
-                self.feature_verbatim,
-                self.feature_math,
-                self.feature_headings,
-                self.feature_refs,
-                self.feature_endnotes,
-                self.feature_citations,
-                self.feature_floats,
-                self.feature_defterm,
-                self.graphics_collection,
-            ];
+            const features = install_standard_features(self, zooflm_options);
 
             const parsing_mode_deltas = {
                 // /// not sure how useful this is ...
@@ -653,7 +662,7 @@ export var ZooFLMEnvironment = __class__(
                 // }) ),
                 //
                 // enable \begin{raw:html}...\end{raw:html},
-                // \begin{raw:latex}...\end{raw:latex}, etc. TODO
+                // \begin{raw:latex}...\end{raw:latex}, etc. TODO -- NO DON'T. NOT NECESSARY.
                 // 'enable-raw': ParsingStateDelta(
                 //     // ...
                 // ),
@@ -670,7 +679,6 @@ export var ZooFLMEnvironment = __class__(
                 //     parsing_mode_deltas: parsing_mode_deltas,
                 // })
             );
-
 
             const parsing_state_event_handler = 
                   new flmenvironment.FLMLatexWalkerMathContextParsingStateEventHandler();
