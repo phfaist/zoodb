@@ -61,7 +61,7 @@ jobs:
         run: 'git clone https://github.com/phfaist/zoodb-example.git'
 
       - name: 'Use Version of ZooDb that we want to test'
-        run: 'yarn up @phfaist/zoodb@${{ github.repositoryUrl }}#${{ github.sha }}'
+        run: 'yarn up @phfaist/zoodb@https://github.com/${{ github.repository }}.git#${{ github.sha }}'
         working-directory: ./zoodb-example/
 
       - name: 'Build example ZooDB'
