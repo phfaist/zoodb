@@ -66,5 +66,5 @@ jobs:
 
       - name: 'Build example ZooDB'
         run: 'yarn build'
-        working-directory: ./zoodb-example/
+        working-directory: ./zoodb-example/website
         
