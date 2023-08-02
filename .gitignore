@@ -31,3 +31,7 @@ _zoodb_citations_cache
 
 # my handy symbolic link to the flm sources' location
 flm-src
+
+
+.11ty-parcel-temp
+.parcel-cache

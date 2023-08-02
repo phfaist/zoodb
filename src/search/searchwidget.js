@@ -243,7 +243,7 @@ export class SearchWidget
                     console.log("Processing clause: ", clause,
                                 " auto_fuzz_min_word_length = ", _auto_fuzz_min_word_length,
                                 " auto_fuzz_distance = ", _auto_fuzz_distance);
-                    const term_length = clause.term.length;
+                    let term_length = clause.term.length;
                     if (clause.term.charAt(0) == '*') { --term_length; }
                     if (clause.term.charAt(clause.term.length - 1) == '*') { --term_length; }
                     if (typeof clause.editDistance === 'undefined'
