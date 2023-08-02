@@ -17,6 +17,8 @@ import { ZooDbProcessorBase } from './base.js';
 function getGitLastUpdatedDate(filePath) {
     //debug(`Getting GIT modification time stamp for ${filePath}`);
 
+    let dateObject = null;
+
     try {
 
         let spw = spawnSync(
@@ -33,7 +35,7 @@ function getGitLastUpdatedDate(filePath) {
                 spw.stdout.toString("utf-8")
             ) * 1000
         );
-        const dateObject = new Date(timestamp);
+        dateObject = new Date(timestamp);
 
         // make sure the date is valid!
         dateObject.toISOString();
