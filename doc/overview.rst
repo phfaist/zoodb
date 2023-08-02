@@ -60,8 +60,8 @@ The `ZooDb` library is geared towards providing the following features:
 An example
 ----------
 
-Please check out the example provided with the source code!
-https://github.com/phfaist/zoodb/blob/main/example/
+Please check out the example provided in the following github repository —
+https://github.com/phfaist/zoodb-example
 
 The example proposes a simple database of people.  Each person has a name, a
 biography, and can be related to other people as a spouse, a parental
@@ -85,7 +85,8 @@ This example covers:
   object ID.
 
 * The website is built using the `Eleventy (11ty) static website generator
-  <https://11ty.dev/>`_ (in the ``website/`` folder).  We:
+  <https://11ty.dev/>`_ (in the ``website/`` folder) and assets (JS/CSS) are
+  bundled using `ParcelJS <https://parceljs.org/>`_.  We:
 
   - configure the 11ty site (``website/eleventy.config.js``);
 
@@ -105,8 +106,8 @@ This example covers:
     information in case of doubt.  Here, we're paginating directly over the data
     in the loaded zoo object).
 
-To try it out, refer to the instructions in
-the `README file <https://github.com/phfaist/zoodb/blob/main/example/website/README.md>`_.
+To try it out, refer to the instructions in the `README file
+<https://github.com/phfaist/zoodb-example/blob/main/website/README.md>`_.
 
 
 .. _why-js:

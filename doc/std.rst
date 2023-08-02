@@ -186,6 +186,6 @@ boilerplate code:
   
 
 
-Also, check out our simple provided example in the source code (see
+Also, check out our simple example which we provide in a separate repo (see
 :ref:`example`).
 
