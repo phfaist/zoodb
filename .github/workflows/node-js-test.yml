@@ -53,3 +53,18 @@ jobs:
       - run: 'yarn'
   
       - run: 'yarn test'
+
+
+      # Try to compile our example zoodb "PeopleDB"
+
+      - name: 'Clone example ZooDB repo'
+        run: 'git clone https://github.com/phfaist/zoodb-example.git'
+
+      - name: 'Use Version of ZooDb that we want to test'
+        run: 'yarn update @phfaist/zoodb@${{ github.repositoryUrl }}#${{ github.sha }}'
+        working-directory: ./zoodb-example/
+
+      - name: 'Build example ZooDB'
+        run: 'yarn build'
+        working-directory: ./zoodb-example/
+        
