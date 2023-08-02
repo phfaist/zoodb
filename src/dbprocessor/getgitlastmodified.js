@@ -16,28 +16,33 @@ import { ZooDbProcessorBase } from './base.js';
  */
 function getGitLastUpdatedDate(filePath) {
     //debug(`Getting GIT modification time stamp for ${filePath}`);
-    const timestamp = (
-        parseInt(
-            spawnSync(
-                "git",
-                // Formats https://www.git-scm.com/docs/git-log#_pretty_formats
-                // %at author date, UNIX timestamp
-                ["log", "-1", "--format=%at", filePath],
-                {
-                    cwd: path.dirname(filePath),
-                }
-            )
-            .stdout.toString("utf-8")
-        ) * 1000
-    );
-    const dateObject = new Date(timestamp);
 
     try {
+
+        let spw = spawnSync(
+            "git",
+            // Formats https://www.git-scm.com/docs/git-log#_pretty_formats
+            // %at author date, UNIX timestamp
+            ["log", "-1", "--format=%at", filePath],
+            {
+                cwd: path.dirname(filePath),
+            }
+        );
+        const timestamp = (
+            parseInt(
+                spw.stdout.toString("utf-8")
+            ) * 1000
+        );
+        const dateObject = new Date(timestamp);
+
         // make sure the date is valid!
         dateObject.toISOString();
-    } catch(err) {
-        console.error(`Failed to find GIT last modified time for ‘${filePath}’!`);
+
+    } catch (err) {
+
+        console.error(`Failed to find GIT last modified time for ‘${filePath}’!`, err);
         return new Date();
+
     }
 
     //debug(`  -> date = ${dateObject.toISOString()}`);
