@@ -82,10 +82,11 @@ export class StandardZooDb extends ZooDb
             );
         }
 
-        // NOTE! read-only property, assining to this property won't take effect
-        // later on because the property value is used already here in
+        // NOTE! read-only properties, assining to this property won't take
+        // effect later on because the property value is used here already in
         // use_flm_environment().
-        _this.zoo_object_permalink = _this.config.zoo_permalinks.object;
+        _this.zoo_permalinks = Object.assign({}, _this.config.zoo_permalinks);
+        _this.zoo_object_permalink = _this.zoo_permalinks.object;
 
         _this.zoo_flm_environment = null;
         if (_this.config.use_flm_environment) {

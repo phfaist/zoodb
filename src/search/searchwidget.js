@@ -113,6 +113,8 @@ export class SearchWidget
 
         this.getMathJax = options.getMathJax ?? null;
 
+        this.tippyAppearanceTheme = options.tippyAppearanceTheme ?? null;
+
         this._install();
     }
 
@@ -182,6 +184,11 @@ export class SearchWidget
             </p>`;
         this.dom_container.appendChild(instructions_widget);
 
+        let moreTippyOptions = {};
+        if (this.tippyAppearanceTheme) {
+            moreTippyOptions.theme = this.tippyAppearanceTheme;
+        }
+
         // add a tippy widget for some simple instructions
         this.tippy_instance = tippy(
             this.search_input,
@@ -193,11 +200,8 @@ export class SearchWidget
                 interactiveBorder: 30,
                 maxWidth: '450px',
                 placement: 'bottom',
-                //flip: false,
-                // popperOptions: {
-                //     placement: 'bottom',
-                // },
-                // theme: 'light',
+
+                ... moreTippyOptions
             }
         );
 
