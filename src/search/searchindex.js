@@ -3,27 +3,6 @@ const debug = debug_module('zoodb.search.searchindex');
 
 import lunr from 'lunr';
 
-import { iter_schema_fields_recursive, iter_object_fields_recursive }
-    from '../util/objectinspector.js';
-
-
-
-
-function default_assemble_doc_text_values(doc_values) {
-    let doc = {}
-    for (const [k, v] of doc_values) {
-        if (k in doc) {
-            doc[k] += '\n' + v;
-        } else {
-            doc[k] = v;
-        }
-    }
-    return doc;
-};
-
-
-
-
 
 /**
  * An object holding an index for the zoo database, which can be used for
@@ -199,7 +178,7 @@ export class SearchIndex
             if (j != st_doc._z_stid) {
                 throw new Error(
                     `Internal error: inconsistency of store id: `
-                    + `st_id=${st_id}, st_doc=${JSON.stringify(st_doc)}`
+                    + `j=${j}, st_doc=${JSON.stringify(st_doc)}`
                 );
             }
             for (const fieldname of storefields) {
@@ -225,7 +204,4 @@ export class SearchIndex
         return store;
     }
 
-};
-
-
-
+}

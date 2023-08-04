@@ -104,7 +104,7 @@ export class FilesystemResourceRetriever
     async finish()
     {
     }
-};
+}
 
 
 class FilesystemPropertiesAccessor
@@ -189,4 +189,4 @@ class FilesystemPropertiesAccessor
         }
         return res;
     }
-};
+}

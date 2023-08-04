@@ -1,4 +1,3 @@
-//
 import debug_module from 'debug';
 const debug = debug_module('zoodb.zooflm._renderutils');
 
@@ -8,6 +7,9 @@ import { $$kw, repr, dict } from './flm-js/py.js';
 import { is_flm_fragment } from './_environment.js';
 
 import { ZooHtmlFragmentRenderer } from './_fragmentrenderers.js';
+
+import { sqzhtml } from '../util/sqzhtml.js';
+
 
 export function render_value(x, render_context, render_value_options = {})
 {
@@ -55,7 +57,7 @@ export function render_value(x, render_context, render_value_options = {})
     }
     debug('Cannot render %O', x);
     throw new Error(`No idea how to render x = ${x}`);
-};
+}
 
 export function value_not_empty(value)
 {
@@ -155,7 +157,7 @@ export function make_and_render_document({
 
     const doc = zoo_flm_environment.make_document( internal_render_doc_fn, $$kw(kwargs) );
     try {
-        let [rendered_content_data, render_context] =
+        let [rendered_content_data, /*render_context*/] =
             doc.render( fragment_renderer, feature_render_options );
         let {rendered_content, rendered_endnotes} = rendered_content_data;
         if (rendered_endnotes != null) {
@@ -169,7 +171,9 @@ export function make_and_render_document({
         let errstr = '<??>';
         try {
             errstr = ((err && err.__class__ != null) ? repr(err) : ''+err);
-        } catch (tostrerr) {}
+        } catch (tostrerr) {
+            debug(`(Can't get error string), will proceed with what we got`);
+        }
         console.error("\n🚨🚨🚨 FLM RENDERING ERROR 🚨🚨🚨\n\n" + errstr, err);
 
         if (flm_error_policy === 'abort') {

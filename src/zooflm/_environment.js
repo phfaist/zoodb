@@ -3,11 +3,11 @@ const debug = debug_module('zoodb.zooflm._environment');
 
 import path from 'path';
 
-import {$$kw, repr} from './flm-js/py.js';
+import {$$kw, /*repr*/} from './flm-js/py.js';
 import {__class__, __super__, __get__, isinstance} from './flm-js/org.transcrypt.__runtime__.js';
 
 import {
-    ParsingState, ParsingStateDelta,
+    ParsingStateDelta,
     LatexWalkerLocatedError, LatexWalkerLocatedErrorFormatter
 } from './flm-js/pylatexenc.latexnodes.js';
 import * as macrospec from './flm-js/pylatexenc.macrospec.js';
@@ -166,7 +166,7 @@ export class RefResolver
         if (ref_type == null) { // undefined or null
             throw new Error(`Invalid ref_type:ref_label pair ‘${ref_type}:${ref_label}’`);
         }
-        if (!this.ref_instance_database.hasOwnProperty(ref_type)) {
+        if (!Object.hasOwn(this.ref_instance_database, ref_type)) {
             if (this.options.ref_types !== undefined) {
                 throw new Error(
                     `Invalid ref prefix ‘${ref_type}’ in ‘${ref_type}:${ref_label}’, `
@@ -177,7 +177,7 @@ export class RefResolver
             // to include whatever ref_type was given
             this.ref_instance_database[ref_type] = {};
         }
-        if (this.ref_instance_database[ref_type].hasOwnProperty(ref_label)) {
+        if (Object.hasOwn(this.ref_instance_database[ref_type], ref_label)) {
             throw new Error(
                 `Ref target ‘${ref_type}:${ref_label}’ already exists in ref instance `
                 + `database, found `
@@ -266,7 +266,7 @@ export class RefResolver
         this.ref_instance_database = ridb;
     }
 
-};
+}
 
 
 
@@ -295,10 +295,10 @@ export class CitationsProvider
     /// string or a precompiled FLM fragment object instance.
     add_citation(cite_prefix, cite_key, full_citation_flm_text)
     {
-        if (!this.citations_database.hasOwnProperty(cite_prefix)) {
+        if (!Object.hasOwn(this.citations_database, cite_prefix)) {
             this.citations_database[cite_prefix] = {};
         }
-        if (this.citations_database[cite_prefix].hasOwnProperty(cite_key)) {
+        if (Object.hasOwn(this.citations_database[cite_prefix], cite_key)) {
             throw new Error(
                 `There is already a citation registered for ‘${cite_prefix}:${cite_key}’`
             );
@@ -326,7 +326,7 @@ export class CitationsProvider
 
     get_citation_full_text_flm(cite_prefix, cite_key, resource_info)
     {
-        if (!this.citations_database.hasOwnProperty(cite_prefix)) {
+        if (!Object.hasOwn(this.citations_database, cite_prefix)) {
             return this.handle_unresolved_citation({
                 cite_prefix, cite_key, resource_info,
                 message:
@@ -335,7 +335,7 @@ export class CitationsProvider
             });
             
         }
-        if (!this.citations_database[cite_prefix].hasOwnProperty(cite_key)) {
+        if (!Object.hasOwn(this.citations_database[cite_prefix], cite_key)) {
             return this.handle_unresolved_citation({
                 cite_prefix, cite_key, resource_info,
                 message:
@@ -346,7 +346,7 @@ export class CitationsProvider
         return this.citations_database[cite_prefix][cite_key];
     }
 
-    handle_unresolved_citation({ cite_prefix, cite_key, message, resource_info })
+    handle_unresolved_citation({ cite_prefix, cite_key, message, /*resource_info*/ })
     {
         // no, this will prevent processing with further citations providers!
         //throw new Error(message);
@@ -378,7 +378,7 @@ export class CitationsProvider
         this.citations_database = data.citations_database;
     }
 
-};
+}
 
 
 // we need to define this class the Transcrypt way because we want to inherit a
@@ -389,7 +389,7 @@ export const FeatureZooGraphicsCollection = __class__(
     {
         // static members
 
- 	__module__: 'zoodb.zooflm._environment',
+        __module__: 'zoodb.zooflm._environment',
 
         // static member - nested class definition
         RenderManager:  __class__(
@@ -407,7 +407,7 @@ export const FeatureZooGraphicsCollection = __class__(
                     //
                     const source_path = path.join(resource_info.get_source_directory(),
                                                   graphics_path);
-                    if (!feature.graphics_collection.hasOwnProperty(source_path)) {
+                    if (!Object.hasOwn(feature.graphics_collection, source_path)) {
                         throw new Error(
                             `No such graphics ‘${source_path}’ (‘${graphics_path}’ `
                             + `relative to ${resource_info})`
@@ -440,7 +440,7 @@ export const FeatureZooGraphicsCollection = __class__(
 
 
         // constructor.  I'm not sure why we need the getters etc.
- 	get __init__ () {return __get__ (this, function
+        get __init__ () {return __get__ (this, function
         (self) {
 
             // call superclass constructor
@@ -463,7 +463,7 @@ export const FeatureZooGraphicsCollection = __class__(
 
         get add_graphics () {return __get__(this, function
         (self, source_path, graphics_resource) {
-            if (self.graphics_collection.hasOwnProperty(source_path)) {
+            if (Object.hasOwn(self.graphics_collection, source_path)) {
                 throw new Error(
                     `Graphics collection already has a graphics resource registered `
                     + ` for path ‘${source_path}’ (registered target `
@@ -559,7 +559,7 @@ export function zooflm_default_options(footnote_counter_formatter='alph')
         defterm_render_defterm_with_term: true,
         defterm_render_defterm_with_term_suffix: ': ',
     };
-};
+}
 
 
 
@@ -651,22 +651,22 @@ export var ZooFLMEnvironment = __class__(
 
             const features = install_standard_features(self, zooflm_options);
 
-            const parsing_mode_deltas = {
-                // /// not sure how useful this is ...
-                // 'safer-latexier': ParsingStateDelta( $$kw({
-                //     set_attributes: {
-                //         enable_comments: false,
-                //         latex_inline_math_delimiters: [['$','$'], ['\\(', '\\)']],
-                //         forbidden_characters: '',
-                //     },
-                // }) ),
-                //
-                // enable \begin{raw:html}...\end{raw:html},
-                // \begin{raw:latex}...\end{raw:latex}, etc. TODO -- NO DON'T. NOT NECESSARY.
-                // 'enable-raw': ParsingStateDelta(
-                //     // ...
-                // ),
-            };
+            // const parsing_mode_deltas = {
+            //     // /// not sure how useful this is ...
+            //     // 'safer-latexier': ParsingStateDelta( $$kw({
+            //     //     set_attributes: {
+            //     //         enable_comments: false,
+            //     //         latex_inline_math_delimiters: [['$','$'], ['\\(', '\\)']],
+            //     //         forbidden_characters: '',
+            //     //     },
+            //     // }) ),
+            //     //
+            //     // enable \begin{raw:html}...\end{raw:html},
+            //     // \begin{raw:latex}...\end{raw:latex}, etc. TODO -- NO DON'T. NOT NECESSARY.
+            //     // 'enable-raw': ParsingStateDelta(
+            //     //     // ...
+            //     // ),
+            // };
 
             debug("ZooFLMEnvironment.__init__(): calling super constructor ...");
 

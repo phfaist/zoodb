@@ -1,12 +1,7 @@
-import debug_mod from 'debug';
-const debug = debug_mod("eczoodbjs.use_flm_processor");
-
-import {
-    $$kw, ZooTextFragmentRenderer, ZooFLMEnvironment, repr, CitationsProvider
-} from '../zooflm/index.js';
+// import debug_mod from 'debug';
+// const debug = debug_mod("eczoodbjs.use_flm_processor");
 
 import { ZooFLMProcessor } from '../dbprocessor/flmprocessor.js';
-
 
 import { CitationSourceArxiv } from '../citationmanager/source/arxiv.js';
 import { CitationSourceDoi } from '../citationmanager/source/doi.js';
@@ -17,8 +12,7 @@ import { FilesystemResourceRetriever } from '../resourcecollector/retriever/fs.j
 
 import { FLMGraphicsResourceProcessor } from '../resourcecollector/processor/flmgraphicsprocessor.js';
 
-import loMerge from 'lodash/merge.js';
-
+//import loMerge from 'lodash/merge.js';
 
 
 const default_figure_template_name =
@@ -26,7 +20,7 @@ const default_figure_template_name =
 
 
 const default_make_resource_retriever_graphics_path = (flm_options_resources,
-                                                       {fs,fs_data_dir,_this}) => {
+                                                       {fs,fs_data_dir,/*_this*/}) => {
     return new FilesystemResourceRetriever({
         copy_to_target_directory: false,
         rename_file_template:
@@ -44,7 +38,7 @@ const default_make_resource_retriever_graphics_path = (flm_options_resources,
 };
 
 const default_make_resource_processors_graphics_path = (flm_options_resources,
-                                                        {fs,fs_data_dir,_this}) => {
+                                                        {fs, /*fs_data_dir,*/ _this}) => {
     return [
         new FLMGraphicsResourceProcessor({
             zoo_flm_environment: _this.zoo_flm_environment,
@@ -132,4 +126,4 @@ export function use_flm_processor(_this)
     let zoo_flm_processor = new ZooFLMProcessor(flm_processor_config);
 
     return zoo_flm_processor;
-};
+}

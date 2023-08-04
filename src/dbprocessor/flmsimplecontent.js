@@ -3,12 +3,12 @@ const debug = debug_module('zoodb.dbprocessor.flmsimplecontent');
 
 import { ZooDbProcessorBase } from './base.js';
 
-import { getfield } from '../util/getfield.js';
 import {
     iter_object_fields_recursive, iter_schema_fields_recursive
 } from '../util/objectinspector.js';
 import {
-    ZooFLMResourceInfo, $$kw, repr, FLMDataDumper,
+    ZooFLMResourceInfo, $$kw, // repr,
+    //FLMDataDumper,
     is_flm_fragment, is_pylatexenc_located_error, format_pylatexenc_located_error,
 } from '../zooflm/index.js';
 
@@ -118,7 +118,7 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
     prepare_zoo_update_objects(db_objects)
     {
         for (const [object_type, objectdb] of Object.entries(db_objects)) {
-            for (const [object_id, obj] of Object.entries(objectdb)) {
+            for (const [object_id, /*obj*/] of Object.entries(objectdb)) {
                 this.config.content_scanner.unregister_all_from_object(object_type, object_id);
             }
         }
@@ -291,7 +291,8 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
 
         obj._zoodb.flm_fields = [];
 
-        for (const {fieldname, fieldvalue, fieldschema, parent, parent_index, flm_options}
+        for (const {fieldname, fieldvalue, /*fieldschema,*/
+                    parent, parent_index, flm_options}
              of this._iter_flm_fields(obj, schema)) {
 
             // debug(
@@ -325,6 +326,8 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
         }
         // remove object pointers in relations, to avoid cyclic references, and
         // instead list all relations separately.
+
+        // todo ... use FLMDataDumper ...
 
         throw new Error(`Operation not supported!`);
     }

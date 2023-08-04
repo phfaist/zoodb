@@ -11,13 +11,15 @@ import { $$kw, render_value, ZooTextFragmentRenderer } from '../zooflm/index.js'
  */
 export class FLMSearchableDocTextValuesAssembler
 {
-    constructor({zoo_flm_environment, render_value_fn, doc_metadata})
+    constructor({zoo_flm_environment, render_value_fn, doc_metadata,
+                 text_fragment_renderer})
     {
         this.zoo_flm_environment = zoo_flm_environment;
         this.doc_metadata = doc_metadata ?? null;
         this.render_value_fn = render_value_fn ?? render_value;
 
-        this.text_fragment_renderer = new ZooTextFragmentRenderer();
+        this.text_fragment_renderer =
+            text_fragment_renderer ?? new ZooTextFragmentRenderer();
     }
     
     assemble_doc_text_values(doc_values)
@@ -50,9 +52,8 @@ export class FLMSearchableDocTextValuesAssembler
             }),
         );
 
-        const [result, junk] = flmdoc.render(this.text_fragment_renderer);
+        const [result, /*junk*/] = flmdoc.render(this.text_fragment_renderer);
         //debug('render field value --> result = ', result);
         return result;
-    };
-};
-
+    }
+}

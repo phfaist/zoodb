@@ -8,8 +8,8 @@ import sax from 'sax';
 
 import exif_parser from 'exif-parser';
 
-import debug_module from 'debug';
-const debug = debug_module('zoodb.resourcecollector.processor._inspectimagefile');
+//import debug_module from 'debug';
+//const debug = debug_module('zoodb.resourcecollector.processor._inspectimagefile');
 
 
 
@@ -48,8 +48,6 @@ function sliceEq(a, offset, b)
 }
 
 const SIG_PNG  = str2arr('\x89PNG\r\n\x1a\n'); // length = 8
-const SIG_IHDR = str2arr('IHDR');
-const SIG_pHYs = str2arr('pHYs');
 
 class PngMetaDataParser extends stream.Writable
 {
@@ -130,7 +128,7 @@ class PngMetaDataParser extends stream.Writable
         this.done();
     }
 
-    _handle_chunk_end(data) {
+    _handle_chunk_end(/*data*/) {
     }
 
     done()
@@ -139,7 +137,7 @@ class PngMetaDataParser extends stream.Writable
         this._skipBytes(Infinity);
     }
 
-};
+}
 
 
 export async function parse_png_metadata(stream, options={})
@@ -157,7 +155,7 @@ export async function parse_png_metadata(stream, options={})
     if (mp.unit_is_meters) {
         if (mp.x_ppu != mp.y_ppu) {
             console.error(`horizontal and vertical resolutions differ in ‘${options.what}’ `
-                          `— image might appear distorted`);
+                          + `— image might appear distorted`);
         }
         //we want dpi = dots_per_meter * (meter / inch), with (meter/inch)=0.0254
         x_dpi = dpiround(mp.x_ppu * 0.0254);
@@ -238,7 +236,7 @@ export async function parse_exif_metadata(stream, options={})
 
     if (x_dpi != y_dpi) {
         console.error(`horizontal and vertical resolutions differ in ‘${options.what}’ `
-                      `— image might appear distorted`);
+                      + `— image might appear distorted`);
     }
 
     const dpi = x_dpi;
@@ -252,8 +250,6 @@ export async function parse_exif_metadata(stream, options={})
             pixel_dimensions[1]*72/y_dpi,
         ]
     };
-
-    throw new Error(`Finish writing me!`);
 }
 
 
@@ -315,7 +311,7 @@ export async function parse_svg_metadata(stream, options)
         console.error(`Error parsing ‘${options.what}’: ${e}`);
         token.reject();
     });
-    parser.on('end', (e) => {
+    parser.on('end', (/*e*/) => {
         token.reject();
     });
     parser.on('opentag', (node) => {

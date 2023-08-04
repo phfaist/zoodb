@@ -67,7 +67,7 @@ export class ZooRelation
             this.use_backreference = false;
         }
 
-        if ( !this.zoodb.objects.hasOwnProperty(this.to_object_type) ) {
+        if ( !Object.hasOwn(this.zoodb.objects, this.to_object_type) ) {
             throw new Error(`Invalid _zoo_relation definition in ‘${this.object_type}’: `
                             + `There is no such object type ‘${this.to_object_type}’`);
         }
@@ -201,7 +201,8 @@ export class ZooRelation
         } else {
             rel_object_copy_nopkfld = Object.fromEntries(
                 Object.entries(relation_object).filter(
-                    ([relobjkey, relobjval]) => (relobjkey != this.relation_primary_key_field)
+                    ([relobjkey, /*relobjval*/]) =>
+                        (relobjkey != this.relation_primary_key_field)
                 )
             );
         }
@@ -236,9 +237,7 @@ export class ZooRelation
         }
     }
 
-
-
-};
+}
 
 
 
@@ -325,26 +324,27 @@ export class RelationsPopulator extends ZooDbProcessorBase
 
     // If we're going to update objects, then we clear everything and rebuild
     // all relations.
-    prepare_zoo_update_objects(db_objects)
+    prepare_zoo_update_objects(/*db_objects*/)
     {
         this.clear_all_relation_fields();
-    };
+    }
 
 
     // ---
 
     clear_all_relation_fields()
     {
-        const clear_field = ({object_type, object, computed_relation_fieldinfo, value}) => {
-            setfield(object, computed_relation_fieldinfo.fieldname, () => undefined);
-        };
+        const clear_field =
+              ({/*object_type,*/ object, computed_relation_fieldinfo, /*value*/}) => {
+                  setfield(object, computed_relation_fieldinfo.fieldname, () => undefined);
+              };
         this.check_all_clean_fields({ action: clear_field });
     }
 
     check_all_clean_fields({ action } = {})
     {
         if (action == null) { // null or undefined
-            action = ({object_type, object, computed_relation_fieldinfo, value}) => {
+            action = ({object_type, /*object,*/ computed_relation_fieldinfo, value}) => {
                 throw new Error(
                     `${object_type} object's ‘${computed_relation_fieldinfo.fieldname}’ `
                     + `field should not be specified manually (got ${JSON.stringify(value)}). `
@@ -355,7 +355,7 @@ export class RelationsPopulator extends ZooDbProcessorBase
 
         const all_relations_computed_fields = {};
 
-        for (const [object_type, relations] of Object.entries(this.relations)) {
+        for (const [/*object_type*/, relations] of Object.entries(this.relations)) {
             for (const relation of relations) {
                 const computed_fields = relation.get_computed_fields();
                 for (const [fld_object_type, fld_infos] of Object.entries(computed_fields)) {
@@ -407,5 +407,5 @@ export class RelationsPopulator extends ZooDbProcessorBase
         
     }
 
-};
+}
 

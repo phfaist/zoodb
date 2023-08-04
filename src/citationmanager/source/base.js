@@ -118,7 +118,7 @@ export class CitationSourceBase
         this.options = loMerge(
             {
                 fs: {
-                    readFileSync(fname) {
+                    readFileSync(/*fname*/) {
                         throw new Error(
                             `You did not specify fs: to your CitationSource `
                             + `instance but the source requested a local file.  You `
@@ -230,7 +230,7 @@ export class CitationSourceBase
 
             debug(`${this.source_name}: there are `
                   + `${this.keys_to_retrieve_remaining.length} citation(s) to retrieve`);
-            while (true) {
+            for (;;) {
 
                 if (this.keys_to_retrieve_remaining.length) {
 
@@ -394,9 +394,9 @@ export class CitationSourceBase
      * stored in `this.cache_store_options`!
      *
      */
-    async run_retrieve_chunk(id_list)
+    async run_retrieve_chunk(/*id_list*/)
     {
         throw new Error(`The method run_retrieve_chunk() must be reimplemented by subclasses!`);
     }
 
-};
+}

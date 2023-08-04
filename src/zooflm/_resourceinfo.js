@@ -33,7 +33,7 @@ export class ZooFLMResourceInfo
     {
         return `${this.object_type} ‘${this.object_id}’ in ‘${this.source_path}’`;
     }
-};
+}
 
 
 

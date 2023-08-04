@@ -62,7 +62,8 @@ export function getfield(obj, field)
         obj = obj[part] || {};
     }
     return obj[tail_part]; // can be undefined
-};
+}
+
 export function setfield(obj, field, setterfn)
 {
     if (typeof obj == 'undefined') {
@@ -72,17 +73,17 @@ export function setfield(obj, field, setterfn)
     const parts = field.split('.');
     const tail_part = parts.pop();
     for (const part of parts) {
-        if (!obj.hasOwnProperty(part)) {
+        if (!Object.hasOwn(obj, part)) {
             obj[part] = {};
         }
         obj = obj[part];
     }
-    if (!obj.hasOwnProperty(tail_part)) {
+    if (!Object.hasOwn(obj, tail_part)) {
         obj[tail_part] = setterfn();
     } else {
         obj[tail_part] = setterfn(obj[tail_part]);
     }
-};
+}
 
 export function concatlistfield(obj, field, items)
 {

@@ -175,6 +175,4 @@ export class StandardZooDb extends ZooDb
     {
     }
 
-};
-
-
+}

@@ -33,7 +33,7 @@ export class ZooDb
      */
     schema(object_type)
     {
-        if (!this.db.schemas.hasOwnProperty(object_type)) {
+        if (!Object.hasOwn(this.db.schemas, object_type)) {
             throw new Error(
                 `No zoo schema associated with object type ‘${object_type}’`
             );
@@ -140,7 +140,7 @@ export class ZooDb
 
         // update the raw data
         for (const [object_type, object_db] of Object.entries(db_objects)) {
-            for (const [object_id, object] of Object.entries(object_db)) {
+            for (const [object_id, /*object*/] of Object.entries(object_db)) {
                 this.raw_data_db.objects[object_type][object_id] =
                     JSON.parse(JSON.stringify(db_objects[object_type][object_id]));
             }
@@ -172,5 +172,5 @@ export class ZooDb
         object_db[object_id] = new_object;
     }
 
-};
+}
 

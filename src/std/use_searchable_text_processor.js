@@ -1,7 +1,7 @@
-import debug_mod from 'debug';
-const debug = debug_mod("zoodb.std.use_searchable_text_processor");
+// import debug_mod from 'debug';
+// const debug = debug_mod("zoodb.std.use_searchable_text_processor");
 
-import loMerge from 'lodash/merge.js';
+// import loMerge from 'lodash/merge.js';
 
 import {
     SearchableTextFieldset,
@@ -45,4 +45,4 @@ export function use_searchable_text_processor(_this)
         _this.searchable_text_fieldset
     );
     return searchable_text_processor;
-};
+}

@@ -2,8 +2,8 @@ import debug_module from 'debug';
 const debug = debug_module('zoodb.zooflm.scanner');
 
 import {$$kw, repr} from './flm-js/py.js';
-import * as latexnodes_nodes from './flm-js/pylatexenc.latexnodes.nodes.js';
-import {FLMFragment} from './flm-js/flm.flmfragment.js';
+
+import {is_flm_fragment} from './_environment.js';
 
 //import {getfield, setfield, concatlistfield, get_field_schema} from '../util/getfield.js';
 import {iter_object_fields_recursive} from '../util/objectinspector.js';
@@ -26,7 +26,7 @@ class LatexNodesVisitorJS
 {
     constructor() { }
 
-    visit(node) { }
+    visit(/*node*/) { }
 
     visit_chars_node(node) { this.visit(node); }
     visit_group_node(node) { this.visit(node); }
@@ -56,8 +56,7 @@ class LatexNodesVisitorJS
         node.accept_node_visitor(this);
     }
 
-};
-
+}
 
 const make_scanned_types_empty = () => ({
     // citation prefixes & keys for which we'll probably have to fetch
@@ -84,7 +83,7 @@ const make_scanned_types_empty = () => ({
  */
 export class ZooFLMScanner extends LatexNodesVisitorJS
 {
-    constructor(options)
+    constructor(/*options*/)
     {
         super();
 
@@ -110,7 +109,7 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
             return [];
         }
 
-        if (!encountered.hasOwnProperty(scanned_type)) {
+        if (!Object.hasOwn(encountered, scanned_type)) {
             throw new Error(`No such scanned type ‘${scanned_type}’`);
         }
         return encountered[scanned_type];
@@ -137,7 +136,7 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
                         }
                     }
                 );
-                return referenceable_dicts;
+                return referenceables_by_reftype;
             },
             [] // referenceables_by_reftype initial value for reduce()
         );
@@ -204,7 +203,7 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
     _visit_callable(node)
     {
         //debug(`Visiting callable node ${repr(node)}`);
-        if (node.hasOwnProperty('flmarg_cite_items'))
+        if (Object.hasOwn(node, 'flmarg_cite_items'))
         {
             // it's a citation node with citations to track
             node.flmarg_cite_items.forEach( (cite_item) => {
@@ -221,7 +220,7 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
             } );
         }
 
-        if (node.hasOwnProperty('flm_resources'))
+        if (Object.hasOwn(node, 'flm_resources'))
         {
             // this node depends on external resources that might need to be
             // collected and packaged along with the output
@@ -237,7 +236,7 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
             }
         }
 
-        if (node.hasOwnProperty('flm_referenceable_infos'))
+        if (Object.hasOwn(node, 'flm_referenceable_infos'))
         {
             let extra_attributes = {};
             // special treatment for some nodes, to add additional information
@@ -281,12 +280,12 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
         super.visit_environment_node(node);
     }
 
-    scan_fragment(fragment, what=undefined)
+    scan_fragment(fragment, /*what=undefined*/)
     {
         fragment.start_node_visitor(this);
     }
 
-    scan_object_with_schema(schema, what=undefined)
+    scan_object_with_schema(object, schema, what=undefined)
     {
         visitor_scan_object(this, object, schema, what);
     }
@@ -295,7 +294,7 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
     {
         visitor_scan_zoo(this, zoodbdata, options);
     }
-};
+}
 
 
 
@@ -318,7 +317,7 @@ export function visitor_scan_object(visitor, obj, schema, what=undefined)
         //debug(`\tfield: ${fieldname}`);
 
         if (fieldschema._flm) {
-            if ( ! fieldvalue instanceof FLMFragment ) {
+            if ( ! is_flm_fragment(fieldvalue) ) {
                 throw new Error(
                     `Field ${fieldname} of object ${JSON.stringify(obj)} is not an `
                     + `FLM object, even though its schema claims so: ${fieldvalue}`

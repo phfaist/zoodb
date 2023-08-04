@@ -115,7 +115,7 @@ export class CitationDatabaseManager
         let new_id = id;
         let cite_obj;
         let set_properties_chained = {};
-        while (true) {
+        for (;;) { // infinite loop
             // debug(`get_citation_by_id() -> cache get ${JSON.stringify(id)}`);
             cite_obj = this.cache.get(new_id);
             if (cite_obj === null) {
@@ -194,7 +194,7 @@ export class CitationDatabaseManager
 
             //debug(`Citation object is ${JSON.stringify(c)}`);
             
-            if (!keys_to_retrieve.hasOwnProperty(cite_prefix)) {
+            if (!Object.hasOwn(keys_to_retrieve, cite_prefix)) {
                 throw new Error(
                     `No source registered for cite prefix ‘${cite_prefix}’ `
                     + `(citation encountered in ${c.encountered_in?.what})`
@@ -336,7 +336,7 @@ export class CitationDatabaseManager
             const new_cite_prefix = entry_csl_json.chained.cite_prefix;
             const new_cite_key = entry_csl_json.chained.cite_key;
 
-            if ( ! this.sources.hasOwnProperty(new_cite_prefix) ) {
+            if ( ! Object.hasOwn(this.sources, new_cite_prefix) ) {
                 throw new Error(
                     `No source registered for cite prefix ‘${new_cite_prefix}’ in `
                     + `chained citation retreival for ‘${cite_prefix}:${cite_key}’`
@@ -426,4 +426,4 @@ export class CitationDatabaseManager
         return hasher.digest('hex');
     }
 
-};
+}

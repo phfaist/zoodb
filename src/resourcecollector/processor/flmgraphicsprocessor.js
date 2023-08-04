@@ -1,18 +1,10 @@
-import debug_module from 'debug';
-const debug = debug_module('zoodb.resourcecollector.processor.flmgraphicsprocessor');
-
-import path from 'path';
+// import debug_module from 'debug';
+// const debug = debug_module('zoodb.resourcecollector.processor.flmgraphicsprocessor');
 
 import { GraphicsResource, $$kw } from '../../zooflm/index.js';
 
 import { parse_image_metadata } from './_inspectimagefile.js';
 
-
-const graphics_type_by_format = {
-    svg: 'vector',
-    png: 'raster',
-    jpeg: 'raster',
-};
 
 
 /**
@@ -84,8 +76,4 @@ export class FLMGraphicsResourceProcessor
 
         return { graphics_resource };
     }
-};
-
-
-
-
+}

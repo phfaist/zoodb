@@ -57,7 +57,7 @@ export class ZooDbProcessorBase
      * new, updated data that will be reloaded into the zoo.  The current, old
      * object data that will be replaced is available in `this.zoodb.objects`.
      */
-    prepare_zoo_update_objects(db_objects)
+    prepare_zoo_update_objects(db_objects) // eslint-disable-line no-unused-vars
     {
         // by default do nothing
     }
@@ -70,7 +70,7 @@ export class ZooDbProcessorBase
      * The default implementation calls `process_zoo()` to re-process the entire
      * zoo.
      */
-    process_zoo_update_objects(db_objects)
+    process_zoo_update_objects(db_objects) // eslint-disable-line no-unused-vars
     {
         // by default simply process_zoo() again.
         this.process_zoo();
@@ -91,9 +91,9 @@ export class ZooDbProcessorBase
      * In all cases, return the resulting data even if no modifications are
      * required.
      */
-    process_data_dump(data, options)
+    process_data_dump(data, options) // eslint-disable-line no-unused-vars
     {
         return data;
     }
 
-};
+}

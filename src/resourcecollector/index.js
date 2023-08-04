@@ -48,8 +48,8 @@ export class ResourceCollector
                 );
             }
 
-            if (this.collected_resources[resource_type].hasOwnProperty(source)
-               || this.collected_resources_aliases[resource_type].hasOwnProperty(source)) {
+            if (Object.hasOwn(this.collected_resources[resource_type], source)
+               || Object.hasOwn(this.collected_resources_aliases[resource_type], source)) {
                 // already collected
                 debug(`... already collected.`);
                 return;
@@ -70,7 +70,7 @@ export class ResourceCollector
             };
 
             if (this.collected_resources[resource_type] &&
-                this.collected_resources[resource_type].hasOwnProperty(resolved_source)) {
+                Object.hasOwn(this.collected_resources[resource_type], resolved_source)) {
                 // already collected, only need to register the alias source
                 do_register_the_alias();
                 debug(`... registered ‘${source}’ as alias to already `
@@ -130,6 +130,4 @@ export class ResourceCollector
         );
     }
 
-};
-
-
+}

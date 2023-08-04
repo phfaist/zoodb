@@ -104,7 +104,7 @@ function Cache () {
         return (typeof data != 'undefined'); // && (isNaN(data.expire) || data.expire >= Date.now()));
     };
 
-    this.get_full_cache = function (key) {
+    this.get_full_cache = function () {
         return Object.assign({}, _cache);
     }
 
@@ -155,7 +155,7 @@ function Cache () {
     this.memsize = function() {
         var size = 0,
             key;
-        for (key in _cache) {
+        for (key in _cache) { // eslint-disable-line no-unused-vars
             size++;
         }
         return size;
@@ -206,7 +206,7 @@ function Cache () {
         var skipDuplicates = options && options.skipDuplicates;
 
         for (var key in cacheToImport) {
-            if (cacheToImport.hasOwnProperty(key)) {
+            if (Object.hasOwn(cacheToImport, key)) {
                 if (skipDuplicates) {
                     var existingRecord = _cache[key];
                     if (existingRecord) {

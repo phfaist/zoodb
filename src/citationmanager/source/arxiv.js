@@ -122,7 +122,7 @@ export class CitationSourceArxiv extends CitationSourceBase
             feedparser.on('readable', function () { // not arrow function, need 'this'
                 let stream = this;
                 let article;
-                while (article = stream.read()) {
+                while (article = stream.read()) { // eslint-disable-line no-cond-assign
                     _articles.push(article);
                 }
             });
@@ -171,7 +171,7 @@ export class CitationSourceArxiv extends CitationSourceBase
         const title = atom_article['title'];
 
         let author = atom_article['atom:author'];
-        if (author.hasOwnProperty('name')) {
+        if (Object.hasOwn(author, 'name')) {
             author = [ author ];
         }
 
@@ -184,7 +184,7 @@ export class CitationSourceArxiv extends CitationSourceBase
                      + `“${author_names.join(', ')}; ${title}”`);
         
         let doi = null;
-        if (this.override_arxiv_dois.hasOwnProperty(arxivid)) {
+        if (Object.hasOwn(this.override_arxiv_dois, arxivid)) {
             doi = this.override_arxiv_dois[arxivid];
         } else if (atom_article['arxiv:doi']) {
             doi = atom_article['arxiv:doi']['#'] || null;
@@ -224,7 +224,7 @@ export class CitationSourceArxiv extends CitationSourceBase
             );
         }
 
-        if (this.data_for_versionless_arxivid.hasOwnProperty(arxivid)) {
+        if (Object.hasOwn(this.data_for_versionless_arxivid, arxivid)) {
             // the ID w/o version number was requested (possibly in addition to
             // the one with version number).  Store this result as a candidate
             // for that version.
@@ -291,7 +291,7 @@ export class CitationSourceArxiv extends CitationSourceBase
         }
     }
 
-};
+}
 
 const _arxivurlregexp =
   /^https?:\/\/arxiv.org\/abs\/(?<arxivid>.*?)(?<versionnumstr>v(?<versionnum>\d+))?$/i;

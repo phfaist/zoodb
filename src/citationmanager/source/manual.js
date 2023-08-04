@@ -1,5 +1,5 @@
-import debug_module from 'debug';
-const debug = debug_module('zoodb.citationmanager.source.manual');
+// import debug_module from 'debug';
+// const debug = debug_module('zoodb.citationmanager.source.manual');
 
 
 import { CitationSourceBase } from './base.js';
@@ -53,4 +53,4 @@ export class CitationSourceManual extends CitationSourceBase
         }
     }
 
-};
+}

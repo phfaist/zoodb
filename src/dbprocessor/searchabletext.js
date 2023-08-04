@@ -3,7 +3,6 @@ const debug = debug_module('zoodb.dbprocessor.searchabletext');
 
 import { ZooDbProcessorBase } from './base.js';
 
-import { getfield } from '../util/getfield.js';
 import { iter_schema_fields_recursive, iter_object_fields_recursive } from '../util/objectinspector.js';
 
 
@@ -15,12 +14,12 @@ const _iterfieldsopts = {
         return (fieldname ? (fieldname + '_' + propname) : propname);
     },
 
-    arrayitemfieldname(fieldname, i) {
+    arrayitemfieldname(fieldname, /*i*/) {
         // don't keep array indices or '[]', flatten them out
         return fieldname ?? '';
     },
 
-    visit_predicate({fieldname, fieldschema, fieldvalue}) {
+    visit_predicate({fieldname, fieldschema, /*fieldvalue*/}) {
         // skip fields that are computed from other field (e.g.,
         // resolved references to code objects)
         if (fieldschema._auto_populated) {
@@ -48,7 +47,7 @@ function default_assemble_doc_text_values(doc_values) {
         }
     }
     return doc;
-};
+}
 
 
 
@@ -111,8 +110,6 @@ export class SearchableTextFieldset
 
     initialize(zoodb)
     {
-        const config = this.config;
-
         if (this.object_types == null) {
             this.object_types = Object.keys(zoodb.schemas);
         }
@@ -153,8 +150,6 @@ export class SearchableTextFieldset
 
     get_object_searchable_text_doc({object_type, object_id, object, schema, titlefield})
     {
-        const config = this.config;
-        
         // create the search-index document to add to the LUNR index
         let doc_values = [
             ['_z_otype', object_type],
@@ -169,13 +164,13 @@ export class SearchableTextFieldset
             // skip any fields not included in the index (e.g.,
             // auto-populated fields or fields that were manually
             // excluded from index)
-            if (!this.fields_set.has(fieldname)) {
+            if (!this.fields_set.has(s_fieldname)) {
                 continue;
             }
 
             if (fieldvalue != null) {
                 //debug(`search index doc: field ${fieldname}, value =`, fieldvalue);
-                doc_values.push([fieldname, fieldvalue]);
+                doc_values.push([s_fieldname, fieldvalue]);
             }
         }
 
@@ -196,7 +191,7 @@ export class SearchableTextFieldset
  */
 export class SearchableTextProcessor extends ZooDbProcessorBase
 {
-    constructor(searchable_text_fieldset, options = {})
+    constructor(searchable_text_fieldset, /*options = {}*/)
     {
         super();
 
@@ -222,7 +217,7 @@ export class SearchableTextProcessor extends ZooDbProcessorBase
         }
     }
 
-    prepare_zoo_update_objects(db_objects)
+    prepare_zoo_update_objects(/*db_objects*/)
     {
     }
 
@@ -263,8 +258,4 @@ export class SearchableTextProcessor extends ZooDbProcessorBase
         }
     }
 
-};
-
-
-
-
+}

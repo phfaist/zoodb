@@ -144,7 +144,7 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         await this.flm_simple_content_compiler.prepare_zoo_update_objects(db_objects);
     }
 
-    async process_zoo_update_objects(db_objects)
+    async process_zoo_update_objects(/*db_objects*/)
     {
         // simply re-process the full zoo.
         await this.process_zoo();
@@ -332,4 +332,4 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         await this.resource_collector.finish();
     }
 
-};
+}

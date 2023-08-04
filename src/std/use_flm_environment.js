@@ -2,7 +2,8 @@ import debug_mod from 'debug';
 const debug = debug_mod("zoodb.std.use_flm_environment");
 
 import {
-    $$kw, ZooTextFragmentRenderer, ZooFLMEnvironment, repr, CitationsProvider,
+    $$kw, // repr,
+    ZooFLMEnvironment,
     RefInstance,
     //fn_unique_object_id,
 } from '../zooflm/index.js';
@@ -74,7 +75,7 @@ export function use_flm_environment(_this)
     if (_this.config.flm_options?.allow_unresolved_references) {
         zoo_flm_environment.feature_refs.add_external_ref_resolver(
             {
-                get_ref(ref_type, ref_label, resource_info, render_context) {
+                get_ref(ref_type, ref_label, /*resource_info, render_context*/) {
                     debug(`Default ref_resolver called for invalid reference `
                           + `‘${ref_type}:${ref_label}’`);
                     return RefInstance(
@@ -92,7 +93,7 @@ export function use_flm_environment(_this)
     if (_this.config.flm_options?.allow_unresolved_citations) {
         zoo_flm_environment.feature_citations.add_external_citations_provider(
             {
-                get_citation_full_text_flm(cite_prefix, cite_key, resource_info)
+                get_citation_full_text_flm(cite_prefix, cite_key, /*resource_info*/)
                 {
                     debug(`Note: unresolved citation ‘${cite_prefix}:${cite_key}’`);
                     return `\\begin{verbatimtext}${cite_prefix}:${cite_key}\\end{verbatimtext}`;
@@ -106,7 +107,7 @@ export function use_flm_environment(_this)
     // given graphics resource.
     //
     zoo_flm_environment.graphics_collection.src_url_resolver =
-        (graphics_resource, render_context) => {
+        (graphics_resource, /*render_context*/) => {
 
             const src_url =
                   _this.config.zoo_permalinks.graphics_resource(graphics_resource);
@@ -163,5 +164,3 @@ export function use_flm_environment(_this)
 
     return zoo_flm_environment;
 }
-
-

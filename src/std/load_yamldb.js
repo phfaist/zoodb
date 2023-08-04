@@ -1,9 +1,7 @@
 import debug_mod from 'debug';
 const debug = debug_mod("zoodb.std.load_yamldb");
 
-import path from 'path';
-
-import loMerge from 'lodash/merge.js';
+//import loMerge from 'lodash/merge.js';
 
 import { YamlDbZooDataLoader } from '@phfaist/zoodb/dbdataloader/yamldb';
 
@@ -96,13 +94,18 @@ export class StandardZooDbYamlDataLoader
         try {
 
             debug("Reloading Zoo!");
-            const { dbdata, reload_info } = await this.yamldb_loader.reload(this.zoodb.db);
+
+            const { /*dbdata,*/ reload_info } =
+                  await this.yamldb_loader.reload(this.zoodb.db);
+
             await this.zoodb.update_objects(reload_info.reloaded_objects);
 
             debug("Re-Validating Zoo");
+
             await this.zoodb.validate();
 
             debug("Finished reloading Zoo.");
+
             return true;
 
         } catch (err) {
@@ -112,4 +115,4 @@ export class StandardZooDbYamlDataLoader
         }
     }
 
-};
+}

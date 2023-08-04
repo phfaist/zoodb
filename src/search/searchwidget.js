@@ -254,7 +254,7 @@ export class SearchWidget
                         && term_length >= _auto_fuzz_min_word_length) {
                         clause.editDistance = _auto_fuzz_distance;
                     }
-                };
+                }
                 console.log("Done processing clauses.");
                 return qq;
             };
@@ -363,13 +363,13 @@ export class SearchWidget
 
         const hipos = {}; // hipos[field] = [ (list of highlight positions) ]
 
-        for (const [word, wordmatches] of Object.entries(result.matchData.metadata)) {
+        for (const [/*word*/, wordmatches] of Object.entries(result.matchData.metadata)) {
             for (const [fieldname, fieldmatches] of Object.entries(wordmatches)) {
 
                 const poslist = fieldmatches.position;
                 //console.log('word =', word, 'fieldname =', fieldname, 'poslist =', poslist);
 
-                if ( ! hipos.hasOwnProperty(fieldname) ) {
+                if ( ! Object.hasOwn(hipos, fieldname) ) {
                     hipos[fieldname] = [];
                 }
 
@@ -383,7 +383,7 @@ export class SearchWidget
         // iterate over this.search_index.info.fields instead, to preserve field order
         for (const fieldname of this.search_index.info.fields) {
 
-            if ( ! hipos.hasOwnProperty(fieldname) ) {
+            if ( ! Object.hasOwn(hipos, fieldname) ) {
                 // no such field in match
                 continue;
             }
@@ -459,4 +459,4 @@ export class SearchWidget
         container.appendChild(div);
     }
 
-};
+}

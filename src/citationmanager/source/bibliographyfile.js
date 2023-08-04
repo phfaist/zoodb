@@ -1,9 +1,9 @@
-import path from 'path';
+// import path from 'path';
 
 import jsyaml from 'js-yaml';
 
-import debug_module from 'debug';
-const debug = debug_module('zoodb.citationmanager.source.bibliographyfile');
+// import debug_module from 'debug';
+// const debug = debug_module('zoodb.citationmanager.source.bibliographyfile');
 
 import { CitationSourceBase } from './base.js';
 
@@ -109,4 +109,4 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
         }
     }
 
-};
+}

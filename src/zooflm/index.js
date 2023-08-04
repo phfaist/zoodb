@@ -1,7 +1,6 @@
 //
-import debug_module from 'debug';
-const debug = debug_module('zoodb.zooflm');
-
+// ZooDB/ZooFLM code base
+//
 
 // provide $$kw({...}) and repr() to importers
 export {$$kw, repr} from './flm-js/py.js';

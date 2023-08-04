@@ -2,7 +2,9 @@ import debug_module from 'debug';
 const debug = debug_module('zoodb.zooflm.citationcompiler');
 
 import * as zooflm from './index.js';
-const {$$kw, repr} = zooflm;
+const {
+    $$kw, // repr,
+} = zooflm;
 
 import { split_prefix_label } from '../util/index.js';
 
@@ -35,7 +37,7 @@ function escape_flm(x)
 {
     _rx_flm_escape_chars.lastIndex = 0;
     return x.replaceAll(_rx_flm_escape_chars, (m) => flm_escape_chars[m]);
-};
+}
 
 
 
@@ -69,7 +71,7 @@ function escape_html(x)
  */
 export function install_csl_flm_output_format(zooflmenviron)
 {
-    if (CSL.Output.Formats.hasOwnProperty('flm')) {
+    if (Object.hasOwn(CSL.Output.Formats, 'flm')) {
         // FLM format already exists, not re-installing it
         return;
     }
@@ -100,7 +102,7 @@ export function install_csl_flm_output_format(zooflmenviron)
             
             const transform_mml_to_tex = (chunk) => {
                 // really too simple ... basically a cheap conversion to text... :/
-                return chunk.replace(/\s*\<.*?\>\s*/g, '');
+                return chunk.replace(/\s*<.*?>\s*/g, '');
             };
             text = text.replace(/<mml:math.*?<\/\s*mml:math>/g, transform_mml_to_tex);
 
@@ -212,7 +214,7 @@ export function install_csl_flm_output_format(zooflmenviron)
         "@display/indent": function (state, str) {
             return str; // "<div class=\"csl-indent\">" + str + "</div>\n  ";
         },
-        "@showid/true": function (state, str, cslid) {
+        "@showid/true": function (state, str, /*cslid*/) {
             return str;
         },
         "@URL/true": function (state, str) {
@@ -226,7 +228,7 @@ export function install_csl_flm_output_format(zooflmenviron)
             return "\\href{" + doiurl + "}{DOI}";
         }
     };
-};
+}
 
 
 
@@ -234,8 +236,8 @@ export function install_csl_flm_output_format(zooflmenviron)
 
 const _default_format_link_text = {
     'arxiv': function (arxivid) { return `arXiv:${arxivid}`; },
-    'doi': function (doi) { return `DOI`; },
-    'url': function (url) { return `URL`; },
+    'doi': function (/*doi*/) { return `DOI`; },
+    'url': function (/*url*/) { return `URL`; },
 };
 
 
@@ -569,7 +571,7 @@ export class CitationCompiler
         this.compiled_citations[cite_id] = c;
     }
 
-};
+}
 
 
 function _compose_id_from_cite_prefix_key(cite_prefix, cite_key)
@@ -582,7 +584,7 @@ function _compose_id_from_cite_prefix_key(cite_prefix, cite_key)
 
 function _split_to_cite_prefix_key(id)
 {
-    return [cite_prefix, cite_key] = split_prefix_label(id);
+    const [cite_prefix, cite_key] = split_prefix_label(id);
     return {cite_prefix, cite_key};
 }
 

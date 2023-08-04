@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import jsyaml from 'js-yaml';
-import glob from 'glob';
+// import glob from 'glob';
 
 import jsonschema from 'jsonschema';
 import $RefParser from "@apidevtools/json-schema-ref-parser";
@@ -46,7 +46,7 @@ function get_default_ignore_file_name_match(resource_file_extensions) {
         // backup files / desktop services
         + '^\\.DS_Store|\\~|\\.bak|\\.bkp|'
         // autosave files (e.g., Emacs)
-        + '^[.]?\#.*\#|'
+        + '^[.]?#.*#|'
         // .git, .gitignore, .gitattributes, .gitmodules, etc.
         + '^\\.git.*|'
         // any latex temporary files lying around
@@ -177,7 +177,7 @@ export class YamlDbZooDataLoader
         this.schema_refparser_resolver = {
             ...json_refparser_resolver_http,
             order: 1,
-            canRead(file) { return true; },
+            canRead(/*file*/) { return true; },
             read(file) {
                 try {
                     debug(`file.url = ${file.url}, `
@@ -232,7 +232,7 @@ export class YamlDbZooDataLoader
     {
         debug(`Loading Zoo from ‘${this.config.root_data_dir}’ ...`);
 
-        const { dbdata, reload_info } = await this.reload();
+        const { dbdata, /*reload_info*/ } = await this.reload();
 
         return dbdata;
     }
@@ -331,7 +331,7 @@ export class YamlDbZooDataLoader
 
     async get_schema_by_name(schema_name)
     {
-        if ( this.schemas_by_name.hasOwnProperty(schema_name) ) {
+        if ( Object.hasOwn(this.schemas_by_name, schema_name) ) {
             return this.schemas_by_name[schema_name];
         }
 
@@ -443,7 +443,7 @@ export class YamlDbZooDataLoader
     {
         const fullsrcpath = path.join(this.config.root_data_dir, objectconfig.data_src_path);
 
-        const dir_callback = (root_path, rel_path, dirent) => {
+        const dir_callback = (root_path, rel_path, /*dirent*/) => {
             debug(`Looking for ${objectconfig.object_type} objects in ‘${rel_path}’ ...`);
         };
         const file_callback = async (root_path, rel_path, dirent) => {
@@ -542,7 +542,7 @@ export class YamlDbZooDataLoader
 
             // to help debugging, mark all old object instances, which we'll replace
             // here, as "STALE"
-            for (const [old_object_id, old_object]
+            for (const [ /*old_object_id*/ , old_object]
                  of existing_dbdata_info.objects_by_source[source_file_path][object_type]) {
                 old_object.$STALE = true;
                 old_object._zoodb.$STALE = true;
@@ -578,7 +578,8 @@ export class YamlDbZooDataLoader
     }
 
     finalize_object(obj, objectconfig,
-                    {root_path, rel_path, source_file_path, source_file_modification_token})
+                    { /*root_path, rel_path,*/
+                      source_file_path, source_file_modification_token })
     {
         // validate according to the JSON schema
 
@@ -605,7 +606,4 @@ export class YamlDbZooDataLoader
         // debug(`Finalized object, _zoodb -> ${JSON.stringify(obj._zoodb)}`);
     }
 
-
-};
-
-
+}
