@@ -306,9 +306,23 @@ export class CitationsProvider
         this.citations_database[cite_prefix][cite_key] = full_citation_flm_text;
     }
 
+    /** Equivalent to calling `clear_citations()` followed by
+     * `update_citations(iterable)`.
+     */
     set_citations(iterable)
     {
         this.clear_citations();
+        this.update_citations(iterable);
+    }
+
+    /** Add the given citations to the database, updating any existing citations
+     * with the coinciding prefix/key.
+     *
+     * The iterable should be a list or iterable of objects of the form
+     * ``{cite_prefix:..., cite_key:..., citation_text:....}``.
+     */
+    update_citations(iterable)
+    {
         for (const {cite_prefix, cite_key, citation_text} of iterable) {
             this.add_citation(cite_prefix, cite_key, citation_text);
         }
@@ -330,7 +344,7 @@ export class CitationsProvider
             return this.handle_unresolved_citation({
                 cite_prefix, cite_key, resource_info,
                 message:
-                    `There is no citation registered for prefix ‘${cite_prefix}’ in query `
+                    `There is no citation registered for prefix ‘${cite_prefix}’ `
                     + `for ‘${cite_prefix}:${cite_key}’ in ${resource_info}`
             });
             
@@ -407,7 +421,7 @@ export const FeatureZooGraphicsCollection = __class__(
                     //
                     const source_path = path.join(resource_info.get_source_directory(),
                                                   graphics_path);
-                    if (!Object.hasOwn(feature.graphics_collection, source_path)) {
+                    if (!feature.has_graphics_for(source_path)) {
                         throw new Error(
                             `No such graphics ‘${source_path}’ (‘${graphics_path}’ `
                             + `relative to ${resource_info})`
@@ -418,13 +432,16 @@ export const FeatureZooGraphicsCollection = __class__(
 
                     //debug(`Got graphics_resource = `, graphics_resource);
 
-                    if (feature.src_url_resolver != null) {
-                        const { src_url, srcset } = feature.src_url_resolver(
+                    if (feature.src_url_resolver_fn != null) {
+                        const { src_url, srcset } = feature.src_url_resolver_fn({
                             graphics_resource,
-                            self.render_context
-                        );
+                            render_context: self.render_context,
+                            source_path,
+                        });
                         if (src_url === undefined) {
-                            throw new Error(`src_url_resolver() did not return { src_url }.`);
+                            throw new Error(
+                                `src_url_resolver_fn() did not return { src_url }.`
+                            );
                         }
                         return new GraphicsResource($$kw(
                             Object.assign({}, graphics_resource.asdict(),
@@ -454,7 +471,11 @@ export const FeatureZooGraphicsCollection = __class__(
             self.feature_name = 'graphics_resource_provider';
 
             // can set a src_url resolver for generation-time url resolution
-            self.src_url_resolver = null;
+            self.src_url_resolver_fn = null;
+
+            // can set a src_url for when we're exporting the entire graphics
+            // collection information to JSON
+            self.export_graphics_resource_url_fn = (graphics_resource) => null;
 
             //debug("FeatureZooGraphicsCollection constructor.  self = ", self);
         });},
@@ -484,6 +505,10 @@ export const FeatureZooGraphicsCollection = __class__(
             } );
         }); },
 
+        get has_graphics_for () {return __get__(this, function
+        (self, source_path) {
+            return Object.hasOwn(self.graphics_collection, source_path);
+        }); },
 
         // load/save references DB
         get dump_database() {return __get__(this, function
@@ -492,9 +517,15 @@ export const FeatureZooGraphicsCollection = __class__(
                 graphics_collection: Object.fromEntries(
                     Object.entries(self.graphics_collection).map(
                         ([source_path, graphics_resource]) => {
+                            let graphics_resource_dict = graphics_resource.asdict()
+                            // fix the path if necessary, especially if the
+                            // resulting website files is being processed by a
+                            // bundler like parceljs
+                            graphics_resource_dict.src_url =
+                                self.export_graphics_resource_url_fn(graphics_resource);
                             return [
                                 source_path,
-                                graphics_resource.asdict()
+                                graphics_resource_dict,
                             ];
                         }
                     )

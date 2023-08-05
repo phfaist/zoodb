@@ -16,6 +16,7 @@ import { CitationCompiler, install_csl_flm_output_format } from '../zooflm/citat
 import { CitationDatabaseManager } from '../citationmanager/index.js';
 import { ResourceCollector } from '../resourcecollector/index.js';
 
+import loMerge from 'lodash/merge.js';
 
 /**
  * Database processor that compiles FLM content in object fields all while
@@ -33,16 +34,30 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         //
         // fix some options & defaults
         //
-        this.options = options || {};
-        this.options.refs ||= {};
-        this.options.refs_defaults ||= {};
+        this.options = loMerge(
+            {
+                refs: {},
+                refs_defaults: {},
+                citations: {
+                    sources: {},
+                    // default_user_agent: null, // can be left undefined
+                    cache_fs: null,
+                    cache_dir: '.',
+                    // cache_entry_default_duration_ms: null, // can be left undefined
+                },
+                flm_error_policy: 'abort', // 'abort' or 'continue'
 
-        this.options.citations ||= {};
-        this.options.citations.sources ||= {};
-        //this.options.citations.default_user_agent ||= null; // ### can leave undefined
+                skip_check_update_existing_citations: false,
+                skip_check_update_existing_resources: false,
 
-        // 'abort' or 'continue'
-        this.options.flm_error_policy ??= 'abort';
+                // by default, we'll create an instance on our own later on in
+                // the constructor with the given resource_collector_options as
+                // arguments.
+                resource_collector: null,
+                resource_collector_options: {},
+            },
+            options,
+        );
 
         this.zoo_flm_environment = this.options.zoo_flm_environment;
         if (!this.zoo_flm_environment) {
@@ -73,7 +88,7 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
             {
                 default_user_agent: this.options.citations.default_user_agent,
                 cache_fs: this.options.citations.cache_fs,
-                cache_file: path.join(this.options.citations.cache_dir ?? '.',
+                cache_file: path.join(this.options.citations.cache_dir,
                                       'cache_downloaded_info.json'),
                 cache_entry_default_duration_ms:
                     this.options.citations.cache_entry_default_duration_ms,
@@ -94,14 +109,14 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
             flm_compile_fragments: true,
             flm_environment: this.zoo_flm_environment,
             cache_fs: this.options.citations.cache_fs,
-            cache_file: path.join(this.options.citations.cache_dir ?? '.',
+            cache_file: path.join(this.options.citations.cache_dir,
                                   'cache_compiled_citations.json'),
         });
 
         //
         // Resource collector, e.g. for graphics
         //
-        this.resource_collector = this.options.resource_collector ||
+        this.resource_collector = this.options.resource_collector ??
             new ResourceCollector(this.options.resource_collector_options);
     }
 
@@ -239,28 +254,30 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
 
         const encountered_citations = this.scanner.get_encountered('citations');
 
-        // check to retrieve only citation information for citations we don't
-        // already have in our compiled citations cache.  (If it's already in
-        // the downloaded citations cache, the citation manager will pick it up
-        // automatically.  But the manager doesn't know about the citations
-        // compiler.)
-        const new_citations_to_compile = encountered_citations.filter(
-            ({ cite_prefix, cite_key }) => {
-                if (this.zoo_flm_environment.citations_provider
-                    .has_citation({cite_prefix, cite_key})) {
-                    // don't need to retrieve this citation info, we already
-                    // have the relevant compiled citaiton
+        // Normally, we'll mark all citation prefix/key pairs to be reloaded, so
+        // that any updated citation information can be re-fetched if
+        // applicable.  However, if the `skip_check_update_existing_citations`
+        // flag is set, we'll skip update checks for any citations that are
+        // already stored in the zooflm environment citation provider's
+        // database.  [Note that the citation information goes through three
+        // stages and is stored (1) in the citation information manager incl
+        // cache, (2) in the citation compiler incl cache, and (3) in the
+        // citation provider of the zooflm environment.]
 
-                    // TODO -- Include check to see if the citation might be
-                    // out-of-date!!  Actually, add a configuration flat that
-                    // tells us if we should check (or not) for the information
-                    // to be up-to-date.  The idea is that for an in-browser zoo
-                    // loading, we should skip this check!
-                    return false;
+        let new_citations_to_compile = encountered_citations;
+        if (this.options.skip_check_update_existing_citations) {
+            new_citations_to_compile = new_citations_to_compile.filter(
+                ({ cite_prefix, cite_key }) => {
+                    if (this.zoo_flm_environment.citations_provider
+                        .has_citation({cite_prefix, cite_key})) {
+                        // don't need to retrieve this citation info, we already
+                        // have the relevant compiled citaiton
+                        return false;
+                    }
+                    return true;
                 }
-                return true;
-            }
-        );
+            );
+        }
 
         // make sure we purge any entries from earlier possible zoo processings
         this.citation_manager.purge_expired();
@@ -276,7 +293,7 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
             new_citations_to_compile
         );
 
-        this.zoo_flm_environment.citations_provider.set_citations(
+        this.zoo_flm_environment.citations_provider.update_citations(
             this.citation_compiler.iter_compiled_citations()
         );
 
@@ -291,15 +308,6 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         const encountered_resources = this.scanner.get_encountered('resources');
 
         for (const resource of encountered_resources) {
-
-            // TODO -- only collect resources that need to be collected !!!
-            // check any already-collected resources !!!
-
-            // TODO -- Add a configuration flat that tells us if we should check
-            // (or not) for the collected resources to be up-to-date.  The idea
-            // is that for an in-browser zoo loading, we should skip
-            // checking/loading any known resources!
-            //...
 
             // debug('resource = ', resource);
 
@@ -321,6 +329,16 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
                 );
             } else {
                 source = resource.resource_source;
+            }
+
+            if (this.options.skip_check_update_existing_resources) {
+                if (resource.resource_type == 'graphics_path'
+                    && this.zoo_flm_environment.graphics_collection.has_graphics_for(source)) {
+                    debug(`Resource information for ${resource.resource_type} ‘${source}’ is `
+                          + `already available and `
+                          + `options.skip_check_update_existing_resources is set; skipping.`);
+                    continue;
+                }
             }
 
             await this.resource_collector.collect(

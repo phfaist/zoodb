@@ -106,8 +106,8 @@ export function use_flm_environment(_this)
     // callable in config that tells us how to build URLs corresponding to a
     // given graphics resource.
     //
-    zoo_flm_environment.graphics_collection.src_url_resolver =
-        (graphics_resource, /*render_context*/) => {
+    zoo_flm_environment.graphics_collection.src_url_resolver_fn =
+        ({graphics_resource, /*render_context, source_path*/}) => {
 
             const src_url =
                   _this.config.zoo_permalinks.graphics_resource(graphics_resource);

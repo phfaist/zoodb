@@ -115,7 +115,10 @@ export class ResourceCollector
 
     get_resource_data(resource_type, source)
     {
-        const alias_info = this.colected_resources_aliases[resource_type][source];
+        let alias_info = null;
+        if (this.collected_resources_aliases[resource_type]) {
+            alias_info = this.collected_resources_aliases[resource_type][source];
+        }
         if (alias_info != null) { // not undefined or null
             source = alias_info.resolved_source;
         }

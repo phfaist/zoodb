@@ -120,7 +120,11 @@ export function use_flm_processor(_this)
                     make_resource_processors_graphics_path(flm_options.resources ?? {},
                                                            { fs, fs_data_dir, _this })
             },
-        }
+        },
+        skip_check_update_existing_citations:
+            flm_options.skip_check_update_existing_citations,
+        skip_check_update_existing_resources:
+            flm_options.skip_check_update_existing_resources,
     };
 
     let zoo_flm_processor = new ZooFLMProcessor(flm_processor_config);
