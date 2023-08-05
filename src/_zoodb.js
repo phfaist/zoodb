@@ -60,34 +60,15 @@ export class ZooDb
     // ---
 
     /**
-     * Produce a serializable data dump of the contents of the database.
-     *
-     * This method will call all database processors' `process_data_dump()`
-     * methods to ensure that the database is prepared for serialization.
-     */
-    data_dump(options = {})
-    {
-        let data = { db: this.db };
-        // note iteration in reverse order, so that processors can "standardize"
-        // or "partially undo" their transformations in the correct order.
-        for (const processor of Array.from(this.processors).reverse()) {
-            data = processor.process_data_dump(data, options);
-        }
-        return data;
-    }
-    
-    // internal. 
-    raw_data_db_dump()
-    {
-        return {db: this.raw_data_db};
-    }
-
-
-    /**
      * Initialize the database processors and then directly load objects whose
      * data is given in the argument dictionary `db`.  We ensure that the
      * objects are copies of the probvided data, by serializing them &
      * deserializing them again from JSON.
+     *
+     * Note that this method is meant to load raw data that needs to be
+     * processed.  You are not likely to be able to load data dumped using
+     * `data_dump()`, unless you dumped that data by using raw data dump options
+     * and skipping the db processors' fiddling.  See `data_dump()` for details.
      *
      * @param {Object} db - an object with keys 'schemas' and 'objects'.
      */
@@ -171,6 +152,43 @@ export class ZooDb
     {
         object_db[object_id] = new_object;
     }
+
+
+
+
+    /**
+     * Produce a serializable data dump of the contents of the database.
+     *
+     * This method will call all database processors' `process_data_dump()`
+     * methods to ensure that the database is prepared for serialization.
+     */
+    async data_dump(options = {})
+    {
+        const {
+            use_raw_db_data,
+            skip_db_processors,
+        } = options;
+
+        let data = {};
+
+        if (use_raw_db_data ?? false) {
+            data.db = this.raw_data_db;
+            skip_db_processors ??= true;
+        } else {
+            data.db = this.db;
+        }
+
+        if ( ! (skip_db_processors ?? false) ) {
+            // note iteration in reverse order, so that processors can "standardize"
+            // or "partially undo" their transformations in the correct order.
+            for (const processor of Array.from(this.processors).reverse()) {
+                data = await processor.process_data_dump(data, options);
+            }
+        }
+        return data;
+    }
+    
+
 
 }
 

@@ -165,6 +165,7 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         await this.process_zoo();
     }
 
+
     // ---
 
 
@@ -348,6 +349,41 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         }
 
         await this.resource_collector.finish();
+    }
+
+    // ---
+
+    async process_data_dump(data, options)
+    {
+        let {
+            flm_include_refs_data,
+        } = options;
+        
+        flm_include_refs_data ??= true;
+
+        await this.flm_simple_content_compiler.process_data_dump(data, options);
+
+        //
+        // include data about references & citations
+        //
+        if (flm_include_refs_data) {
+            let refs_data = {};
+            if (this.zoo_flm_environment.ref_resolver) {
+                refs_data.refs =
+                    this.zoo_flm_environment.ref_resolver.dump_database();
+            }
+            if (this.zoo_flm_environment.citations_provider) {
+                refs_data.citations =
+                    this.zoo_flm_environment.citations_provider.dump_database();
+            }
+            if (this.zoo_flm_environment.graphics_collection) {
+                refs_data.graphics_collection =
+                    this.zoo_flm_environment.graphics_collection.dump_database();
+            }
+            data.refs_data = refs_data;
+        }
+
+        return data;
     }
 
 }

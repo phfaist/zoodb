@@ -8,7 +8,7 @@ import {
 } from '../util/objectinspector.js';
 import {
     ZooFLMResourceInfo, $$kw, // repr,
-    //FLMDataDumper,
+    FLMDataDumper,
     is_flm_fragment, is_pylatexenc_located_error, format_pylatexenc_located_error,
 } from '../zooflm/index.js';
 
@@ -319,17 +319,75 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
 
 
     // ---
-    prepare_data_dump(data, options)
+    async prepare_data_dump(data, options)
     {
-        if (options.flm_keep_fragment_instances) {
-            return data;
+        let {
+            flm_fragments_keep_instances,
+            flm_fragments_to_flm_text,
+            flm_fragments_to_flm_dump,
+        } = options;
+
+        flm_fragments_keep_instances ??= false;
+        flm_fragments_to_flm_text ??= false;
+        flm_fragments_to_flm_dump ??= false;
+
+        if (!flm_fragments_keep_instances
+            && !flm_fragments_to_flm_text
+            && !flm_fragments_to_flm_dump) {
+            // if neither option is set, use flm_text
+            flm_fragments_to_flm_text = true;
         }
-        // remove object pointers in relations, to avoid cyclic references, and
-        // instead list all relations separately.
 
-        // todo ... use FLMDataDumper ...
+        // error if more than one of these options is set
+        if ( (0 + (+flm_fragments_keep_instances)
+              + (+flm_fragments_to_flm_text)
+              + (+flm_fragments_to_flm_dump) ) > 1 ) {
+            throw new Error(
+                `preparing data dump in FLMSimpleContentCompiler: at most one of `
+                + `flm_fragments_keep_instances (=${flm_fragments_keep_instances}), `
+                + `flm_fragments_to_flm_text (=${flm_fragments_to_flm_text}), and `
+                + `flm_fragments_to_flm_dump (=${flm_fragments_to_flm_dump}) `
+                + `may be set.`
+            );
+        }
+        
+        let flm_dumper = null;
+        let flm_dumper_key = 0;
+        if (flm_fragments_to_flm_dump) {
+            flm_dumper = new FLMDataDumper(this.config.flm_environment);
+        }
+            
+        if (flm_fragments_keep_instances) {
+            // keep data as is
+        } else {
+            // we need to iterate over the data and fix it
+            for (const object_type of this.config.object_types) {
+                const schema = this.zoodb.schema(object_type);
+                const objects = data.db.objects[object_type];
+                if (!objects || Object.keys(objects).length == 0) {
+                    continue;
+                }
+                for (const [objid, obj] of Object.entries(objects)) {
+                    for (const flm_field of obj._zoodb.flm_fields) {
+                        // we need to process obj's field `flm_field`
+                        const fragment = getfield(obj, flm_field);
+                        if (flm_fragments_to_flm_text) {
+                            setfield(obj, fragment.flm_text);
+                        }
+                        if (flm_fragments_to_flm_dump) {
+                            flm_dumper.add_object_dump(flm_dumper_key, fragment);
+                            setfield(obj, {'flm_fragment_key': flm_dumper_key});
+                        }
+                    }
+                }
+            }
+        }
 
-        throw new Error(`Operation not supported!`);
+        if (flm_fragments_to_flm_dump) {
+            data.flm_fragment_data = flm_dumper.get_data();
+        }
+
+        return data;
     }
 
 }
