@@ -374,7 +374,8 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
                         // we need to process obj's field `flm_field`
                         const fragment = getfield(obj, flm_field);
                         if (flm_fragments_to_flm_text) {
-                            setfield(obj, fragment.flm_text);
+                            setfield(obj, flm_field,
+                                     () => fragment.flm_text);
                         }
                         if (flm_fragments_to_flm_dump) {
                             flm_dumper.add_object_dump(flm_dumper_key, fragment);
