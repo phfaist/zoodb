@@ -61,7 +61,7 @@ export function * iter_object_fields_recursive(obj, schema, options, fieldname=u
               only_schema_properties ? Object.keys(schema_properties) : Object.keys(obj) ;
         for (const propname of keys) {
             const propschema =
-                  (schema_properties??{})[propname] ?? schema.additionalProperties ?? {};
+                  schema_properties[propname] ?? schema.additionalProperties ?? {};
             const propvalue = obj[propname];
 
             let iter = iter_object_fields_recursive(
@@ -138,4 +138,57 @@ export function * iter_schema_fields_recursive(schema, options, fieldname=undefi
                fieldschema: schema};
 
     }
+}
+
+
+
+export function copy_object_structure(obj, schema, options={})
+{
+    let {
+        only_schema_properties,
+        create_object,
+        create_array,
+    } = options;
+    
+    only_schema_properties ??= false;
+    create_object ??= () => ({});
+    create_array ??= () => [];
+
+    if (obj == null) {
+        return obj; // no fields to expore or yield
+    }
+    if (schema.type == 'object') {
+
+        let new_obj = create_object();
+
+        const schema_properties = schema.properties ?? {};
+        const keys =
+              only_schema_properties ? Object.keys(schema_properties) : Object.keys(obj) ;
+        for (const propname of keys) {
+            const propschema =
+                  schema_properties[propname] ?? schema.additionalProperties ?? {};
+            const propvalue = obj[propname];
+            new_obj[propname] = copy_object_structure(propvalue, propschema, options);
+        }
+        return new_obj;
+
+    }
+    if (schema.type == 'array') {
+
+        let new_obj = create_array();
+
+        const schema_items = schema.items ?? {};
+
+        for (let i = 0; i < obj.length; ++i) {
+
+            new_obj.push(
+                copy_object_structure(obj[i], schema_items, options)
+            );
+
+        }
+        return new_obj;
+        
+    }
+
+    return obj;
 }

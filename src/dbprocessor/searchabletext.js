@@ -258,4 +258,35 @@ export class SearchableTextProcessor extends ZooDbProcessorBase
         }
     }
 
+
+
+
+    // ---
+
+    async process_data_dump(data, options)
+    {
+        let {
+            searchabletext_remove_doc_info
+        } = options;
+
+        searchabletext_remove_doc_info ??= true;
+
+        // remove obj._zoodb.searchable_text_doc which takes up too much content
+        // volume
+        if (searchabletext_remove_doc_info) {
+            for (const object_type of this.searchable_text_fieldset.object_types) {
+                const objects = data.db.objects[object_type];
+                if (!objects || Object.keys(objects).length == 0) {
+                    continue;
+                }
+                for (let [/*obj_id*/, obj] of Object.entries(objects)) {
+                    let zoodbinfo = obj._zoodb;
+                    delete zoodbinfo.searchable_text_doc;
+                }
+            }
+        }
+        
+        return data;
+    }
+
 }

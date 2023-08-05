@@ -560,7 +560,7 @@ export class YamlDbZooDataLoader
         debug(`Loaded ${objects_data.length} ${objectconfig.object_type} object(s) `
               +`from ‘${path.join(objectconfig.data_src_path,rel_path)}’`);
 
-        // validate & add _zoodb field:
+        // add _zoodb field as appropriate
         for (let obj of objects_data) {
             this.finalize_object(
                 obj, objectconfig,
@@ -583,9 +583,6 @@ export class YamlDbZooDataLoader
     {
         // validate according to the JSON schema
 
-        // if (objectconfig.object_type == 'user') {
-        //   debug(`DEBUG: Validating ${JSON.stringify(obj,null,4)} on ${JSON.stringify(objectconfig.schema,null,4)}`);
-        // }
         const validation_result = this.schema_validator.validate(obj, objectconfig.schema);
         if (!validation_result.valid) {
             throw new Error(
@@ -594,8 +591,6 @@ export class YamlDbZooDataLoader
                 +`*** ${ validation_result.errors.join("\n*** ") }\n`
             );
         }
-        //debug(`Validated ${JSON.stringify(obj)} against `
-        //             +`${JSON.stringify(objectconfig.schema)}`);
 
         obj._zoodb = {
             id: obj[objectconfig.schema._zoo_primarykey],

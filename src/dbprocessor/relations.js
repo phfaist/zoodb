@@ -174,7 +174,7 @@ export class ZooRelation
         if (target_obj_id == null && !this.allow_null) {
             throw new Error(
                 `Target object ID in reference cannot be null in `
-                + `${this.object_type} ‘${obj._zoodb.id}’ .${this.object_field}: `
+                + `${this.object_type} ‘${obj._zoodb?.id}’ .${this.object_field}: `
                 + ` ${JSON.stringify(relation_object)}`
             );
         }
@@ -332,21 +332,28 @@ export class RelationsPopulator extends ZooDbProcessorBase
 
     // ---
 
-    clear_all_relation_fields()
+    clear_all_relation_fields({ dbobjects } = {})
     {
         const clear_field =
-              ({/*object_type,*/ object, computed_relation_fieldinfo, /*value*/}) => {
-                  setfield(object, computed_relation_fieldinfo.fieldname, () => undefined);
+              ({object, fieldnameidx,}) => {
+                  setfield(object, fieldnameidx, {
+                      set_object_attribute_fn: (parent_object, fieldname) => {
+                          delete parent_object[fieldname];
+                      }
+                  });
               };
-        this.check_all_clean_fields({ action: clear_field });
+        this.check_all_clean_fields({ action: clear_field, dbobjects });
     }
 
-    check_all_clean_fields({ action } = {})
+    check_all_clean_fields({ action, dbobjects } = {})
     {
+        dbobjects ??= this.zoodb.objects;
+
         if (action == null) { // null or undefined
-            action = ({object_type, /*object,*/ computed_relation_fieldinfo, value}) => {
+            action = ({object_type, /*object,*/ computed_relation_fieldinfo,
+                       fieldnameidx, value}) => {
                 throw new Error(
-                    `${object_type} object's ‘${computed_relation_fieldinfo.fieldname}’ `
+                    `${object_type} object's ‘${fieldnameidx}’ `
                     + `field should not be specified manually (got ${JSON.stringify(value)}). `
                     + computed_relation_fieldinfo.msg
                 );
@@ -367,13 +374,17 @@ export class RelationsPopulator extends ZooDbProcessorBase
         }
         
         for (const [object_type, ofields] of Object.entries(all_relations_computed_fields)) {
-            for (const object of Object.values(this.zoodb.objects[object_type])) {
+            for (const object of Object.values(dbobjects[object_type])) {
 
                 for (const computed_relation_fieldinfo of ofields) {
                     const { fieldname } = computed_relation_fieldinfo;
-                    for (const value of iterfield(object, fieldname)) {
+
+                    for (const { value, fieldnameidx } of iterfield(object, fieldname)) {
+
                         if (value !== undefined) {
-                            action({ object_type, object, computed_relation_fieldinfo, value });
+                            action({ object_type, object,
+                                     computed_relation_fieldinfo, fieldnameidx,
+                                     value });
                         }
                     }
                 }
@@ -384,27 +395,26 @@ export class RelationsPopulator extends ZooDbProcessorBase
 
 
     // ---
-    prepare_data_dump(data, options)
+    process_data_dump(data, options)
     {
-        if (options.relations_keep_object_property_pointers) {
+        let {
+            relations_keep_object_property_pointers
+        } = options;
+
+        relations_keep_object_property_pointers ??= false;
+
+
+        if (relations_keep_object_property_pointers) {
             return data;
         }
-        // remove object pointers in relations, to avoid cyclic references, and
-        // instead list all relations separately.
 
-        throw new Error(`Operation not supported!`);
+        // remove object pointers in relations (to avoid cyclic references)
 
-        // // copy in all props except 'db' contents
-        // let newdata = Object.assign({}, data, { db: {} });
+        debug(`About to clear all relation fields in objects `, data.db.objects);
+        this.clear_all_relation_fields({ dbobjects: data.db.objects });
+        debug(`Cleared all relation fields in objects -> `, data.db.objects);
 
-        // for (const [object_type, objects_db] of Object.entries(data.db)) {
-        //     newdata.db[object_type] = {};
-        //     for (const [object_id, object] of Object.entries(objects_db)) {
-                
-        //         newdata.db[object_type]
-        //     }
-        // }
-        
+        return data;
     }
 
 }

@@ -85,11 +85,36 @@ export class ZooDbProcessorBase
      * For instance, an FLM content processor will likely want to replace
      * `FLMFragment` objects by e.g. the corresponding FLM code representation.
      *
-     * Note: do not modify `data`! Return a new data structure if modifications
-     * are needed please.
+     * Return the data as properly modified.  You need to return the data even
+     * if you modify it in-place (but read the warning below!).
      *
-     * In all cases, return the resulting data even if no modifications are
-     * required.
+     * **WARNING**: EXTRA CARE IS NECESSARY WHEN ANY MODIFICATIONS OF THE DATA
+     * ARE NECESSARY. **TL,DR: You can modify objects as long as you assign the
+     * object's fields (as declared in the schema) directly.** If the object
+     * field value is an object instance (through some db processor), do NOT
+     * directly modify that object, IT IS THE DBPROCESSOR'S RESPONSIBILITY TO
+     * MAKE A DEEP COPY OF THE FIELD'S VALUE.
+     *
+     * The zoodb's data dump procedure cannot begin by making a deep copy of the
+     * data, because the field values might have been processed to custom object
+     * instances e.g. with circular references, and we might not know how to
+     * copy such objects.  It is therefore the database processor's
+     * responsibility to make sure that suitable copies are made whenever
+     * appropriate.
+     *
+     * The `data` itself and `data.db` are already new object instances.  The
+     * `data.db.schemas` object is already a full deep copy of the original
+     * schemas.  The `data.db.objects` is copied recursively only up to the
+     * object properties that are fields as declared in the schema.  Fields that
+     * are objects themselves and that have subfields declared in the schema are
+     * also recursed into.  The `_zoodb` properties of each object is also
+     * already a deep copy of the original data.  However the field values
+     * cannot be copied at the beginning of the export by the ZooDb base dump
+     * method, because we might not know how to copy the object.  In other
+     * words, while the general object structure is copied, the object's field
+     * values are not.
+     *
+     * In all cases, you need to return the resulting data.
      */
     process_data_dump(data, options) // eslint-disable-line no-unused-vars
     {

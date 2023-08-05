@@ -475,6 +475,7 @@ export const FeatureZooGraphicsCollection = __class__(
 
             // can set a src_url for when we're exporting the entire graphics
             // collection information to JSON
+            // eslint-disable-next-line no-unused-vars
             self.export_graphics_resource_url_fn = (graphics_resource) => null;
 
             //debug("FeatureZooGraphicsCollection constructor.  self = ", self);

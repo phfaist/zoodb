@@ -364,12 +364,12 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
         } else {
             // we need to iterate over the data and fix it
             for (const object_type of this.config.object_types) {
-                const schema = this.zoodb.schema(object_type);
+                // const schema = this.zoodb.schema(object_type);
                 const objects = data.db.objects[object_type];
                 if (!objects || Object.keys(objects).length == 0) {
                     continue;
                 }
-                for (const [objid, obj] of Object.entries(objects)) {
+                for (const [/*objid*/, obj] of Object.entries(objects)) {
                     for (const flm_field of obj._zoodb.flm_fields) {
                         // we need to process obj's field `flm_field`
                         const fragment = getfield(obj, flm_field);
