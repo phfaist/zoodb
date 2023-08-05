@@ -327,11 +327,15 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
             flm_fragments_keep_instances,
             flm_fragments_to_flm_text,
             flm_fragments_to_flm_dump,
+
+            flm_keep_zoodb_info_flm_fields,
         } = options;
 
         flm_fragments_keep_instances ??= false;
         flm_fragments_to_flm_text ??= false;
         flm_fragments_to_flm_dump ??= false;
+
+        flm_keep_zoodb_info_flm_fields ??= true;
 
         if (!flm_fragments_keep_instances
             && !flm_fragments_to_flm_text
@@ -371,7 +375,7 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
             }));
         }
             
-        if (flm_fragments_keep_instances) {
+        if (flm_fragments_keep_instances && flm_keep_zoodb_info_flm_fields) {
             // keep data as is
         } else {
             // we need to iterate over the data and fix it
@@ -396,6 +400,10 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
                             setfield(obj, flm_field,
                                      () => ({'flm_fragment_key': flm_dumper_key}));
                         }
+                    }
+                    if (!flm_keep_zoodb_info_flm_fields) {
+                        let zdbinf = obj._zoodb;
+                        delete zdbinf.flm_fields;
                     }
                 }
             }

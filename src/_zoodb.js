@@ -241,11 +241,13 @@ export class ZooDb
         let {
             use_raw_db_data,
             skip_db_processors,
+            remove_zoodb_id,
             remove_zoodb_info,
         } = options;
 
         use_raw_db_data ??= false;
         skip_db_processors ??= false;
+        remove_zoodb_id ??= false;
         remove_zoodb_info ??= false;
 
         let data = {};
@@ -286,6 +288,14 @@ export class ZooDb
             }
         }
 
+        if (remove_zoodb_id) {
+            for (const [ /*object_type*/, object_db] of Object.entries(data.db.objects)) {
+                for (const [ /*object_id*/, object] of Object.entries(object_db)) {
+                    let zdbinf = object._zoodb;
+                    delete zdbinf.id;
+                }
+            }
+        }
         if (remove_zoodb_info) {
             for (const [ /*object_type*/, object_db] of Object.entries(data.db.objects)) {
                 for (const [ /*object_id*/, object] of Object.entries(object_db)) {
