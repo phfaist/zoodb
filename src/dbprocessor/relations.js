@@ -410,9 +410,9 @@ export class RelationsPopulator extends ZooDbProcessorBase
 
         // remove object pointers in relations (to avoid cyclic references)
 
-        debug(`About to clear all relation fields in objects `, data.db.objects);
+        // debug(`About to clear all relation fields in objects `, data.db.objects);
         this.clear_all_relation_fields({ dbobjects: data.db.objects });
-        debug(`Cleared all relation fields in objects -> `, data.db.objects);
+        // debug(`Cleared all relation fields in objects -> `, data.db.objects);
 
         return data;
     }

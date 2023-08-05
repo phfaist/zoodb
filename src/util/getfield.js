@@ -35,12 +35,12 @@ export function *  iterfield(obj, field, fieldnameidx=undefined)
             obj ||= []; 
             for (let k = 0; k < obj.length; ++k) {
                 const objitem = obj[k];
-                fieldnameidx = (fieldnameidx ? `${fieldnameidx}.` : '') + `[${k}]`;
+                let newfieldnameidx = (fieldnameidx ? `${fieldnameidx}.` : '') + `[${k}]`;
                 const restfield = parts.slice(j+1).join('.')
                 if (restfield) {
-                    yield * iterfield(objitem, restfield, fieldnameidx);
+                    yield * iterfield(objitem, restfield, newfieldnameidx);
                 } else {
-                    yield { value: objitem, fieldnameidx };
+                    yield { value: objitem, fieldnameidx: newfieldnameidx };
                 }
             }
             // & we're done

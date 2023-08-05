@@ -84,6 +84,11 @@ export const get_simple_test_data = () => ({
                 "name": "Fork",
                 "description": "Has \\emph{pointy} spikes to get food to eat",
             },
+            "knife": {
+                "ust_id": "knife",
+                "name": "Knife",
+                "description": "Enables you to cut your food in small pieces before eating it",
+            },
             "spoon": {
                 "ust_id": "spoon",
                 "name": "Spoon",
@@ -100,6 +105,10 @@ export const get_simple_test_data = () => ({
                         {
                             "ust_id": "fork",
                             "how": "Roll spaghetti around the fork by turning the fork on its axis."
+                        },
+                        {
+                            "ust_id": "knife",
+                            "how": "To help guide the pasta around the fork.  Not to cut the pasta!"
                         },
                     ],
                 },
