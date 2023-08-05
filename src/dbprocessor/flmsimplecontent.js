@@ -378,7 +378,8 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
                         }
                         if (flm_fragments_to_flm_dump) {
                             flm_dumper.add_object_dump(flm_dumper_key, fragment);
-                            setfield(obj, {'flm_fragment_key': flm_dumper_key});
+                            setfield(obj, flm_field,
+                                     () => ({'flm_fragment_key': flm_dumper_key}));
                         }
                     }
                 }
