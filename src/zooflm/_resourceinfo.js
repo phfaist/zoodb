@@ -1,5 +1,7 @@
 import path from 'path';
 
+import * as flmdump from './flm-js/flm.flmdump.js';
+
 /**
  * Store information about which source file an FLM fragment was encountered in.
  * Useful to find resources (eg. graphics files) with relative paths as well as
@@ -22,6 +24,12 @@ export class ZooFLMResourceInfo
         this.object_type = object_type;
         this.object_id = object_id;
         this.source_path = source_path;
+
+        // to enable data dumps
+        this._fields = ['object_type', 'object_id', 'source_path'];
+        this.__class__ = {
+            __name__: 'ZooFLMResourceInfo',
+        };
     }
 
     get_source_directory(prefix='')
@@ -31,12 +39,11 @@ export class ZooFLMResourceInfo
 
     toString()
     {
-        return `${this.object_type} ‘${this.object_id}’ in ‘${this.source_path}’`;
+        return `[${this.object_type} ‘${this.object_id}’ in ‘${this.source_path}’]`;
     }
 }
 
 
 
-
-
-
+// to enable data dumps
+flmdump.known_object_types['ZooFLMResourceInfo'] = ZooFLMResourceInfo;

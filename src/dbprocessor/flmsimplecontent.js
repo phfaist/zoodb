@@ -337,6 +337,16 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
             && !flm_fragments_to_flm_text
             && !flm_fragments_to_flm_dump) {
             // if neither option is set, use flm_text
+            if (options.flm_fragments_to_flm_text === false) {
+                // if the option was initially explicitly set to false, that's
+                // an error
+                throw new Error(
+                    `For data dumps with FLMSimpleContentCompiler, you need `
+                    + `to set one of the flm_fragemnts_** options.  The `
+                    + `flm_fragments_to_flm_text defaults to being chosen if none `
+                    + `is provided, but you explicitly set it to false.`
+                );
+            }
             flm_fragments_to_flm_text = true;
         }
 
@@ -354,9 +364,11 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
         }
         
         let flm_dumper = null;
-        let flm_dumper_key = 0;
+        let flm_dumper_key_counter = 0;
         if (flm_fragments_to_flm_dump) {
-            flm_dumper = new FLMDataDumper(this.config.flm_environment);
+            flm_dumper = new FLMDataDumper($$kw({
+                environment: this.config.flm_environment
+            }));
         }
             
         if (flm_fragments_keep_instances) {
@@ -378,6 +390,8 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
                                      () => fragment.flm_text);
                         }
                         if (flm_fragments_to_flm_dump) {
+                            let flm_dumper_key = `flm.${flm_dumper_key_counter}`;
+                            ++flm_dumper_key_counter;
                             flm_dumper.add_object_dump(flm_dumper_key, fragment);
                             setfield(obj, flm_field,
                                      () => ({'flm_fragment_key': flm_dumper_key}));

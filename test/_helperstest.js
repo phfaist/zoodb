@@ -87,19 +87,19 @@ export const get_simple_test_data = () => ({
             "spoon": {
                 "ust_id": "spoon",
                 "name": "Spoon",
-                "description": "Can carry \\href{https://en.wikipedia.org/wiki/Soup}{soup}."
+                "description": "Can be used to eat some good \\href{https://en.wikipedia.org/wiki/Soup}{soup}."
             },
         },
         "dish": {
             "pasta": {
                 "dish_id": "pasta",
                 "name": "Pasta",
-                "description": "Like, you know, spagghetti.",
+                "description": "Like, you know, \\emph{spaghetti}.",
                 "relations": {
                     "eaten_with": [
                         {
                             "ust_id": "fork",
-                            "how": "Roll spagghetti around the fork by turning the fork on its axis."
+                            "how": "Roll spaghetti around the fork by turning the fork on its axis."
                         },
                     ],
                 },
