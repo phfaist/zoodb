@@ -3,6 +3,7 @@ const debug = debug_module('zoodb.dbprocessor.flmsimplecontent');
 
 import { ZooDbProcessorBase } from './base.js';
 
+import { getfield, setfield } from '../util/getfield.js';
 import {
     iter_object_fields_recursive, iter_schema_fields_recursive
 } from '../util/objectinspector.js';
@@ -319,7 +320,8 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
 
 
     // ---
-    async prepare_data_dump(data, options)
+
+    async process_data_dump(data, options)
     {
         let {
             flm_fragments_keep_instances,
