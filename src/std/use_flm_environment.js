@@ -2,7 +2,7 @@ import debug_mod from 'debug';
 const debug = debug_mod("zoodb.std.use_flm_environment");
 
 import {
-    $$kw, // repr,
+    $$kw, repr,
     ZooFLMEnvironment,
     RefInstance,
     //fn_unique_object_id,
@@ -10,7 +10,7 @@ import {
 
 import { split_prefix_label } from '../util/prefixlabel.js';
 
-import loMerge from 'lodash/merge.js';
+// import loMerge from 'lodash/merge.js';
 
 /**
  * Doc........
