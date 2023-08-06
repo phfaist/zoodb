@@ -40,7 +40,7 @@ export class FLMGraphicsResourceProcessor
         }
     }
 
-    async process(target_info, source)
+    async process({target_info, source, resolved_info, processed_info})
     {
         // observe that filename (full_source_path) already includes any data
         // dir / source dir set by the retriever, so don't prefix and data dir
@@ -62,6 +62,12 @@ export class FLMGraphicsResourceProcessor
                     grdata.physical_dimensions.map( (dim) => dim * this.global_raster_scale )
             });
         }
+
+        grdata.source_info = {
+            target_info,
+            resolved_info,
+            processed_info,
+        };
 
         const graphics_resource =
               GraphicsResource(target_info.target_name ?? null, $$kw( grdata ));
