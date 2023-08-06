@@ -41,7 +41,7 @@ export class FLMGraphicsResourceProcessor
         }
     }
 
-    async process({target_info, source, resolved_info, processed_info})
+    async process({target_info, source, processed_info})
     {
         // observe that filename (full_source_path) already includes any data
         // dir / source dir set by the retriever, so don't prefix and data dir
@@ -65,10 +65,13 @@ export class FLMGraphicsResourceProcessor
         }
 
         grdata.source_info = {
-            target_info: (target_info != null) ? loCloneDeep(target_info) : undefined,
-            resolved_info: (resolved_info != null) ? loCloneDeep(resolved_info) : undefined,
-            processed_info: (processed_info != null) ? loCloneDeep(processed_info) : undefined,
+            resolved_source: target_info.resolved_source,
         };
+        if (processed_info != null && processed_info
+            && typeof processed_info === 'object'
+            && Object.keys(processed_info).length > 0) {
+            grdata.source_info.processed_info = loCloneDeep(processed_info);
+        }
 
         const graphics_resource =
               GraphicsResource(target_info.target_name ?? null, $$kw( grdata ));

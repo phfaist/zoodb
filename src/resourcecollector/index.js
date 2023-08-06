@@ -86,7 +86,7 @@ export class ResourceCollector
                 // run this processor
                 const new_processed_info =
                       await resource_processor.process({target_info, source,
-                                                        resolved_info, processed_info});
+                                                        processed_info});
                 // merge any processed_info properties
                 Object.assign(processed_info, new_processed_info);
             }
