@@ -51,7 +51,12 @@ export function default_target_href_resolver(ref_instance, render_context,
 export function use_flm_environment(_this)
 {
     const zoo_flm_environment_options = loMerge(
-        { },
+        {
+            use_srcset_parceljs: {
+                enabled: false,
+                image_max_zoom_factor: 4,
+            },
+        },
         _this.config.zoo_flm_environment_options ?? {}
     );
 
@@ -117,49 +122,52 @@ export function use_flm_environment(_this)
 
             let srcset = undefined;
 
-            // ### BUILDING AN SRCSET THIS WAY ONLY WORKS IF WE POSTPROCESS THE
-            // ### RESULTING HTML PAGES WITH PARCEL, WHICH WE DON'T DO ATM
+            if (zoo_flm_environment_options.use_srcset_parceljs
+                && zoo_flm_environment_options.use_srcset_parceljs.enabled) {
 
-            // const zoo_graphics_resource_image_srcset_parceljs =
-            //       _this.config.zoo_graphics_resource_image_srcset_parceljs;
+                // Note: building an srcset this way only works if we
+                // postprocess the resulting html pages with parcel.  This is
+                // why this feature is opt-in with the explicit option
+                // `use_srcset_parceljs: { enabled: true, max_zoom_factor: ... }`.
 
-            // if (zoo_graphics_resource_image_srcset_parceljs != null) {
-            //     throw Error(`parceljs' srcset= not yet implemented...`);
-            // }
+                const {
+                    image_max_zoom_factor
+                } = zoo_flm_environment_options.use_srcset_parceljs;
 
-            // const max_factor = _this.config.zoo_graphics_resource_image_max_zoom_factor;
+                if (graphics_resource.graphics_type == 'raster') {
 
-            // if (graphics_resource.graphics_type == 'raster') {
+                    const [imgw, imgh] = graphics_resource.pixel_dimensions;
 
-            //     const [imgw, imgh] = graphics_resource.pixel_dimensions;
-
-            //     let srcset_items = [];
-            //     for (let factor = 1; factor <= max_factor; ++factor) {
-            //         const dpi = 96*factor;
-            //         if (dpi >= graphics_resource.dpi) {
-            //             break;
-            //         }
-            //         srcset_items.push({
-            //             factor,
-            //             width: Math.round(imgw * dpi / graphics_resource.dpi),
-            //             height: Math.round(imgh * dpi / graphics_resource.dpi),
-            //         });
-            //     }
-            //     srcset = srcset_items.map( ({factor, width, height}) => (
-            //         `${src_url}?`
-            //             + (new URLSearchParams({as:'webp',width,height})).toString()
-            //             + ` ${factor}x`
-            //     ) ).join(', ');
-
-            //     debug(`built srcset for ${src_url} → ‘${srcset}’  `
-            //           + `for ${repr(graphics_resource)}`);
-            // }
+                    let srcset_items = [];
+                    for (let factor = 1; factor <= image_max_zoom_factor; ++factor) {
+                        const dpi = 96*factor;
+                        if (dpi >= graphics_resource.dpi) {
+                            break;
+                        }
+                        srcset_items.push({
+                            factor,
+                            width: Math.round(imgw * dpi / graphics_resource.dpi),
+                            height: Math.round(imgh * dpi / graphics_resource.dpi),
+                        });
+                    }
+                    srcset = srcset_items.map( ({factor, width, height}) => (
+                        {
+                            source: `${src_url}?`
+                                + (new URLSearchParams({width,height,as:'webp',})).toString(),
+                            pixel_density: factor,
+                        }
+                    ) );
+                    
+                    debug(`built srcset for ${src_url} for ${repr(graphics_resource)} → `,
+                          srcset);
+                }
+            }
 
             return {src_url, srcset};
         }
     ;
 
-    // provide helper $$kw{} for superclass, if necessary
+    // provide helper $$kw({}) for superclass, if necessary
     _this.$$kw = $$kw;
 
     return zoo_flm_environment;
