@@ -2,7 +2,7 @@ import debug_mod from 'debug';
 const debug = debug_mod("zoodb.std.use_flm_environment");
 
 import {
-    $$kw, repr,
+    $$kw, //repr,
     ZooFLMEnvironment,
     RefInstance,
     //fn_unique_object_id,
@@ -162,8 +162,10 @@ export function use_flm_environment(_this)
                         }
                     ) );
                     
-                    debug(`built srcset for ${src_url} for ${repr(graphics_resource)} → `,
-                          srcset);
+                    debug(`built parceljs-compatible srcset for ${src_url} → `
+                          + srcset.map(
+                              ({source,pixel_density}) => `${source} ${pixel_density}x`
+                          ).join(', '));
                 }
             }
 
