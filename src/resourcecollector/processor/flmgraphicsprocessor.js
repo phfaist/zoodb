@@ -5,7 +5,7 @@ import { GraphicsResource, $$kw } from '../../zooflm/index.js';
 
 import { parse_image_metadata } from './_inspectimagefile.js';
 
-import loDeepCopy from 'lodash/deepCopy.js';
+import loCloneDeep from 'lodash/cloneDeep.js';
 
 
 /**
@@ -65,9 +65,9 @@ export class FLMGraphicsResourceProcessor
         }
 
         grdata.source_info = {
-            target_info: (target_info != null) ? loDeepCopy(target_info) : undefined,
-            resolved_info: (resolved_info != null) ? loDeepCopy(resolved_info) : undefined,
-            processed_info: (processed_info != null) ? loDeepCopy(processed_info) : undefined,
+            target_info: (target_info != null) ? loCloneDeep(target_info) : undefined,
+            resolved_info: (resolved_info != null) ? loCloneDeep(resolved_info) : undefined,
+            processed_info: (processed_info != null) ? loCloneDeep(processed_info) : undefined,
         };
 
         const graphics_resource =
