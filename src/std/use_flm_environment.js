@@ -157,7 +157,7 @@ export function use_flm_environment(_this)
                     srcset = srcset_items.map( ({factor, width, height}) => (
                         {
                             source: `${src_url}?`
-                                + (new URLSearchParams({width,height,as:'webp',})).toString(),
+                                + (new URLSearchParams({as:'webp',width,height,})).toString(),
                             pixel_density: factor,
                         }
                     ) );
