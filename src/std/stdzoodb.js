@@ -52,6 +52,16 @@ export class StandardZooDb extends ZooDb
                         figure_filename_extensions: null,
                         graphics_resources_fs_data_dir: null,
                         resource_file_extensions: null,
+
+                        graphics_use_srcset_parceljs: {
+                            enabled: false,
+                            // if `pixel_density_list` is set, it should be a
+                            // list of pixel densities for which to generate
+                            // images.  Otherwise, we generate images for 1x,
+                            // 2x, etc. up until `image_max_zoom_factor`.
+                            pixel_density_list: null,
+                            image_max_zoom_factor: 4,
+                        },
                     },
                 },
 

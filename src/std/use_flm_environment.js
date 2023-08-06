@@ -50,15 +50,10 @@ export function default_target_href_resolver(ref_instance, render_context,
  */
 export function use_flm_environment(_this)
 {
-    const zoo_flm_environment_options = loMerge(
-        {
-            use_srcset_parceljs: {
-                enabled: false,
-                image_max_zoom_factor: 4,
-            },
-        },
-        _this.config.zoo_flm_environment_options ?? {}
-    );
+    const zoo_flm_environment_options = _this.config.zoo_flm_environment_options ?? {};
+
+    const flm_options = _this.config.flm_options ?? {};
+
 
     const zoo_flm_environment = new ZooFLMEnvironment(zoo_flm_environment_options);
 
@@ -77,7 +72,7 @@ export function use_flm_environment(_this)
     //
     // Maybe allow unresolved references, for an incomplete zoo?
     //
-    if (_this.config.flm_options?.allow_unresolved_references) {
+    if (flm_options.allow_unresolved_references) {
         zoo_flm_environment.feature_refs.add_external_ref_resolver(
             {
                 get_ref(ref_type, ref_label, /*resource_info, render_context*/) {
@@ -95,7 +90,7 @@ export function use_flm_environment(_this)
     //
     // Maybe allow unresolved citations?
     //
-    if (_this.config.flm_options?.allow_unresolved_citations) {
+    if (flm_options.allow_unresolved_citations) {
         zoo_flm_environment.feature_citations.add_external_citations_provider(
             {
                 get_citation_full_text_flm(cite_prefix, cite_key, /*resource_info*/)
@@ -122,24 +117,33 @@ export function use_flm_environment(_this)
 
             let srcset = undefined;
 
-            if (zoo_flm_environment_options.use_srcset_parceljs
-                && zoo_flm_environment_options.use_srcset_parceljs.enabled) {
+            if (flm_options.resources?.graphics_use_srcset_parceljs
+                && flm_options.resources.graphics_use_srcset_parceljs.enabled) {
 
                 // Note: building an srcset this way only works if we
                 // postprocess the resulting html pages with parcel.  This is
                 // why this feature is opt-in with the explicit option
-                // `use_srcset_parceljs: { enabled: true, max_zoom_factor: ... }`.
+                // `graphcis_use_srcset_parceljs: { enabled: true,
+                // image_max_zoom_factor: ... }`.
 
-                const {
-                    image_max_zoom_factor
-                } = zoo_flm_environment_options.use_srcset_parceljs;
+                let {
+                    pixel_density_list,
+                    image_max_zoom_factor,
+                } = flm_options.resources.graphics_use_srcset_parceljs;
 
                 if (graphics_resource.graphics_type == 'raster') {
 
                     const [imgw, imgh] = graphics_resource.pixel_dimensions;
 
+                    if (!pixel_density_list) {
+                        let maxfactor = Math.floor(image_max_zoom_factor);
+                        // [1, 2, ..., maxfactor]
+                        pixel_density_list = Array(maxfactor).fill().map((_,i)=>(i+1));
+                    }
+
                     let srcset_items = [];
-                    for (let factor = 1; factor <= image_max_zoom_factor; ++factor) {
+                    //for (let factor = 1; factor <= image_max_zoom_factor; ++factor)
+                    for (const factor of pixel_density_list) {
                         const dpi = 96*factor;
                         if (dpi >= graphics_resource.dpi) {
                             break;
