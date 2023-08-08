@@ -3,7 +3,7 @@ const debug = debug_mod("zoodb.std.load_yamldb");
 
 //import loMerge from 'lodash/merge.js';
 
-import { YamlDbZooDataLoader } from '@phfaist/zoodb/dbdataloader/yamldb';
+import { YamlDbZooDataLoader } from '../dbdataloader/yamldb';
 
 
 //
@@ -42,6 +42,8 @@ export class StandardZooDbYamlDataLoader
             object_defaults: { },
             root_data_dir: this.zoodb.config.fs_data_dir,
             schemas: this.config.schemas,
+
+            fs: this.config.fs ?? this.zoodb.config.fs,
         });
 
         this._currently_loading = false;

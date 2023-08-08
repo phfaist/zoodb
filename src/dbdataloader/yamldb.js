@@ -1,4 +1,6 @@
-import fs from 'fs';
+
+// import fs from 'fs';
+
 import path from 'path';
 
 import jsyaml from 'js-yaml';
@@ -132,6 +134,8 @@ export class YamlDbZooDataLoader
         this.config.objects = Object.assign({}, this.config.objects ?? {});
         this.config.object_defaults = Object.assign({}, this.config.object_defaults ?? {});
         this.config.schemas = Object.assign({}, this.config.schemas ?? {});
+
+        this.fs = this.config.fs;
 
         this.config.options ??= {};
         this.config.options.normalize_id_for_uniqueness_check ??= ((x) => x.toLowerCase());
@@ -424,7 +428,7 @@ export class YamlDbZooDataLoader
             //debug(`Walking ‘${root_path}’ → directory ${rel_path}`);
             dir_callback(root_path, rel_path, dirent);
             const pathname = path.join(root_path, rel_path);
-            const direntries = fs.readdirSync(pathname, { withFileTypes: true });
+            const direntries = this.fs.readdirSync(pathname, { withFileTypes: true });
             // list of recursive call results, each is itself a list; will need
             // to flatten (cf below)
             const results_list = await Promise.all(
@@ -434,7 +438,7 @@ export class YamlDbZooDataLoader
             );
             return results_list.flat();
         };
-        let dirent = fs.lstatSync(root_path);
+        let dirent = this.fs.lstatSync(root_path);
         dirent.name = path.basename(root_path);
         return await do_walk_dir('', dirent);
     }
@@ -480,14 +484,14 @@ export class YamlDbZooDataLoader
     get_file_modification_token(root_path, rel_path)
     {
         const fullpath = path.join(root_path, rel_path);
-        return fs.statSync(fullpath).mtimeMs;
+        return this.fs.statSync(fullpath).mtimeMs;
     }
 
     read_file_contents(root_path, rel_path)
     {
         const fullpath = path.join(root_path, rel_path);
         //debug(`read_file_contents ${fullpath}`);
-        return fs.readFileSync(fullpath);
+        return this.fs.readFileSync(fullpath);
     }
     parse_file_data(file_contents, objectconfig, root_path, rel_path)
     {
