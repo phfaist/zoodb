@@ -2,8 +2,31 @@ import debug_module from 'debug';
 const debug = debug_module('zoodb._zoodb');
 
 import loCloneDeep from 'lodash/cloneDeep.js';
+import loCloneDeepWith from 'lodash/cloneDeepWith.js';
+import loAssignWith from 'lodash/assignWith.js';
 
 import { copy_object_structure } from './util/objectinspector.js';
+
+
+function cloneDeepWithEmptyPrototypeObjects(object)
+{
+    return loCloneDeepWith(object, (value) => {
+        if (typeof value === 'object') {
+            if (value instanceof Array) {
+                return undefined; // use the default cloning procedure
+            }
+            return loAssignWith(
+                Object.create(null),
+                value,
+                (existingValue, newValue) => {
+                    return cloneDeepWithEmptyPrototypeObjects(newValue);
+                }
+            );
+        }
+        return undefined; // run the default cloning procedure
+    });
+}
+
 
 /**
  * The main database class.
@@ -100,11 +123,15 @@ export class ZooDb
 
         //debug('load_data(): db = ', db);
 
-        this.db = loCloneDeep(db); //JSON.parse(JSON.stringify(db));
-        this._object_types = Object.keys(db.objects);
-
         this.raw_data_db = loCloneDeep(db); //JSON.parse(JSON.stringify(this.db));
         //debug('raw_data_db = ', this.raw_data_db);
+
+        //this.db = JSON.parse(JSON.stringify(db));
+        this.db = {};
+        this.db.schemas = cloneDeepWithEmptyPrototypeObjects(db.schemas);
+        this.db.objects = cloneDeepWithEmptyPrototypeObjects(db.objects);
+
+        this._object_types = Object.keys(this.db.objects);
 
         this._sanitize_raw_object_db(this.db.objects);
 
