@@ -12,6 +12,9 @@ function cloneDeepWithEmptyPrototypeObjects(object)
 {
     return loCloneDeepWith(object, (value) => {
         if (typeof value === 'object') {
+            if (value === null) { // yes, typeof null === 'object' !!?!
+                return null;
+            }
             if (value instanceof Array) {
                 return undefined; // use the default cloning procedure
             }
