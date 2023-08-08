@@ -1,8 +1,9 @@
 import debug_module from 'debug';
 const debug = debug_module('zoodb.dbprocessor.relations');
 
-import {getfield, setfield, iterfield, concatlistfield, get_field_schema}
-    from '../util/getfield.js';
+import {
+    getfield, setfield, iterfield, concatlistfield, get_field_schema
+} from '../util/getfield.js';
 
 import { ZooDbProcessorBase } from './base.js';
 
@@ -82,12 +83,16 @@ export class ZooRelation
         }
         if (relation_field_schema.type === 'array') {
             this.source_has_multiple_relations = true;
-            this.fully_specified_relation_add_object_field =
-                this.object_field + '.[].' + this.relation_add_object_field;
+            if (this.relation_add_object_field) {
+                this.fully_specified_relation_add_object_field =
+                    this.object_field + '.[].' + this.relation_add_object_field;
+            }
         } else {
             this.source_has_multiple_relations = false;
-            this.fully_specified_relation_add_object_field =
-                this.object_field + '.' + this.relation_add_object_field;
+            if (this.relation_add_object_field) {
+                this.fully_specified_relation_add_object_field =
+                    this.object_field + '.' + this.relation_add_object_field;
+            }
         }
     }
 
@@ -104,10 +109,12 @@ export class ZooRelation
     get_computed_fields()
     {
         let computed_fields = {}
-        computed_fields[this.object_type] = [
-            { fieldname: this.fully_specified_relation_add_object_field,
-              msg: `You are only expected to set ‘${this.relation_primary_key_field}’.`},
-        ];
+        if (this.fully_specified_relation_add_object_field) {
+            computed_fields[this.object_type] = [
+                { fieldname: this.fully_specified_relation_add_object_field,
+                  msg: `You are only expected to set ‘${this.relation_primary_key_field}’.`},
+            ];
+        }
 
         // backreferences too
         if (this.use_backreference) {
@@ -237,6 +244,10 @@ export class ZooRelation
         }
     }
 
+    toString()
+    {
+        return `[ZooRelation ${this.object_type}:${this.object_field} → ${this.to_object_type}]`
+    }
 }
 
 
