@@ -293,12 +293,14 @@ export class CitationsProvider
 
     /// The FLM argument can be either valid standalone FLM text given as a
     /// string or a precompiled FLM fragment object instance.
-    add_citation(cite_prefix, cite_key, full_citation_flm_text)
+    add_citation(cite_prefix, cite_key, full_citation_flm_text, options)
     {
+        const { overwrite } = options ?? {};
+
         if (!Object.hasOwn(this.citations_database, cite_prefix)) {
             this.citations_database[cite_prefix] = {};
         }
-        if (Object.hasOwn(this.citations_database[cite_prefix], cite_key)) {
+        if (!overwrite && Object.hasOwn(this.citations_database[cite_prefix], cite_key)) {
             throw new Error(
                 `There is already a citation registered for ‘${cite_prefix}:${cite_key}’`
             );
@@ -324,7 +326,7 @@ export class CitationsProvider
     update_citations(iterable)
     {
         for (const {cite_prefix, cite_key, citation_text} of iterable) {
-            this.add_citation(cite_prefix, cite_key, citation_text);
+            this.add_citation(cite_prefix, cite_key, citation_text, { overwrite: true });
         }
     }
 
