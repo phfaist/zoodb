@@ -3,7 +3,7 @@ const debug = debug_mod("zoodb.std.load_yamldb");
 
 //import loMerge from 'lodash/merge.js';
 
-import { YamlDbZooDataLoader } from '../dbdataloader/yamldb';
+import { YamlDbZooDataLoader } from '../dbdataloader/yamldb.js';
 
 
 //
