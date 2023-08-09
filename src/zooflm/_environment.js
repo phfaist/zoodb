@@ -3,36 +3,36 @@ const debug = debug_module('zoodb.zooflm._environment');
 
 import path from 'path';
 
-import {$$kw, /*repr*/} from './flm-js/py.js';
-import {__class__, __super__, __get__, isinstance} from './flm-js/org.transcrypt.__runtime__.js';
+import {$$kw, /*repr*/} from '#flm-js/py.js';
+import {__class__, __super__, __get__, isinstance} from '#flm-js/org.transcrypt.__runtime__.js';
 
 import {
     ParsingStateDelta,
     LatexWalkerLocatedError, LatexWalkerLocatedErrorFormatter
-} from './flm-js/pylatexenc.latexnodes.js';
-import * as macrospec from './flm-js/pylatexenc.macrospec.js';
+} from '#flm-js/pylatexenc.latexnodes.js';
+import * as macrospec from '#flm-js/pylatexenc.macrospec.js';
 
-import { FLMFragment } from './flm-js/flm.flmfragment.js';
+import { FLMFragment } from '#flm-js/flm.flmfragment.js';
 
-import * as flmenvironment from './flm-js/flm.flmenvironment.js';
+import * as flmenvironment from '#flm-js/flm.flmenvironment.js';
 import {
     FLMEnvironment,
     FLMParsingState,
     FLMParsingStateDeltaSetBlockLevel,
-} from './flm-js/flm.flmenvironment.js';
+} from '#flm-js/flm.flmenvironment.js';
 
-import * as flm_feature from './flm-js/flm.feature.js';
-import * as flm_feature_baseformatting from './flm-js/flm.feature.baseformatting.js';
-import * as flm_feature_href from './flm-js/flm.feature.href.js';
-import * as flm_feature_verbatim from './flm-js/flm.feature.verbatim.js';
-import * as flm_feature_math from './flm-js/flm.feature.math.js';
-import * as flm_feature_headings from './flm-js/flm.feature.headings.js';
-import * as flm_feature_endnotes from './flm-js/flm.feature.endnotes.js';
-import * as flm_feature_refs from './flm-js/flm.feature.refs.js';
-import * as flm_feature_cite from './flm-js/flm.feature.cite.js';
-import * as flm_feature_floats from './flm-js/flm.feature.floats.js';
-import * as flm_feature_defterm from './flm-js/flm.feature.defterm.js';
-import * as flm_feature_graphics from './flm-js/flm.feature.graphics.js';
+import * as flm_feature from '#flm-js/flm.feature.js';
+import * as flm_feature_baseformatting from '#flm-js/flm.feature.baseformatting.js';
+import * as flm_feature_href from '#flm-js/flm.feature.href.js';
+import * as flm_feature_verbatim from '#flm-js/flm.feature.verbatim.js';
+import * as flm_feature_math from '#flm-js/flm.feature.math.js';
+import * as flm_feature_headings from '#flm-js/flm.feature.headings.js';
+import * as flm_feature_endnotes from '#flm-js/flm.feature.endnotes.js';
+import * as flm_feature_refs from '#flm-js/flm.feature.refs.js';
+import * as flm_feature_cite from '#flm-js/flm.feature.cite.js';
+import * as flm_feature_floats from '#flm-js/flm.feature.floats.js';
+import * as flm_feature_defterm from '#flm-js/flm.feature.defterm.js';
+import * as flm_feature_graphics from '#flm-js/flm.feature.graphics.js';
 
 
 export {

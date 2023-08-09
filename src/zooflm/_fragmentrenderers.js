@@ -1,13 +1,13 @@
 
-import {/*$$kw,*/ repr} from './flm-js/py.js';
-import {__class__, /*__super__,*/ __get__} from './flm-js/org.transcrypt.__runtime__.js';
+import {/*$$kw,*/ repr} from '#flm-js/py.js';
+import {__class__, /*__super__,*/ __get__} from '#flm-js/org.transcrypt.__runtime__.js';
 
 import {
     LatexWalkerLocatedErrorFormatter
-} from './flm-js/pylatexenc.latexnodes.js';
+} from '#flm-js/pylatexenc.latexnodes.js';
 
-import * as flm_fragmentrenderer_html from './flm-js/flm.fragmentrenderer.html.js'; 
-import * as flm_fragmentrenderer_text from './flm-js/flm.fragmentrenderer.text.js';
+import * as flm_fragmentrenderer_html from '#flm-js/flm.fragmentrenderer.html.js'; 
+import * as flm_fragmentrenderer_text from '#flm-js/flm.fragmentrenderer.text.js';
 
 
 

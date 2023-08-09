@@ -1,12 +1,13 @@
 import debug_module from 'debug';
 const debug = debug_module('zoodb.zooflm.scanner');
 
-import {$$kw, repr} from './flm-js/py.js';
+import {$$kw, repr} from '#flm-js/py.js';
 
 import {is_flm_fragment} from './_environment.js';
 
 //import {getfield, setfield, concatlistfield, get_field_schema} from '../util/getfield.js';
 import {iter_object_fields_recursive} from '../util/objectinspector.js';
+
 
 
 
