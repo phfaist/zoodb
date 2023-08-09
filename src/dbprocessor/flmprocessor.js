@@ -283,22 +283,33 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         // make sure we purge any entries from earlier possible zoo processings
         this.citation_manager.purge_expired();
 
-        await this.citation_manager.retrieve_citations( new_citations_to_compile );
+        try {
 
-        //     // citations database ready
-        //     debug("Citation database ready!")
+            await this.citation_manager.retrieve_citations( new_citations_to_compile );
 
-        debug('Compiling citations ...');
+            //     // citations database ready
+            //     debug("Citation database ready!")
 
-        this.citation_compiler.compile_citations(
-            new_citations_to_compile
-        );
+            debug('Compiling citations ...');
 
-        this.zoo_flm_environment.citations_provider.update_citations(
-            this.citation_compiler.iter_compiled_citations()
-        );
+            this.citation_compiler.compile_citations(
+                new_citations_to_compile
+            );
 
-        debug("Compiled citations ready!")
+            this.zoo_flm_environment.citations_provider.update_citations(
+                this.citation_compiler.iter_compiled_citations()
+            );
+
+            debug("Compiled citations ready!")
+
+        } catch (err) {
+            if (this.options.flm_error_policy === 'continue') {
+                debug(`Error while fetching and compiling citations; attempting to continue.`,
+                      err);
+            } else {
+                throw err;
+            }
+        }
     }
 
 
@@ -310,42 +321,55 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
 
         for (const resource of encountered_resources) {
 
-            // debug('resource = ', resource);
+            try {
 
-            const source_directory =
-                  resource.encountered_in.resource_info.get_source_directory();
+                // debug('resource = ', resource);
 
-            debug(
-                `Collecting resource of type ‘${resource.resource_type}’ with source `
-                + `type ‘${resource.resource_source_type}’ and source `
-                + `‘${resource.resource_source}’; calling item's source_directory is `
-                + `‘${source_directory}’`
-            );
+                const source_directory =
+                      resource.encountered_in.resource_info.get_source_directory();
 
-            let source;
-            if (resource.resource_source_type == 'file' && resource.encountered_in) {
-                source = path.join(
-                    source_directory,
-                    resource.resource_source,
+                debug(
+                    `Collecting resource of type ‘${resource.resource_type}’ with source `
+                        + `type ‘${resource.resource_source_type}’ and source `
+                        + `‘${resource.resource_source}’; calling item's source_directory is `
+                        + `‘${source_directory}’`
                 );
-            } else {
-                source = resource.resource_source;
-            }
 
-            if (this.options.skip_check_update_existing_resources) {
-                if (resource.resource_type == 'graphics_path'
-                    && this.zoo_flm_environment.graphics_collection.has_graphics_for(source)) {
-                    debug(`Resource information for ${resource.resource_type} ‘${source}’ is `
-                          + `already available and `
-                          + `options.skip_check_update_existing_resources is set; skipping.`);
-                    continue;
+                let source;
+                if (resource.resource_source_type == 'file' && resource.encountered_in) {
+                    source = path.join(
+                        source_directory,
+                        resource.resource_source,
+                    );
+                } else {
+                    source = resource.resource_source;
+                }
+
+                if (this.options.skip_check_update_existing_resources) {
+                    if (resource.resource_type == 'graphics_path'
+                        && (this.zoo_flm_environment.graphics_collection
+                            .has_graphics_for(source))) {
+                        debug(`Resource information for ${resource.resource_type} `
+                              + `‘${source}’ is already available and `
+                              + `options.skip_check_update_existing_resources is set; `
+                              + `skipping.`);
+                        continue;
+                    }
+                }
+
+                await this.resource_collector.collect(
+                    resource.resource_type,
+                    source
+                );
+
+            } catch (err) {
+                if (this.options.flm_error_policy === 'continue') {
+                    debug(`Failed to collect resource, attempting to continue.`,
+                          { resource, err });
+                } else {
+                    throw err;
                 }
             }
-
-            await this.resource_collector.collect(
-                resource.resource_type,
-                source
-            );
         }
 
         await this.resource_collector.finish();

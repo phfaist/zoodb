@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-08-06 17:30:21
+/* 000001 */ // Transcrypt'ed from Python, 2023-08-09 15:47:10
 /* 000094 */ var functools = {};
 /* 000094 */ var itertools = {};
 /* 000094 */ var logging = {};
@@ -18,7 +18,7 @@
 /* 000095 */ __nest__ (logging, '', __module_logging__);
 /* 000094 */ import * as __module_unicodedata__ from './unicodedata.js';
 /* 000094 */ __nest__ (unicodedata, '', __module_unicodedata__);
-/* 000094 */ export {PartialLatexToLatexEncoder, UnicodeToLatexConversionRule, RULE_DICT, RULE_CALLABLE, RULE_REGEX, UnicodeToLatexEncoder, _util};
+/* 000094 */ export {UnicodeToLatexConversionRule, UnicodeToLatexEncoder, RULE_REGEX, _util, PartialLatexToLatexEncoder, RULE_DICT, RULE_CALLABLE};
 /* 000001 */ var __name__ = 'pylatexenc.latexencode';
 /* 000109 */ export var logger = (function () {
 /* 000109 */ 	var __accu0__ = logging;

@@ -47,7 +47,7 @@ export class FLMGraphicsResourceProcessor
         // dir / source dir set by the retriever, so don't prefix and data dir
         // at this point.
         const filename = target_info.full_source_path;
-        const stream = this.fs.createReadStream( filename );
+        const stream = await this.fs.createReadStream( filename );
 
         let grdata = await parse_image_metadata(filename, stream);
         //debug(`DEBUG - got grdata = ${JSON.stringify(grdata)}`);

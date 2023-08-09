@@ -255,18 +255,8 @@ export class CitationDatabaseManager
             }
         }
 
-        try {
-
-            await Promise.all( Object.values(source_run_promises) );
-
-        } catch (e) {
-            //console.error(`Error while fetching citations`);
-
-            // find the failures in `all_citations_to_retrieve_by_prefix` to
-            // report usage locations
-            // debug('error, will look for failed citation search in ',
-            //       { all_citations_to_retrieve_by_prefix } );
-
+        
+        const print_citation_fetch_error = (e) => {
             const failure_citation_fetch = e.failure_citation_fetch;
             if (failure_citation_fetch != null) {
                 const { cite_prefix, cite_keys } = failure_citation_fetch;
@@ -294,9 +284,31 @@ export class CitationDatabaseManager
                     }
                 }
             }
+        };
 
-            throw e;
+        // don't use Promise.all() so that we can catch and intercept all
+        // exceptions that might have happened among the difference sources
+
+        const promiseResults =
+              await Promise.allSettled( Object.values(source_run_promises) );
+
+        let throw_error = null;
+
+        for (const promiseResult of promiseResults) {
+            if (promiseResult.status === 'rejected') {
+                const e = promiseResult.reason;
+                print_citation_fetch_error(e);
+                if (throw_error == null) {
+                    // keep the first error so we can throw it again
+                    throw_error = e;
+                }
+            }
         }
+            
+        if (throw_error != null) {
+            throw throw_error;
+        }
+
     }
 
 

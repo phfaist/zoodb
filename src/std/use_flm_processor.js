@@ -78,27 +78,48 @@ export function use_flm_processor(_this)
           flm_options.resources.make_resource_processors_graphics_path
           ?? default_make_resource_processors_graphics_path;
 
+    let citation_sources = {
+        arxiv: new CitationSourceArxiv({
+            override_arxiv_dois_file:
+            flm_options.citations?.override_arxiv_dois_file,
+            fs,
+            fsRootFilePath: fs_data_dir,
+        }),
+        doi: new CitationSourceDoi(),
+        manual: new CitationSourceManual(),
+        preset: new CitationSourceBibliographyFile({
+            bibliography_files:
+            flm_options.citations?.preset_bibliography_files,
+            fs,
+            fsRootFilePath: fs_data_dir,
+        }),
+    };
+    for (const [source_name, source_setting]
+         of Object.entries(flm_options.citations?.sources ?? {})) {
+        if (source_setting === false || source_setting === null) {
+            delete citation_sources[source_name];
+            continue;
+        }
+        if (source_setting === true) {
+            if (citation_sources[source_name] == null) {
+                throw new Error(
+                    `Cannot activate source ‘${source_name}’ that is not known to `
+                    + `use_flm_processor()`
+                );
+            }
+            // keep this source in citation_sources as is
+            continue;
+        }
+        // at this point, it has to be a source object instance
+        citation_sources[source_name] = source_setting;
+    }
+
     let flm_processor_config = {
         zoo_flm_environment: _this.zoo_flm_environment,
         flm_error_policy: _this.flm_error_policy,
         refs: flm_options.refs ?? {},
         citations: {
-            sources: {
-                arxiv: new CitationSourceArxiv({
-                    override_arxiv_dois_file:
-                        flm_options.citations?.override_arxiv_dois_file,
-                    fs,
-                    fsRootFilePath: fs_data_dir,
-                }),
-                doi: new CitationSourceDoi(),
-                manual: new CitationSourceManual(),
-                preset: new CitationSourceBibliographyFile({
-                    bibliography_files:
-                        flm_options.citations?.preset_bibliography_files,
-                    fs,
-                    fsRootFilePath: fs_data_dir,
-                }),
-            },
+            sources: citation_sources,
             default_user_agent:
               flm_options.citations?.default_user_agent
               ?? `zoodb-bibliography-build-script/0.1 (https://github.com/phfaist/zoodb)`,

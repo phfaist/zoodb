@@ -8,11 +8,64 @@ import jsyaml from 'js-yaml';
 
 import jsonschema from 'jsonschema';
 import $RefParser from "@apidevtools/json-schema-ref-parser";
-import json_refparser_resolver_http from "@apidevtools/json-schema-ref-parser/lib/resolvers/http.js";
-import json_refparser_resolver_file from "@apidevtools/json-schema-ref-parser/lib/resolvers/file.js";
+import json_refparser_resolver_http from "@apidevtools/json-schema-ref-parser/dist/lib/resolvers/http.js";
+//import json_refparser_resolver_file from "@apidevtools/json-schema-ref-parser/lib/resolvers/file.js";
 
 import debug_module from 'debug';
 const debug = debug_module('zoodb.dbdataloader');
+
+
+
+// -------------------------------------------------------
+//
+// // adapted "@apidevtools/json-schema-ref-parser/lib/resolvers/file.js" to allow
+// // arbitrary 'fs' objects
+//
+// function get_json_refparser_resolver_file(fs)
+// {
+//     return {
+//         /**
+//          * The order that this resolver will run, in relation to other resolvers.
+//          */
+//         order: 100,
+//
+//         /**
+//          * Determines whether this resolver can read a given file reference.
+//          * Resolvers that return true will be tried, in order, until one
+//          * successfully resolves the file.  Resolvers that return false will not
+//          * be given a chance to resolve the file.
+//          */
+//         canRead(file) {
+//             const protocol = (new URL(file.url)).protocol;
+//             if (!protocol || protocol === 'file:') {
+//                 return true;
+//             }
+//             return false;
+//         },
+
+//         /**
+//          * Reads the given file and returns its raw contents as a Buffer.
+//          */
+//         async read(file) {
+//             let path;
+//             try {
+//                 path = (new URL(file.url)).pathname;
+//             } catch (err) {
+//                 throw new Error(`Malformed URI: ${file.url}: ${err}`);
+//             }
+//             try {
+//                 const data = await new Promise( (resolve) => fs.readFile(path, resolve) );
+//                 return data;
+//             } catch (err) {
+//                 throw new Error(`Error opening file "${path}"`);
+//             }
+//         },
+//     };
+// };
+
+// -------------------------------------------------------
+
+
 
 
 
@@ -136,6 +189,7 @@ export class YamlDbZooDataLoader
         this.config.schemas = Object.assign({}, this.config.schemas ?? {});
 
         this.fs = this.config.fs;
+        this.fsPromises = this.config.fs.promises ?? this.config.fs;
 
         this.config.options ??= {};
         this.config.options.normalize_id_for_uniqueness_check ??= ((x) => x.toLowerCase());
@@ -169,6 +223,7 @@ export class YamlDbZooDataLoader
         if (!this.config.schemas.schema_root.endsWith('/')) {
             throw new Error("Please include trailing slash in schemas.schema_root")
         }
+        debug(`Using schema_root = ${this.config.schemas.schema_root}`);
 
         this.schema_validator = new jsonschema.Validator();
         this.schema_ref_parser = new $RefParser();
@@ -178,16 +233,20 @@ export class YamlDbZooDataLoader
             throw new Error("You did not specify a schema_root: in your config!");
         }
         let _config = this.config;
+        let fsPromises = this.fsPromises;
         this.schema_refparser_resolver = {
             ...json_refparser_resolver_http,
             order: 1,
-            canRead(/*file*/) { return true; },
-            read(file) {
+            canRead(/*file*/) {
+                //debug(`schema_refparser_rersolver.canRead: ${file.url}`);
+                return true;
+            },
+            async read(file) {
                 try {
-                    debug(`file.url = ${file.url}, `
-                          +`schema_root = ${_config.schemas.schema_root}`);
+                    debug(`schema_refparser_resolver.read() `, file);
 
                     let url = file.url;
+
                     if (url.startsWith('file://') &&
                         ! url.startsWith(_config.schemas.schema_root)) {
                         // a "/schemas/xyz" path was already interpreted as
@@ -196,29 +255,37 @@ export class YamlDbZooDataLoader
                         url = (new URL(url)).pathname.substring(1); // skip leading '/'
                     }
 
-                    let full_url =
-                        new URL(url, _config.schemas.schema_root).href;
+                    let full_url = new URL(url, _config.schemas.schema_root).href;
 
-                    debug(`full_url = ${full_url} (from url=${url})`);
+                    // debug(`full_url = ${full_url} (from url=${url}); `,
+                    //       {config_schemas: _config.schemas});
 
                     if (full_url.startsWith(_config.schemas.schema_root) &&
                         ! full_url.endsWith(_config.schemas.schema_add_extension) ) {
                         full_url += _config.schemas.schema_add_extension;
+                        // debug(`with extension → full_url = ${full_url}`);
                     }
 
                     const newfile = {
                         url: full_url,
                         extension: path.extname(full_url),
                     };
-                    const protocol = (new URL(newfile.url)).protocol;
+                    const newfileurl = new URL(newfile.url);
+                    const protocol = newfileurl.protocol;
 
                     debug(`Resolved schema URL ${file.url} → ${newfile.url} `
-                          + `extension=${newfile.extension} protocol=${protocol}`);
+                          + `[extension=${newfile.extension} protocol=${protocol}]`);
                     
                     if ( protocol == 'file:' ) { 
-                        return json_refparser_resolver_file.read(newfile);
+                        //return json_refparser_resolver_file.read(newfile);
+                        const filePathToRead = newfileurl.pathname;
+                        // debug(`Finally! will read path `, filePathToRead);
+                        const data = await fsPromises.readFile(filePathToRead,
+                                                               { encoding: 'utf-8' });
+                        // debug(` ---> retreived data = `, data);
+                        return data;
                     } else {
-                        return json_refparser_resolver_http.read(newfile);
+                        return await json_refparser_resolver_http.read(newfile);
                     }
                 } catch (err) {
                     console.error(`Error reading ${file.url}: ${err}`);
@@ -428,17 +495,28 @@ export class YamlDbZooDataLoader
             //debug(`Walking ‘${root_path}’ → directory ${rel_path}`);
             dir_callback(root_path, rel_path, dirent);
             const pathname = path.join(root_path, rel_path);
-            const direntries = this.fs.readdirSync(pathname, { withFileTypes: true });
+
+            // avoid using "readdir(..., { withFileTypes: true })" because we
+            // might want to use other fs interfaces that don't support this
+            // option (e.g. fs-remote)
+            const direntryfnames = await this.fsPromises.readdir(pathname);
+
             // list of recursive call results, each is itself a list; will need
             // to flatten (cf below)
             const results_list = await Promise.all(
-                direntries.map(
-                    (dirent) => do_walk_dir(path.join(rel_path, dirent.name), dirent)
+                direntryfnames.map(
+                    async (direntryfname) => {
+                        let therelpath = path.join(rel_path, direntryfname);
+                        let thefullpath = path.join(root_path, therelpath);
+                        let dirent = await this.fsPromises.lstat(thefullpath);
+                        dirent.name = thefullpath;
+                        return await do_walk_dir(therelpath, dirent);
+                    }
                 )
             );
             return results_list.flat();
         };
-        let dirent = this.fs.lstatSync(root_path);
+        let dirent = await this.fsPromises.lstat(root_path);
         dirent.name = path.basename(root_path);
         return await do_walk_dir('', dirent);
     }
@@ -481,18 +559,20 @@ export class YamlDbZooDataLoader
         );
     }
 
-    get_file_modification_token(root_path, rel_path)
+    async get_file_modification_token(root_path, rel_path)
     {
         const fullpath = path.join(root_path, rel_path);
-        return this.fs.statSync(fullpath).mtimeMs;
+        const stat_info = await this.fsPromises.stat(fullpath);
+        return stat_info.mtimeMs;
     }
 
-    read_file_contents(root_path, rel_path)
+    async read_file_contents(root_path, rel_path)
     {
         const fullpath = path.join(root_path, rel_path);
         //debug(`read_file_contents ${fullpath}`);
-        return this.fs.readFileSync(fullpath);
+        return await this.fsPromises.readFile(fullpath);
     }
+
     parse_file_data(file_contents, objectconfig, root_path, rel_path)
     {
         // in case root_path is already a JSON/YAML file and rel_path is empty
@@ -518,7 +598,7 @@ export class YamlDbZooDataLoader
         const { object_type } = objectconfig;
         const source_file_path = path.join(objectconfig.data_src_path, rel_path);
         const source_file_modification_token =
-              this.get_file_modification_token(root_path, rel_path);
+              await this.get_file_modification_token(root_path, rel_path);
 
         if (source_file_path in existing_dbdata_info.objects_by_source
             && object_type in existing_dbdata_info.objects_by_source[source_file_path]) {
@@ -555,7 +635,7 @@ export class YamlDbZooDataLoader
 
         debug(`Loading file ‘${rel_path}’ (from ${root_path})`);
 
-        const file_contents = this.read_file_contents(root_path, rel_path);
+        const file_contents = await this.read_file_contents(root_path, rel_path);
         const file_data = this.parse_file_data( file_contents, objectconfig,
                                                 root_path, rel_path );
 
@@ -571,7 +651,8 @@ export class YamlDbZooDataLoader
                 {root_path, rel_path, source_file_path, source_file_modification_token}
             );
 
-            existing_dbdata_info.reloaded_objects[objectconfig.object_type][obj._zoodb.id] = obj;
+            existing_dbdata_info.reloaded_objects[objectconfig.object_type][obj._zoodb.id]
+                = obj;
         }
 
         // debug(`(re)loaded: ${object_type}: objects_data = `, objects_data);
