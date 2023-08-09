@@ -509,7 +509,7 @@ export class YamlDbZooDataLoader
                         let therelpath = path.join(rel_path, direntryfname);
                         let thefullpath = path.join(root_path, therelpath);
                         let dirent = await this.fsPromises.lstat(thefullpath);
-                        dirent.name = thefullpath;
+                        dirent.name = direntryfname; //thefullpath;
                         return await do_walk_dir(therelpath, dirent);
                     }
                 )
