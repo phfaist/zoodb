@@ -20,6 +20,12 @@ export class CitationSourceManual extends CitationSourceBase
             source_name: 'Manual citation info source',
             chunk_size: Infinity,
             chunk_retrieve_delay_ms: 0,
+
+            cache_store_options: {
+                // do not keep in cache (it will stay though long enough for the
+                // zoo to be built)
+                cache_duration_ms: 0,
+            },
         };
         const default_options = {
             cite_prefix: 'manual',
@@ -31,9 +37,6 @@ export class CitationSourceManual extends CitationSourceBase
             default_options,
         );
 
-        // do not keep in cache (it will stay though long enough for the zoo to
-        // be built)
-        this.cache_store_options.cache_duration_ms ??= 0;
     }
 
     async run_retrieve_chunk(id_list)
