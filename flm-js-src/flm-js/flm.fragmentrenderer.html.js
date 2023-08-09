@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-08-09 15:47:10
+/* 000001 */ // Transcrypt'ed from Python, 2023-08-09 17:29:35
 /* 000006 */ var html = {};
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
@@ -1301,99 +1301,99 @@
 /* 000755 */ 	return __call__ (__accu0__.compile, __accu0__, '<FLM:DLYD:(?P<key>\\d+)\\s*/>');
 /* 000755 */ }) ();
 /* 000762 */ export var _html_css_global = '\np, ul, ol {\n  margin: 1em 0px;\n}\np:first-child, ul:first-child, ol:first-child {\n  margin-top: 0px;\n}\np:last-child, ul:last-child, ol:last-child {\n  margin-bottom: 0px;\n}\ndd > p, dd > p:first-child, dd > p:last-child {\n  margin: 0.33em 0px;\n}\n\na, a:link, a:hover, a:active, a:visited {\n  color: #3232c8;\n  text-decoration: none;\n}\na:hover {\n  color: #22228a;\n}\n';
-/* 000785 */ export var _html_css_content = "\n.emph, .textit {\n  font-style: italic;\n}\n.textbf {\n  font-weight: bold;\n}\n\nh1 {\n  font-size: 1.6rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh2 {\n  font-size: 1.3rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh3 {\n  font-size: 1rem;\n  font-weight: bold;\n  margin: 1em 0px;\n}\n\n.heading-level-4 {\n  font-style: italic;\n  display: inline;\n}\n.heading-level-4::after {\n  display: inline-block;\n  margin: 0px .12em;\n  content: '—';\n}\n\n.heading-level-5 {\n  font-style: italic;\n  font-size: .9em;\n  display: inline;\n}\n.heading-level-5::after {\n  display: inline-block;\n  margin-right: .12em;\n  content: '';\n}\n\n.heading-level-6 {\n  font-style: italic;\n  font-size: .8em;\n  display: inline;\n}\n.heading-level-6::after {\n  display: inline-block;\n  margin-right: .06em;\n  content: '';\n}\n\n\n.heading-level-theorem {\n  font-weight: bold;\n  display: inline-block;\n}\n.heading-level-theorem::after {\n  font-weight: bold;\n  display: inline-block;\n  margin: 0px .12em 0px 0px;\n  content: '.';\n}\n\ndiv.theoremlike, div.definitionlike, div.prooflike {\n  margin: 1em 0px;\n}\n\ndiv.prooflike > p > .heading-level-theorem,\ndiv.prooflike > p > .heading-level-theorem::after {\n  font-weight: normal;\n  font-style: italic;\n}\n\n\ndl.enumeration {\n  display: block;\n  margin-left: 2.5em;\n}\ndl.enumeration > dt {\n  float: left;\n  clear: left;\n  display: inline-block;\n  /*margin: 0px; */\n  margin-left: -2.5em;\n  width: 2.0em;\n  min-width: 2.0em;\n  max-width: 2.0em;\n  margin-right: 0.5em;\n  text-align: right;\n}\ndl.enumeration > dd {\n  /*display: inline-block;\n  width: 100%;*/\n  border: 0px;\n  padding: 0px;\n  margin: 0px;\n}\n\nfigure.float {\n  width: 100%;\n  border-width: 1px 0px 1px 0px;\n  border-style: solid none solid none;\n  border-color: rgba(120, 120, 140, 0.15);\n  margin: 0.5rem 0px;\n  padding: 0.5rem 0px;\n}\n\nfigure.float .float-contents {\n  width: 100%;\n  max-width: 100%;\n  overflow-x: auto;\n}\n\nfigure.float .float-contents img {\n  display: block;\n  margin: 0pt auto;\n  padding: 0pt;\n  border: 0pt;\n  margin: 0px auto;\n}\n\nfigure.float figcaption {\n  display: block;\n  margin-top: 0.5em;\n  margin: 0.75em 2em 0px;\n  text-align: center;\n}\n\nfigure.float figcaption > span {\n  display: inline-block;\n  font-style: italic;\n  text-align: left;\n}\n\ntable {\n  margin: 1em 0px 1em 0px;\n  border-collapse: separate;\n  border-spacing: 0px;\n  /*border-top: solid 1pt;\n  border-bottom: solid 1pt;*/\n}\nfigure.float .float-contents table {\n  margin: 0px auto;\n}\ntd {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\nth {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\n.cellstyle-H {\n  border-bottom: solid .5pt;\n}\n.cellstyle-rH {\n}\n.cellstyle-l {\n  text-align: left;\n}\n.cellstyle-c {\n  text-align: center;\n}\n.cellstyle-r {\n  text-align: right;\n}\n.cellstyle-green {\n  background-color: rgba(69, 255, 69, 0.31); /*rgb(200,255,200);*/\n}\n.cellstyle-blue {\n  background-color: rgba(79, 142, 255, 0.27); /*rgb(200,220,255);*/\n}\n.cellstyle-yellow {\n  background-color: rgba(255, 255, 49, 0.33); /*rgb(255,255,200);*/\n}\n.cellstyle-red {\n  background-color: rgba(255,120,120,0.30);  /*rgb(255,200,200);*/\n}\n.cellstyle-lvert {\n  border-left: solid .5pt;\n}\n.cellstyle-rvert {\n  border-right: solid .5pt;\n}\n\n.celltbledge-top {\n  border-top: solid 1pt;\n}\n.celltbledge-bottom {\n  border-bottom: solid 1pt;\n}\n\n.verbatimcode {\n  font-family: monospace;\n  font-size: 0.9em;\n  background-color: rgba(127,127,127,0.25);\n  border-radius: 2px;\n  padding: 1px 2px;\n  display: inline-block;\n  white-space: pre-wrap;\n}\n.verbatima {\n  font-style: italic;\n}\n.verbatimcode-environment {\n  display: block;\n  margin: 0.75em 0px 1em;\n  white-space: pre;\n}\n\n.defterm {\n  font-style: italic;\n}\n\n.defterm .defterm-term {\n  font-style: italic;\n  font-weight: bold;\n}\n\n.display-math {\n  width: 100%;\n  max-width: 100%;\n  display: block;\n  overflow-x: auto;\n}\n\n.endnotes, .citations {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\n.citation {\n}\n.footnote {\n}\ndl.citation-list > dt, dl.footnote-list > dt {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\n";
-/* 001037 */ export var _html_js_mathjax = '\nMathJax = {\n    tex: {\n        inlineMath: [[\'\\\\(\', \'\\\\)\']],\n        displayMath: [[\'\\\\[\', \'\\\\]\']],\n        processEnvironments: true,\n        processRefs: true,\n\n        // equation numbering on\n        tags: \'ams\'\n    },\n    options: {\n        // all MathJax content is marked with CSS classes\n        // skipHtmlTags: \'body\',\n        // processHtmlClass: \'display-math|inline-math\',\n    },\n    startup: {\n        pageReady: function() {\n            // override the default "typeset everything on the page" behavior to\n            // only typeset whatever we have explicitly marked as math\n            return typesetPageMathPromise();\n        }\n    }\n};\nfunction typesetPageMathPromise()\n{\n    var elements = document.querySelectorAll(\'.display-math, .inline-math\');\n    return MathJax.typesetPromise(elements);\n}\n';
-/* 001068 */ export var _html_body_end_js_scripts_mathjax = '\n<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>\n<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>\n';
-/* 001076 */ export var get_html_css_global = function (html_fragment_renderer) {
-/* 001076 */ 	if (arguments.length) {
-/* 001076 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001076 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001076 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001076 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001076 */ 				switch (__attrib0__) {
-/* 001076 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001076 */ 				}
-/* 001076 */ 			}
-/* 001076 */ 		}
-/* 001076 */ 	}
-/* 001076 */ 	else {
-/* 001076 */ 	}
-/* 001077 */ 	return _html_css_global;
-/* 001077 */ };
-/* 001079 */ export var get_html_css_content = function (html_fragment_renderer) {
-/* 001079 */ 	if (arguments.length) {
-/* 001079 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001079 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001079 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001079 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001079 */ 				switch (__attrib0__) {
-/* 001079 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001079 */ 				}
-/* 001079 */ 			}
-/* 001079 */ 		}
-/* 001079 */ 	}
-/* 001079 */ 	else {
-/* 001079 */ 	}
-/* 001080 */ 	return _html_css_content;
-/* 001080 */ };
-/* 001082 */ export var get_html_js = function (html_fragment_renderer) {
-/* 001082 */ 	if (arguments.length) {
-/* 001082 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001082 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001082 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001082 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001082 */ 				switch (__attrib0__) {
-/* 001082 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001082 */ 				}
-/* 001082 */ 			}
-/* 001082 */ 		}
-/* 001082 */ 	}
-/* 001082 */ 	else {
-/* 001082 */ 	}
-/* 001083 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
-/* 001084 */ 		return _html_js_mathjax;
+/* 000785 */ export var _html_css_content = "\n.emph, .textit {\n  font-style: italic;\n}\n.textbf {\n  font-weight: bold;\n}\n\nh1 {\n  font-size: 1.6rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh2 {\n  font-size: 1.3rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh3 {\n  font-size: 1rem;\n  font-weight: bold;\n  margin: 1em 0px;\n}\n\n.heading-level-4 {\n  font-style: italic;\n  display: inline;\n}\n.heading-level-4::after {\n  display: inline-block;\n  margin: 0px .12em;\n  content: '—';\n}\n\n.heading-level-5 {\n  font-style: italic;\n  font-size: .9em;\n  display: inline;\n}\n.heading-level-5::after {\n  display: inline-block;\n  margin-right: .12em;\n  content: '';\n}\n\n.heading-level-6 {\n  font-style: italic;\n  font-size: .8em;\n  display: inline;\n}\n.heading-level-6::after {\n  display: inline-block;\n  margin-right: .06em;\n  content: '';\n}\n\n\n.heading-level-theorem {\n  font-weight: bold;\n  display: inline-block;\n}\n.heading-level-theorem::after {\n  font-weight: bold;\n  display: inline-block;\n  margin: 0px .12em 0px 0px;\n  content: '.';\n}\n\ndiv.theoremlike, div.definitionlike, div.prooflike {\n  margin: 1em 0px;\n}\n\ndiv.prooflike > p > .heading-level-theorem,\ndiv.prooflike > p > .heading-level-theorem::after {\n  font-weight: normal;\n  font-style: italic;\n}\n\n\ndl.enumeration {\n  display: block;\n  margin-left: 2.5em;\n}\ndl.enumeration > dt {\n  float: left;\n  clear: left;\n  display: inline-block;\n  /*margin: 0px; */\n  margin-left: -2.5em;\n  width: 2.0em;\n  min-width: 2.0em;\n  max-width: 2.0em;\n  margin-right: 0.5em;\n  text-align: right;\n}\ndl.enumeration > dd {\n  /*display: inline-block;\n  width: 100%;*/\n  border: 0px;\n  padding: 0px;\n  margin: 0px;\n}\n\nfigure.float {\n  width: 100%;\n  border-width: 1px 0px 1px 0px;\n  border-style: solid none solid none;\n  border-color: rgba(120, 120, 140, 0.15);\n  margin: 0.5rem 0px;\n  padding: 0.5rem 0px;\n}\n\nfigure.float .float-contents {\n  width: 100%;\n  max-width: 100%;\n  overflow-x: auto;\n}\n\nfigure.float .float-contents img {\n  display: block;\n  margin: 0pt auto;\n  padding: 0pt;\n  border: 0pt;\n  margin: 0px auto;\n}\n\nfigure.float figcaption {\n  display: block;\n  margin-top: 0.5em;\n  margin: 0.75em 2em 0px;\n  text-align: center;\n}\n\nfigure.float figcaption > span {\n  display: inline-block;\n  font-style: italic;\n  text-align: left;\n}\n\ntable {\n  margin: 1em 0px 1em 0px;\n  border-collapse: separate;\n  border-spacing: 0px;\n  /*border-top: solid 1pt;\n  border-bottom: solid 1pt;*/\n}\nfigure.float .float-contents table {\n  margin: 0px auto;\n}\ntd {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\nth {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\n.cellstyle-H {\n  border-bottom: solid .5pt;\n}\n.cellstyle-rH {\n}\n.cellstyle-l {\n  text-align: left;\n}\n.cellstyle-c {\n  text-align: center;\n}\n.cellstyle-r {\n  text-align: right;\n}\n.cellstyle-green {\n  background-color: rgba(69, 255, 69, 0.31); /*rgb(200,255,200);*/\n}\n.cellstyle-blue {\n  background-color: rgba(79, 142, 255, 0.27); /*rgb(200,220,255);*/\n}\n.cellstyle-yellow {\n  background-color: rgba(255, 255, 49, 0.33); /*rgb(255,255,200);*/\n}\n.cellstyle-red {\n  background-color: rgba(255,120,120,0.30);  /*rgb(255,200,200);*/\n}\n.cellstyle-lvert {\n  border-left: solid .5pt;\n}\n.cellstyle-rvert {\n  border-right: solid .5pt;\n}\n\n.celltbledge-top {\n  border-top: solid 1pt;\n}\n.celltbledge-bottom {\n  border-bottom: solid 1pt;\n}\n\n.verbatimcode {\n  font-family: monospace;\n  font-size: 0.9em;\n  background-color: rgba(127,127,127,0.25);\n  border-radius: 2px;\n  padding: 1px 2px;\n  display: inline-block;\n  white-space: pre-wrap;\n}\n.verbatima {\n  font-style: italic;\n}\n.verbatimcode-environment {\n  display: block;\n  margin: 0.75em 0px 1em;\n  white-space: pre;\n}\n\n.defterm {\n  font-style: italic;\n}\n\n.defterm .defterm-term {\n  font-style: italic;\n  font-weight: bold;\n}\n\n.display-math {\n  width: 100%;\n  max-width: 100%;\n  display: block;\n  overflow-x: auto;\n}\n\n.endnote {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\n.citation {\n}\n.footnote {\n}\n.endnotes, .citations {\n}\ndl.citation-list > dt, dl.footnote-list > dt {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\n";
+/* 001039 */ export var _html_js_mathjax = '\nMathJax = {\n    tex: {\n        inlineMath: [[\'\\\\(\', \'\\\\)\']],\n        displayMath: [[\'\\\\[\', \'\\\\]\']],\n        processEnvironments: true,\n        processRefs: true,\n\n        // equation numbering on\n        tags: \'ams\'\n    },\n    options: {\n        // all MathJax content is marked with CSS classes\n        // skipHtmlTags: \'body\',\n        // processHtmlClass: \'display-math|inline-math\',\n    },\n    startup: {\n        pageReady: function() {\n            // override the default "typeset everything on the page" behavior to\n            // only typeset whatever we have explicitly marked as math\n            return typesetPageMathPromise();\n        }\n    }\n};\nfunction typesetPageMathPromise()\n{\n    var elements = document.querySelectorAll(\'.display-math, .inline-math\');\n    return MathJax.typesetPromise(elements);\n}\n';
+/* 001070 */ export var _html_body_end_js_scripts_mathjax = '\n<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>\n<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>\n';
+/* 001078 */ export var get_html_css_global = function (html_fragment_renderer) {
+/* 001078 */ 	if (arguments.length) {
+/* 001078 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001078 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001078 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001078 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001078 */ 				switch (__attrib0__) {
+/* 001078 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001078 */ 				}
+/* 001078 */ 			}
+/* 001078 */ 		}
+/* 001078 */ 	}
+/* 001078 */ 	else {
+/* 001078 */ 	}
+/* 001079 */ 	return _html_css_global;
+/* 001079 */ };
+/* 001081 */ export var get_html_css_content = function (html_fragment_renderer) {
+/* 001081 */ 	if (arguments.length) {
+/* 001081 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001081 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001081 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001081 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001081 */ 				switch (__attrib0__) {
+/* 001081 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001081 */ 				}
+/* 001081 */ 			}
+/* 001081 */ 		}
+/* 001081 */ 	}
+/* 001081 */ 	else {
+/* 001081 */ 	}
+/* 001082 */ 	return _html_css_content;
+/* 001082 */ };
+/* 001084 */ export var get_html_js = function (html_fragment_renderer) {
+/* 001084 */ 	if (arguments.length) {
+/* 001084 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001084 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001084 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001084 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001084 */ 				switch (__attrib0__) {
+/* 001084 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001084 */ 				}
+/* 001084 */ 			}
+/* 001084 */ 		}
 /* 001084 */ 	}
-/* 001085 */ 	return '';
-/* 001085 */ };
-/* 001087 */ export var get_html_body_end_js_scripts = function (html_fragment_renderer) {
-/* 001087 */ 	if (arguments.length) {
-/* 001087 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001087 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001087 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001087 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001087 */ 				switch (__attrib0__) {
-/* 001087 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001087 */ 				}
-/* 001087 */ 			}
-/* 001087 */ 		}
-/* 001087 */ 	}
-/* 001087 */ 	else {
-/* 001087 */ 	}
-/* 001088 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
-/* 001089 */ 		return _html_body_end_js_scripts_mathjax;
+/* 001084 */ 	else {
+/* 001084 */ 	}
+/* 001085 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
+/* 001086 */ 		return _html_js_mathjax;
+/* 001086 */ 	}
+/* 001087 */ 	return '';
+/* 001087 */ };
+/* 001089 */ export var get_html_body_end_js_scripts = function (html_fragment_renderer) {
+/* 001089 */ 	if (arguments.length) {
+/* 001089 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001089 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001089 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001089 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001089 */ 				switch (__attrib0__) {
+/* 001089 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001089 */ 				}
+/* 001089 */ 			}
+/* 001089 */ 		}
 /* 001089 */ 	}
-/* 001090 */ 	return '';
-/* 001090 */ };
-/* 001096 */ export var FragmentRendererInformation =  __class__ ('FragmentRendererInformation', [object], {
-/* 001096 */ 	__module__: __name__,
-/* 001102 */ 	FragmentRendererClass: HtmlFragmentRenderer,
-/* 001105 */ 	get get_style_information () {return function (fragment_renderer) {
-/* 001105 */ 		if (arguments.length) {
-/* 001105 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001105 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001105 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001105 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001105 */ 					switch (__attrib0__) {
-/* 001105 */ 						case 'fragment_renderer': var fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001105 */ 					}
-/* 001105 */ 				}
-/* 001105 */ 			}
-/* 001105 */ 		}
-/* 001105 */ 		else {
-/* 001105 */ 		}
-/* 001110 */ 		return dict ({'css_global': __call__ (get_html_css_global, null, fragment_renderer), 'css_content': __call__ (get_html_css_content, null, fragment_renderer), 'js': __call__ (get_html_js, null, fragment_renderer), 'body_end_js_scripts': __call__ (get_html_body_end_js_scripts, null, fragment_renderer)});
-/* 001110 */ 	};},
-/* 001113 */ 	format_name: 'html'
-/* 001113 */ });
+/* 001089 */ 	else {
+/* 001089 */ 	}
+/* 001090 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
+/* 001091 */ 		return _html_body_end_js_scripts_mathjax;
+/* 001091 */ 	}
+/* 001092 */ 	return '';
+/* 001092 */ };
+/* 001098 */ export var FragmentRendererInformation =  __class__ ('FragmentRendererInformation', [object], {
+/* 001098 */ 	__module__: __name__,
+/* 001104 */ 	FragmentRendererClass: HtmlFragmentRenderer,
+/* 001107 */ 	get get_style_information () {return function (fragment_renderer) {
+/* 001107 */ 		if (arguments.length) {
+/* 001107 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001107 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001107 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001107 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001107 */ 					switch (__attrib0__) {
+/* 001107 */ 						case 'fragment_renderer': var fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001107 */ 					}
+/* 001107 */ 				}
+/* 001107 */ 			}
+/* 001107 */ 		}
+/* 001107 */ 		else {
+/* 001107 */ 		}
+/* 001112 */ 		return dict ({'css_global': __call__ (get_html_css_global, null, fragment_renderer), 'css_content': __call__ (get_html_css_content, null, fragment_renderer), 'js': __call__ (get_html_js, null, fragment_renderer), 'body_end_js_scripts': __call__ (get_html_body_end_js_scripts, null, fragment_renderer)});
+/* 001112 */ 	};},
+/* 001115 */ 	format_name: 'html'
+/* 001115 */ });
 /* 000006 */ 
 //# sourceMappingURL=flm.fragmentrenderer.html.map
