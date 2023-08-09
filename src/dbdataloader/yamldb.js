@@ -101,7 +101,7 @@ function get_default_ignore_file_name_match(resource_file_extensions) {
         // backup files / desktop services
         + '^\\.DS_Store|\\~|\\.bak|\\.bkp|'
         // autosave files (e.g., Emacs)
-        + '^[.]?#.*#|'
+        + '^[.]?#.*|'
         // .git, .gitignore, .gitattributes, .gitmodules, etc.
         + '^\\.git.*|'
         // any latex temporary files lying around
