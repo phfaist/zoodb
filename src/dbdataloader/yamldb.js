@@ -226,7 +226,7 @@ export class YamlDbZooDataLoader
         debug(`Using schema_root = ${this.config.schemas.schema_root}`);
 
         this.schema_validator = new jsonschema.Validator();
-        this.schema_ref_parser = new $RefParser();
+        this.schema_ref_parser = $RefParser;
         this.schemas_by_name = {};
 
         if (!this.config.schemas.schema_root) {
