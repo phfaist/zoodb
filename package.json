@@ -56,7 +56,7 @@
         "./std/*": "./src/std/*.js",
         "./flm-js/*": "./flm-js-src/flm-js/*.js"
     },
-    "imports": {
+    "....imports...StillBuggyInParceljs...ExportSymbolsAreNotRecognized": {
         "#flm-js/*": "./flm-js-src/flm-js/*"
     }
 }

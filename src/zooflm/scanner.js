@@ -1,7 +1,7 @@
 import debug_module from 'debug';
 const debug = debug_module('zoodb.zooflm.scanner');
 
-import {$$kw, repr} from '#flm-js/py.js';
+import {$$kw, repr} from './_flm-js/py.js';
 
 import {is_flm_fragment} from './_environment.js';
 

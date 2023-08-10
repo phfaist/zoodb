@@ -3,10 +3,10 @@
 //
 
 // provide $$kw({...}) and repr() to importers
-export {$$kw, repr} from '#flm-js/py.js';
+export {$$kw, repr} from './_flm-js/py.js';
 
 // provide ability to create derived classes of transcrypt/py classes, if necessary ...
-export {__class__, __super__, __get__, isinstance} from '#flm-js/org.transcrypt.__runtime__.js';
+export {__class__, __super__, __get__, isinstance} from './_flm-js/org.transcrypt.__runtime__.js';
 
 // ZooFLMResourceInfo
 export * from './_resourceinfo.js';
@@ -21,7 +21,7 @@ export * from './_environment.js';
 //
 // Easily dump and reload compiled FLM to/from data/JSON
 //
-export { FLMDataDumper, FLMDataLoader } from '#flm-js/flm.flmdump.js';
+export { FLMDataDumper, FLMDataLoader } from './_flm-js/flm.flmdump.js';
 
 
 
@@ -30,7 +30,7 @@ export * from './_fragmentrenderers.js';
 
 
 // fn_unique_object_id utility
-export { fn_unique_object_id } from '#flm-js/unique_object_id.js';
+export { fn_unique_object_id } from './_flm-js/unique_object_id.js';
 
 
 // utilities for rendering:

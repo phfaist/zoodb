@@ -1,6 +1,6 @@
 import path from 'path';
 
-import * as flmdump from '#flm-js/flm.flmdump.js';
+import * as flmdump from './_flm-js/flm.flmdump.js';
 
 /**
  * Store information about which source file an FLM fragment was encountered in.
