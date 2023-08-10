@@ -127,7 +127,8 @@ export function use_flm_processor(_this)
             cache_fs: fs,
             cache_dir: citations_cache_dir,
             cache_entry_default_duration_ms:
-                flm_options.citations?.cache_entry_default_duration_ms
+                flm_options.citations?.cache_entry_default_duration_ms,
+            citation_manager_options: flm_options.citations?.citation_manager_options,
         },
         resource_collector_options: {
             resource_types: ['graphics_path'],

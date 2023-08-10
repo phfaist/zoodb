@@ -92,6 +92,7 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
                                       'cache_downloaded_info.json'),
                 cache_entry_default_duration_ms:
                     this.options.citations.cache_entry_default_duration_ms,
+                ...(this.options.citations.citation_manager_options??{})
             },
         );
 
