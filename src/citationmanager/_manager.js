@@ -378,8 +378,10 @@ export class CitationDatabaseManager
             cache_duration_ms ?? this.cache_entry_default_duration_ms
         );
 
-        // save cache at each store
-        this.save_cache();
+        if ( ! this.options.skip_save_cache ) {
+            // save cache at each store
+            this.save_cache();
+        }
     }
 
 

@@ -58,5 +58,10 @@
     },
     "....imports...StillBuggyInParceljs...ExportSymbolsAreNotRecognized": {
         "#flm-js/*": "./flm-js-src/flm-js/*"
+    },
+    "browser": {
+        "node-fetch": {
+            "global": "fetch"
+        }
     }
 }
