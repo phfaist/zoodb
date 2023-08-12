@@ -589,7 +589,7 @@ export class YamlDbZooDataLoader
             console.error(
                 `Parse error in ‘${fullpath}’: ${err}`
             );
-            throw err;
+            throw new Error(`Parse error in ‘${fullpath}’: ${err}`);
         }
     }
 
