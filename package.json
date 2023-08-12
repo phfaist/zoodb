@@ -11,6 +11,7 @@
         "browser-process-hrtime": "^1.0.0",
         "citeproc": "^2.4.62",
         "debug": "^4.3.4",
+        "escape-html": "^1.0.3",
         "exif-parser": "^0.1.12",
         "feedparser": "^2.2.10",
         "glob": "^8.0.3",

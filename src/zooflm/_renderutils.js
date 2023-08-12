@@ -1,6 +1,8 @@
 import debug_module from 'debug';
 const debug = debug_module('zoodb.zooflm._renderutils');
 
+import html_escape from 'escape-html';
+
 // provide $$kw({...}) and repr() to importers
 import { $$kw, repr, dict } from './_flm-js/py.js';
 
@@ -55,8 +57,15 @@ export function render_value(x, render_context, render_value_options = {})
         // debug(`Rendering fragment -> `, x.flm_text, x);
         return x.render(render_context);
     }
+
+    // catch internal ZooDb object references and display them in some
+    // meaningful way.
+    if (typeof x === 'object' && Object.hasOwn(x, '_zoodb')) {
+        return html_escape(`<Reference to zoo entry ‘${x._zoodb?.id}’>`);
+    }
+
     debug('Cannot render %O', x);
-    throw new Error(`No idea how to render x = ${x}`);
+    throw new Error(`Cannot render value of unknown type: ${x}`);
 }
 
 export function value_not_empty(value)
@@ -186,7 +195,7 @@ export function make_and_render_document({
             return sqzhtml`
   <div class="flm-html-error">
     <b>🚨 FLM ERROR 🚨</b>
-    <pre>${errstr}</pre>
+    <pre>${html_escape(errstr)}</pre>
   </div>`;
         } else {
             throw new Error(
