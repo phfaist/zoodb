@@ -44,6 +44,7 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
                     cache_fs: null,
                     cache_dir: '.',
                     // cache_entry_default_duration_ms: null, // can be left undefined
+                    skip_save_cache: false,
                 },
                 flm_error_policy: 'abort', // 'abort' or 'continue'
 
@@ -92,6 +93,7 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
                                       'cache_downloaded_info.json'),
                 cache_entry_default_duration_ms:
                     this.options.citations.cache_entry_default_duration_ms,
+                skip_save_cache: this.options.citations.skip_save_cache,
                 ...(this.options.citations.citation_manager_options??{})
             },
         );
@@ -112,6 +114,7 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
             cache_fs: this.options.citations.cache_fs,
             cache_file: path.join(this.options.citations.cache_dir,
                                   'cache_compiled_citations.json'),
+            skip_save_cache: this.options.citations.skip_save_cache,
         });
 
         //

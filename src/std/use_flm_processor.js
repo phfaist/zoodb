@@ -128,6 +128,7 @@ export function use_flm_processor(_this)
             cache_dir: citations_cache_dir,
             cache_entry_default_duration_ms:
                 flm_options.citations?.cache_entry_default_duration_ms,
+            skip_save_cache: flm_options.citations?.skip_save_cache ?? false,
             citation_manager_options: flm_options.citations?.citation_manager_options,
         },
         resource_collector_options: {

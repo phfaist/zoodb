@@ -57,8 +57,10 @@ export class CitationDatabaseManager
 
         this.load_cache();
 
-        debug(`Citation database will be regularly saved back to the `
-              + `cache file ‘${this.cache_file}’`);
+        if ( ! this.options.skip_save_cache ) {
+            debug(`Citation database will be regularly saved back to the `
+                  + `cache file ‘${this.cache_file}’`);
+        }
     }
 
     /**
@@ -69,12 +71,18 @@ export class CitationDatabaseManager
     load_cache()
     {
         const fs = this.cache_fs;
-        if ( fs.existsSync(this.cache_file) ) {
-            const json_data = fs.readFileSync(this.cache_file);
-            this.cache.importJson(json_data);
-            debug(`Loaded citations cache from ‘${this.cache_file}’ `
-                  + `(${this.cache.size()} items)`);
+        let json_data = null;
+        try {
+            json_data = fs.readFileSync(this.cache_file);
+        } catch (err) {
+            debug(`Cache file does not exist or error loading cache file`, err);
         }
+        if (json_data == null) {
+            return;
+        }
+        this.cache.importJson(json_data);
+        debug(`Loaded citations cache from ‘${this.cache_file}’ `
+              + `(${this.cache.size()} items)`);
     }
 
     /**
