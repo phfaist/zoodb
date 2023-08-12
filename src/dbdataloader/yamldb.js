@@ -671,8 +671,10 @@ export class YamlDbZooDataLoader
         const validation_result = this.schema_validator.validate(obj, objectconfig.schema);
         if (!validation_result.valid) {
             const validation_errors = validation_result.errors.map(
-                (errorstr) => errorstr.replace(/^instance\b/,
-                                               `[${objectconfig.object_type.toUpperCase()}]`)
+                (errorstr) => (''+errorstr).replace(
+                    /^instance\b/,
+                    () => `[${objectconfig.object_type.toUpperCase()}]`
+                )
             );
             throw new Error(
                 `Schema validation failed for ${objectconfig.object_type} object data in `
