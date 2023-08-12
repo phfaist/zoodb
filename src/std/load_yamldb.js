@@ -112,6 +112,9 @@ export class StandardZooDbYamlDataLoader
 
         } catch (err) {
             console.error('ERROR RELOADING DATA: ', err);
+            if (this.config.throw_reload_errors ?? false) {
+                throw err;
+            }
         } finally {
             this._currently_loading = false;
         }
