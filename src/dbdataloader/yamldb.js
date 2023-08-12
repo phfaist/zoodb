@@ -493,7 +493,8 @@ export class YamlDbZooDataLoader
                 return result;
             }
             //debug(`Walking ‘${root_path}’ → directory ${rel_path}`);
-            dir_callback(root_path, rel_path, dirent);
+            await dir_callback(root_path, rel_path, dirent);
+
             const pathname = path.join(root_path, rel_path);
 
             // avoid using "readdir(..., { withFileTypes: true })" because we
@@ -548,14 +549,12 @@ export class YamlDbZooDataLoader
             }
         };
 
-        return await Promise.all(
-            await this.walk(
-                fullsrcpath,
-                // callback for directories:
-                dir_callback,
-                // callback for files:
-                file_callback
-            )
+        return await this.walk(
+            fullsrcpath,
+            // callback for directories:
+            dir_callback,
+            // callback for files:
+            file_callback
         );
     }
 
