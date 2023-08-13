@@ -132,7 +132,7 @@ export class CitationSourceArxiv extends CitationSourceBase
         // parse retreived articles
         for (const article of _articles)
         {
-            this.handle_arxiv_article_response(article);
+            await this.handle_arxiv_article_response(article);
         }
     }
 
@@ -151,7 +151,7 @@ export class CitationSourceArxiv extends CitationSourceBase
         return authorobj;
     }
 
-    handle_arxiv_article_response(atom_article)
+    async handle_arxiv_article_response(atom_article)
     {
         const arxivurl = atom_article['atom:id']['#'];
         const m = _arxivurlregexp.exec(arxivurl);
@@ -218,7 +218,7 @@ export class CitationSourceArxiv extends CitationSourceBase
             // If a specific version was requested, we don't chain the citation
             // resolution to the DOI entry, because we want to print the info
             // associated with that specific arXiv version.
-            this.citation_manager.store_citation(
+            await this.citation_manager.store_citation(
                 this.cite_prefix, arxivid_with_version,
                 citeprocjsond, this.cache_store_options
             );
@@ -235,24 +235,24 @@ export class CitationSourceArxiv extends CitationSourceBase
         }
     }
 
-    call_store_callback(arxividkey, citeprocjsond)
+    async call_store_callback(arxividkey, citeprocjsond)
     {
         if (this.chain_to_doi && citeprocjsond.doi) {
             // chain citation call to DOI access
-            this.citation_manager.store_citation_chained(
+            await this.citation_manager.store_citation_chained(
                 this.cite_prefix, arxividkey,
                 'doi', citeprocjsond.doi,
                 { arxivid: arxividkey },
                 this.cache_store_options
             );
         } else {
-            this.citation_manager.store_citation(
+            await this.citation_manager.store_citation(
                 this.cite_prefix, arxividkey, citeprocjsond, this.cache_store_options
             );
         }
     }
 
-    source_finalize_run()
+    async source_finalize_run()
     {
         debug(`Finalizing arXiv citation entries’`);
 
@@ -287,7 +287,7 @@ export class CitationSourceArxiv extends CitationSourceBase
                 },
                 null
             );
-            this.call_store_callback(arxivid, last_version_jsond);
+            await this.call_store_callback(arxivid, last_version_jsond);
         }
     }
 

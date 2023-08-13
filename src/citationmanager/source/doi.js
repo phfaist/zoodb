@@ -64,7 +64,7 @@ export class CitationSourceDoi extends CitationSourceBase
         // clean up the data a bit, we don't need the full list of references (!)
         csljsondata.reference = [];
 
-        this.citation_manager.store_citation(
+        await this.citation_manager.store_citation(
             this.cite_prefix, doi, csljsondata, this.cache_store_options
         );
     }

@@ -94,9 +94,13 @@ export class CitationDatabaseManager
         if (json_data == null) {
             return;
         }
-        this.cache.importJson(json_data);
-        debug(`Loaded citations cache from ‘${this.cache_file}’ `
-              + `(${this.cache.size()} items)`);
+        try {
+            this.cache.importJson(json_data);
+            debug(`Loaded citations cache from ‘${this.cache_file}’ `
+                  + `(${this.cache.size()} items)`);
+        } catch (err) {
+            debug(`Error importing cache!`, err);
+        }
     }
 
     /**
@@ -358,7 +362,7 @@ export class CitationDatabaseManager
      *   future.
      *
      */
-    store_citation(cite_prefix, cite_key, entry_csl_json, options={})
+    async store_citation(cite_prefix, cite_key, entry_csl_json, options={})
     {
         const cite_id = `${cite_prefix}:${cite_key}`;
 
@@ -402,7 +406,7 @@ export class CitationDatabaseManager
 
         if ( ! this.options.skip_save_cache ) {
             // save cache at each store
-            this.save_cache();
+            await this.save_cache();
         }
     }
 
@@ -422,10 +426,10 @@ export class CitationDatabaseManager
      * `arXiv:1234.56789` will use the citation information that was retrieved
      * from `doi:10.1234/abcdef` with the additional property `arxivid` set.
      */
-    store_citation_chained(cite_prefix, cite_key, new_cite_prefix, new_cite_key,
-                           set_properties)
+    async store_citation_chained(cite_prefix, cite_key, new_cite_prefix, new_cite_key,
+                                 set_properties)
     {
-        this.store_citation(
+        await this.store_citation(
             cite_prefix,
             cite_key,
             // special JSON entry to store in cache

@@ -63,7 +63,7 @@ import { timeout, promisify } from '../../util/prify.js';
  * - ``cache_store_options`` - Any options to use when calling the manager
  *   object's `store_citation()` method, for instance, ``{ cache_duration_ms:
  *   ... }``.  Subclasses should remember to pass this option on in calls to
- *   ``this.citation_manager.store_citation(..., this.cache_store_options)``.
+ *   ``await this.citation_manager.store_citation(..., this.cache_store_options)``.
  *
  * - ``use_user_agent``, ``user_agent`` - Specify a custom user agent when
  *   fetching remote content with `fetch_url()`.  If `use_user_agent` is false,
@@ -370,10 +370,10 @@ export class CitationSourceBase
      * from a local file path or from a remote URL.
      *
      * Once the citation information for a citation key/ID is retrieved, then we
-     * need to call ``this.citation_manager.store_citation(...)``.  See the
-     * corresponding documentation for :class:`CitationManager`.  Use the cite
-     * prefix stored in `this.cite_prefix`.  Don't forget to pass on the options
-     * stored in `this.cache_store_options`!
+     * need to call ``await this.citation_manager.store_citation(...)``.  See
+     * the corresponding documentation for :class:`CitationManager`.  Use the
+     * cite prefix stored in `this.cite_prefix`.  Don't forget to pass on the
+     * options stored in `this.cache_store_options`!
      *
      */
     async run_retrieve_chunk(/*id_list*/)

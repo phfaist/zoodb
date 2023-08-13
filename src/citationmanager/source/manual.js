@@ -43,7 +43,7 @@ export class CitationSourceManual extends CitationSourceBase
     {
         for (const key of id_list) {
 
-            this.citation_manager.store_citation(
+            await this.citation_manager.store_citation(
                 this.cite_prefix, key,
                 {
                     _ready_formatted: {

@@ -98,7 +98,7 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
                     + `(for prefix ‘${this.cite_prefix}’)`
                 );
             }
-            this.citation_manager.store_citation(
+            await this.citation_manager.store_citation(
                 this.cite_prefix, key,
                 d,
                 Object.assign(
