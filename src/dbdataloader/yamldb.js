@@ -14,61 +14,11 @@ import json_refparser_resolver_http from "@apidevtools/json-schema-ref-parser/di
 import debug_module from 'debug';
 const debug = debug_module('zoodb.dbdataloader');
 
-
-
-// -------------------------------------------------------
-//
-// // adapted "@apidevtools/json-schema-ref-parser/lib/resolvers/file.js" to allow
-// // arbitrary 'fs' objects
-//
-// function get_json_refparser_resolver_file(fs)
-// {
-//     return {
-//         /**
-//          * The order that this resolver will run, in relation to other resolvers.
-//          */
-//         order: 100,
-//
-//         /**
-//          * Determines whether this resolver can read a given file reference.
-//          * Resolvers that return true will be tried, in order, until one
-//          * successfully resolves the file.  Resolvers that return false will not
-//          * be given a chance to resolve the file.
-//          */
-//         canRead(file) {
-//             const protocol = (new URL(file.url)).protocol;
-//             if (!protocol || protocol === 'file:') {
-//                 return true;
-//             }
-//             return false;
-//         },
-
-//         /**
-//          * Reads the given file and returns its raw contents as a Buffer.
-//          */
-//         async read(file) {
-//             let path;
-//             try {
-//                 path = (new URL(file.url)).pathname;
-//             } catch (err) {
-//                 throw new Error(`Malformed URI: ${file.url}: ${err}`);
-//             }
-//             try {
-//                 const data = await new Promise( (resolve) => fs.readFile(path, resolve) );
-//                 return data;
-//             } catch (err) {
-//                 throw new Error(`Error opening file "${path}"`);
-//             }
-//         },
-//     };
-// };
-
-// -------------------------------------------------------
+import { promisifyMethods } from '../util/prify.js';
 
 
 
-
-
+// -----------------------------------------------------------------------------
 
 
 
@@ -90,7 +40,7 @@ const default_resource_file_extensions = [
     ".psd",
     ".png",
     ".jpeg",
-    ".jpg"
+    ".jpg",
 ];
 
 
@@ -176,9 +126,9 @@ const dbdata = zoodbdataloader.load();
  *
  * Configuration options .............
  *
- * See also :class:`StandardZooDbYamlDataLoader` for a simplified loading.
+ * See also :class:`makeStandardZooDbYamlDataLoader` for a simplified loading.
  */
-export class YamlDbZooDataLoader
+export class YamlDbDataLoader
 {
 
     constructor(config)
@@ -189,7 +139,10 @@ export class YamlDbZooDataLoader
         this.config.schemas = Object.assign({}, this.config.schemas ?? {});
 
         this.fs = this.config.fs;
-        this.fsPromises = this.config.fs.promises ?? this.config.fs;
+        this.fsPromises =
+            this.config.fs.promises
+            ?? promisifyMethods(this.config.fs, ['readData', 'readdir', 'stat', 'lstat',])
+        ;
 
         this.config.options ??= {};
         this.config.options.normalize_id_for_uniqueness_check ??= ((x) => x.toLowerCase());
@@ -692,3 +645,4 @@ export class YamlDbZooDataLoader
     }
 
 }
+

@@ -130,9 +130,13 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         this.flm_simple_content_compiler.install_zoo(zoodb);
     }
 
-    initialize_zoo(zoodb)
+    async initialize_zoo(zoodb)
     {
-        this.flm_simple_content_compiler.initialize_zoo(zoodb);
+        // the citation manager & compiler need to load their cache files
+        await this.citation_manager.initialize();
+        await this.citation_compiler.initialize();
+
+        await this.flm_simple_content_compiler.initialize_zoo(zoodb);
     }
 
     async process_zoo()

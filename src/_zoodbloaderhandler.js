@@ -1,50 +1,33 @@
-import debug_mod from 'debug';
-const debug = debug_mod("zoodb.std.load_yamldb");
+import debugm from 'debug';
+const debug = debugm('zoodb._zoodbloaderhandler');
 
-//import loMerge from 'lodash/merge.js';
-
-import { YamlDbZooDataLoader } from '../dbdataloader/yamldb.js';
-
-
-//
-// Load & reload zoo from our YAML files database
-//
-
-
-// -----------------------------------------------------------------------------
+import loMerge from 'lodash/merge.js';
 
 /**
  * Doc........
  */
-export class StandardZooDbYamlDataLoader
+export class ZooDbDataLoaderHandler
 {
-    constructor(config)
+    constructor(db_data_loader, options={})
     {
-        this.config = config ?? {};
+        this.options = loMerge(
+            {
+                throw_reload_errors: true
+            },
+            options,
+        );
+
+        this.db_data_loader = db_data_loader;
+
+        this.zoodb = null;
 
         this._currently_loading = null;
         this._first_load_done = null;
-
-        if (this.config.objects == null) {
-            throw new Error(`Need to specify objects: {...} config parameter`);
-        }
     }
 
     initialize(zoodb)
     {
         this.zoodb = zoodb;
-
-        this.yamldb_loader = new YamlDbZooDataLoader({
-            resource_file_extensions:
-                this.zoodb.config.flm_options.resources.resource_file_extensions,
-            objects: this.config.objects,
-
-            object_defaults: { },
-            root_data_dir: this.zoodb.config.fs_data_dir,
-            schemas: this.config.schemas,
-
-            fs: this.config.fs ?? this.zoodb.config.fs,
-        });
 
         this._currently_loading = false;
         this._first_load_done = false;
@@ -53,8 +36,8 @@ export class StandardZooDbYamlDataLoader
     async load()
     {
         if (this._currently_loading) {
-            console.error("The zoo is already currently being loaded! Will not "
-                          + "reload again at this time.");
+            console.error("The zoo is already currently being loaded! Please wait "
+                          + "before trying to reload the zoo.");
             return;
         }
 
@@ -62,14 +45,19 @@ export class StandardZooDbYamlDataLoader
             return this.reload();
         }
 
-        debug(`Loading YAML data from ‘${this.zoodb.config.fs_data_dir}’`);
+        debug(`Initiating loading the zoo data using our registered data db_data_loader`);
 
         this._currently_loading = true;
 
         //
+        // Load the data files
+        //
+        const dbdata = await this.db_data_loader.load();
+
+        //
         // Load the zoo from the data files
         //
-        await this.zoodb.load_data( await this.yamldb_loader.load() );
+        await this.zoodb.load_data( dbdata );
 
         this._currently_loading = false;
         this._first_load_done = true;
@@ -97,8 +85,10 @@ export class StandardZooDbYamlDataLoader
 
             debug("Reloading Zoo!");
 
-            const { /*dbdata,*/ reload_info } =
-                  await this.yamldb_loader.reload(this.zoodb.db);
+            const {
+                // dbdata,
+                reload_info
+            } = await this.db_data_loader.reload(this.zoodb.db);
 
             await this.zoodb.update_objects(reload_info.reloaded_objects);
 
@@ -112,7 +102,7 @@ export class StandardZooDbYamlDataLoader
 
         } catch (err) {
             console.error('ERROR RELOADING DATA: ', err);
-            if (this.config.throw_reload_errors ?? false) {
+            if (this.options.throw_reload_errors ?? false) {
                 throw err;
             }
         } finally {

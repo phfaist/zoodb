@@ -66,7 +66,27 @@ export class FLMGraphicsResourceProcessor
 
         grdata.source_info = {
             resolved_source: target_info.resolved_source,
+
+            toJSON()
+            {
+                return Object.fromEntries(
+                    // skip exporting file_content which can be a big file!
+                    Object.entries(this).filter( ([k, /*v*/]) => (k != 'file_content') )
+                );
+                // return Object.fromEntries(
+                //     Object.entries(this).map( ([k,v]) => {
+                //         // for file_content, if present --
+                //         if (typeof v === 'object' && v instanceof Buffer) {
+                //             return [k, {'$type': 'Buffer', data: v.toString('base64')}];
+                //         }
+                //         return [k, v];
+                //     } )
+                // );
+            }
         };
+        if (target_info.file_content != null) {
+            grdata.source_info.file_content = target_info.file_content;
+        }
         if (processed_info != null && processed_info
             && typeof processed_info === 'object'
             && Object.keys(processed_info).length > 0) {

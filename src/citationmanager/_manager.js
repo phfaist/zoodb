@@ -5,6 +5,8 @@ const debug = debug_module('zoodb.citationmanager');
 
 import sha256 from 'hash.js/lib/hash/sha/256.js';
 
+import { promisifyMethods } from '../util/prify.js';
+
 import { Cache, one_day } from './_cache.js';
 
 
@@ -34,6 +36,11 @@ import { Cache, one_day } from './_cache.js';
  * - ``default_use_user_agent``, ``default_user_agent`` - specify defaults
  *   as to whether or not to set a custom user agent when source fetch
  *   remote content, and if so, then which user agent to specify.
+ *
+ * .. warning:
+ *
+ *    Do not forget to call and await the result of the `initialize()` method on
+ *    the newly created object, so that the cache can be loaded.
  */
 export class CitationDatabaseManager
 {
@@ -49,13 +56,15 @@ export class CitationDatabaseManager
         }
 
         this.cache_fs = options.cache_fs;
+        this.cache_fsp =
+            this.cache_fs.promises
+            ?? promisifyMethods(this.cache_fs, ['readFile', 'writeFile'])
+        ;
         this.cache_file =
             this.options.cache_file || '_zoodb_cache_citations_downloaded_info.json';
         this.cache_entry_default_duration_ms =
             this.options.cache_entry_default_duration_ms || 30*one_day;
         this.cache = new Cache();
-
-        this.load_cache();
 
         if ( ! this.options.skip_save_cache ) {
             debug(`Citation database will be regularly saved back to the `
@@ -63,17 +72,22 @@ export class CitationDatabaseManager
         }
     }
 
+    async initialize()
+    {
+        await this.load_cache();
+    }
+
     /**
      * Load citation information from the cache file.  Does nothing if the cache
      * file does not exist.  This method is automatically called by the
      * constructor.
      */
-    load_cache()
+    async load_cache()
     {
-        const fs = this.cache_fs;
+        const fsp = this.cache_fsp;
         let json_data = null;
         try {
-            json_data = fs.readFileSync(this.cache_file);
+            json_data = await fsp.readFile(this.cache_file);
         } catch (err) {
             debug(`Cache file does not exist or error loading cache file`, err);
         }
@@ -88,12 +102,12 @@ export class CitationDatabaseManager
     /**
      * Save the current citation information database to the cache file.
      */
-    save_cache()
+    async save_cache()
     {
-        const fs = this.cache_fs;
+        const fsp = this.cache_fsp;
         // debug(`Saving database to cache file ‘${this.cache_file}’`);
         // to this.cache_file
-        fs.writeFileSync(this.cache_file, this.cache.exportJson());
+        await fsp.writeFile(this.cache_file, this.cache.exportJson());
     }
 
     /**

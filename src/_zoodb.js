@@ -56,6 +56,8 @@ export class ZooDb
         this.raw_data_db = {};
 
         this.schema_validator = schema_validator ?? null;
+
+        this.zoo_loader_handler = null;
     }
 
     /**
@@ -150,6 +152,80 @@ export class ZooDb
 
         debug('zoodb load_data done.');
     }
+
+
+
+    /**
+     * Can be overridden to proceed to validatation of the zoo.  E.g., you can
+     * enforce any constraints, sanity checks, etc.
+     *
+     * .. warning:
+     *
+     *    This validation function is only called if you use a loader handler to
+     *    handle the data loads (see :class:`ZooDbDataLoaderHandler`).
+     *    Otherwise it's up to you to call this method manually whenever
+     *    appropriate.
+     */
+    async validate()
+    {
+    }
+
+
+    // -----------------------
+
+    //
+    // Methods for installing and using data loader handlers.
+    //
+
+    /** Install a zoo loader handler.
+     *
+     * The loader handler's task is to invoke a dbdataloader
+     * (e.g. :class:`YamlDbDataLoader`) to obtain the database data from some
+     * source (e.g. YAML files) and then to properly initialize and validate the
+     * zoo with that data.
+     *
+     * The `zoo_loader_handler` is pretty much expected to be a
+     * :class:`ZooDbDataLoaderHandler` instance.  If you specify `null` here,
+     * any existing loader handler will be removed.
+     *
+     * The reason for splitting off the logic of the loader handler is to avoid
+     * bloating the ZooDb class definition, especially in case a user would like
+     * to create a barebones ZooDb, e.g. with hard-coded JSON data, without
+     * reloading features, in which case neither a loader nor a loader handler
+     * are not necessary.
+     */
+    async install_zoo_loader_handler( zoo_loader_handler )
+    {
+        if (zoo_loader_handler == null) {
+            // remove any existing loader handler
+            this.zoo_loader_handler = null;
+            return;
+        }
+        if (this.zoo_loader_handler != null) {
+            throw new Error(`There is already a loader handler installed.`);
+        }
+        this.zoo_loader_handler = zoo_loader_handler;
+        await this.zoo_loader_handler.initialize(this);
+    }
+
+    /** Load or reload the zoo, using the loader handler that was installed via
+     * `install_zoo_loader_handler()`.
+     */
+    async load(options={})
+    {
+        // also use load() for reload updated data, etc.
+
+        if (this.zoo_loader_handler == null) {
+            throw new Error(
+                `No zoo loader installed, use ZooDb.install_zoo_loader_handler() to set one`
+            );
+        }
+        await this.zoo_loader_handler.load(options);
+    }
+
+    
+
+    // -----------------------
 
 
     _sanitize_raw_object({object_type, object_id, object})
@@ -291,7 +367,7 @@ export class ZooDb
         
         data.db = {
             objects: {},
-            schemas: loCloneDeep(this.db.schemas), //JSON.parse(JSON.stringify(this.db.schemas)),
+            schemas: loCloneDeep(this.db.schemas),
         }
         
         // Make shallow copies of each object, including their declared
@@ -337,5 +413,7 @@ export class ZooDb
         return data;
     }
     
+
+
 }
 

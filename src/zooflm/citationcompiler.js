@@ -7,7 +7,7 @@ const {
 } = zooflm;
 
 import { split_prefix_label } from '../util/index.js';
-
+import { promisifyMethods } from '../util/prify.js';
 
 import { Cache, one_day } from '../citationmanager/_cache.js';
 
@@ -326,14 +326,23 @@ export class CitationCompiler
 
         // The cache stores the compiled FLM text.
         this.cache_fs = this.options.cache_fs;
+        this.cache_fsp =
+            this.cache_fs.promises
+            ?? promisifyMethods(this.cache_fs, ['readFile', 'writeFile'])
+        ;
         this.cache_file =
             this.options.cache_file || '_zoodb_cache_citations_compiled.json';
         this.cache_entry_default_duration_ms =
             this.options.cache_entry_default_duration_ms || 30*one_day;
 
         this.cache = new Cache();
-        this.load_cache();
     }
+
+    async initialize()
+    {
+        await this.load_cache();
+    }
+
 
     produce_link = {
         flm: function (url, displaytext) {
@@ -356,12 +365,12 @@ export class CitationCompiler
      * file does not exist.  This method is automatically called by the
      * constructor.
      */
-    load_cache()
+    async load_cache()
     {
-        const fs = this.cache_fs;
+        const fsp = this.cache_fsp;
         let json_data = null;
         try {
-            json_data = fs.readFileSync(this.cache_file);
+            json_data = await fsp.readFile(this.cache_file);
         } catch (err) {
             debug(`Cache file does not exist or error loading cache file`, err);
         }
@@ -386,11 +395,11 @@ export class CitationCompiler
      * Save the current citation information database to the cache file.
      * Automatically done after compiling citations.
      */
-    save_cache()
+    async save_cache()
     {
-        const fs = this.cache_fs;
+        const fsp = this.cache_fsp;
         debug(`Saving compiled citations to cache file ‘${this.cache_file}’`);
-        fs.writeFileSync(this.cache_file, this.cache.exportJson());
+        await fsp.writeFile(this.cache_file, this.cache.exportJson());
     }
 
 

@@ -31,6 +31,9 @@ export class ZooDbProcessorBase
      * reimplemented), then both of those events call `process_zoo()`.  However,
      * the `initialize_zoo()` is only called once upon the initial zoo load
      * event.
+     *
+     * This method is `await`'ed when called by the main zoo instance, so it can
+     * be declared `async` or return a `Promise`.
      */
     initialize_zoo()
     {
@@ -44,6 +47,9 @@ export class ZooDbProcessorBase
      * also called when certain objects are reloaded and updated.  In this case,
      * make sure that this method can be called multiple times; don't assume
      * that the data in `this.zoodb` is fresh and hasn't been processed yet.
+     *
+     * This method is `await`'ed when called by the main zoo instance, so it can
+     * be declared `async` or return a `Promise`.
      */
     process_zoo()
     {
@@ -56,6 +62,9 @@ export class ZooDbProcessorBase
      * ``db_objects[object_type][object_id] = new_object_data`` and contains the
      * new, updated data that will be reloaded into the zoo.  The current, old
      * object data that will be replaced is available in `this.zoodb.objects`.
+     *
+     * This method is `await`'ed when called by the main zoo instance, so it can
+     * be declared `async` or return a `Promise`.
      */
     prepare_zoo_update_objects(db_objects) // eslint-disable-line no-unused-vars
     {
@@ -69,11 +78,17 @@ export class ZooDbProcessorBase
      *
      * The default implementation calls `process_zoo()` to re-process the entire
      * zoo.
+     *
+     * This method is `await`'ed when called by the main zoo instance, so it can
+     * be declared `async` or return a `Promise`.
      */
     process_zoo_update_objects(db_objects) // eslint-disable-line no-unused-vars
     {
         // by default simply process_zoo() again.
-        this.process_zoo();
+
+        // !! Make sure we `return` the result of this method, in case it
+        // !! returns a Promise that should be awaited by the caller !!
+        return this.process_zoo();
     }
 
     // ---
@@ -115,6 +130,9 @@ export class ZooDbProcessorBase
      * values are not.
      *
      * In all cases, you need to return the resulting data.
+     *
+     * This method is `await`'ed when called by the main zoo instance, so it can
+     * be declared `async` or return a `Promise`.
      */
     process_data_dump(data, options) // eslint-disable-line no-unused-vars
     {

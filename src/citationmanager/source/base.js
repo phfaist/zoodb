@@ -7,29 +7,7 @@ import loMerge from 'lodash/merge.js';
 
 import fetch from 'node-fetch';
 
-
-export function timeout(ms)
-{
-    // return new Promise((resolve, reject) => { setTimeout(resolve, ms); });
-
-    let d = {};
-    let promise = new Promise( (resolve, reject) => {
-        d.resolve = resolve;
-        d.reject = reject;
-    } );
-
-    const timerId = setTimeout( () => { d.resolve(); }, ms );
-    let cancel = () => { clearTimeout(timerId); d.reject(); };
-
-    promise.cancel_timeout = cancel;
-
-    return promise;
-    
-    // inspired by cancellation token - thanks
-    // https://stackoverflow.com/a/30235261/1694896
-}
-
-
+import { timeout, promisify } from '../../util/prify.js';
 
 
 /**
@@ -117,16 +95,16 @@ export class CitationSourceBase
         // are assigned correctly, too.
         this.options = loMerge(
             {
-                fs: {
-                    readFileSync(/*fname*/) {
+                fs: { promises: {
+                    readFile(/*fname*/) {
                         throw new Error(
                             `You did not specify fs: to your CitationSource `
                             + `instance but the source requested a local file.  You `
                             + `probably want `
-                            + `"fs: { readFileSync(fname) { return fs.readFileSync(fname) }}"`
+                            + `"fs: { promises: { readFile(fname) { return ... } }}"`
                         );
                     }
-                },
+                } },
                 fsRootFilePath: null,
 
                 cache_store_options: {},
@@ -135,6 +113,10 @@ export class CitationSourceBase
             options ?? {},
             override_options ?? {},
         );
+
+        // ensure a promisified version of readFile
+        this.fsp_readFile =
+            this.options.fs.promises?.readFile || promisify(this.options.fs.readFile);
 
         if (this.options.fsRootFilePath != null && this.options.fsRootFilePath != '') {
             this._file_root = `//${this.options.fsRootFilePath}/`;
@@ -349,7 +331,7 @@ export class CitationSourceBase
                     + `‘${url}’`
                 );
             }
-            return this.options.fs.readFileSync(urlobj.pathname);
+            return await this.fsp_readFile(urlobj.pathname);
         }
         const response = await fetch(urlobj.href, fetch_options);
         if (get_response_object) {

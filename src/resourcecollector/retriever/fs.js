@@ -11,15 +11,18 @@ import debug_module from 'debug';
 const debug = debug_module('zoodb.resourcecollector.retriever.fs');
 
 
+import { promisifyMethods } from '../../util/prify.js';
+
 
 /**
  * Doc........
  *
- * `options.fs` should be an object providing the methods `accessSync()` and
- * `readFileSync()` (the `readFileSync()` method is in fact only needed if the
- * file renaming template includes a hash of the file content). Additionally, if
- * `copy_to_target_directory` is true, then the methods `mkdirSync()` and
- * `copyFileSync(src, dest)` should also be available.
+ * `options.fs` should be an object providing the methods `access()` and
+ * `readFile()` (the `readFile()` method is in fact only needed if the file
+ * renaming template includes a hash of the file content).  Alternatively (and
+ * even better), `options.fs.promises` can contain the promisified versions of
+ * those functions.  Additionally, if `copy_to_target_directory` is true, then
+ * the methods `mkdir()` and `copyFile(src, dest)` should also be available.
  *
  */
 export class FilesystemResourceRetriever
@@ -28,6 +31,10 @@ export class FilesystemResourceRetriever
     {
         this.fs = options.fs;
 
+        this.fsp =
+            this.fs.promises
+            ?? promisifyMethods(this.fs, ['access', 'readFile', 'mkdir', 'copyFile']);
+
         this.copy_to_target_directory = options.copy_to_target_directory ?? false;
 
         this.source_directory = options.source_directory ?? '.';
@@ -35,18 +42,27 @@ export class FilesystemResourceRetriever
         this.rename_file_template =
             options.rename_file_template ?? ( (f) => `fig-${f.b32hash(24)}${f.lowerext()}` );
 
+        // If we use hashes in our rename_file_template, then we read the file
+        // contents to compute the hashes before calling the renamer function.
+        // If the renamer function doesn't use the file contents, we can avoid
+        // reading its contents; specify `false` here.
+        this.rename_use_file_hash = options.rename_use_file_hash ?? true;
+
+        this.should_read_file_content =
+            options.read_file_content || this.rename_use_file_hash;
+
         // don't forget to include the empty string in this list in case you'd
         // like to support the situation where the source already specifies the
         // full file name with extension.
         this.extensions = options.extensions ?? [ '' ];
+    }
 
+    async initialize()
+    {
         if (this.copy_to_target_directory) {
             //this.mkdir_promise = 
-            this.fs.mkdirSync( this.target_directory, { recursive: true } );
+            await this.fsp.mkdir( this.target_directory, { recursive: true } );
         }
-        //  else {
-        //     this.mkdir_promise = null;
-        // }
     }
 
     async resolve(source)
@@ -55,14 +71,14 @@ export class FilesystemResourceRetriever
             const resolved_source = source + extension;
             const full_source_path = path.resolve(this.source_directory, resolved_source);
             try {
-                this.fs.accessSync( full_source_path );
+                await this.fsp.access( full_source_path );
                 // file exists!
                 debug(`located ‘${source}’ at ‘${full_source_path}’`);
                 return { resolved_source: resolved_source,
                          full_source_path: full_source_path };
             } catch (err) {
                 // file does not exist, try next extension
-                debug(`resolving ‘${source}’, tried ‘${full_source_path}’`);
+                debug(`resolving ‘${source}’, tried ‘${full_source_path}’ and got ${err}`);
                 continue
             }
         }
@@ -81,8 +97,17 @@ export class FilesystemResourceRetriever
 
         debug(`retrieving ‘${source}’ (resolved at ‘${full_source_path}’)`);
         
+        let file_content = null;
+        let add_file_content_props = {};
+        if (this.should_read_file_content) {
+            file_content = await this.fsp.readFile( full_source_path );
+            add_file_content_props = { file_content }
+        }
+
         const target_name = this.rename_file_template(
-            new FilesystemPropertiesAccessor(resolved_source, full_source_path, this.fs)
+            new FilesystemPropertiesAccessor({
+                resolved_source, full_source_path, file_content,
+            })
         );
 
         const target_full_path = path.resolve(this.target_directory, target_name);
@@ -90,7 +115,7 @@ export class FilesystemResourceRetriever
         if (this.copy_to_target_directory) {
             // actually copy the file (await in case we have to process it after
             // retrieval...)
-            this.fs.copyFileSync( full_source_path, target_full_path);
+            await this.fsp.copyFile( full_source_path, target_full_path);
         }
 
         return {
@@ -98,6 +123,7 @@ export class FilesystemResourceRetriever
             full_source_path: full_source_path,
             target_name: target_name,
             target_full_path: target_full_path,
+            ...add_file_content_props
         };
     }
 
@@ -109,11 +135,11 @@ export class FilesystemResourceRetriever
 
 class FilesystemPropertiesAccessor
 {
-    constructor(resolved_source, full_source_path, fs)
+    constructor({resolved_source, full_source_path, file_content})
     {
         this.resolved_source = resolved_source;
         this.full_source_path = full_source_path;
-        this.fs = fs;
+        this.file_content = file_content;
     }
 
     fullname()
@@ -148,17 +174,13 @@ class FilesystemPropertiesAccessor
 
     binary_hash()
     {
-        return sha256().update(
-            this.fs.readFileSync( this.full_source_path )
-        ).digest();
+        return sha256().update( this.file_content ).digest();
     }
 
     // hash the actual file contents
     hexhash(len)
     {
-        const res = sha256().update(
-            this.fs.readFileSync( this.full_source_path )
-        ).digest('hex');
+        const res = sha256().update( this.file_content ).digest('hex');
         if (len) {
             return res.slice(0, len);
         }

@@ -19,33 +19,35 @@ const default_figure_template_name =
       (f) => `fig-${f.basenameshort()}.${f.b32hash(4)}${f.lowerext()}`;
 
 
-const default_make_resource_retriever_graphics_path = (flm_options_resources,
-                                                       {fs,fs_data_dir,/*_this*/}) => {
-    return new FilesystemResourceRetriever({
-        copy_to_target_directory: false,
-        rename_file_template:
-        flm_options_resources?.rename_figure_template
-            ?? default_figure_template_name,
-        extensions:
-            flm_options_resources?.figure_filename_extensions
-            ?? [ '', '.svg', '.png', '.jpeg', '.jpg' ],
-        //target_directory: './_output_resource_graphics_files/',
-        fs,
-        source_directory:
-            flm_options_resources?.graphics_resources_fs_data_dir
-            ?? fs_data_dir
-    });
-};
+const default_make_resource_retriever_graphics_path =
+      (flm_options_resources, {fs, fs_data_dir, /*_this*/}) => {
+          return new FilesystemResourceRetriever({
+              copy_to_target_directory: false,
+              rename_file_template:
+              flm_options_resources?.rename_figure_template
+                  ?? default_figure_template_name,
+              extensions:
+                  flm_options_resources?.figure_filename_extensions
+                  ?? [ '', '.svg', '.png', '.jpeg', '.jpg' ],
+              //target_directory: './_output_resource_graphics_files/',
+              fs,
+              source_directory:
+                  flm_options_resources?.graphics_resources_fs_data_dir
+                  ?? fs_data_dir
+          });
+      }
+;
 
-const default_make_resource_processors_graphics_path = (flm_options_resources,
-                                                        {fs, /*fs_data_dir,*/ _this}) => {
-    return [
-        new FLMGraphicsResourceProcessor({
-            zoo_flm_environment: _this.zoo_flm_environment,
-            fs,
-        }),
-    ];
-};
+const default_make_resource_processors_graphics_path =
+      (flm_options_resources, {fs, /*fs_data_dir,*/ _this}) => {
+          return [
+              new FLMGraphicsResourceProcessor({
+                  zoo_flm_environment: _this.zoo_flm_environment,
+                  fs,
+              }),
+          ];
+      }
+;
 
 
 
@@ -54,7 +56,7 @@ const default_make_resource_processors_graphics_path = (flm_options_resources,
  *
  * Lots of options to document!.......
  */
-export function use_flm_processor(_this)
+export async function use_flm_processor(_this)
 {
     if (_this.zoo_flm_environment == null) {
         throw new Error(`Cannot use ‘use_flm_processor()’ with no zoo_flm_environment set.`);
@@ -63,12 +65,14 @@ export function use_flm_processor(_this)
     const flm_options = _this.config.flm_options ?? {};
 
     const fs = _this.config.fs;
+    const fsp = _this.config.fs.promises;
     const fs_data_dir = _this.config.fs_data_dir;
 
-    const citations_cache_dir = flm_options.citations?.cache_dir ?? '_zoodb_citations_cache';
-    if ((flm_options.citations.cache_dir_create ?? true)
-        && !fs.existsSync(citations_cache_dir)) {
-        fs.mkdirSync(citations_cache_dir, { recursive: true });
+    const citations_cache_dir =
+          flm_options.citations?.cache_dir ?? '_zoodb_citations_cache';
+
+    if (flm_options.citations.cache_dir_create ?? true) {
+        await fsp.mkdir(citations_cache_dir, { recursive: true });
     }
 
     const make_resource_retriever_graphics_path =
