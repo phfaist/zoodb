@@ -95,7 +95,9 @@ export class FilesystemResourceRetriever
         // Find the file. We might have to try different extensions, for instance.
         const {resolved_source, full_source_path} = resolved_info;
 
-        debug(`retrieving ‘${source}’ (resolved at ‘${full_source_path}’)`);
+        debug(`retrieving ‘${source}’ (resolved at ‘${full_source_path}’) `
+              + `(${this.should_read_file_content ? 'with': 'without'} loading `
+              + `data at this point)`);
         
         let file_content = null;
         let add_file_content_props = {};

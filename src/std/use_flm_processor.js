@@ -26,6 +26,8 @@ const default_make_resource_retriever_graphics_path =
               rename_file_template:
               flm_options_resources?.rename_figure_template
                   ?? default_figure_template_name,
+              rename_use_file_hash: flm_options_resources?.rename_use_file_hash,
+              read_file_content: flm_options_resources?.read_file_content,
               extensions:
                   flm_options_resources?.figure_filename_extensions
                   ?? [ '', '.svg', '.png', '.jpeg', '.jpg' ],
@@ -139,13 +141,17 @@ export async function use_flm_processor(_this)
             resource_types: ['graphics_path'],
             resource_retrievers: {
                 graphics_path:
-                    make_resource_retriever_graphics_path(flm_options.resources ?? {},
-                                                          { fs, fs_data_dir, _this })
+                    make_resource_retriever_graphics_path(
+                        flm_options.resources ?? {},
+                        { fs, fs_data_dir, _this }
+                    )
             },
             resource_processors: {
                 graphics_path:
-                    make_resource_processors_graphics_path(flm_options.resources ?? {},
-                                                           { fs, fs_data_dir, _this })
+                    make_resource_processors_graphics_path(
+                        flm_options.resources ?? {},
+                        { fs, fs_data_dir, _this }
+                    )
             },
         },
         skip_check_update_existing_citations:
