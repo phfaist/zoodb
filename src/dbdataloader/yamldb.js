@@ -515,7 +515,9 @@ export class YamlDbDataLoader
     {
         const fullpath = path.join(root_path, rel_path);
         const stat_info = await this.fsPromises.stat(fullpath);
-        return stat_info.mtimeMs;
+        // don't use stats.mtimeMs as it might not be available depending on the
+        // fs interface we're using (e.g. BrowserFS)
+        return stat_info.mtime ? stat_info.mtime.getTime() : Number.NaN ;
     }
 
     async read_file_contents(root_path, rel_path)
@@ -549,6 +551,7 @@ export class YamlDbDataLoader
     {
         const { object_type } = objectconfig;
         const source_file_path = path.join(objectconfig.data_src_path, rel_path);
+        // FIXME: we already 'stat'ed the file, no? We should reuse that information!!
         const source_file_modification_token =
               await this.get_file_modification_token(root_path, rel_path);
 
