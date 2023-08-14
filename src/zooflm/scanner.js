@@ -189,7 +189,9 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
             }
         }
         // remove also from this.encountered_by_object
-        delete this.encountered_by_object[object_type][object_id];
+        if (this.encountered_by_object[object_type]) {
+            delete this.encountered_by_object[object_type][object_id];
+        }
     }
 
     // ---
