@@ -193,7 +193,7 @@ export class RefResolver
     
     get_ref(ref_type, ref_label, resource_info, render_context)
     {
-        //debug(`RefResolver: resolving ref ‘${ref_type}:${ref_label}’ ...`);
+        // debug(`RefResolver: resolving ref ‘${ref_type}:${ref_label}’ ...`);
 
         const ref_instance = this.ref_instance_database?.[ref_type]?.[ref_label];
 
