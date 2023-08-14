@@ -84,6 +84,14 @@ export function is_flm_fragment(obj)
     return isinstance(obj, FLMFragment);
 }
 
+
+
+export function is_kwargs_object(kwargs)
+{
+    return kwargs && Object.hasOwn(kwargs, "__kwargtrans__");
+}
+
+
 /**
  * Test whether or not `obj` is an instance of an error object thrown by
  * pylatexenc (the core library used by FLM).  This error object contains
@@ -412,7 +420,26 @@ export const FeatureZooGraphicsCollection = __class__(
             'RenderManager', // class name
             [ flm_feature.Feature.RenderManager ], // base classes
             {
-                // static members
+
+                get initialize () {return __get__(this, function
+                (self, kwargs) {
+                    let override_get_graphics_resource = null;
+                    if (kwargs != null) {
+                        if (!is_kwargs_object(kwargs)) {
+                            console.error(`FeatureZooGraphicsCollection.initialize() - `
+                                          + `invalid argument kwargs=`, kwargs);
+                        }
+                        override_get_graphics_resource = kwargs.override_get_graphics_resource;
+                    }
+                    if (override_get_graphics_resource) {
+                        self.override_get_graphics_resource = override_get_graphics_resource;
+                        debug(`FeatureZooGraphicsCollection: Set custom render-time `
+                              + `override_get_graphics_resource`);
+                    } else {
+                        self.override_get_graphics_resource = null;
+                    }
+                });},
+                    
                 get get_graphics_resource () {return __get__(this, function
                 (self, graphics_path, resource_info) {
                     
@@ -423,6 +450,16 @@ export const FeatureZooGraphicsCollection = __class__(
                     //
                     const source_path = path.join(resource_info.get_source_directory(),
                                                   graphics_path);
+
+                    if (self.override_get_graphics_resource) {
+                        let result = self.override_get_graphics_resource(
+                            { feature, graphics_path, resource_info, source_path }
+                        );
+                        if (result != null) {
+                            return result;
+                        }
+                    }
+
                     if (!feature.has_graphics_for(source_path)) {
                         throw new Error(
                             `No such graphics ‘${source_path}’ (‘${graphics_path}’ `
