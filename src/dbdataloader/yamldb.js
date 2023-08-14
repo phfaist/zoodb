@@ -293,11 +293,11 @@ export class YamlDbDataLoader
                         source_file_modification_token;
                     if (existing_dbdata_info.source_modification_tokens[source_file_path]
                         != source_file_modification_token) {
-                        throw new Error(
-                            `Inconsistency in provided existing zoo dbdata, source file `
+                        console.error(
+                            `*** Inconsistency in provided existing zoo dbdata, source file `
                             + `${source_file_path} has conflicting modification tokens `
                             + `${existing_dbdata_info.source_modification_tokens[source_file_path]}`
-                            + `${source_file_modification_token} in different objects`
+                            + `and ${source_file_modification_token} in different objects ***`
                         );
                     }
                 }
