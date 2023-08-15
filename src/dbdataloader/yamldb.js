@@ -193,15 +193,16 @@ export class YamlDbDataLoader
         this.schema_refparser_resolver = {
             ...json_refparser_resolver_http,
             order: 1,
-            canRead(file) {
+            canRead(/*file*/) {
                 //debug(`schema_refparser_rersolver.canRead: ${file.url}`);
                 return true;
             },
             async read(file) {
-                try {
-                    debug(`schema_refparser_resolver.read(), url ${file.url}`);
+                debug(`schema_refparser_resolver.read(), url ${file.url}`);
 
-                    let url = file.url;
+                let url = file.url;
+
+                try {
 
                     // undo our workaround fix -- see call to dereference()
                     // below in the definition of get_schema_by_name()
@@ -255,6 +256,7 @@ export class YamlDbDataLoader
                               + `[extension=${newfile.extension} protocol=${protocol}]`);
                         return await json_refparser_resolver_http.read(newfile);
                     }
+
                 } catch (err) {
                     console.error(`Error reading ${url}: ${err}`);
                     throw err;
