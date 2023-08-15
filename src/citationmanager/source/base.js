@@ -8,6 +8,7 @@ import loMerge from 'lodash/merge.js';
 import fetch from 'node-fetch';
 
 import { timeout, promisify } from '../../util/prify.js';
+import { path_or_url_to_url } from '../../util/url.js';
 
 
 /**
@@ -119,7 +120,7 @@ export class CitationSourceBase
             this.options.fs.promises?.readFile || promisify(this.options.fs.readFile);
 
         if (this.options.fsRootFilePath != null && this.options.fsRootFilePath != '') {
-            this._file_root = `//${this.options.fsRootFilePath}/`;
+            this._file_root = this.options.fsRootFilePath;
         } else {
             this._file_root = '';
         }
@@ -313,25 +314,28 @@ export class CitationSourceBase
      */
     async fetch_url(url, fetch_options=undefined)
     {
+        // debug(`fetch_url(): url=${url}`);
+
         let get_response_object = false;
         if (fetch_options != null) {
             get_response_object = fetch_options.get_response_object ?? false;
             delete fetch_options.get_response_object;
         }
 
-        // convert simple fs paths to file:/// URLs
-        const urlobj = new URL(url, `file:${this._file_root}`);
+        const urlobj = path_or_url_to_url(url, { fs_root_path: this._file_root });
+
         debug(`Fetching URL ‘${urlobj}’ ...`);
 
         if (urlobj.protocol === 'file:') {
             // a local file.
             if (get_response_object) {
                 throw new Error(
-                    `fetch_url() can't get response object for a local filesystem access to `
-                    + `‘${url}’`
+                    `fetch_url() can't get response object for a local `
+                    + `filesystem access to ‘${url}’`
                 );
             }
-            return await this.fsp_readFile(urlobj.pathname);
+            let path = decodeURIComponent(urlobj.pathname);
+            return await this.fsp_readFile(path);
         }
         const response = await fetch(urlobj.href, fetch_options);
         if (get_response_object) {

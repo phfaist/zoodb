@@ -193,15 +193,20 @@ export class YamlDbDataLoader
         this.schema_refparser_resolver = {
             ...json_refparser_resolver_http,
             order: 1,
-            canRead(/*file*/) {
+            canRead(file) {
                 //debug(`schema_refparser_rersolver.canRead: ${file.url}`);
                 return true;
             },
             async read(file) {
                 try {
-                    debug(`schema_refparser_resolver.read() `, file);
+                    debug(`schema_refparser_resolver.read(), url ${file.url}`);
 
                     let url = file.url;
+
+                    // undo our workaround fix -- see call to dereference()
+                    // below in the definition of get_schema_by_name()
+                    url = url.replace(/^fspath:/, 'file:');
+
 
                     if (url.startsWith('file://') &&
                         ! url.startsWith(_config.schemas.schema_root)) {
@@ -229,22 +234,29 @@ export class YamlDbDataLoader
                     const newfileurl = new URL(newfile.url);
                     const protocol = newfileurl.protocol;
 
-                    debug(`Resolved schema URL ${file.url} → ${newfile.url} `
-                          + `[extension=${newfile.extension} protocol=${protocol}]`);
+                    // debug(`Resolved schema URL ${url} → ${newfile.url} `
+                    //       + `[extension=${newfile.extension} protocol=${protocol}]`);
                     
                     if ( protocol == 'file:' ) { 
                         //return json_refparser_resolver_file.read(newfile);
-                        const filePathToRead = newfileurl.pathname;
-                        // debug(`Finally! will read path `, filePathToRead);
-                        const data = await fsPromises.readFile(filePathToRead,
-                                                               { encoding: 'utf-8' });
+                        const filePathToRead = decodeURIComponent(
+                            newfileurl.pathname
+                        );
+                        debug(`Resolved schema URL ${url} → ${filePathToRead} on filesystem`);
+                        //debug(`Finally! will read path ‘${filePathToRead}’`);
+                        const data = await fsPromises.readFile(
+                            filePathToRead,
+                            { encoding: 'utf-8' }
+                        );
                         // debug(` ---> retreived data = `, data);
                         return data;
                     } else {
+                        debug(`Resolved schema URL ${url} → URL ${newfile.url} `
+                              + `[extension=${newfile.extension} protocol=${protocol}]`);
                         return await json_refparser_resolver_http.read(newfile);
                     }
                 } catch (err) {
-                    console.error(`Error reading ${file.url}: ${err}`);
+                    console.error(`Error reading ${url}: ${err}`);
                     throw err;
                 }
             }
@@ -362,10 +374,25 @@ export class YamlDbDataLoader
             return this.schemas_by_name[schema_name];
         }
 
-        let schema_path = path.posix.join(this.config.schemas.schema_rel_path, schema_name);
-        schema_path = new URL(schema_path, this.config.schemas.schema_root).href;
+        let schema_rel_path =
+            path.posix.join(this.config.schemas.schema_rel_path, schema_name);
+        let schema_path =
+            new URL(schema_rel_path, this.config.schemas.schema_root).href;
 
         debug(`Requesting schema for ‘${schema_name}’ → path=‘${schema_path}’`);
+
+        if (schema_path.startsWith('file://')) {
+            // work around a bug in $RefResolver where filesystem paths get
+            // escaped a second time.  This is likely due to the following
+            // lines:
+            // https://github.com/APIDevTools/json-schema-ref-parser/blob/a5b3946fbb62683ab69e3747a8893014591726af/lib/index.ts#L100-L102
+            //
+            // Our workaround is to avoid $RefParser detecting that this is, in
+            // fact, a filesystem path.
+            schema_path = schema_path.replace( /^file:/, 'fspath:' );
+
+            //debug(`Will use ‘${schema_path}’ as a workaround to a bug in $RefParser`);
+        }
 
         const schema = await this.schema_ref_parser.dereference(
             schema_path,

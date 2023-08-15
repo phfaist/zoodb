@@ -7,6 +7,8 @@ import jsyaml from 'js-yaml';
 
 import { CitationSourceBase } from './base.js';
 
+import { path_or_url_to_url } from '../../util/url.js';
+
 
 /**
  * A citation source which looks up bibliographic citaiton information in one or
@@ -49,7 +51,9 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
             throw new Error(`You need to specify option {bibliography_files: ...}`);
         }
         this.bibliography_files_url = this.bibliography_files.map( (bibfile) => {
-            const url = new URL(bibfile, `file://${this.options.fsRootFilePath}/`);
+            const url = path_or_url_to_url(
+                bibfile, { fs_root_path: this.options.fsRootFilePath }
+            );
             if (url.protocol !== 'file:') {
                 this.have_remote = true;
             }
