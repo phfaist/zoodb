@@ -4,7 +4,52 @@ const debug = debugm('zoodb._zoodbloaderhandler');
 import loMerge from 'lodash/merge.js';
 
 /**
- * Doc........
+ * This class takes care of loading raw database data using a `dbdataloader`
+ * (e.g. :class:`YamlDbDataLoader`) into a :class:`ZooDb` instance.  It can take
+ * care of performing reloads, etc.
+ *
+ * You can install a `ZooDbDataLoaderHandler` in a :class:`ZooDb` instance by
+ * calling :meth:`ZooDb.install_data_loader_handler()`.
+ *
+ * The reason for splitting off the logic of the loader handler is to avoid
+ * bloating the `ZooDb` class definition, especially in case a user would like
+ * to create a barebones `ZooDb`, e.g. with hard-coded JSON data, without
+ * reloading features, in which case neither a loader nor a loader handler are
+ * not necessary.
+ *
+ * This class will do a few more things other than directly calling the
+ * `dbdataloader`'s load method and setting the data on the `zoodb` instance:
+ *
+ * - Checks if a loading operation is already currently in progress, and if
+ *   so, declines to reload the data with an error message in the console.
+ *
+ * - Calls the `zoodb` instance's validate() function, to ensure that the loaded
+ *   data conforms to any validation checks.
+ *
+ * - Provides a `load()` function that can be called repeatedly --- the method
+ *   performs an initial zoo load the first time it is called and then performs
+ *   reload operations on subsequent calls.
+ *
+ * Constructor arguments:
+ *
+ * - `db_data_loader` - the `dbdataloader` instance to use for loading the
+ *   database data, for instance, a :class:`YamlDbDataLoader` instance.
+ *
+ * - `options` - [optional] an object with the following properties.
+ *
+ * Options:
+ *
+ * - ``throw_reload_errors`` - if set to `true`, then reload operation failures
+ *   will cause an error to be thrown (regardless of whether they are initiated
+ *   with a second call to load() or with a call to reload()).  If set to
+ *   `false`, only an error message is printed to the console while the function
+ *   returns normally.  Setting this option to `false` can be useful in
+ *   development mode in eleventy, for instance, where you don't want to stop
+ *   the development server by throwing an exception when reloading a database
+ *   after a file modification is detected.
+ *
+ * @param {} db_data_loader
+ * @param {} options
  */
 export class ZooDbDataLoaderHandler
 {
@@ -25,6 +70,13 @@ export class ZooDbDataLoaderHandler
         this._first_load_done = null;
     }
 
+    /**
+     * Initializes the loader handler, giving it the zoodb instance.
+     *
+     * **Normally, you don't need to call this method!** This function is
+     * automatically called by the :class:`ZooDb` instance when you call
+     * :meth:`ZooDb.install_data_loader_handler()`.
+     */
     initialize(zoodb)
     {
         this.zoodb = zoodb;
@@ -33,6 +85,14 @@ export class ZooDbDataLoaderHandler
         this._first_load_done = false;
     }
 
+    /**
+     * Load the data into the zoo, using the dbdataloader.  See the class
+     * documentation for details.
+     *
+     * After the initial call to load(), any subsequent calls to load() will
+     * automatically reload the zoo in the same was as directly calling
+     * reload().
+     */
     async load()
     {
         if (this._currently_loading) {
@@ -72,6 +132,15 @@ export class ZooDbDataLoaderHandler
         debug("Zoo is now loaded!");
     }
 
+    /**
+     * Reload data into the zoo using the dbdataloader.  You must have called
+     * load() at least once before, and that call must have completed.
+     *
+     * Usually you don't need to call reload() directly and simply call load()
+     * instead.  After the initial call to load(), any subsequent calls to
+     * load() will automatically reload the zoo in the same was as directly
+     * calling reload().
+     */
     async reload()
     {
         if (this._currently_loading) {
@@ -80,6 +149,15 @@ export class ZooDbDataLoaderHandler
             return;
         }
         this._currently_loading = true;
+
+        if (!this._first_load_done) {
+            throw new Error(
+                `Call to ZooDbDataLoaderHandler.reload() before having called load().  You `
+                + `can only call reload() after having loaded the zoo earlier with load(). `
+                + `if in doubt, simply call load() which will automatically perform a reload `
+                + `operation if it detects the zoo was already loaded once.`
+            );
+        }
 
         try {
 

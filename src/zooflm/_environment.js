@@ -142,7 +142,16 @@ export function format_pylatexenc_located_error_traceback(obj)
 /**
  * Manager for cross-references.
  *
- * Doc...........
+ * Doc........... & doc members.......!
+ *
+ * .. attribute:: target_href_resolver
+ *
+ *    You can set this attribute to a custom function that will be called when
+ *    `get_ref()` is called to override the target href URL of the returned
+ *    reference isntance.  The value of this attribute should be a function with
+ *    signature ``callback(ref_instance, render_context)`` and should return a
+ *    string, the new URL to use for the `target_href` attribute of the returned
+ *    :class:`RefInstance`.
  */
 export class RefResolver
 {
@@ -261,6 +270,7 @@ export class RefResolver
             ref_instance_database: dump,
         };
     }
+
     load_database(data)
     {
         // create RefInstance object instances

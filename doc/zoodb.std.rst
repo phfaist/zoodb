@@ -1,15 +1,22 @@
 Zoo Standard Setup Tools
 ========================
 
+Here is the API reference of the "standard ZooDb setup" related functions and
+classes.  Please refer to :ref:`zoodb-std` for a little guide on using them to
+create your zoo.
+
 .. code::
 
-   import { StandardZooDb } from '@phfaist/zoodb/stdzoodb';
+   import { makeStandardZooDb } from '@phfaist/zoodb/stdzoodb';
+   import {
+       makeStandardYamlDbDataLoader
+   } from '@phfaist/zoodb/std/stdyamldbdataloader';
 
    import { use_relations_populator } from '@phfaist/zoodb/use_relations_populator';
    import {
        use_flm_environment, default_target_href_resolver,
    } from '@phfaist/zoodb/use_flm_environment';
-   import { use_flm_processor, } from '@phfaist/zoodb/use_flm_processor';
+   import { use_flm_processor } from '@phfaist/zoodb/use_flm_processor';
    import {
        use_gitlastmodified_processor
    } from '@phfaist/zoodb/use_gitlastmodified_processor';
@@ -17,14 +24,9 @@ Zoo Standard Setup Tools
        use_searchable_text_processor
    } from '@phfaist/zoodb/use_searchable_text_processor';
 
-   import {
-       StandardZooDbYamlDataLoader
-   } from '@phfaist/zoodb/load_yamldb';
 
-
-.. js:autoclass:: src/std/stdzoodb.StandardZooDb
+.. js:autofunction:: src/std/stdzoodb.makeStandardZooDb
    :short-name:
-   :members:
 
 
 Feature helpers
@@ -52,8 +54,11 @@ Feature helpers
 Data loader
 -----------
 
-.. js:autoclass:: src/std/load_yamldb.StandardZooDbYamlDataLoader
+This function will create a data loader class (:class:`YamlDbDataLoader`) that
+you can then use in a :`ZooDbDataLoaderHandler` class, which will take care of
+loading (and if requested, reloading) the data into the main zoo instance.
+
+.. js:autofunction:: src/std/stdyamldbdataloader.makeStandardYamlDbDataLoader
    :short-name:
-   :members:
 
 

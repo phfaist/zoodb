@@ -7,7 +7,16 @@ const debug = debug_mod("zoodb.std.stdyamldbloader");
 import { YamlDbDataLoader } from '../dbdataloader/yamldb.js';
 
 
-
+/**
+ * Create a :class:`YamlDbDataLoader` instance using some standard settings with
+ * higher-level options, based on some settings that have been set in a standard
+ * ZooDb instance.
+ *
+ * The `zoodb` argument should be a :class:`ZooDb` instance (or subclass
+ * instance) that was created with :func:`makeStandardZooDb()`.
+ *
+ * TODO: Document the higher-level options !!  (Check our example for now)
+ */
 export async function makeStandardYamlDbDataLoader(zoodb, config={})
 {
     if (config.objects == null) {

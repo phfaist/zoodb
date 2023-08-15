@@ -2,8 +2,9 @@
     "sourceType": "module",
     "source": {
         "include": [],
+        "includePattern": ".+\\.js(x?)$",
         "exclude": [],
-        "includePattern": ".+\\.js(x?)$"
+        "excludePattern": "./flm-src/.*"
     },
     "plugins": [ ],
     "opts": {

@@ -33,16 +33,33 @@ function cloneDeepWithEmptyPrototypeObjects(object)
 
 /**
  * The main database class.
+ *
+ * 
+ *
+ * The constructor accepts a single object with the following properties:
+ *
+ * - ``processors`` - list of DB processors to install.  See module
+ *   :ref:`zoodb.dbprocessor`.
+ *
+ * - ``schema_validator`` - [Optional] You can specify a schema validator, which
+ *   should provide the method ``validate(object, schema)`` (such as a
+ *   ``Validator`` object instance from the `jsonschema npm package
+ *   <https://www.npmjs.com/package/jsonschema>`_).
+ *
+ * If you specify a schema validator, objects that are added to the database
+ * will automatically be validated against the schema using the provided
+ * validator.
+ *
+ * Note that if you use a :class:`YamlDbDataLoader` to load your data, then that
+ * class already performs schema validation so you don't need to validate your
+ * objects here again.  In this case, you may simply leave `schema_validator` be
+ * `null` or undefined.
+ *
+ * @param {} options
+ *
  */
 export class ZooDb
 {
-    /**
-     * Constructor.  Pass the database processors you want to install here.  See
-     * module :ref:`zoodb.dbprocessor`.
-     *
-     * @param {} processors - list of DB processors to install
-     *
-     */
     constructor({ processors, schema_validator })
     {
         this.processors = processors ?? [];

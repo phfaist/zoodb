@@ -24,6 +24,8 @@ import loMerge from 'lodash/merge.js';
  * objects, collect external resources, and manage citations (fetching,
  * compiling, formatting).
  *
+ * TODO: Document & explain options ............. !
+ *
  */
 export class ZooFLMProcessor extends ZooDbProcessorBase
 {

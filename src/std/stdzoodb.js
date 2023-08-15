@@ -6,7 +6,16 @@ import { ZooDb } from '../_zoodb.js';
 import loMerge from 'lodash/merge.js';
 
 
-
+/**
+ * Create a :class:`ZooDb` instance (or a custom subclass instance) using 
+ * standard settings with higher-level options.
+ *
+ * To create an instance of a custom ZooDb subclass, set the config value
+ * `config.ZooDbClass` to the subclass of ZooDb you want to use (see
+ * :ref:`example`).
+ *
+ * TODO: Document the higher-level options !!
+ */
 export async function makeStandardZooDb(config)
 {
     let _this = {};

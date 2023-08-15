@@ -23,7 +23,7 @@ import {
 export function parse_schema_flm_options(schema)
 {
     if (!schema || !schema._flm) {
-        return {enabled: false, standalone: false};
+        return { enabled: false, standalone: false };
     }
 
     const schema_flm = schema._flm;
@@ -65,17 +65,23 @@ export function parse_schema_flm_options(schema)
  *   in a visual editor application that provides an instant preview of the
  *   typed FLM code.)
  *
- * Parsing of DB fields follows the schema's _flm field.  The value of that
- * field can be:
+ * Parsing of DB fields follows the schema's ``_flm`` field.  The value of that
+ * field can either be a dictionary, a string, `true`, `false`, or `null`.  If
+ * it's a dictionary, then it should be of the form ``{ enabled: true|false,
+ * standalone: true|false }`` (both fields default to `false` if omitted).  The
+ * schema's ``_flm`` field can also be `true` or ``'full'`` (shorthands for ``{
+ * enabled: true, standalone: false }``, ``'standalone'`` (a shorthand for ``{
+ * enabled: true, standalone: true }``), or `false` or `null` (interpreted as
+ * ``{ enabled: false }``).
  *
- * - a dictionary --> enable FLM with given options.  The options can be:
- *   ``enabled:`` true|false and ``standalone:`` true|false.
- *
- * A few shortcuts:
- *
- * - 'full'          --> parse as full FLM content
- *
- * - 'standalone'    --> shortcut for ``{ standalone: true }``
+ * If ``enabled`` is true, then FLM processing is enabled for that field,
+ * otherwise it is disabled.  If ``standalone`` is true, then any FLM processing
+ * of that field happens in standalone mode.  Standalone mode = content that can
+ * be rendered in any context = content that doesn't make use of citations,
+ * cross-references or similar context-dependent content.  Standalone mode is
+ * useful for pieces of text that you'd want to be able to render in multiple
+ * different contexts (e.g. an object's name or title, which you might want to
+ * reproduce in links to that object or in a list of objects).
  *
  */
 export class FLMSimpleContentCompiler extends ZooDbProcessorBase

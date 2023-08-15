@@ -60,7 +60,7 @@ export class ZooDbProcessorBase
      * Called before certain objects are reloaded and updated to new values.
      * The argument `db_objects` has the structure
      * ``db_objects[object_type][object_id] = new_object_data`` and contains the
-     * new, updated data that will be reloaded into the zoo.  The current, old
+     * new, updated data that will be loaded into the zoo.  The current, old
      * object data that will be replaced is available in `this.zoodb.objects`.
      *
      * This method is `await`'ed when called by the main zoo instance, so it can
@@ -78,6 +78,10 @@ export class ZooDbProcessorBase
      *
      * The default implementation calls `process_zoo()` to re-process the entire
      * zoo.
+     *
+     * The argument `db_objects` has the structure
+     * ``db_objects[object_type][object_id] = new_object_data`` and contains the
+     * new, updated data that will be loaded into the zoo.
      *
      * This method is `await`'ed when called by the main zoo instance, so it can
      * be declared `async` or return a `Promise`.
@@ -103,12 +107,14 @@ export class ZooDbProcessorBase
      * Return the data as properly modified.  You need to return the data even
      * if you modify it in-place (but read the warning below!).
      *
-     * **WARNING**: EXTRA CARE IS NECESSARY WHEN ANY MODIFICATIONS OF THE DATA
-     * ARE NECESSARY. **TL,DR: You can modify objects as long as you assign the
-     * object's fields (as declared in the schema) directly.** If the object
-     * field value is an object instance (through some db processor), do NOT
-     * directly modify that object, IT IS THE DBPROCESSOR'S RESPONSIBILITY TO
-     * MAKE A DEEP COPY OF THE FIELD'S VALUE.
+     * .. warning::
+     *
+     *    EXTRA CARE IS NECESSARY WHEN ANY MODIFICATIONS OF THE DATA ARE
+     *    NECESSARY. **TL,DR: You can modify objects as long as you assign the
+     *    object's fields (as declared in the schema) directly.** If the object
+     *    field value is an object instance (through some db processor), do NOT
+     *    directly modify that object, IT IS THE DBPROCESSOR'S RESPONSIBILITY TO
+     *    MAKE A DEEP COPY OF THE FIELD'S VALUE.
      *
      * The zoodb's data dump procedure cannot begin by making a deep copy of the
      * data, because the field values might have been processed to custom object
