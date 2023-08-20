@@ -79,11 +79,11 @@ export class ZooDb
         };
 
         this.schema_validator = schema_validator ?? null;
-        if (this.schema_validator == null && !this.silent) {
-            console.warn(
-                `No schema validator was set on this ZooDb.  No schema validation `
-                + `will be performed.  To suppress this message use the value ‘false’ `
-                + `for the schema_validator argument.`
+        if (this.schema_validator == null) {
+            throw new Error(
+                `No schema validator set on this ZooDb to perform schema validation. `
+                + `To suppress this error and proceed without schema validation, `
+                + `use the value ‘false’ for the schema_validator argument.`
             );
         }
 
@@ -338,8 +338,8 @@ export class ZooDb
         delete obj_to_validate._zoodb; // remove any ._zoodb field from the object to validate
 
         const schema = this.schemas[object_type];
-        if (this.schema_validator) {
 
+        if (this.schema_validator) {
             const validation_result = this.schema_validator.validate(obj_to_validate, schema);
             if (!validation_result.valid) {
                 const validation_errors = validation_result.errors.map(
