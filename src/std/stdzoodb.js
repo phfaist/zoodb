@@ -2,6 +2,7 @@ import debug_mod from 'debug';
 const debug = debug_mod("zoodb.std.stdzoodb");
 
 import { ZooDb } from '../_zoodb.js';
+import { SchemaLoader } from '../schemaloader.js';
 
 import loMerge from 'lodash/merge.js';
 
@@ -22,6 +23,9 @@ export async function makeStandardZooDb(config)
 
     _this.config = loMerge(
         {
+            ZooDbClass: ZooDb,
+            SchemaLoaderClass: SchemaLoader,
+
             continue_with_errors: false,
 
             // for any filesystem access, mostly for flm_processor
@@ -76,6 +80,14 @@ export async function makeStandardZooDb(config)
 
             zoo_permalinks: null, //{ object:, graphics_resource: }
             // e.g.  graphics_resource:  (gresource) => `/fig/${gresource.src_url}`,
+
+            // set schemas: false  to forbid creating a SchemaLoader instance
+            schemas: {
+                schema_root: null,
+                schema_rel_path: null,
+                schema_add_extension: null,
+            },
+            schema_names: null,
 
         },
         config,
@@ -146,7 +158,8 @@ export async function makeStandardZooDb(config)
         _this.zoodb_processors.push(_this.searchable_text_processor);
     }
 
-    let ZooDbClass = _this.config.ZooDbClass ?? ZooDb;
+    let ZooDbClass = _this.config.ZooDbClass;
+    let SchemaLoaderClass = _this.config.SchemaLoaderClass;
 
     //
     // Set up the ZooDb object
@@ -155,10 +168,27 @@ export async function makeStandardZooDb(config)
         // database processors:
         processors: _this.zoodb_processors,
     });
-    
+
     // set attributes we prepared from _this
     for (const [k, v] of Object.entries(_this)) {
         zoodb[k] = v;
+    }
+
+    if (_this.config.schemas && SchemaLoaderClass) {
+        //
+        // Load the schemas
+        //
+        const schema_loader = new SchemaLoaderClass({
+            fs: _this.config.fs,
+            schemas: _this.config.schemas,
+            schema_names: _this.config.schema_names,
+        });
+        zoodb.schema_loader = schema_loader;
+        const schemas_data = await schema_loader.load_schemas();
+        await zoodb.load_data({
+            schemas: schemas_data.schemas,
+        });
+        debug(`Created schema loader and loaded the schemas`);
     }
 
     return zoodb;

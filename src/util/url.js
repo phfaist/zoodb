@@ -15,6 +15,12 @@ function percent_encode_path(p)
 }
 
 
+export function url_has_protocol(url)
+{
+    return (new URL(url, 'xyzdummyproto://')).protocol !== 'xyzdummyproto:';
+}
+
+
 /** Normalizes a path or url into a proper URL.
  *
  * If the `url` argument is a URL with a protocol (e.g. 'http:' or 'file:'
@@ -33,7 +39,7 @@ function percent_encode_path(p)
 export function path_or_url_to_url(url, { fs_root_path }={})
 {
     // if `url` is a filesystem path, then it isn't %-encoded
-    if ( (new URL(url, 'xyzdummyproto://')).protocol === 'xyzdummyproto:') {
+    if ( ! url_has_protocol(url) ) {
         if (fs_root_path) {
             url = path.join(fs_root_path, url);
         }

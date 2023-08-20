@@ -1,19 +1,72 @@
 import * as assert from 'assert';
 
-import jsonschema from 'jsonschema';
-
 import { ZooDb } from '../src/_zoodb.js';
 
-import { get_simple_test_data } from './_helperstest.js';
+import { get_simple_test_data, schema_validator, } from './_helperstest.js';
 
 
 describe('zoodb._zoodb', function () {
 
     describe('ZooDb', function () {
 
+        it('can load schemas and data in one call to load_data', async function () {
+
+            let zoodb = new ZooDb({ schema_validator });
+            await zoodb.load_data(get_simple_test_data());
+
+            assert.strictEqual(zoodb.schemas.ustensil._zoo_primarykey, 'ust_id');
+            assert.strictEqual(zoodb.objects.dish.pasta.name, 'Pasta');
+        });
+
+        it('can load schemas and data in separate calls to load_data', async function () {
+
+            let zoodb = new ZooDb({ schema_validator });
+            let data = get_simple_test_data();
+            await zoodb.load_data({ schemas: data.schemas });
+            await zoodb.load_data({ objects: data.objects });
+
+            assert.strictEqual(zoodb.schemas.ustensil._zoo_primarykey, 'ust_id');
+            assert.strictEqual(zoodb.objects.dish.pasta.name, 'Pasta');
+        });
+
+        it('can load schemas and data in separate calls to load_schemas and load_data', async function () {
+
+            let zoodb = new ZooDb({ schema_validator });
+            let data = get_simple_test_data();
+            await zoodb.load_schemas({ schemas: data.schemas });
+            await zoodb.load_data({ objects: data.objects });
+
+            assert.strictEqual(zoodb.schemas.ustensil._zoo_primarykey, 'ust_id');
+            assert.strictEqual(zoodb.objects.dish.pasta.name, 'Pasta');
+        });
+
+        it('refuses to load data without having loaded any schema', async function () {
+
+            let zoodb = new ZooDb({ schema_validator });
+            let data = get_simple_test_data();
+
+            await assert.rejects( async () => {
+                await zoodb.load_data({ objects: data.objects });
+            }, /No schemas loaded/i );
+        });
+
+        it('refuses to load data without a corresponding schema', async function () {
+
+            let zoodb = new ZooDb({ schema_validator });
+            let data = get_simple_test_data();
+
+            await zoodb.load_schemas({
+                schemas: { myobjecttype: { type: 'array', items: {} } }
+            });
+
+            await assert.rejects( async () => {
+                await zoodb.load_data({ objects: data.objects });
+            }, /No schema loaded/i );
+        });
+
         it('adds the _zoodb field to objects if necessary', async function () {
 
-            let zoodb = new ZooDb({});
+            let zoodb = new ZooDb({ schema_validator });
             await zoodb.load_data(get_simple_test_data());
 
             assert.strictEqual(zoodb.objects.dish.pasta._zoodb?.id, 'pasta');
@@ -24,11 +77,9 @@ describe('zoodb._zoodb', function () {
             let simple_test_data_error = get_simple_test_data();
             simple_test_data_error.schemas.ustensil.properties.name.type = 'array';
 
-            let zoodb = new ZooDb({
-                shema_validator: new jsonschema.Validator()
-            });
+            let zoodb = new ZooDb({ schema_validator, silent: true });
 
-            assert.rejects( async () => {
+            await assert.rejects( async () => {
                 await zoodb.load_data(simple_test_data_error);
             }, /Schema validation failed/i );
 
@@ -38,7 +89,7 @@ describe('zoodb._zoodb', function () {
 
             let simple_test_data = get_simple_test_data();
 
-            let zoodb = new ZooDb({});
+            let zoodb = new ZooDb({ schema_validator });
             await zoodb.load_data(simple_test_data);
 
             assert.deepStrictEqual(simple_test_data, get_simple_test_data());
@@ -48,7 +99,7 @@ describe('zoodb._zoodb', function () {
 
             let simple_test_data = get_simple_test_data();
 
-            let zoodb = new ZooDb({});
+            let zoodb = new ZooDb({ schema_validator });
             await zoodb.load_data(simple_test_data);
 
             let dump = await zoodb.data_dump({ remove_zoodb_info: true });
@@ -61,7 +112,7 @@ describe('zoodb._zoodb', function () {
 
             let simple_test_data = get_simple_test_data();
 
-            let zoodb = new ZooDb({});
+            let zoodb = new ZooDb({ schema_validator });
             await zoodb.load_data(simple_test_data);
 
             let dump = await zoodb.data_dump();
@@ -92,7 +143,7 @@ describe('zoodb._zoodb', function () {
                 }
             }
 
-            let zoodb = new ZooDb({});
+            let zoodb = new ZooDb({ schema_validator });
             await zoodb.load_data(simple_test_data_2);
 
             let dump = await zoodb.data_dump({remove_zoodb_id: true});

@@ -60,21 +60,40 @@ function cloneDeepWithEmptyPrototypeObjects(object)
  */
 export class ZooDb
 {
-    constructor({ processors, schema_validator })
+    constructor({ processors, schema_validator,
+                  normalize_id_for_uniqueness_check, silent })
     {
         this.processors = processors ?? [];
         this.processors_initialized = false;
+
+        this.silent = silent ?? false;
 
         for (const processor of this.processors) {
             processor.install_zoo(this);
         }
 
         // the raw loaded data, before db processors start to process it
-        this.raw_data_db = {};
+        this.raw_data_db = {
+            schemas: {},
+            objects: {},
+        };
 
         this.schema_validator = schema_validator ?? null;
+        if (this.schema_validator == null && !this.silent) {
+            console.warn(
+                `No schema validator was set on this ZooDb.  No schema validation`
+                + `will be performed.  To suppress this message use the value ‘false’ `
+                + `for the schema_validator argument.`
+            );
+        }
+
+        this.normalize_id_for_uniqueness_check =
+            normalize_id_for_uniqueness_check ?? ((x) => (''+x).toLowerCase())
+        ;
 
         this.zoo_loader_handler = null;
+
+        this.db = {};
     }
 
     /**
@@ -109,6 +128,13 @@ export class ZooDb
 
     // ---
 
+    async load_schemas({ schemas })
+    {
+        this.raw_data_db.schemas = loCloneDeep(schemas);
+        this.db.schemas = cloneDeepWithEmptyPrototypeObjects(schemas);
+        debug(`Loaded db schemas (${Object.keys(this.db.schemas).join(', ')})`);
+    }
+
     /**
      * Initialize the database processors and then directly load objects whose
      * data is given in the argument dictionary `db`.  We ensure that the
@@ -126,36 +152,50 @@ export class ZooDb
     {
         debug('zoodb load_data');
 
-        if (!db || typeof db.schemas != 'object' || typeof db.objects != 'object') {
+        if (!db || typeof db !== 'object'
+            || (db.schemas != null && typeof db.schemas !== 'object')
+            || (db.objects != null && typeof db.objects !== 'object')
+            || (db.objects == null && db.schemas == null)) {
             throw new Error(
-                `Invalid zoo DB data, expected db.schemas and db.objects to be objects, got `
-                + `db=${db}`
+                `Invalid zoo DB data, expected db.schemas and/or db.objects `
+                + `to be objects, got db=${db}`
             );
+        }
+
+        if (db.schemas != null && Object.keys(db.schemas).length > 0) {
+            // load schemas
+            await this.load_schemas({ schemas: db.schemas });
+        }
+
+        if (db.objects == null || Object.keys(db.objects).length == 0) {
+            debug(`No objects to load at this time.`);
+            return;
+        }
+
+        if (this.db.schemas == null) {
+            throw new Error(`No schemas loaded. It looks like you forgot to load `
+                            +` the schemas before loading the object data`);
         }
 
         // Ensure that each object type has a schema.  (It's fine though if
         // there are additional schemas with no associated object types.)
-        for (const object_type in db.objects) {
-            if (db.schemas[object_type] == null) {
+        for (const object_type in db.objects ?? {}) {
+            if (this.db.schemas[object_type] == null) {
                 throw new Error(
-                    `Zoo DB data does not have schema for objects of type ‘${object_type}’`
+                    `No schema loaded for objects of type ‘${object_type}’. It looks like `
+                    + `you forgot to load schemas for this object type.`
                 );
             }
         }
 
-        //debug('load_data(): db = ', db);
+        this.raw_data_db.objects = loCloneDeep(db.objects);
 
-        this.raw_data_db = loCloneDeep(db); //JSON.parse(JSON.stringify(this.db));
-        //debug('raw_data_db = ', this.raw_data_db);
-
-        //this.db = JSON.parse(JSON.stringify(db));
-        this.db = {};
-        this.db.schemas = cloneDeepWithEmptyPrototypeObjects(db.schemas);
         this.db.objects = cloneDeepWithEmptyPrototypeObjects(db.objects);
 
         this._object_types = Object.keys(this.db.objects);
 
         this._sanitize_raw_object_db(this.db.objects);
+
 
         if (!this.processors_initialized) {
             this.processors_initialized = true;
@@ -176,6 +216,14 @@ export class ZooDb
      * Can be overridden to proceed to validatation of the zoo.  E.g., you can
      * enforce any constraints, sanity checks, etc.
      *
+     * The base class applies checks that all IDs are unique modulo the
+     * normalizer set as constructor argument.
+     *
+     * (Schema validation doesn't happen here, it happens instead directly when
+     * loading the data in `load_data()` because the check can be performed
+     * earlier.  The ID uniqueness check happens here because it must act
+     * globally on the database.)
+     *
      * .. warning:
      *
      *    This validation function is only called if you use a loader handler to
@@ -185,8 +233,48 @@ export class ZooDb
      */
     async validate()
     {
+        for (const [object_type, object_db] of Object.entries(this.db.objects)) {
+            // check that all object IDs are suitably unique
+            let unique_ids_check_seen = {};
+            let normalize_id_fn = this.normalize_id_for_uniqueness_check;
+            for (const [objid, obj] of object_db) {
+                const object_id_unique_normalized = normalize_id_fn(objid);
+                const other_object = unique_ids_check_seen[object_id_unique_normalized];
+                if (other_object !== undefined) {
+                    throw new Error(
+                        `ID ‘${objid}’ was assigned to multiple objects of type `
+                        + ` ${object_type} (duplicate ID), `
+                        + `${this.display_object_source(other_object)} and `
+                        + `${this.display_object_source(obj)}’ [normalized ID `
+                        + `‘${object_id_unique_normalized}’]`
+                    );
+                }
+                // keep original ID in the database
+                d[objid] = obj;
+                // but use the "normalized" ID for the temporary ID uniqueness check
+                // dictionary
+                unique_ids_check_seen[object_id_unique_normalized] = obj;
+            }
+        }
     }
 
+
+    display_object_source(object)
+    {
+        const zi = object._zoodb;
+        if (zi) {
+            if (zi.source_file_path) {
+                return `in file ‘${zi.source_file_path}’`;
+            }
+            if (zi.source_url) {
+                return `at ‘${zi.source_url}’`;
+            }
+            if (zi.id) {
+                return `with ID ‘${zi.id}’`;
+            }
+        }
+        return `(unknown source)`;
+    }
 
     // -----------------------
 
@@ -253,8 +341,16 @@ export class ZooDb
 
         const schema = this.schemas[object_type];
         if (this.schema_validator) {
+
             const validation_result = this.schema_validator.validate(obj_to_validate, schema);
             if (!validation_result.valid) {
+                const validation_errors = validation_result.errors.map(
+                    (errorstr) => (''+errorstr).replace(
+                        /^instance\b/,
+                        () => `[${object_type.toUpperCase()}]`
+                    )
+                );
+                const validation_errors_str = '*** ' + validation_errors.join("\n*** ");
                 let addwhere = '';
                 if (object_id) {
                     addwhere = ` with ID ‘${object_id}’`;
@@ -262,12 +358,19 @@ export class ZooDb
                 if (object._zoodb?.source_file_path) {
                     addwhere = ` in ‘${object._zoodb.source_file_path}’`;
                 }
-                let e = new Error(
+                let errormsg = 
                     `Schema validation failed for <${object_type}> object data`
-                        + `${addwhere}:\n\n`
-                        +`*** ${ validation_result.errors.join("\n*** ") }\n`
-                );
-                e.validation_result = validation_result;
+                    + `${addwhere}:\n\n`
+                    + `${validation_errors_str}\n`
+                ;
+                if (!this.silent) {
+                    console.error(errormsg);
+                }
+                let e = new Error( errormsg );
+                e.error_info = {
+                    error_type: 'schema_validation_failure',
+                    validation_result,
+                }
                 throw e;
             }
         }
@@ -294,6 +397,9 @@ export class ZooDb
             }
         }
     }
+
+
+    // -------------
 
 
     async update_objects(db_objects)
@@ -344,6 +450,7 @@ export class ZooDb
     }
 
 
+    // -------------
 
 
     /**

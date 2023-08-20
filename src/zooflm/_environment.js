@@ -756,9 +756,10 @@ export var ZooFLMEnvironment = __class__(
                 features,
                 parsing_state,
                 new macrospec.LatexContextDb(),
-                // $$kw({
-                //     parsing_mode_deltas: parsing_mode_deltas,
-                // })
+                $$kw({
+                    // parsing_mode_deltas: parsing_mode_deltas,
+                    ... (zooflm_options.flm_environment_options ?? {})
+                })
             );
 
             const parsing_state_event_handler = 

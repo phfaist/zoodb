@@ -9,7 +9,7 @@ import { ZooFLMEnvironment } from '../src/zooflm/index.js';
 import { ZooDb } from '../src/index.js';
 
 
-import { get_simple_test_data } from './_helperstest.js';
+import { get_simple_test_data, schema_validator } from './_helperstest.js';
 
 
 
@@ -25,6 +25,7 @@ describe('zoodb.dbprocessor.flmsimplecontent', function () {
                 processors: [
                     new FLMSimpleContentCompiler({ flm_environment, }),
                 ],
+                schema_validator,
             });
 
             await zoodb.load_data(get_simple_test_data());
@@ -40,6 +41,7 @@ describe('zoodb.dbprocessor.flmsimplecontent', function () {
                 processors: [
                     new FLMSimpleContentCompiler({ flm_environment, }),
                 ],
+                schema_validator,
             });
 
             await zoodb.load_data(get_simple_test_data());
@@ -59,6 +61,7 @@ describe('zoodb.dbprocessor.flmsimplecontent', function () {
                 processors: [
                     new FLMSimpleContentCompiler({ flm_environment, }),
                 ],
+                schema_validator,
             });
 
             await zoodb.load_data(get_simple_test_data());

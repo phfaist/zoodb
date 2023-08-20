@@ -1,4 +1,6 @@
+import jsonschema from 'jsonschema';
 
+export const schema_validator = new jsonschema.Validator();
 
 export const get_simple_test_data = () => ({
     "schemas": {

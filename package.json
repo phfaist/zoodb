@@ -41,6 +41,7 @@
         ".": "./src/index.js",
         "./citationmanager": "./src/citationmanager/index.js",
         "./citationmanager/source/*": "./src/citationmanager/source/*.js",
+        "./schemaloader": "./src/schemaloader.js",
         "./dbdataloader/*": "./src/dbdataloader/*.js",
         "./dbprocessor/*": "./src/dbprocessor/*.js",
         "./resourcecollector": "./src/resourcecollector/index.js",

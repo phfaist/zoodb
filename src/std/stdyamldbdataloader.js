@@ -33,7 +33,6 @@ export async function makeStandardYamlDbDataLoader(zoodb, config={})
 
         object_defaults: { },
         root_data_dir: config.fs_data_dir ?? zoo_config?.fs_data_dir,
-        schemas: config.schemas,
 
         fs: config.fs ?? zoo_config.fs,
     };

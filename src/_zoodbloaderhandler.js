@@ -32,8 +32,10 @@ import loMerge from 'lodash/merge.js';
  *
  * Constructor arguments:
  *
- * - `db_data_loader` - the `dbdataloader` instance to use for loading the
- *   database data, for instance, a :class:`YamlDbDataLoader` instance.
+ * - `db_data_loaders` - one or more `dbdataloader` instance to use for loading
+ *   the database data. You might include, for instance, a
+ *   :class:`YamlDbDataLoader` instance.  Specify either an array of loader
+ *   instances or a single loader instance.
  *
  * - `options` - [optional] an object with the following properties.
  *
@@ -53,7 +55,7 @@ import loMerge from 'lodash/merge.js';
  */
 export class ZooDbDataLoaderHandler
 {
-    constructor(db_data_loader, options={})
+    constructor(db_data_loaders, options={})
     {
         this.options = loMerge(
             {
@@ -62,7 +64,8 @@ export class ZooDbDataLoaderHandler
             options,
         );
 
-        this.db_data_loader = db_data_loader;
+        this.db_data_loaders =
+            Array.isArray(db_data_loaders) ? db_data_loaders: [ db_data_loaders ];
 
         this.zoodb = null;
 
@@ -112,7 +115,35 @@ export class ZooDbDataLoaderHandler
         //
         // Load the data files
         //
-        const dbdata = await this.db_data_loader.load();
+        let dbdata = { schemas: {}, objects: {}, };
+        let newdbdata;
+        for (const db_data_loader of this.db_data_loaders) {
+
+            newdbdata = await db_data_loader.load({ schemas: this.zoodb.schemas });
+
+            for (const [k,v] of Object.entries(newdbdata.schemas ?? {})) {
+                if (dbdata.schemas[k] != null) {
+                    throw new Error(
+                        `Conflict: same schema name ‘${k}’ loaded by different db data loaders!`
+                    );
+                }
+                dbdata.schemas[k] = v;
+            }
+
+            for (const [object_type, object_db] of Object.entries(newdbdata.objects ?? {})) {
+                dbdata.objects[object_type] ??= {};
+                for (const [k,v] of Object.entries(object_db)) {
+                    if (dbdata.objects[object_type][k] != null) {
+                        throw new Error(
+                            `Conflict: same object ID ‘${k}’ loaded by different `
+                            + `db data loaders!`
+                        );
+                    }
+                    dbdata.objects[object_type][k] = v;
+                }
+            }
+
+        }
 
         //
         // Load the zoo from the data files
@@ -163,10 +194,26 @@ export class ZooDbDataLoaderHandler
 
             debug("Reloading Zoo!");
 
-            const {
-                // dbdata,
-                reload_info
-            } = await this.db_data_loader.reload(this.zoodb.db);
+            let reloaded_objects = {};
+
+            for (const db_data_loader of this.db_data_loaders) {
+                const reload_result = await db_data_loader.reload(
+                    this.zoodb.db,
+                    { schemas: this.zoodb.schemas }
+                );
+                let this_reloaded_objects = reload_result.reload_info?.reloaded_objects ?? {};
+                for (const [object_type, object_db] of Object.entries(this_reloaded_objects)) {
+                    reloaded_objects[object_type] ??= {};
+                    for (const [k,v] of Object.entries(object_db)) {
+                        if (reloaded_objects[object_type][k] != null) {
+                            throw new Error(
+                                `Conflict: same object ID ‘${k}’ loaded by two loaders!`
+                            );
+                        }
+                        reloaded_objects[object_type][k] = v;
+                    }
+                }
+            }
 
             await this.zoodb.update_objects(reload_info.reloaded_objects);
 

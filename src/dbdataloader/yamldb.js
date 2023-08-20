@@ -1,18 +1,9 @@
-
-// import fs from 'fs';
+import debug_module from 'debug';
+const debug = debug_module('zoodb.dbdataloader.yamldb');
 
 import path from 'path';
 
 import jsyaml from 'js-yaml';
-// import glob from 'glob';
-
-import jsonschema from 'jsonschema';
-import $RefParser from "@apidevtools/json-schema-ref-parser";
-import json_refparser_resolver_http from "@apidevtools/json-schema-ref-parser/dist/lib/resolvers/http.js";
-//import json_refparser_resolver_file from "@apidevtools/json-schema-ref-parser/lib/resolvers/file.js";
-
-import debug_module from 'debug';
-const debug = debug_module('zoodb.dbdataloader');
 
 import sha256 from 'hash.js/lib/hash/sha/256.js';
 
@@ -110,9 +101,6 @@ const zoodbdataloader = new ZooDbDataLoader({
       schema_rel_path: '/schemas/',
       schema_add_extension: '.json',
     },
-    options: {
-      normalize_id_for_uniqueness_check: (object_id) => object_id.toLowerCase()
-    },
   });
 
 const dbdata = zoodbdataloader.load();
@@ -120,8 +108,7 @@ const dbdata = zoodbdataloader.load();
 
 
 /**
- * Load schemas and object data from a collection of YAML (or JSON) source
- * files.
+ * Load object data from a collection of YAML (or JSON) source files.
  *
  * Includes validation of the input object data against the provided schemas.
  *
@@ -133,22 +120,17 @@ const dbdata = zoodbdataloader.load();
  */
 export class YamlDbDataLoader
 {
-
     constructor(config)
     {
         this.config = Object.assign({}, config);
         this.config.objects = Object.assign({}, this.config.objects ?? {});
         this.config.object_defaults = Object.assign({}, this.config.object_defaults ?? {});
-        this.config.schemas = Object.assign({}, this.config.schemas ?? {});
 
         this.fs = this.config.fs;
         this.fsPromises =
             this.config.fs.promises
-            ?? promisifyMethods(this.config.fs, ['readData', 'readdir', 'stat', 'lstat',])
+            ?? promisifyMethods(this.config.fs, ['readFile', 'readdir', 'stat', 'lstat',])
         ;
-
-        this.config.options ??= {};
-        this.config.options.normalize_id_for_uniqueness_check ??= ((x) => x.toLowerCase());
 
         // set defaults in config
         this.config.object_defaults.file_name_match ??= /\.(ya?ml|json)$/i;
@@ -173,118 +155,30 @@ export class YamlDbDataLoader
             objectconfig.load_objects ??= this.config.object_defaults.load_objects;
         }
 
-        // simplify schema_root URL (e.g., remove x/y/../z -> x/z, will be
-        // needed to compare when to add our custom extension)
-        this.config.schemas.schema_root = new URL(this.config.schemas.schema_root).href;
-        if (!this.config.schemas.schema_root.endsWith('/')) {
-            throw new Error("Please include trailing slash in schemas.schema_root")
-        }
-        debug(`Using schema_root = ${this.config.schemas.schema_root}`);
-
-        this.schema_validator = new jsonschema.Validator();
-        this.schema_ref_parser = $RefParser;
-        this.schemas_by_name = {};
-
-        if (!this.config.schemas.schema_root) {
-            throw new Error("You did not specify a schema_root: in your config!");
-        }
-        let _config = this.config;
-        let fsPromises = this.fsPromises;
-        this.schema_refparser_resolver = {
-            ...json_refparser_resolver_http,
-            order: 1,
-            canRead(/*file*/) {
-                //debug(`schema_refparser_rersolver.canRead: ${file.url}`);
-                return true;
-            },
-            async read(file) {
-                debug(`schema_refparser_resolver.read(), url ${file.url}`);
-
-                let url = file.url;
-
-                try {
-
-                    // undo our workaround fix -- see call to dereference()
-                    // below in the definition of get_schema_by_name()
-                    url = url.replace(/^fspath:/, 'file:');
-
-
-                    if (url.startsWith('file://') &&
-                        ! url.startsWith(_config.schemas.schema_root)) {
-                        // a "/schemas/xyz" path was already interpreted as
-                        // being a path relative to the root directory, make it
-                        // relative to the schema_root:
-                        url = (new URL(url)).pathname.substring(1); // skip leading '/'
-                    }
-
-                    let full_url = new URL(url, _config.schemas.schema_root).href;
-
-                    // debug(`full_url = ${full_url} (from url=${url}); `,
-                    //       {config_schemas: _config.schemas});
-
-                    if (full_url.startsWith(_config.schemas.schema_root) &&
-                        ! full_url.endsWith(_config.schemas.schema_add_extension) ) {
-                        full_url += _config.schemas.schema_add_extension;
-                        // debug(`with extension → full_url = ${full_url}`);
-                    }
-
-                    const newfile = {
-                        url: full_url,
-                        extension: path.extname(full_url),
-                    };
-                    const newfileurl = new URL(newfile.url);
-                    const protocol = newfileurl.protocol;
-
-                    // debug(`Resolved schema URL ${url} → ${newfile.url} `
-                    //       + `[extension=${newfile.extension} protocol=${protocol}]`);
-                    
-                    if ( protocol == 'file:' ) { 
-                        //return json_refparser_resolver_file.read(newfile);
-                        const filePathToRead = decodeURIComponent(
-                            newfileurl.pathname
-                        );
-                        debug(`Resolved schema URL ${url} → ${filePathToRead} on filesystem`);
-                        //debug(`Finally! will read path ‘${filePathToRead}’`);
-                        const data = await fsPromises.readFile(
-                            filePathToRead,
-                            { encoding: 'utf-8' }
-                        );
-                        // debug(` ---> retreived data = `, data);
-                        return data;
-                    } else {
-                        debug(`Resolved schema URL ${url} → URL ${newfile.url} `
-                              + `[extension=${newfile.extension} protocol=${protocol}]`);
-                        return await json_refparser_resolver_http.read(newfile);
-                    }
-
-                } catch (err) {
-                    console.error(`Error reading ${url}: ${err}`);
-                    throw err;
-                }
-            }
-        };
     }
 
     // -------------------------------------------
     // methods to load zoo data
     // -------------------------------------------
 
-    async load()
+    async load({ schemas })
     {
         debug(`Loading Zoo from ‘${this.config.root_data_dir}’ ...`);
 
-        const { dbdata, /*reload_info*/ } = await this.reload();
+        const { dbdata, /*reload_info*/ } = await this.reload(null, { schemas });
 
         return dbdata;
     }
 
-    async reload(dbdata)
+    async reload(dbdata, { schemas })
     {
         debug(`(Re-)Loading Zoo from ‘${this.config.root_data_dir}’ ...`);
         
         dbdata ??= {
             objects: {},
         };
+
+        //debug(`schemas = `, schemas)
 
         let existing_dbdata_info = {
             dbdata: dbdata,
@@ -293,13 +187,15 @@ export class YamlDbDataLoader
             reloaded_objects: Object.fromEntries(Object.keys(this.config.objects).map(
                 (object_type) => [object_type, {}]
             )),
+            schemas,
         };
         if (dbdata.objects != null && Object.keys(dbdata.objects).length) {
             for (const [object_type, objects_db] of Object.entries(dbdata.objects)) {
                 for (const [object_id, object] of Object.entries(objects_db)) {
                     const { source_file_path, source_file_modification_token } = object._zoodb;
                     existing_dbdata_info.objects_by_source[source_file_path] ??= {};
-                    existing_dbdata_info.objects_by_source[source_file_path][object_type] ??= [];
+                    existing_dbdata_info.objects_by_source[source_file_path][object_type]
+                        ??= [];
                     existing_dbdata_info.objects_by_source[source_file_path][object_type].push(
                         [object_id, object]
                     );
@@ -316,19 +212,8 @@ export class YamlDbDataLoader
                     }
                 }
             }
-            // debug(`reload(): existing_dbdata_info is `, existing_dbdata_info);
-            // debug(`reload(): sample is `,
-            //       existing_dbdata_info.objects_by_source['codes/CSS.yml'].code);
         }
 
-        // const objects_results = await Promise.all( Object.values(this.config.objects).map(
-        //     async (objectconfig) => {
-        //         const obj_results =
-        //               await this._load_objects_of_type(objectconfig, existing_dbdata_info);
-        //         // debug(`reload() object_type ‘${objectconfig.object_type}’ ->`, obj_results);
-        //         return obj_results;
-        //     }
-        // ) );
         let objects_results = {};
         for (const [object_type, objectconfig] of Object.entries(this.config.objects)) {
             const obj_db =
@@ -339,15 +224,6 @@ export class YamlDbDataLoader
 
         const d = {
             dbdata: {
-                //
-                // Provide all the schema objects (might contain circular refs!):
-                //
-                schemas: Object.fromEntries(
-                    Object.values(this.config.objects).map( (objectconfig) => {
-                        return [objectconfig.object_type,
-                                this.schemas_by_name[objectconfig.schema_name]];
-                    } )
-                ),
                 //
                 // Provide all the object data:
                 //
@@ -369,58 +245,83 @@ export class YamlDbDataLoader
     }
 
 
+    // -------------------------------------------
+    // Can be reimplemented (e.g., FlmFilesDbDataLoader)
+    // -------------------------------------------
 
-    async get_schema_by_name(schema_name)
+
+    async parse_file_data(file_content, objectconfig, root_path, rel_path)
     {
-        if ( Object.hasOwn(this.schemas_by_name, schema_name) ) {
-            return this.schemas_by_name[schema_name];
-        }
-
-        let schema_rel_path =
-            path.posix.join(this.config.schemas.schema_rel_path, schema_name);
-        let schema_path =
-            new URL(schema_rel_path, this.config.schemas.schema_root).href;
-
-        debug(`Requesting schema for ‘${schema_name}’ → path=‘${schema_path}’`);
-
-        if (schema_path.startsWith('file://')) {
-            // work around a bug in $RefResolver where filesystem paths get
-            // escaped a second time.  This is likely due to the following
-            // lines:
-            // https://github.com/APIDevTools/json-schema-ref-parser/blob/a5b3946fbb62683ab69e3747a8893014591726af/lib/index.ts#L100-L102
-            //
-            // Our workaround is to avoid $RefParser detecting that this is, in
-            // fact, a filesystem path.
-            schema_path = schema_path.replace( /^file:/, 'fspath:' );
-
-            //debug(`Will use ‘${schema_path}’ as a workaround to a bug in $RefParser`);
-        }
-
-        const schema = await this.schema_ref_parser.dereference(
-            schema_path,
-            {
-                resolve: {
-                    file: false,
-                    http: false,
-                    myresolver: this.schema_refparser_resolver,
-                }
+        // in case root_path is already a JSON/YAML file and rel_path is empty
+        const fullpath = path.join(root_path, rel_path);
+        try {
+            if ( /\.ya?ml$/i.test(fullpath) ) {
+                return jsyaml.load( file_content );
+            } else if ( /\.json$/i.test(fullpath) ) {
+                return JSON.parse( file_content );
+            } else {
+                throw new Error(`Unknown file type for path ‘${fullpath}’`);
             }
-        );
-        this.schemas_by_name[schema_name] = schema;
-        return schema;
+        } catch (err) {
+            console.error(
+                `Parse error in ‘${fullpath}’: ${err}`
+            );
+            throw new Error(`Parse error in ‘${fullpath}’: ${err}`);
+        }
     }
+
+    // -------------
+
+    async read_file_content(root_path, rel_path)
+    {
+        const fullpath = path.join(root_path, rel_path);
+        //debug(`read_file_content ${fullpath}`);
+        return await this.fsPromises.readFile(fullpath);
+    }
+
+    // -------------
+
+    async get_file_modification_token(root_path, rel_path, file_content)
+    {
+        // Don't use the file modification time, because it might be a reliable
+        // indicator of modification from the internal loaded state (e.g., if
+        // you do a git checkout to another branch, the file is "modified"
+        // although the file on the other branch might have an anterior
+        // modification time.)  Instead, hash the file contents.
+
+        const hash = sha256().update( file_content ).digest('hex');
+        return hash;
+
+        // const fullpath = path.join(root_path, rel_path);
+        // FIXME: we already 'stat'ed the file, no? We should reuse that information!!
+        // const stat_info = await this.fsPromises.stat(fullpath);
+        // // don't use stats.mtimeMs as it might not be available depending on the
+        // // fs interface we're using (e.g. BrowserFS)
+        // return stat_info.mtime ? stat_info.mtime.getTime() : Number.NaN ;
+    }
+
+
+
+    // -------------------------------------------
+    // Internal implementation methods.
+    // -------------------------------------------
+
 
     async _load_objects_of_type(objectconfig, existing_dbdata_info)
     {
         debug(`Loading objects of type ${objectconfig.object_type} ...`);
 
+        const schemas = existing_dbdata_info.schemas;
+
         const schema_name = objectconfig.schema_name;
-        const schema = await this.get_schema_by_name(schema_name);
+        const schema = schemas[schema_name];
 
-        this.schema_validator.addSchema(schema);
-
-        objectconfig.schema = schema;
+        if (schema == null) {
+            throw new Error(`Schema ‘${schema_name}’ was not loaded into the Zoo DB.`);
+        }
         
+        objectconfig.schema = schema;
+
         // const loaded_objects = [ ['aid',{ a: 'b', c: 'd' }],
         //                          ['bid',{ e: 'f', g: 'h' }] ];
 
@@ -428,31 +329,19 @@ export class YamlDbDataLoader
               await this.walk_src_files(objectconfig, existing_dbdata_info);
 
         let d = {};
-
-        let unique_ids_check_seen = {};
-        let normalize_id_fn = this.config.options.normalize_id_for_uniqueness_check;
         for (const [objid, obj] of loaded_objects_pair_with_id) {
-            //debug(`Got object: objid=${objid}, obj=${JSON.stringify(obj)}`);
-            const object_id_unique_normalized = normalize_id_fn(objid);
-            const other_object = unique_ids_check_seen[object_id_unique_normalized];
-            if (other_object !== undefined) {
+            if (d[objid]) {
+                const other_object = d[objid];
                 throw new Error(
                     `ID ‘${objid}’ was assigned to multiple objects (duplicate ID), in `
                     + `files ‘${other_object._zoodb.source_file_path}’ and `
-                    + `‘${obj._zoodb.source_file_path}’ [normalized ID `
-                    + `‘${object_id_unique_normalized}’]`
+                    + `‘${obj._zoodb.source_file_path}’`
                 );
             }
-            // keep original ID in the database
             d[objid] = obj;
-            // but use the "normalized" ID for the temporary ID uniqueness check
-            // dictionary
-            unique_ids_check_seen[object_id_unique_normalized] = obj;
         }
 
-        //debug(`_load_objects_of_type() [${objectconfig.object_type}] --> ${JSON.stringify(d)}`);
-
-        return d; //[objectconfig.object_type, d];
+        return d;
     }
 
     /// Recursively explores the given directory `root_path` and calls
@@ -543,51 +432,7 @@ export class YamlDbDataLoader
         );
     }
 
-    async get_file_modification_token(root_path, rel_path, file_content)
-    {
-        // Don't use the file modification time, because it might be a reliable
-        // indicator of modification from the internal loaded state (e.g., if
-        // you do a git checkout to another branch, the file is "modified"
-        // although the file on the other branch might have an anterior
-        // modification time.)  Instead, hash the file contents.
-
-        const hash = sha256().update( file_content ).digest('hex');
-        return hash;
-
-        // const fullpath = path.join(root_path, rel_path);
-        // FIXME: we already 'stat'ed the file, no? We should reuse that information!!
-        // const stat_info = await this.fsPromises.stat(fullpath);
-        // // don't use stats.mtimeMs as it might not be available depending on the
-        // // fs interface we're using (e.g. BrowserFS)
-        // return stat_info.mtime ? stat_info.mtime.getTime() : Number.NaN ;
-    }
-
-    async read_file_content(root_path, rel_path)
-    {
-        const fullpath = path.join(root_path, rel_path);
-        //debug(`read_file_content ${fullpath}`);
-        return await this.fsPromises.readFile(fullpath);
-    }
-
-    parse_file_data(file_content, objectconfig, root_path, rel_path)
-    {
-        // in case root_path is already a JSON/YAML file and rel_path is empty
-        const fullpath = path.join(root_path, rel_path);
-        try {
-            if ( /\.ya?ml$/i.test(fullpath) ) {
-                return jsyaml.load( file_content );
-            } else if ( /\.json$/i.test(fullpath) ) {
-                return JSON.parse( file_content );
-            } else {
-                throw new Error(`Unknown file type for path ‘${fullpath}’`);
-            }
-        } catch (err) {
-            console.error(
-                `Parse error in ‘${fullpath}’: ${err}`
-            );
-            throw new Error(`Parse error in ‘${fullpath}’: ${err}`);
-        }
-    }
+    // -------------
 
     async parse_file_into_objects(root_path, rel_path, objectconfig, existing_dbdata_info)
     {
@@ -634,8 +479,8 @@ export class YamlDbDataLoader
 
         debug(`Loading file ‘${rel_path}’ (from ${root_path})`);
 
-        const file_data = this.parse_file_data( file_content, objectconfig,
-                                                root_path, rel_path );
+        const file_data = await this.parse_file_data( file_content, objectconfig,
+                                                      root_path, rel_path );
 
         let objects_data = objectconfig.load_objects( file_data );
 
@@ -660,27 +505,14 @@ export class YamlDbDataLoader
         return objects_data.map( (obj) => [ obj._zoodb.id, obj ] );
     }
 
+
+    // -------------
+
+
     finalize_object(obj, objectconfig,
                     { /*root_path, rel_path,*/
                       source_file_path, source_file_modification_token })
     {
-        // validate according to the JSON schema
-
-        const validation_result = this.schema_validator.validate(obj, objectconfig.schema);
-        if (!validation_result.valid) {
-            const validation_errors = validation_result.errors.map(
-                (errorstr) => (''+errorstr).replace(
-                    /^instance\b/,
-                    () => `[${objectconfig.object_type.toUpperCase()}]`
-                )
-            );
-            throw new Error(
-                `Schema validation failed for ${objectconfig.object_type} object data in `
-                +`‘${source_file_path}’:\n\n`
-                +`*** ${ validation_errors.join("\n*** ") }\n`
-            );
-        }
-
         obj._zoodb = {
             id: obj[objectconfig.schema._zoo_primarykey],
             source_file_path: source_file_path,
@@ -689,6 +521,7 @@ export class YamlDbDataLoader
 
         // debug(`Finalized object, _zoodb -> ${JSON.stringify(obj._zoodb)}`);
     }
+
 
 }
 

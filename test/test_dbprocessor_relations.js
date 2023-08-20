@@ -8,7 +8,7 @@ import { ZooRelation, RelationsPopulator } from '../src/dbprocessor/relations.js
 import { ZooDb } from '../src/index.js';
 
 
-import { get_simple_test_data } from './_helperstest.js';
+import { get_simple_test_data, schema_validator } from './_helperstest.js';
 
 
 
@@ -41,6 +41,7 @@ describe('zoodb.dbprocessor.relations', function () {
                 processors: [
                     new RelationsPopulator(),
                 ],
+                schema_validator,
             });
 
             await zoodb.load_data(get_simple_test_data());
@@ -58,6 +59,7 @@ describe('zoodb.dbprocessor.relations', function () {
                 processors: [
                     new RelationsPopulator(),
                 ],
+                schema_validator,
             });
 
             await zoodb.load_data(get_simple_test_data());
