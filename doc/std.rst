@@ -74,9 +74,10 @@ boilerplate code:
     
   }
 
-  export async function createMyFancyZooDb(config={})
+  export async function createMyFancyZooDb(config={}, { schema_root })
   {
-  
+      schema_root ??= schemas_root_path;
+
       const csl_style =
           await fs.promises.readFile( csl_filename, { encoding: 'utf-8', }, );
   
@@ -155,6 +156,23 @@ boilerplate code:
               graphics_resource:
                   (graphics_resource) => `/fig/${graphics_resource.src_url}`,
           },
+
+          
+          //
+          // Specify where to find our object schemas
+          //
+          schemas: {
+              schema_root: schema_root,
+              schema_rel_path: 'schemas/',
+              schema_add_extension: '.yml',
+          },
+  
+          // 
+          // Specify which schemas to load.  Not necessary if you want to load
+          // all .yml files in the schema_root (as long as it's a filesystem
+          // folder)
+          //
+          //schema_names: [ 'myfancyobject', ]
     
       }, config);
   
@@ -164,10 +182,8 @@ boilerplate code:
 
   // -----------------
   
-  export async function createMyFancyYamlDbDataLoader(zoodb, { schema_root }={})
+  export async function createMyFancyYamlDbDataLoader(zoodb)
   {
-      schema_root ??= `file://${schemas_root_path}/`;
-
       let config = {
           //
           // Specify object types & where to find the corresponding data.
@@ -181,15 +197,6 @@ boilerplate code:
               },
           },
           
-          //
-          // specify where to find schemas
-          //
-          schemas: {
-              schema_root: schema_root,
-              schema_rel_path: 'schemas/',
-              schema_add_extension: '.yml',
-          },
-  
       };
 
       return await makeStandardYamlDbDataLoader(config);
