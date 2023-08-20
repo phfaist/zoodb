@@ -1,6 +1,8 @@
 import debug_mod from 'debug';
 const debug = debug_mod("zoodb.std.stdzoodb");
 
+import jsonschema from 'jsonschema';
+
 import { ZooDb } from '../_zoodb.js';
 import { SchemaLoader } from '../schemaloader.js';
 
@@ -161,12 +163,15 @@ export async function makeStandardZooDb(config)
     let ZooDbClass = _this.config.ZooDbClass;
     let SchemaLoaderClass = _this.config.SchemaLoaderClass;
 
+    let schema_validator = new jsonschema.Validator();
+
     //
     // Set up the ZooDb object
     //
     let zoodb = new ZooDbClass({
         // database processors:
         processors: _this.zoodb_processors,
+        schema_validator,
     });
 
     // set attributes we prepared from _this

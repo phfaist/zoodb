@@ -81,7 +81,7 @@ export class ZooDb
         this.schema_validator = schema_validator ?? null;
         if (this.schema_validator == null && !this.silent) {
             console.warn(
-                `No schema validator was set on this ZooDb.  No schema validation`
+                `No schema validator was set on this ZooDb.  No schema validation `
                 + `will be performed.  To suppress this message use the value ‘false’ `
                 + `for the schema_validator argument.`
             );
@@ -249,10 +249,8 @@ export class ZooDb
                         + `‘${object_id_unique_normalized}’]`
                     );
                 }
-                // keep original ID in the database
-                d[objid] = obj;
-                // but use the "normalized" ID for the temporary ID uniqueness check
-                // dictionary
+                // register the "normalized" ID for the temporary ID uniqueness
+                // check dictionary
                 unique_ids_check_seen[object_id_unique_normalized] = obj;
             }
         }

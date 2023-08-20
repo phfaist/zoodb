@@ -1,6 +1,6 @@
 import path from 'path';
 
-import jsyaml from 'js-yaml';
+// import jsyaml from 'js-yaml';
 
 import $RefParser from "@apidevtools/json-schema-ref-parser";
 import json_refparser_resolver_http from "@apidevtools/json-schema-ref-parser/dist/lib/resolvers/http.js";

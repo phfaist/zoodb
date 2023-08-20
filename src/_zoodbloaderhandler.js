@@ -215,7 +215,7 @@ export class ZooDbDataLoaderHandler
                 }
             }
 
-            await this.zoodb.update_objects(reload_info.reloaded_objects);
+            await this.zoodb.update_objects(reloaded_objects);
 
             debug("Re-Validating Zoo");
 
