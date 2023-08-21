@@ -10,11 +10,11 @@ import {
     ParsingStateDelta,
     LatexWalkerLocatedError, LatexWalkerLocatedErrorFormatter
 } from './_flm-js/pylatexenc.latexnodes.js';
-import * as macrospec from './_flm-js/pylatexenc.macrospec.js';
+import * as pylatexenc_macrospec from './_flm-js/pylatexenc.macrospec.js';
 
 import { FLMFragment } from './_flm-js/flm.flmfragment.js';
 
-import * as flmenvironment from './_flm-js/flm.flmenvironment.js';
+import * as flm_flmenvironment from './_flm-js/flm.flmenvironment.js';
 import {
     FLMEnvironment,
     FLMParsingState,
@@ -34,11 +34,28 @@ import * as flm_feature_floats from './_flm-js/flm.feature.floats.js';
 import * as flm_feature_defterm from './_flm-js/flm.feature.defterm.js';
 import * as flm_feature_graphics from './_flm-js/flm.feature.graphics.js';
 
+import * as flm_flmspecinfo from './_flm-js/flm.flmspecinfo.js';
+import * as pylatexenc_latexnodes from './_flm-js/pylatexenc.latexnodes.js';
+import * as pylatexenc_latexnodes_nodes from './_flm-js/pylatexenc.latexnodes.nodes.js';
+import * as pylatexenc_latexnodes_parsers from './_flm-js/pylatexenc.latexnodes.parsers.js';
 
 export {
+    //
+    // Convenient classes ---
+    //
     FLMParsingState, ParsingStateDelta, FLMParsingStateDeltaSetBlockLevel,
-    //LatexWalkerError, LatexWalkerLocatedError,
-    LatexWalkerLocatedErrorFormatter
+    LatexWalkerLocatedErrorFormatter,
+
+    //
+    // provide access to individual python modules ---
+    //
+    flm_feature, flm_feature_baseformatting, flm_feature_href, flm_feature_verbatim,
+    flm_feature_math, flm_feature_headings, flm_feature_endnotes,
+    flm_feature_refs, flm_feature_cite,
+    flm_feature_floats, flm_feature_defterm, flm_feature_graphics,
+    flm_flmspecinfo, flm_flmenvironment,
+    pylatexenc_latexnodes, pylatexenc_latexnodes_nodes, pylatexenc_latexnodes_parsers,
+    pylatexenc_macrospec,
 };
 
 export const SectionCommandInfo = flm_feature_headings.FeatureHeadings.SectionCommandInfo;
@@ -726,7 +743,7 @@ export var ZooFLMEnvironment = __class__(
 
             zooflm_options = Object.assign({}, zooflm_default_options(), zooflm_options);
 
-            const parsing_state = flmenvironment.standard_parsing_state($$kw(
+            const parsing_state = flm_flmenvironment.standard_parsing_state($$kw(
                 zooflm_options.parsing_state_options ?? {}
             ));
 
@@ -755,7 +772,7 @@ export var ZooFLMEnvironment = __class__(
                 self,
                 features,
                 parsing_state,
-                new macrospec.LatexContextDb(),
+                new pylatexenc_macrospec.LatexContextDb(),
                 $$kw({
                     // parsing_mode_deltas: parsing_mode_deltas,
                     ... (zooflm_options.flm_environment_options ?? {})
@@ -763,12 +780,12 @@ export var ZooFLMEnvironment = __class__(
             );
 
             const parsing_state_event_handler = 
-                  new flmenvironment.FLMLatexWalkerMathContextParsingStateEventHandler();
+                  new flm_flmenvironment.FLMLatexWalkerMathContextParsingStateEventHandler();
 
             self.parsing_state_event_handler = parsing_state_event_handler
 
             self.environment_get_located_error_message =
-                flmenvironment.standard_environment_get_located_error_message;
+                flm_flmenvironment.standard_environment_get_located_error_message;
             
             // environment set up.
         });}

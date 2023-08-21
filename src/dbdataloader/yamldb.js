@@ -9,17 +9,12 @@ import sha256 from 'hash.js/lib/hash/sha/256.js';
 
 
 import { promisifyMethods } from '../util/prify.js';
-
+import { escapeRegExp } from '../util/rx.js';
 
 
 // -----------------------------------------------------------------------------
 
 
-
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
-function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-}
 
 
 const default_resource_file_extensions = [
@@ -126,10 +121,12 @@ export class YamlDbDataLoader
         this.config.objects = Object.assign({}, this.config.objects ?? {});
         this.config.object_defaults = Object.assign({}, this.config.object_defaults ?? {});
 
-        this.fs = this.config.fs;
+        // Allow an empty `fs` in case we only instantiate this class to use its
+        // parse_file_content method (e.g. for flmfilesdb tests)
+        this.fs = this.config.fs ?? {};
         this.fsPromises =
-            this.config.fs.promises
-            ?? promisifyMethods(this.config.fs, ['readFile', 'readdir', 'stat', 'lstat',])
+            this.fs.promises
+            ?? promisifyMethods(this.fs, ['readFile', 'readdir', 'stat', 'lstat',])
         ;
 
         // set defaults in config

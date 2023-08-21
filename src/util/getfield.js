@@ -62,7 +62,13 @@ export function getfield(obj, field)
 
     const parts = field.split('.');
     const tail_part = parts.pop();
-    for (const part of parts) {
+    for (let part of parts) {
+        if (Array.isArray(obj)) {
+            let m = /^\[(\d+)\]$/.exec(part);
+            if (m != null) {
+                part = parseInt(m[1]);
+            }
+        }
         obj = obj[part] || {};
     }
     return obj[tail_part]; // can be undefined
@@ -91,7 +97,7 @@ export function setfield(obj, field, setterfn)
 
     const parts_info = parts.map( (part, index) => {
         let isbeforelast = (index === (parts.length-2));
-        let m = /^\[(\d+)*\]$/.exec(part);
+        let m = /^\[(\d*)\]$/.exec(part);
         if (m != null) {
             // this part is an array index
             let arridxstr = m[1];
@@ -131,7 +137,10 @@ export function setfield(obj, field, setterfn)
     }
 
     const tail_part_info = parts_info[parts_info.length - 1];
-    const tail_part = tail_part_info.part;
+    let tail_part = tail_part_info.part;
+    if (tail_part === -1) {
+        tail_part = obj.length;
+    }
 
     return set_object_attribute_fn(obj, tail_part);
 }

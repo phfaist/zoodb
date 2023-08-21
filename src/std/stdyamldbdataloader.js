@@ -25,6 +25,8 @@ export async function makeStandardYamlDbDataLoader(zoodb, config={})
 
     let zoo_config = zoodb.config ?? {};
 
+    let DbDataLoaderClass = config.DbDataLoaderClass ?? YamlDbDataLoader;
+
     let loader_config = {
         resource_file_extensions:
             zoo_config.flm_options?.resources?.resource_file_extensions,
@@ -37,9 +39,9 @@ export async function makeStandardYamlDbDataLoader(zoodb, config={})
         fs: config.fs ?? zoo_config.fs,
     };
 
-    debug(`Creating a YamlDbZooDataLoader with config`, loader_config);
+    debug(`Creating a ${DbDataLoaderClass.name} instance with config`, loader_config);
 
-    let yamldb_loader = new YamlDbDataLoader(loader_config);
+    let yamldb_loader = new DbDataLoaderClass(loader_config);
 
     return yamldb_loader;
 }
