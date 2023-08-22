@@ -26,3 +26,17 @@ Importing YAML Files
 .. js:autoclass:: src/dbdataloader/yamldb.YamlDbDataLoader
    :short-name:
    :members:
+
+
+
+Importing FLM Files
+--------------------
+
+.. code::
+
+   import { FlmFilesDbDataLoader } from '@phfaist/zoodb/dbdataloader/flmfilesdb';
+
+
+.. js:autoclass:: src/dbdataloader/flmfilesdb.FlmFilesDbDataLoader
+   :short-name:
+   :members:

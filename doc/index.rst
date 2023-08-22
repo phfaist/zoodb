@@ -22,8 +22,9 @@ future.  Feel free to use it to build your own zoo, too!
    :caption: Contents:
 
    overview
-   flm
+   datafiles
    schemas
+   flm
    website11ty
    std
    
