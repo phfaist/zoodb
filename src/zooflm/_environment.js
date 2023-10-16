@@ -26,6 +26,7 @@ import * as flm_feature_baseformatting from './_flm-js/flm.feature.baseformattin
 import * as flm_feature_href from './_flm-js/flm.feature.href.js';
 import * as flm_feature_verbatim from './_flm-js/flm.feature.verbatim.js';
 import * as flm_feature_math from './_flm-js/flm.feature.math.js';
+import * as flm_feature_enumeration from './_flm-js/flm.feature.enumeration.js';
 import * as flm_feature_headings from './_flm-js/flm.feature.headings.js';
 import * as flm_feature_endnotes from './_flm-js/flm.feature.endnotes.js';
 import * as flm_feature_refs from './_flm-js/flm.feature.refs.js';
@@ -33,6 +34,7 @@ import * as flm_feature_cite from './_flm-js/flm.feature.cite.js';
 import * as flm_feature_floats from './_flm-js/flm.feature.floats.js';
 import * as flm_feature_defterm from './_flm-js/flm.feature.defterm.js';
 import * as flm_feature_graphics from './_flm-js/flm.feature.graphics.js';
+//import * as flm_feature_cells from './_flm-js/flm.feature.cells.js';
 
 import * as flm_flmspecinfo from './_flm-js/flm.flmspecinfo.js';
 import * as pylatexenc_latexnodes from './_flm-js/pylatexenc.latexnodes.js';
@@ -50,7 +52,8 @@ export {
     // provide access to individual python modules ---
     //
     flm_feature, flm_feature_baseformatting, flm_feature_href, flm_feature_verbatim,
-    flm_feature_math, flm_feature_headings, flm_feature_endnotes,
+    flm_feature_math, flm_feature_enumeration,
+    flm_feature_headings, flm_feature_endnotes,
     flm_feature_refs, flm_feature_cite,
     flm_feature_floats, flm_feature_defterm, flm_feature_graphics,
     flm_flmspecinfo, flm_flmenvironment,
@@ -629,6 +632,16 @@ export function zooflm_default_options(footnote_counter_formatter='alph')
             4: SectionCommandInfo("paragraph", $$kw({inline: true})),
         },
 
+        enumeration_environments: {
+            itemize: {
+                counter_formatter: ['•', '-', '▸'],
+            },
+            enumerate: {
+                // uses default formatters 1., 2., ... incl. nested (i), etc.
+                counter_formatter: null
+            },
+        }
+
         endnote_categories: [
             EndnoteCategory(
                 'footnote',
@@ -685,6 +698,11 @@ export function install_standard_features(self, zooflm_options)
     self.feature_verbatim = new flm_feature_verbatim.FeatureVerbatim();
 
     self.feature_math = new flm_feature_math.FeatureMath();
+
+    self.feature_enumeration = new flm_feature_enumeration.FeatureEnumeration(
+        $$kw({enumeration_environments:
+              zooflm_options.enumeration_environments}),
+    );
 
     self.feature_headings = new flm_feature_headings.FeatureHeadings(
         $$kw({section_commands_by_level:
