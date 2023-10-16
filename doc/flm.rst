@@ -95,6 +95,29 @@ Mathematical equations
   unnumbered display equations.
 
 
+Bullet-point and enumeration lists
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Create numbered lists using
+  ``\begin{enumerate} \item ... \item ... \end{enumerate}``.
+
+- Create bullet-point lists with ``\begin{itemize} \item ... \end{itemize}``.
+
+- You can customize the enumeration label with an optional argument.  In
+  the optional argument value, the first occurence of ``1``, ``a``, ``A``,
+  ``i``, ``I`` will be replaced by the list item number formatted respectively
+  as an arabic numeral (``1, 2, ...``), a lowercase latin letter (``a, b,
+  ...``), an uppercase latin letter (``A, B, ...``), a lowercase roman
+  numeral (``i, ii, iii, iv, ...``), and an uppercase roman numeral
+  (``I, II, III, IV, ...``).  Examples:
+
+  .. code:: latex
+  
+      \begin{enumerate}[(a)]   %% → (a), (b), ...
+      \begin{enumerate}[i)]    %% → i), ii), ...
+      \begin{itemize}[{⇒}]     %% → use '⇒' as bullet character
+
+
 Bibliographic citations
 ~~~~~~~~~~~~~~~~~~~~~~~
 
