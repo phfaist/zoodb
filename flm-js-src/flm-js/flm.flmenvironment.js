@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-08-14 17:27:44
+/* 000001 */ // Transcrypt'ed from Python, 2023-10-16 20:52:33
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
 /* 000006 */ var unique_object_id = {};
@@ -16,7 +16,7 @@
 /* 000007 */ __nest__ (logging, '', __module_logging__);
 /* 000006 */ import * as __module_re__ from './re.js';
 /* 000006 */ __nest__ (re, '', __module_re__);
-/* 000006 */ export {FLMDocument, latexnodes, FLMFragment, latexwalker, LatexWalkerParseError, latexnodes_nodes, LatexWalkerLocatedErrorFormatter, macrospec};
+/* 000006 */ export {FLMFragment, FLMDocument, latexnodes, latexnodes_nodes, LatexWalkerLocatedErrorFormatter, latexwalker, macrospec, LatexWalkerParseError};
 /* 000001 */ var __name__ = 'flm.flmenvironment';
 /* 000008 */ export var logger = (function () {
 /* 000008 */ 	var __accu0__ = logging;
@@ -1046,10 +1046,7 @@
 /* 000723 */ 		var latex_walker = __call__ (FLMLatexWalker, null, __kwargtrans__ ({flm_text: flm_text, default_parsing_state: default_parsing_state, tolerant_parsing: tolerant_parsing, flm_environment: self, standalone_mode: standalone_mode, resource_info: resource_info, what: what, parsing_state_event_handler: self.parsing_state_event_handler, input_lineno_colno_offsets: input_lineno_colno_offsets}));
 /* 000737 */ 		return latex_walker;
 /* 000737 */ 	});},
-/* 000739 */ 	get make_parsing_state () {return __get__ (this, function (self, is_block_level, parsing_mode) {
-/* 000739 */ 		if (typeof parsing_mode == 'undefined' || (parsing_mode != null && parsing_mode.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000739 */ 			var parsing_mode = null;
-/* 000739 */ 		};
+/* 000739 */ 	get define_parsing_mode () {return __get__ (this, function (self, parsing_mode, parsing_mode_delta) {
 /* 000739 */ 		if (arguments.length) {
 /* 000739 */ 			var __ilastarg0__ = arguments.length - 1;
 /* 000739 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -1057,602 +1054,628 @@
 /* 000739 */ 				for (var __attrib0__ in __allkwargs0__) {
 /* 000739 */ 					switch (__attrib0__) {
 /* 000739 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000739 */ 						case 'is_block_level': var is_block_level = __allkwargs0__ [__attrib0__]; break;
 /* 000739 */ 						case 'parsing_mode': var parsing_mode = __allkwargs0__ [__attrib0__]; break;
+/* 000739 */ 						case 'parsing_mode_delta': var parsing_mode_delta = __allkwargs0__ [__attrib0__]; break;
 /* 000739 */ 					}
 /* 000739 */ 				}
 /* 000739 */ 			}
 /* 000739 */ 		}
 /* 000739 */ 		else {
 /* 000739 */ 		}
-/* 000743 */ 		var default_parsing_state = self.parsing_state;
-/* 000745 */ 		if (__t__ (parsing_mode !== null)) {
-/* 000746 */ 			try {
-/* 000747 */ 				var parsing_state_delta = __getitem__ (self.parsing_mode_deltas, parsing_mode);
-/* 000747 */ 			}
-/* 000747 */ 			catch (__except0__) {
-/* 000747 */ 				if (isinstance (__except0__, KeyError)) {
-/* 000747 */ 					var e = __except0__;
-/* 000749 */ 					var __except1__ = __call__ (ValueError, null, 'Invalid parsing_mode ‘{}’'.format (parsing_mode));
-/* 000749 */ 					__except1__.__cause__ = null;
-/* 000749 */ 					throw __except1__;
-/* 000749 */ 				}
-/* 000749 */ 				else {
-/* 000749 */ 					throw __except0__;
-/* 000749 */ 				}
-/* 000749 */ 			}
-/* 000751 */ 			if (__t__ (parsing_state_delta !== null)) {
-/* 000752 */ 				var default_parsing_state = (function () {
-/* 000752 */ 					var __accu0__ = parsing_state_delta;
-/* 000752 */ 					return __call__ (__accu0__.get_updated_parsing_state, __accu0__, default_parsing_state, __kwargtrans__ ({latex_walker: null}));
-/* 000752 */ 				}) ();
+/* 000740 */ 		if (__t__ (__in__ (parsing_mode, self.parsing_mode_deltas))) {
+/* 000741 */ 			var __except0__ = __call__ (ValueError, null, 'Parsing mode ‘{}’ already defined!'.format (parsing_mode));
+/* 000741 */ 			__except0__.__cause__ = null;
+/* 000741 */ 			throw __except0__;
+/* 000741 */ 		}
+/* 000742 */ 		__setitem__ (self.parsing_mode_deltas, parsing_mode, parsing_mode_delta);
+/* 000742 */ 	});},
+/* 000744 */ 	get make_parsing_state () {return __get__ (this, function (self, is_block_level, parsing_mode) {
+/* 000744 */ 		if (typeof parsing_mode == 'undefined' || (parsing_mode != null && parsing_mode.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000744 */ 			var parsing_mode = null;
+/* 000744 */ 		};
+/* 000744 */ 		if (arguments.length) {
+/* 000744 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000744 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000744 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000744 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000744 */ 					switch (__attrib0__) {
+/* 000744 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000744 */ 						case 'is_block_level': var is_block_level = __allkwargs0__ [__attrib0__]; break;
+/* 000744 */ 						case 'parsing_mode': var parsing_mode = __allkwargs0__ [__attrib0__]; break;
+/* 000744 */ 					}
+/* 000744 */ 				}
+/* 000744 */ 			}
+/* 000744 */ 		}
+/* 000744 */ 		else {
+/* 000744 */ 		}
+/* 000748 */ 		var default_parsing_state = self.parsing_state;
+/* 000750 */ 		if (__t__ (parsing_mode !== null)) {
+/* 000751 */ 			try {
+/* 000752 */ 				var parsing_state_delta = __getitem__ (self.parsing_mode_deltas, parsing_mode);
 /* 000752 */ 			}
-/* 000752 */ 		}
-/* 000757 */ 		var kwargs = dict ({});
-/* 000758 */ 		if (__t__ (is_block_level !== null)) {
-/* 000759 */ 			__setitem__ (kwargs, 'is_block_level', is_block_level);
-/* 000759 */ 		}
-/* 000761 */ 		return (function () {
-/* 000761 */ 			var __accu0__ = default_parsing_state;
-/* 000761 */ 			return __call__ (__accu0__.sub_context, __accu0__, __kwargtrans__ (kwargs));
-/* 000761 */ 		}) ();
-/* 000761 */ 	});},
-/* 000764 */ 	get make_fragment () {return __get__ (this, function (self, flm_text) {
-/* 000764 */ 		var kwargs = dict ();
-/* 000764 */ 		if (arguments.length) {
-/* 000764 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000764 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000764 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000764 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000764 */ 					switch (__attrib0__) {
-/* 000764 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000764 */ 						case 'flm_text': var flm_text = __allkwargs0__ [__attrib0__]; break;
-/* 000764 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000764 */ 					}
-/* 000764 */ 				}
-/* 000764 */ 				delete kwargs.__kwargtrans__;
-/* 000764 */ 			}
+/* 000752 */ 			catch (__except0__) {
+/* 000752 */ 				if (isinstance (__except0__, KeyError)) {
+/* 000752 */ 					var e = __except0__;
+/* 000754 */ 					var __except1__ = __call__ (ValueError, null, 'Invalid parsing_mode ‘{}’'.format (parsing_mode));
+/* 000754 */ 					__except1__.__cause__ = null;
+/* 000754 */ 					throw __except1__;
+/* 000754 */ 				}
+/* 000754 */ 				else {
+/* 000754 */ 					throw __except0__;
+/* 000754 */ 				}
+/* 000754 */ 			}
+/* 000756 */ 			if (__t__ (parsing_state_delta !== null)) {
+/* 000757 */ 				var default_parsing_state = (function () {
+/* 000757 */ 					var __accu0__ = parsing_state_delta;
+/* 000757 */ 					return __call__ (__accu0__.get_updated_parsing_state, __accu0__, default_parsing_state, __kwargtrans__ ({latex_walker: null}));
+/* 000757 */ 				}) ();
+/* 000757 */ 			}
+/* 000757 */ 		}
+/* 000762 */ 		var kwargs = dict ({});
+/* 000763 */ 		if (__t__ (is_block_level !== null)) {
+/* 000764 */ 			__setitem__ (kwargs, 'is_block_level', is_block_level);
 /* 000764 */ 		}
-/* 000764 */ 		else {
-/* 000764 */ 		}
-/* 000766 */ 		if (__t__ (__call__ (isinstance, null, flm_text, FLMFragment))) {
-/* 000767 */ 			var frag = flm_text;
-/* 000768 */ 			var __iterable0__ = tuple (['is_block_level', 'standalone_mode']);
-/* 000768 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000768 */ 				var fld = __getitem__ (__iterable0__, __index0__);
-/* 000770 */ 				if (__t__ (__t__ (__in__ (fld, kwargs)) && __t__ (__getitem__ (kwargs, fld) !== null) && __ne__ (__getitem__ (kwargs, fld), __call__ (getattr, null, frag, fld)))) {
-/* 000774 */ 					var __except0__ = __call__ (ValueError, null, 'make_fragment(): FLMFragment instance specified but its ‘{}’ ({}) differs with requested ‘{}’ ({})'.format (fld, __call__ (repr, null, __call__ (getattr, null, frag, fld)), fld, __getitem__ (kwargs, fld)));
-/* 000774 */ 					__except0__.__cause__ = null;
-/* 000774 */ 					throw __except0__;
-/* 000774 */ 				}
-/* 000774 */ 			}
-/* 000777 */ 			return frag;
-/* 000777 */ 		}
-/* 000779 */ 		try {
-/* 000780 */ 			var fragment = __call__ (FLMFragment, null, flm_text, __kwargtrans__ (__mergekwargtrans__ ({environment: self}, kwargs)));
-/* 000781 */ 			return fragment;
-/* 000781 */ 		}
-/* 000781 */ 		catch (__except0__) {
-/* 000783 */ 			if (__t__ (!__t__ (((function () {
-/* 000783 */ 				var __accu0__ = kwargs;
-/* 000783 */ 				return __call__ (__accu0__.py_get, __accu0__, 'silent', false);
-/* 000783 */ 			}) ())))) {
-/* 000784 */ 				(function () {
-/* 000784 */ 					var __accu0__ = logger;
-/* 000785 */ 					return __call__ (__accu0__.error, __accu0__, (function () {
-/* 000785 */ 						var __accu1__ = 'Error compiling fragment for {}\nContent was:\n‘{}’\n';
-/* 000786 */ 						return __call__ (__accu1__.format, __accu1__, (function () {
-/* 000786 */ 							var __accu2__ = kwargs;
-/* 000786 */ 							return __call__ (__accu2__.py_get, __accu2__, 'what', '(unknown)');
-/* 000786 */ 						}) (), flm_text);
-/* 000786 */ 					}) (), __kwargtrans__ ({exc_info: true}));
-/* 000786 */ 				}) ();
-/* 000786 */ 			}
-/* 000789 */ 			__except0__.__cause__ = null;
-/* 000789 */ 			throw __except0__;
-/* 000789 */ 		}
-/* 000789 */ 	});},
-/* 000796 */ 	get make_document () {return __get__ (this, function (self, render_callback) {
-/* 000796 */ 		var kwargs = dict ();
-/* 000796 */ 		if (arguments.length) {
-/* 000796 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000796 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000796 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000796 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000796 */ 					switch (__attrib0__) {
-/* 000796 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000796 */ 						case 'render_callback': var render_callback = __allkwargs0__ [__attrib0__]; break;
-/* 000796 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000796 */ 					}
-/* 000796 */ 				}
-/* 000796 */ 				delete kwargs.__kwargtrans__;
-/* 000796 */ 			}
-/* 000796 */ 		}
-/* 000796 */ 		else {
-/* 000796 */ 		}
-/* 000805 */ 		var doc = __call__ (FLMDocument, null, render_callback, __kwargtrans__ (__mergekwargtrans__ ({environment: self}, kwargs)));
-/* 000810 */ 		(function () {
-/* 000810 */ 			var __accu0__ = doc;
-/* 000810 */ 			return __call__ (__accu0__.initialize, __accu0__);
-/* 000810 */ 		}) ();
-/* 000811 */ 		return doc;
-/* 000811 */ 	});},
-/* 000814 */ 	get get_features_selection () {return __get__ (this, function (self, enable_features) {
-/* 000814 */ 		if (arguments.length) {
-/* 000814 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000814 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000814 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000814 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000814 */ 					switch (__attrib0__) {
-/* 000814 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000814 */ 						case 'enable_features': var enable_features = __allkwargs0__ [__attrib0__]; break;
-/* 000814 */ 					}
-/* 000814 */ 				}
-/* 000814 */ 			}
-/* 000814 */ 		}
-/* 000814 */ 		else {
-/* 000814 */ 		}
-/* 000816 */ 		if (__t__ (enable_features === null)) {
-/* 000818 */ 			return self.features;
-/* 000818 */ 		}
-/* 000820 */ 		var features = (function () {
-/* 000820 */ 			var __accu0__ = [];
-/* 000820 */ 			var __iterable0__ = enable_features;
-/* 000820 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000822 */ 				var feature_name = __getitem__ (__iterable0__, __index0__);
-/* 000822 */ 				(function () {
-/* 000822 */ 					var __accu1__ = __accu0__;
-/* 000822 */ 					return __call__ (__accu1__.append, __accu1__, __getitem__ (self.features_by_name, feature_name));
-/* 000822 */ 				}) ();
-/* 000822 */ 			}
-/* 000822 */ 			return __accu0__;
-/* 000822 */ 		}) ();
-/* 000826 */ 		__call__ (features_ensure_dependencies_are_met, null, features);
-/* 000828 */ 		return features;
-/* 000828 */ 	});},
-/* 000833 */ 	environment_get_located_error_message: null,
-/* 000835 */ 	get get_located_error_message () {return __get__ (this, function (self, exception_object) {
-/* 000835 */ 		if (arguments.length) {
-/* 000835 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000835 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000835 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000835 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000835 */ 					switch (__attrib0__) {
-/* 000835 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000835 */ 						case 'exception_object': var exception_object = __allkwargs0__ [__attrib0__]; break;
-/* 000835 */ 					}
-/* 000835 */ 				}
-/* 000835 */ 			}
-/* 000835 */ 		}
-/* 000835 */ 		else {
-/* 000835 */ 		}
-/* 000836 */ 		if (__t__ (self.environment_get_located_error_message !== null)) {
-/* 000837 */ 			return (function () {
-/* 000837 */ 				var __accu0__ = self;
-/* 000837 */ 				return __call__ (__accu0__.environment_get_located_error_message, __accu0__, exception_object);
-/* 000837 */ 			}) ();
+/* 000766 */ 		return (function () {
+/* 000766 */ 			var __accu0__ = default_parsing_state;
+/* 000766 */ 			return __call__ (__accu0__.sub_context, __accu0__, __kwargtrans__ (kwargs));
+/* 000766 */ 		}) ();
+/* 000766 */ 	});},
+/* 000769 */ 	get make_fragment () {return __get__ (this, function (self, flm_text) {
+/* 000769 */ 		var kwargs = dict ();
+/* 000769 */ 		if (arguments.length) {
+/* 000769 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000769 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000769 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000769 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000769 */ 					switch (__attrib0__) {
+/* 000769 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000769 */ 						case 'flm_text': var flm_text = __allkwargs0__ [__attrib0__]; break;
+/* 000769 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000769 */ 					}
+/* 000769 */ 				}
+/* 000769 */ 				delete kwargs.__kwargtrans__;
+/* 000769 */ 			}
+/* 000769 */ 		}
+/* 000769 */ 		else {
+/* 000769 */ 		}
+/* 000771 */ 		if (__t__ (__call__ (isinstance, null, flm_text, FLMFragment))) {
+/* 000772 */ 			var frag = flm_text;
+/* 000773 */ 			var __iterable0__ = tuple (['is_block_level', 'standalone_mode']);
+/* 000773 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000773 */ 				var fld = __getitem__ (__iterable0__, __index0__);
+/* 000775 */ 				if (__t__ (__t__ (__in__ (fld, kwargs)) && __t__ (__getitem__ (kwargs, fld) !== null) && __ne__ (__getitem__ (kwargs, fld), __call__ (getattr, null, frag, fld)))) {
+/* 000779 */ 					var __except0__ = __call__ (ValueError, null, 'make_fragment(): FLMFragment instance specified but its ‘{}’ ({}) differs with requested ‘{}’ ({})'.format (fld, __call__ (repr, null, __call__ (getattr, null, frag, fld)), fld, __getitem__ (kwargs, fld)));
+/* 000779 */ 					__except0__.__cause__ = null;
+/* 000779 */ 					throw __except0__;
+/* 000779 */ 				}
+/* 000779 */ 			}
+/* 000782 */ 			return frag;
+/* 000782 */ 		}
+/* 000784 */ 		try {
+/* 000785 */ 			var fragment = __call__ (FLMFragment, null, flm_text, __kwargtrans__ (__mergekwargtrans__ ({environment: self}, kwargs)));
+/* 000786 */ 			return fragment;
+/* 000786 */ 		}
+/* 000786 */ 		catch (__except0__) {
+/* 000788 */ 			if (__t__ (!__t__ (((function () {
+/* 000788 */ 				var __accu0__ = kwargs;
+/* 000788 */ 				return __call__ (__accu0__.py_get, __accu0__, 'silent', false);
+/* 000788 */ 			}) ())))) {
+/* 000789 */ 				(function () {
+/* 000789 */ 					var __accu0__ = logger;
+/* 000790 */ 					return __call__ (__accu0__.error, __accu0__, (function () {
+/* 000790 */ 						var __accu1__ = 'Error compiling fragment for {}\nContent was:\n‘{}’\n';
+/* 000791 */ 						return __call__ (__accu1__.format, __accu1__, (function () {
+/* 000791 */ 							var __accu2__ = kwargs;
+/* 000791 */ 							return __call__ (__accu2__.py_get, __accu2__, 'what', '(unknown)');
+/* 000791 */ 						}) (), flm_text);
+/* 000791 */ 					}) (), __kwargtrans__ ({exc_info: true}));
+/* 000791 */ 				}) ();
+/* 000791 */ 			}
+/* 000794 */ 			__except0__.__cause__ = null;
+/* 000794 */ 			throw __except0__;
+/* 000794 */ 		}
+/* 000794 */ 	});},
+/* 000798 */ 	get make_document () {return __get__ (this, function (self, render_callback) {
+/* 000798 */ 		var kwargs = dict ();
+/* 000798 */ 		if (arguments.length) {
+/* 000798 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000798 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000798 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000798 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000798 */ 					switch (__attrib0__) {
+/* 000798 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000798 */ 						case 'render_callback': var render_callback = __allkwargs0__ [__attrib0__]; break;
+/* 000798 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000798 */ 					}
+/* 000798 */ 				}
+/* 000798 */ 				delete kwargs.__kwargtrans__;
+/* 000798 */ 			}
+/* 000798 */ 		}
+/* 000798 */ 		else {
+/* 000798 */ 		}
+/* 000807 */ 		var doc = __call__ (FLMDocument, null, render_callback, __kwargtrans__ (__mergekwargtrans__ ({environment: self}, kwargs)));
+/* 000812 */ 		(function () {
+/* 000812 */ 			var __accu0__ = doc;
+/* 000812 */ 			return __call__ (__accu0__.initialize, __accu0__);
+/* 000812 */ 		}) ();
+/* 000813 */ 		return doc;
+/* 000813 */ 	});},
+/* 000816 */ 	get get_features_selection () {return __get__ (this, function (self, enable_features) {
+/* 000816 */ 		if (arguments.length) {
+/* 000816 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000816 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000816 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000816 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000816 */ 					switch (__attrib0__) {
+/* 000816 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000816 */ 						case 'enable_features': var enable_features = __allkwargs0__ [__attrib0__]; break;
+/* 000816 */ 					}
+/* 000816 */ 				}
+/* 000816 */ 			}
+/* 000816 */ 		}
+/* 000816 */ 		else {
+/* 000816 */ 		}
+/* 000818 */ 		if (__t__ (enable_features === null)) {
+/* 000820 */ 			return self.features;
+/* 000820 */ 		}
+/* 000822 */ 		var features = (function () {
+/* 000822 */ 			var __accu0__ = [];
+/* 000822 */ 			var __iterable0__ = enable_features;
+/* 000822 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000824 */ 				var feature_name = __getitem__ (__iterable0__, __index0__);
+/* 000824 */ 				(function () {
+/* 000824 */ 					var __accu1__ = __accu0__;
+/* 000824 */ 					return __call__ (__accu1__.append, __accu1__, __getitem__ (self.features_by_name, feature_name));
+/* 000824 */ 				}) ();
+/* 000824 */ 			}
+/* 000824 */ 			return __accu0__;
+/* 000824 */ 		}) ();
+/* 000828 */ 		__call__ (features_ensure_dependencies_are_met, null, features);
+/* 000830 */ 		return features;
+/* 000830 */ 	});},
+/* 000835 */ 	environment_get_located_error_message: null,
+/* 000837 */ 	get get_located_error_message () {return __get__ (this, function (self, exception_object) {
+/* 000837 */ 		if (arguments.length) {
+/* 000837 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000837 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000837 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000837 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000837 */ 					switch (__attrib0__) {
+/* 000837 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000837 */ 						case 'exception_object': var exception_object = __allkwargs0__ [__attrib0__]; break;
+/* 000837 */ 					}
+/* 000837 */ 				}
+/* 000837 */ 			}
 /* 000837 */ 		}
-/* 000838 */ 		return (function () {
-/* 000838 */ 			var __accu0__ = __call__ (LatexWalkerLocatedErrorFormatter, null, exception_object);
-/* 000838 */ 			return __call__ (__accu0__.to_display_string, __accu0__);
-/* 000838 */ 		}) ();
-/* 000838 */ 	});},
-/* 000842 */ 	get finalize_nodelist () {return __get__ (this, function (self, nodelist) {
-/* 000842 */ 		if (arguments.length) {
-/* 000842 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000842 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000842 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000842 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000842 */ 					switch (__attrib0__) {
-/* 000842 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000842 */ 						case 'nodelist': var nodelist = __allkwargs0__ [__attrib0__]; break;
-/* 000842 */ 					}
-/* 000842 */ 				}
-/* 000842 */ 			}
-/* 000842 */ 		}
-/* 000842 */ 		else {
-/* 000842 */ 		}
-/* 000843 */ 		var nl = (function () {
-/* 000843 */ 			var __accu0__ = self._node_list_finalizer;
-/* 000843 */ 			return __call__ (__accu0__.finalize_nodelist, __accu0__, nodelist);
-/* 000843 */ 		}) ();
-/* 000844 */ 		return nl;
-/* 000844 */ 	});},
-/* 000846 */ 	get finalize_node () {return __get__ (this, function (self, node) {
-/* 000846 */ 		if (arguments.length) {
-/* 000846 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000846 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000846 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000846 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000846 */ 					switch (__attrib0__) {
-/* 000846 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000846 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000846 */ 					}
-/* 000846 */ 				}
-/* 000846 */ 			}
-/* 000846 */ 		}
-/* 000846 */ 		else {
-/* 000846 */ 		}
-/* 000851 */ 		node._flm_node_id = __call__ (fn_unique_object_id, null, node);
-/* 000852 */ 		return node;
-/* 000852 */ 	});}
-/* 000852 */ });
-/* 000860 */ export var standard_parsing_state = function () {
-/* 000860 */ 	var force_block_level = null;
-/* 000860 */ 	var enable_comments = true;
-/* 000860 */ 	var comment_start = '%%';
-/* 000860 */ 	var extra_forbidden_characters = '';
-/* 000860 */ 	var dollar_inline_math_mode = false;
-/* 000860 */ 	if (arguments.length) {
-/* 000860 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 000860 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000860 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000860 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 000860 */ 				switch (__attrib0__) {
-/* 000860 */ 					case 'force_block_level': var force_block_level = __allkwargs0__ [__attrib0__]; break;
-/* 000860 */ 					case 'enable_comments': var enable_comments = __allkwargs0__ [__attrib0__]; break;
-/* 000860 */ 					case 'comment_start': var comment_start = __allkwargs0__ [__attrib0__]; break;
-/* 000860 */ 					case 'extra_forbidden_characters': var extra_forbidden_characters = __allkwargs0__ [__attrib0__]; break;
-/* 000860 */ 					case 'dollar_inline_math_mode': var dollar_inline_math_mode = __allkwargs0__ [__attrib0__]; break;
-/* 000860 */ 				}
-/* 000860 */ 			}
-/* 000860 */ 		}
-/* 000860 */ 	}
-/* 000860 */ 	else {
-/* 000860 */ 	}
-/* 000876 */ 	var forbidden_characters = __call__ (str, null, extra_forbidden_characters);
-/* 000877 */ 	if (__t__ (__t__ (!__t__ ((dollar_inline_math_mode))) && !__in__ ('$', forbidden_characters))) {
-/* 000878 */ 		var forbidden_characters = __call__ (__iadd__, null, forbidden_characters, '$');
-/* 000878 */ 	}
-/* 000879 */ 	if (__t__ (__t__ ((__t__ (!__t__ ((enable_comments))) || __ne__ (comment_start, '%'))) && !__in__ ('%', forbidden_characters))) {
-/* 000881 */ 		var forbidden_characters = __call__ (__iadd__, null, forbidden_characters, '%');
-/* 000881 */ 	}
-/* 000883 */ 	var latex_inline_math_delimiters = [tuple (['\\(', '\\)'])];
-/* 000885 */ 	if (__t__ (dollar_inline_math_mode)) {
-/* 000886 */ 		(function () {
-/* 000886 */ 			var __accu0__ = latex_inline_math_delimiters;
-/* 000886 */ 			return __call__ (__accu0__.append, __accu0__, tuple (['$', '$']));
-/* 000886 */ 		}) ();
-/* 000886 */ 	}
-/* 000888 */ 	return __call__ (FLMParsingState, null, __kwargtrans__ ({is_block_level: force_block_level, latex_context: null, enable_comments: enable_comments, comment_start: comment_start, latex_inline_math_delimiters: latex_inline_math_delimiters, latex_display_math_delimiters: [tuple (['\\[', '\\]'])], forbidden_characters: forbidden_characters}));
-/* 000888 */ };
-/* 000900 */ export var FLMLatexWalkerMathContextParsingStateEventHandler =  __class__ ('FLMLatexWalkerMathContextParsingStateEventHandler', [latexnodes.LatexWalkerParsingStateEventHandler], {
-/* 000900 */ 	__module__: __name__,
-/* 000929 */ 	math_mode_extend_context: dict ({'unknown_macro_spec': (function () {
-/* 000929 */ 		var __accu0__ = macrospec;
-/* 000929 */ 		return __call__ (__accu0__.MacroSpec, __accu0__, '');
-/* 000930 */ 	}) (), 'unknown_environment_spec': (function () {
-/* 000930 */ 		var __accu0__ = macrospec;
-/* 000930 */ 		return __call__ (__accu0__.EnvironmentSpec, __accu0__, '');
-/* 000931 */ 	}) (), 'unknown_specials_spec': (function () {
+/* 000837 */ 		else {
+/* 000837 */ 		}
+/* 000838 */ 		if (__t__ (self.environment_get_located_error_message !== null)) {
+/* 000839 */ 			return (function () {
+/* 000839 */ 				var __accu0__ = self;
+/* 000839 */ 				return __call__ (__accu0__.environment_get_located_error_message, __accu0__, exception_object);
+/* 000839 */ 			}) ();
+/* 000839 */ 		}
+/* 000840 */ 		return (function () {
+/* 000840 */ 			var __accu0__ = __call__ (LatexWalkerLocatedErrorFormatter, null, exception_object);
+/* 000840 */ 			return __call__ (__accu0__.to_display_string, __accu0__);
+/* 000840 */ 		}) ();
+/* 000840 */ 	});},
+/* 000844 */ 	get finalize_nodelist () {return __get__ (this, function (self, nodelist) {
+/* 000844 */ 		if (arguments.length) {
+/* 000844 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000844 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000844 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000844 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000844 */ 					switch (__attrib0__) {
+/* 000844 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000844 */ 						case 'nodelist': var nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 000844 */ 					}
+/* 000844 */ 				}
+/* 000844 */ 			}
+/* 000844 */ 		}
+/* 000844 */ 		else {
+/* 000844 */ 		}
+/* 000845 */ 		var nl = (function () {
+/* 000845 */ 			var __accu0__ = self._node_list_finalizer;
+/* 000845 */ 			return __call__ (__accu0__.finalize_nodelist, __accu0__, nodelist);
+/* 000845 */ 		}) ();
+/* 000846 */ 		return nl;
+/* 000846 */ 	});},
+/* 000848 */ 	get finalize_node () {return __get__ (this, function (self, node) {
+/* 000848 */ 		if (arguments.length) {
+/* 000848 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000848 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000848 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000848 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000848 */ 					switch (__attrib0__) {
+/* 000848 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000848 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000848 */ 					}
+/* 000848 */ 				}
+/* 000848 */ 			}
+/* 000848 */ 		}
+/* 000848 */ 		else {
+/* 000848 */ 		}
+/* 000853 */ 		node._flm_node_id = __call__ (fn_unique_object_id, null, node);
+/* 000854 */ 		return node;
+/* 000854 */ 	});}
+/* 000854 */ });
+/* 000862 */ export var standard_parsing_state = function () {
+/* 000862 */ 	var force_block_level = null;
+/* 000862 */ 	var enable_comments = true;
+/* 000862 */ 	var comment_start = '%%';
+/* 000862 */ 	var extra_forbidden_characters = '';
+/* 000862 */ 	var dollar_inline_math_mode = false;
+/* 000862 */ 	if (arguments.length) {
+/* 000862 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 000862 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000862 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000862 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 000862 */ 				switch (__attrib0__) {
+/* 000862 */ 					case 'force_block_level': var force_block_level = __allkwargs0__ [__attrib0__]; break;
+/* 000862 */ 					case 'enable_comments': var enable_comments = __allkwargs0__ [__attrib0__]; break;
+/* 000862 */ 					case 'comment_start': var comment_start = __allkwargs0__ [__attrib0__]; break;
+/* 000862 */ 					case 'extra_forbidden_characters': var extra_forbidden_characters = __allkwargs0__ [__attrib0__]; break;
+/* 000862 */ 					case 'dollar_inline_math_mode': var dollar_inline_math_mode = __allkwargs0__ [__attrib0__]; break;
+/* 000862 */ 				}
+/* 000862 */ 			}
+/* 000862 */ 		}
+/* 000862 */ 	}
+/* 000862 */ 	else {
+/* 000862 */ 	}
+/* 000878 */ 	var forbidden_characters = __call__ (str, null, extra_forbidden_characters);
+/* 000879 */ 	if (__t__ (__t__ (!__t__ ((dollar_inline_math_mode))) && !__in__ ('$', forbidden_characters))) {
+/* 000880 */ 		var forbidden_characters = __call__ (__iadd__, null, forbidden_characters, '$');
+/* 000880 */ 	}
+/* 000881 */ 	if (__t__ (__t__ ((__t__ (!__t__ ((enable_comments))) || __ne__ (comment_start, '%'))) && !__in__ ('%', forbidden_characters))) {
+/* 000883 */ 		var forbidden_characters = __call__ (__iadd__, null, forbidden_characters, '%');
+/* 000883 */ 	}
+/* 000885 */ 	var latex_inline_math_delimiters = [tuple (['\\(', '\\)'])];
+/* 000887 */ 	if (__t__ (dollar_inline_math_mode)) {
+/* 000888 */ 		(function () {
+/* 000888 */ 			var __accu0__ = latex_inline_math_delimiters;
+/* 000888 */ 			return __call__ (__accu0__.append, __accu0__, tuple (['$', '$']));
+/* 000888 */ 		}) ();
+/* 000888 */ 	}
+/* 000890 */ 	return __call__ (FLMParsingState, null, __kwargtrans__ ({is_block_level: force_block_level, latex_context: null, enable_comments: enable_comments, comment_start: comment_start, latex_inline_math_delimiters: latex_inline_math_delimiters, latex_display_math_delimiters: [tuple (['\\[', '\\]'])], forbidden_characters: forbidden_characters}));
+/* 000890 */ };
+/* 000902 */ export var FLMLatexWalkerMathContextParsingStateEventHandler =  __class__ ('FLMLatexWalkerMathContextParsingStateEventHandler', [latexnodes.LatexWalkerParsingStateEventHandler], {
+/* 000902 */ 	__module__: __name__,
+/* 000931 */ 	math_mode_extend_context: dict ({'unknown_macro_spec': (function () {
 /* 000931 */ 		var __accu0__ = macrospec;
-/* 000931 */ 		return __call__ (__accu0__.SpecialsSpec, __accu0__, '');
-/* 000928 */ 	}) ()}),
-/* 000934 */ 	get enter_math_mode () {return __get__ (this, function (self, math_mode_delimiter, trigger_token) {
-/* 000934 */ 		if (typeof math_mode_delimiter == 'undefined' || (math_mode_delimiter != null && math_mode_delimiter.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000934 */ 			var math_mode_delimiter = null;
-/* 000934 */ 		};
-/* 000934 */ 		if (typeof trigger_token == 'undefined' || (trigger_token != null && trigger_token.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000934 */ 			var trigger_token = null;
-/* 000934 */ 		};
-/* 000934 */ 		if (arguments.length) {
-/* 000934 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000934 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000934 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000934 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000934 */ 					switch (__attrib0__) {
-/* 000934 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000934 */ 						case 'math_mode_delimiter': var math_mode_delimiter = __allkwargs0__ [__attrib0__]; break;
-/* 000934 */ 						case 'trigger_token': var trigger_token = __allkwargs0__ [__attrib0__]; break;
-/* 000934 */ 					}
-/* 000934 */ 				}
-/* 000934 */ 			}
-/* 000934 */ 		}
-/* 000934 */ 		else {
-/* 000934 */ 		}
-/* 000940 */ 		var set_attributes = __call__ (dict, null, __kwargtrans__ ({in_math_mode: true, math_mode_delimiter: math_mode_delimiter}));
-/* 000944 */ 		// pass;
-/* 000949 */ 		return (function () {
-/* 000949 */ 			var __accu0__ = macrospec;
-/* 000949 */ 			return __call__ (__accu0__.ParsingStateDeltaExtendLatexContextDb, __accu0__, __kwargtrans__ ({set_attributes: set_attributes, extend_latex_context: self.math_mode_extend_context}));
-/* 000949 */ 		}) ();
-/* 000949 */ 	});},
-/* 000954 */ 	get leave_math_mode () {return __get__ (this, function (self, trigger_token) {
-/* 000954 */ 		if (typeof trigger_token == 'undefined' || (trigger_token != null && trigger_token.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000954 */ 			var trigger_token = null;
-/* 000954 */ 		};
-/* 000954 */ 		if (arguments.length) {
-/* 000954 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000954 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000954 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000954 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000954 */ 					switch (__attrib0__) {
-/* 000954 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000954 */ 						case 'trigger_token': var trigger_token = __allkwargs0__ [__attrib0__]; break;
-/* 000954 */ 					}
-/* 000954 */ 				}
-/* 000954 */ 			}
-/* 000954 */ 		}
-/* 000954 */ 		else {
-/* 000954 */ 		}
-/* 000961 */ 		return (function () {
-/* 000961 */ 			var __accu0__ = macrospec;
-/* 000966 */ 			return __call__ (__accu0__.ParsingStateDeltaExtendLatexContextDb, __accu0__, __kwargtrans__ ({set_attributes: __call__ (dict, null, __kwargtrans__ ({in_math_mode: false, math_mode_delimiter: null})), extend_latex_context: __call__ (dict, null, __kwargtrans__ ({unknown_macro_spec: null, unknown_environment_spec: null, unknown_specials_spec: null}))}));
-/* 000966 */ 		}) ();
-/* 000966 */ 	});}
-/* 000966 */ });
-/* 000977 */ export var standard_environment_get_located_error_message = function (exception_object) {
-/* 000977 */ 	if (arguments.length) {
-/* 000977 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 000977 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000977 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000977 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 000977 */ 				switch (__attrib0__) {
-/* 000977 */ 					case 'exception_object': var exception_object = __allkwargs0__ [__attrib0__]; break;
-/* 000977 */ 				}
-/* 000977 */ 			}
-/* 000977 */ 		}
-/* 000977 */ 	}
-/* 000977 */ 	else {
-/* 000977 */ 	}
-/* 001001 */ 	var msg = null;
-/* 001002 */ 	var error_type_info = exception_object.error_type_info;
-/* 001003 */ 	if (__t__ (error_type_info)) {
-/* 001004 */ 		var what = __getitem__ (error_type_info, 'what');
-/* 001005 */ 		if (__t__ (__eq__ (what, 'token_forbidden_character'))) {
-/* 001006 */ 			if (__t__ (__eq__ (__getitem__ (error_type_info, 'forbidden_character'), '%'))) {
-/* 001007 */ 				var msg = 'Single percent signs are not allowed here. Use ‘\\%’ to typeset a literal percent sign, and ‘%%’ to start a comment.';
-/* 001007 */ 			}
-/* 001011 */ 			else if (__t__ (__eq__ (__getitem__ (error_type_info, 'forbidden_character'), '$'))) {
-/* 001012 */ 				var msg = "You can't use ‘$’ here. LaTeX math should be typeset using \\(...\\) for inline math and \\[...\\] for unnumbered display equations. Use ‘\\$’ for a literal dollar sign.";
-/* 001012 */ 			}
-/* 001012 */ 		}
-/* 001012 */ 	}
-/* 001017 */ 	if (__t__ (!__t__ ((msg)))) {
-/* 001018 */ 		var msg = exception_object.msg;
-/* 001018 */ 	}
-/* 001020 */ 	var errfmt = (function () {
-/* 001020 */ 		var __accu0__ = latexnodes;
-/* 001020 */ 		return __call__ (__accu0__.LatexWalkerLocatedErrorFormatter, __accu0__, exception_object);
-/* 001020 */ 	}) ();
-/* 001022 */ 	var msg = __call__ (__iadd__, null, msg, (function () {
-/* 001022 */ 		var __accu0__ = errfmt;
-/* 001022 */ 		return __call__ (__accu0__.format_full_traceback, __accu0__);
-/* 001022 */ 	}) ());
-/* 001024 */ 	return msg;
-/* 001024 */ };
-/* 001031 */ export var make_standard_environment = function (features, parsing_state, latex_context, flm_environment_options, parsing_state_options) {
-/* 001031 */ 	if (typeof parsing_state == 'undefined' || (parsing_state != null && parsing_state.hasOwnProperty ("__kwargtrans__"))) {;
-/* 001031 */ 		var parsing_state = null;
-/* 001031 */ 	};
-/* 001031 */ 	if (typeof latex_context == 'undefined' || (latex_context != null && latex_context.hasOwnProperty ("__kwargtrans__"))) {;
-/* 001031 */ 		var latex_context = null;
-/* 001031 */ 	};
-/* 001031 */ 	if (typeof flm_environment_options == 'undefined' || (flm_environment_options != null && flm_environment_options.hasOwnProperty ("__kwargtrans__"))) {;
-/* 001031 */ 		var flm_environment_options = null;
-/* 001031 */ 	};
-/* 001031 */ 	if (typeof parsing_state_options == 'undefined' || (parsing_state_options != null && parsing_state_options.hasOwnProperty ("__kwargtrans__"))) {;
-/* 001031 */ 		var parsing_state_options = null;
-/* 001031 */ 	};
-/* 001031 */ 	if (arguments.length) {
-/* 001031 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001031 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001031 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001031 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001031 */ 				switch (__attrib0__) {
-/* 001031 */ 					case 'features': var features = __allkwargs0__ [__attrib0__]; break;
-/* 001031 */ 					case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
-/* 001031 */ 					case 'latex_context': var latex_context = __allkwargs0__ [__attrib0__]; break;
-/* 001031 */ 					case 'flm_environment_options': var flm_environment_options = __allkwargs0__ [__attrib0__]; break;
-/* 001031 */ 					case 'parsing_state_options': var parsing_state_options = __allkwargs0__ [__attrib0__]; break;
-/* 001031 */ 				}
-/* 001031 */ 			}
-/* 001031 */ 		}
-/* 001031 */ 	}
-/* 001031 */ 	else {
-/* 001031 */ 	}
-/* 001035 */ 	if (__t__ (latex_context === null)) {
-/* 001036 */ 		var latex_context = (function () {
-/* 001036 */ 			var __accu0__ = macrospec;
-/* 001036 */ 			return __call__ (__accu0__.LatexContextDb, __accu0__);
-/* 001036 */ 		}) ();
-/* 001036 */ 	}
-/* 001038 */ 	if (__t__ (parsing_state === null)) {
-/* 001039 */ 		var parsing_state_options_2 = dict ({});
-/* 001040 */ 		if (__t__ (parsing_state_options !== null)) {
-/* 001041 */ 			var parsing_state_options_2 = parsing_state_options;
-/* 001041 */ 		}
-/* 001043 */ 		var parsing_state = __call__ (standard_parsing_state, null, __kwargtrans__ (parsing_state_options_2));
-/* 001043 */ 	}
-/* 001045 */ 	var parsing_state_event_handler = __call__ (FLMLatexWalkerMathContextParsingStateEventHandler, null);
-/* 001047 */ 	var flm_environment_options_2 = dict ({});
-/* 001048 */ 	if (__t__ (flm_environment_options !== null)) {
-/* 001049 */ 		var flm_environment_options_2 = flm_environment_options;
-/* 001049 */ 	}
-/* 001051 */ 	var environment = __call__ (FLMEnvironment, null, features, parsing_state, latex_context, __kwargtrans__ (flm_environment_options_2));
-/* 001058 */ 	environment.parsing_state_event_handler = parsing_state_event_handler;
-/* 001060 */ 	environment.environment_get_located_error_message = standard_environment_get_located_error_message;
-/* 001063 */ 	return environment;
-/* 001063 */ };
-/* 001077 */ export var _make_argvalue = function (argvalue, latex_walker, parsing_state) {
-/* 001077 */ 	if (arguments.length) {
-/* 001077 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001077 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001077 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001077 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001077 */ 				switch (__attrib0__) {
-/* 001077 */ 					case 'argvalue': var argvalue = __allkwargs0__ [__attrib0__]; break;
-/* 001077 */ 					case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
-/* 001077 */ 					case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
-/* 001077 */ 				}
-/* 001077 */ 			}
-/* 001077 */ 		}
-/* 001077 */ 	}
-/* 001077 */ 	else {
-/* 001077 */ 	}
-/* 001079 */ 	if (__t__ (argvalue === null)) {
-/* 001080 */ 		return null;
-/* 001080 */ 	}
-/* 001082 */ 	if (__t__ (__call__ (isinstance, null, argvalue, str))) {
-/* 001083 */ 		var argvalue = (function () {
-/* 001083 */ 			var __accu0__ = latex_walker;
-/* 001083 */ 			return __call__ (__accu0__.make_node, __accu0__, latexnodes_nodes.LatexCharsNode, __kwargtrans__ ({chars: argvalue, pos: null, pos_end: null, parsing_state: parsing_state}));
-/* 001083 */ 		}) ();
-/* 001083 */ 	}
-/* 001091 */ 	if (__t__ (__call__ (isinstance, null, argvalue, latexnodes_nodes.LatexGroupNode))) {
-/* 001092 */ 		return argvalue;
-/* 001092 */ 	}
-/* 001096 */ 	if (__t__ (__call__ (isinstance, null, argvalue, latexnodes_nodes.LatexNodeList))) {
-/* 001097 */ 		var nodelist = argvalue;
-/* 001097 */ 	}
-/* 001099 */ 	else if (__t__ (__call__ (isinstance, null, argvalue, list))) {
-/* 001100 */ 		var nodelist = (function () {
-/* 001100 */ 			var __accu0__ = latex_walker;
-/* 001100 */ 			return __call__ (__accu0__.make_nodelist, __accu0__, argvalue, __kwargtrans__ ({parsing_state: parsing_state}));
-/* 001100 */ 		}) ();
-/* 001100 */ 	}
-/* 001103 */ 	else {
-/* 001106 */ 		var nodelist = (function () {
-/* 001106 */ 			var __accu0__ = latex_walker;
-/* 001106 */ 			return __call__ (__accu0__.make_nodelist, __accu0__, [argvalue], __kwargtrans__ ({parsing_state: parsing_state}));
-/* 001106 */ 		}) ();
-/* 001106 */ 	}
-/* 001111 */ 	var groupnode = (function () {
-/* 001111 */ 		var __accu0__ = latex_walker;
-/* 001111 */ 		return __call__ (__accu0__.make_node, __accu0__, latexnodes_nodes.LatexGroupNode, __kwargtrans__ ({delimiters: tuple (['', '']), nodelist: nodelist, pos: nodelist.pos, pos_end: nodelist.pos_end, parsing_state: parsing_state}));
-/* 001111 */ 	}) ();
-/* 001120 */ 	return groupnode;
-/* 001120 */ };
-/* 001123 */ export var make_invocable_arguments = function (flm_spec, args) {
-/* 001123 */ 	if (arguments.length) {
-/* 001123 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001123 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001123 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001123 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001123 */ 				switch (__attrib0__) {
-/* 001123 */ 					case 'flm_spec': var flm_spec = __allkwargs0__ [__attrib0__]; break;
-/* 001123 */ 					case 'args': var args = __allkwargs0__ [__attrib0__]; break;
-/* 001123 */ 					case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
-/* 001123 */ 					case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
-/* 001123 */ 				}
-/* 001123 */ 			}
-/* 001123 */ 		}
-/* 001123 */ 	}
-/* 001123 */ 	else {
-/* 001123 */ 	}
-/* 001125 */ 	var argnlist = (function () {
-/* 001125 */ 		var __accu0__ = [];
-/* 001125 */ 		var __iterable0__ = flm_spec.arguments_spec_list;
-/* 001125 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 001125 */ 			var _ = __getitem__ (__iterable0__, __index0__);
-/* 001125 */ 			(function () {
-/* 001125 */ 				var __accu1__ = __accu0__;
-/* 001125 */ 				return __call__ (__accu1__.append, __accu1__, null);
-/* 001125 */ 			}) ();
+/* 000931 */ 		return __call__ (__accu0__.MacroSpec, __accu0__, '');
+/* 000932 */ 	}) (), 'unknown_environment_spec': (function () {
+/* 000932 */ 		var __accu0__ = macrospec;
+/* 000932 */ 		return __call__ (__accu0__.EnvironmentSpec, __accu0__, '');
+/* 000933 */ 	}) (), 'unknown_specials_spec': (function () {
+/* 000933 */ 		var __accu0__ = macrospec;
+/* 000933 */ 		return __call__ (__accu0__.SpecialsSpec, __accu0__, '');
+/* 000930 */ 	}) ()}),
+/* 000936 */ 	get enter_math_mode () {return __get__ (this, function (self, math_mode_delimiter, trigger_token) {
+/* 000936 */ 		if (typeof math_mode_delimiter == 'undefined' || (math_mode_delimiter != null && math_mode_delimiter.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000936 */ 			var math_mode_delimiter = null;
+/* 000936 */ 		};
+/* 000936 */ 		if (typeof trigger_token == 'undefined' || (trigger_token != null && trigger_token.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000936 */ 			var trigger_token = null;
+/* 000936 */ 		};
+/* 000936 */ 		if (arguments.length) {
+/* 000936 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000936 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000936 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000936 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000936 */ 					switch (__attrib0__) {
+/* 000936 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000936 */ 						case 'math_mode_delimiter': var math_mode_delimiter = __allkwargs0__ [__attrib0__]; break;
+/* 000936 */ 						case 'trigger_token': var trigger_token = __allkwargs0__ [__attrib0__]; break;
+/* 000936 */ 					}
+/* 000936 */ 				}
+/* 000936 */ 			}
+/* 000936 */ 		}
+/* 000936 */ 		else {
+/* 000936 */ 		}
+/* 000942 */ 		var set_attributes = __call__ (dict, null, __kwargtrans__ ({in_math_mode: true, math_mode_delimiter: math_mode_delimiter}));
+/* 000946 */ 		// pass;
+/* 000951 */ 		return (function () {
+/* 000951 */ 			var __accu0__ = macrospec;
+/* 000951 */ 			return __call__ (__accu0__.ParsingStateDeltaExtendLatexContextDb, __accu0__, __kwargtrans__ ({set_attributes: set_attributes, extend_latex_context: self.math_mode_extend_context}));
+/* 000951 */ 		}) ();
+/* 000951 */ 	});},
+/* 000956 */ 	get leave_math_mode () {return __get__ (this, function (self, trigger_token) {
+/* 000956 */ 		if (typeof trigger_token == 'undefined' || (trigger_token != null && trigger_token.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000956 */ 			var trigger_token = null;
+/* 000956 */ 		};
+/* 000956 */ 		if (arguments.length) {
+/* 000956 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000956 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000956 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000956 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000956 */ 					switch (__attrib0__) {
+/* 000956 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000956 */ 						case 'trigger_token': var trigger_token = __allkwargs0__ [__attrib0__]; break;
+/* 000956 */ 					}
+/* 000956 */ 				}
+/* 000956 */ 			}
+/* 000956 */ 		}
+/* 000956 */ 		else {
+/* 000956 */ 		}
+/* 000963 */ 		return (function () {
+/* 000963 */ 			var __accu0__ = macrospec;
+/* 000968 */ 			return __call__ (__accu0__.ParsingStateDeltaExtendLatexContextDb, __accu0__, __kwargtrans__ ({set_attributes: __call__ (dict, null, __kwargtrans__ ({in_math_mode: false, math_mode_delimiter: null})), extend_latex_context: __call__ (dict, null, __kwargtrans__ ({unknown_macro_spec: null, unknown_environment_spec: null, unknown_specials_spec: null}))}));
+/* 000968 */ 		}) ();
+/* 000968 */ 	});}
+/* 000968 */ });
+/* 000979 */ export var standard_environment_get_located_error_message = function (exception_object) {
+/* 000979 */ 	if (arguments.length) {
+/* 000979 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 000979 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000979 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000979 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 000979 */ 				switch (__attrib0__) {
+/* 000979 */ 					case 'exception_object': var exception_object = __allkwargs0__ [__attrib0__]; break;
+/* 000979 */ 				}
+/* 000979 */ 			}
+/* 000979 */ 		}
+/* 000979 */ 	}
+/* 000979 */ 	else {
+/* 000979 */ 	}
+/* 001003 */ 	var msg = null;
+/* 001004 */ 	var error_type_info = exception_object.error_type_info;
+/* 001005 */ 	if (__t__ (error_type_info)) {
+/* 001006 */ 		var what = __getitem__ (error_type_info, 'what');
+/* 001007 */ 		if (__t__ (__eq__ (what, 'token_forbidden_character'))) {
+/* 001008 */ 			if (__t__ (__eq__ (__getitem__ (error_type_info, 'forbidden_character'), '%'))) {
+/* 001009 */ 				var msg = 'Single percent signs are not allowed here. Use ‘\\%’ to typeset a literal percent sign, and ‘%%’ to start a comment.';
+/* 001009 */ 			}
+/* 001013 */ 			else if (__t__ (__eq__ (__getitem__ (error_type_info, 'forbidden_character'), '$'))) {
+/* 001014 */ 				var msg = "You can't use ‘$’ here. LaTeX math should be typeset using \\(...\\) for inline math and \\[...\\] for unnumbered display equations. Use ‘\\$’ for a literal dollar sign.";
+/* 001014 */ 			}
+/* 001014 */ 		}
+/* 001014 */ 	}
+/* 001019 */ 	if (__t__ (!__t__ ((msg)))) {
+/* 001020 */ 		var msg = exception_object.msg;
+/* 001020 */ 	}
+/* 001022 */ 	var errfmt = (function () {
+/* 001022 */ 		var __accu0__ = latexnodes;
+/* 001022 */ 		return __call__ (__accu0__.LatexWalkerLocatedErrorFormatter, __accu0__, exception_object);
+/* 001022 */ 	}) ();
+/* 001024 */ 	var msg = __call__ (__iadd__, null, msg, (function () {
+/* 001024 */ 		var __accu0__ = errfmt;
+/* 001024 */ 		return __call__ (__accu0__.format_full_traceback, __accu0__);
+/* 001024 */ 	}) ());
+/* 001026 */ 	return msg;
+/* 001026 */ };
+/* 001033 */ export var make_standard_environment = function (features, parsing_state, latex_context, flm_environment_options, parsing_state_options) {
+/* 001033 */ 	if (typeof parsing_state == 'undefined' || (parsing_state != null && parsing_state.hasOwnProperty ("__kwargtrans__"))) {;
+/* 001033 */ 		var parsing_state = null;
+/* 001033 */ 	};
+/* 001033 */ 	if (typeof latex_context == 'undefined' || (latex_context != null && latex_context.hasOwnProperty ("__kwargtrans__"))) {;
+/* 001033 */ 		var latex_context = null;
+/* 001033 */ 	};
+/* 001033 */ 	if (typeof flm_environment_options == 'undefined' || (flm_environment_options != null && flm_environment_options.hasOwnProperty ("__kwargtrans__"))) {;
+/* 001033 */ 		var flm_environment_options = null;
+/* 001033 */ 	};
+/* 001033 */ 	if (typeof parsing_state_options == 'undefined' || (parsing_state_options != null && parsing_state_options.hasOwnProperty ("__kwargtrans__"))) {;
+/* 001033 */ 		var parsing_state_options = null;
+/* 001033 */ 	};
+/* 001033 */ 	if (arguments.length) {
+/* 001033 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001033 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001033 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001033 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001033 */ 				switch (__attrib0__) {
+/* 001033 */ 					case 'features': var features = __allkwargs0__ [__attrib0__]; break;
+/* 001033 */ 					case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 001033 */ 					case 'latex_context': var latex_context = __allkwargs0__ [__attrib0__]; break;
+/* 001033 */ 					case 'flm_environment_options': var flm_environment_options = __allkwargs0__ [__attrib0__]; break;
+/* 001033 */ 					case 'parsing_state_options': var parsing_state_options = __allkwargs0__ [__attrib0__]; break;
+/* 001033 */ 				}
+/* 001033 */ 			}
+/* 001033 */ 		}
+/* 001033 */ 	}
+/* 001033 */ 	else {
+/* 001033 */ 	}
+/* 001037 */ 	if (__t__ (latex_context === null)) {
+/* 001038 */ 		var latex_context = (function () {
+/* 001038 */ 			var __accu0__ = macrospec;
+/* 001038 */ 			return __call__ (__accu0__.LatexContextDb, __accu0__);
+/* 001038 */ 		}) ();
+/* 001038 */ 	}
+/* 001040 */ 	if (__t__ (parsing_state === null)) {
+/* 001041 */ 		var parsing_state_options_2 = dict ({});
+/* 001042 */ 		if (__t__ (parsing_state_options !== null)) {
+/* 001043 */ 			var parsing_state_options_2 = parsing_state_options;
+/* 001043 */ 		}
+/* 001045 */ 		var parsing_state = __call__ (standard_parsing_state, null, __kwargtrans__ (parsing_state_options_2));
+/* 001045 */ 	}
+/* 001047 */ 	var parsing_state_event_handler = __call__ (FLMLatexWalkerMathContextParsingStateEventHandler, null);
+/* 001049 */ 	var flm_environment_options_2 = dict ({});
+/* 001050 */ 	if (__t__ (flm_environment_options !== null)) {
+/* 001051 */ 		var flm_environment_options_2 = flm_environment_options;
+/* 001051 */ 	}
+/* 001053 */ 	var environment = __call__ (FLMEnvironment, null, features, parsing_state, latex_context, __kwargtrans__ (flm_environment_options_2));
+/* 001060 */ 	environment.parsing_state_event_handler = parsing_state_event_handler;
+/* 001062 */ 	environment.environment_get_located_error_message = standard_environment_get_located_error_message;
+/* 001065 */ 	return environment;
+/* 001065 */ };
+/* 001079 */ export var _make_argvalue = function (argvalue, latex_walker, parsing_state) {
+/* 001079 */ 	if (arguments.length) {
+/* 001079 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001079 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001079 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001079 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001079 */ 				switch (__attrib0__) {
+/* 001079 */ 					case 'argvalue': var argvalue = __allkwargs0__ [__attrib0__]; break;
+/* 001079 */ 					case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
+/* 001079 */ 					case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 001079 */ 				}
+/* 001079 */ 			}
+/* 001079 */ 		}
+/* 001079 */ 	}
+/* 001079 */ 	else {
+/* 001079 */ 	}
+/* 001081 */ 	if (__t__ (argvalue === null)) {
+/* 001082 */ 		return null;
+/* 001082 */ 	}
+/* 001084 */ 	if (__t__ (__call__ (isinstance, null, argvalue, str))) {
+/* 001085 */ 		var argvalue = (function () {
+/* 001085 */ 			var __accu0__ = latex_walker;
+/* 001085 */ 			return __call__ (__accu0__.make_node, __accu0__, latexnodes_nodes.LatexCharsNode, __kwargtrans__ ({chars: argvalue, pos: null, pos_end: null, parsing_state: parsing_state}));
+/* 001085 */ 		}) ();
+/* 001085 */ 	}
+/* 001093 */ 	if (__t__ (__call__ (isinstance, null, argvalue, latexnodes_nodes.LatexGroupNode))) {
+/* 001094 */ 		return argvalue;
+/* 001094 */ 	}
+/* 001098 */ 	if (__t__ (__call__ (isinstance, null, argvalue, latexnodes_nodes.LatexNodeList))) {
+/* 001099 */ 		var nodelist = argvalue;
+/* 001099 */ 	}
+/* 001101 */ 	else if (__t__ (__call__ (isinstance, null, argvalue, list))) {
+/* 001102 */ 		var nodelist = (function () {
+/* 001102 */ 			var __accu0__ = latex_walker;
+/* 001102 */ 			return __call__ (__accu0__.make_nodelist, __accu0__, argvalue, __kwargtrans__ ({parsing_state: parsing_state}));
+/* 001102 */ 		}) ();
+/* 001102 */ 	}
+/* 001105 */ 	else {
+/* 001108 */ 		var nodelist = (function () {
+/* 001108 */ 			var __accu0__ = latex_walker;
+/* 001108 */ 			return __call__ (__accu0__.make_nodelist, __accu0__, [argvalue], __kwargtrans__ ({parsing_state: parsing_state}));
+/* 001108 */ 		}) ();
+/* 001108 */ 	}
+/* 001113 */ 	var groupnode = (function () {
+/* 001113 */ 		var __accu0__ = latex_walker;
+/* 001113 */ 		return __call__ (__accu0__.make_node, __accu0__, latexnodes_nodes.LatexGroupNode, __kwargtrans__ ({delimiters: tuple (['', '']), nodelist: nodelist, pos: nodelist.pos, pos_end: nodelist.pos_end, parsing_state: parsing_state}));
+/* 001113 */ 	}) ();
+/* 001122 */ 	return groupnode;
+/* 001122 */ };
+/* 001125 */ export var make_invocable_arguments = function (flm_spec, args) {
+/* 001125 */ 	if (arguments.length) {
+/* 001125 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001125 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001125 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001125 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001125 */ 				switch (__attrib0__) {
+/* 001125 */ 					case 'flm_spec': var flm_spec = __allkwargs0__ [__attrib0__]; break;
+/* 001125 */ 					case 'args': var args = __allkwargs0__ [__attrib0__]; break;
+/* 001125 */ 					case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
+/* 001125 */ 					case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 001125 */ 				}
+/* 001125 */ 			}
 /* 001125 */ 		}
-/* 001125 */ 		return __accu0__;
-/* 001125 */ 	}) ();
-/* 001127 */ 	if (__t__ (args === null)) {
-/* 001128 */ 		return argnlist;
-/* 001128 */ 	}
-/* 001130 */ 	var __iterable0__ = (function () {
-/* 001130 */ 		var __accu0__ = args;
-/* 001130 */ 		return __call__ (__accu0__.py_items, __accu0__);
-/* 001130 */ 	}) ();
-/* 001130 */ 	for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 001130 */ 		var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 001130 */ 		var argname = __left0__ [0];
-/* 001130 */ 		var argvalue = __left0__ [1];
-/* 001132 */ 		var argj = null;
-/* 001133 */ 		var __iterable1__ = __call__ (enumerate, null, flm_spec.arguments_spec_list);
-/* 001133 */ 		for (var __index1__ = 0; __index1__ < len (__iterable1__); __index1__++) {
-/* 001133 */ 			var __left0__ = __getitem__ (__iterable1__, __index1__);
-/* 001133 */ 			var candidateargj = __left0__ [0];
-/* 001133 */ 			var candidateargspec = __left0__ [1];
-/* 001134 */ 			if (__t__ (__eq__ (candidateargspec.argname, argname))) {
-/* 001135 */ 				var argj = candidateargj;
-/* 001135 */ 				break;
-/* 001135 */ 			}
-/* 001135 */ 		}
-/* 001137 */ 		if (__t__ (argj === null)) {
-/* 001138 */ 			(function () {
-/* 001138 */ 				var __accu0__ = logger;
-/* 001138 */ 				return __call__ (__accu0__.error, __accu0__, 'Cannot find argument %r in spec %r', argname, flm_spec.arguments_spec_list);
-/* 001138 */ 			}) ();
-/* 001140 */ 			var __except0__ = __call__ (ValueError, null, 'No argument named ‘{}’ in spec'.format (argname));
-/* 001140 */ 			__except0__.__cause__ = null;
-/* 001140 */ 			throw __except0__;
-/* 001140 */ 		}
-/* 001143 */ 		__setitem__ (argnlist, argj, __call__ (_make_argvalue, null, argvalue, latex_walker, parsing_state));
-/* 001143 */ 	}
-/* 001145 */ 	return argnlist;
-/* 001145 */ };
-/* 001148 */ export var make_invocable_node_instance = function (node_type, flm_spec) {
-/* 001148 */ 	var args = null;
-/* 001148 */ 	var body_nodelist = null;
-/* 001148 */ 	var node_kwargs = null;
-/* 001148 */ 	if (arguments.length) {
-/* 001148 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001148 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001148 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001148 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001148 */ 				switch (__attrib0__) {
-/* 001148 */ 					case 'node_type': var node_type = __allkwargs0__ [__attrib0__]; break;
-/* 001148 */ 					case 'flm_spec': var flm_spec = __allkwargs0__ [__attrib0__]; break;
-/* 001148 */ 					case 'args': var args = __allkwargs0__ [__attrib0__]; break;
-/* 001148 */ 					case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
-/* 001148 */ 					case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
-/* 001148 */ 					case 'body_nodelist': var body_nodelist = __allkwargs0__ [__attrib0__]; break;
-/* 001148 */ 					case 'node_kwargs': var node_kwargs = __allkwargs0__ [__attrib0__]; break;
-/* 001148 */ 				}
-/* 001148 */ 			}
-/* 001148 */ 		}
-/* 001148 */ 	}
-/* 001148 */ 	else {
-/* 001148 */ 	}
-/* 001155 */ 	var nkwargs = dict ({'pos': null, 'pos_end': null});
-/* 001160 */ 	if (__t__ (node_type === latexnodes_nodes.LatexMacroNode)) {
-/* 001161 */ 		__setitem__ (nkwargs, 'macroname', flm_spec.macroname);
-/* 001162 */ 		if (__t__ (body_nodelist !== null)) {
-/* 001163 */ 			var __except0__ = __call__ (ValueError, null, 'For a LatexMacroNode you must have body_nodelist=None');
-/* 001163 */ 			__except0__.__cause__ = null;
-/* 001163 */ 			throw __except0__;
-/* 001163 */ 		}
-/* 001163 */ 	}
-/* 001165 */ 	else if (__t__ (node_type === latexnodes_nodes.LatexEnvironmentNode)) {
-/* 001166 */ 		__setitem__ (nkwargs, 'environmentname', flm_spec.environmentname);
-/* 001166 */ 	}
-/* 001168 */ 	else if (__t__ (node_type === latexnodes_nodes.LatexSpecialsNode)) {
-/* 001169 */ 		__setitem__ (nkwargs, 'specials_chars', flm_spec.specials_chars);
-/* 001170 */ 		if (__t__ (body_nodelist !== null)) {
-/* 001171 */ 			var __except0__ = __call__ (ValueError, null, 'For a LatexSpecialsNode you must have body_nodelist=None');
-/* 001171 */ 			__except0__.__cause__ = null;
-/* 001171 */ 			throw __except0__;
-/* 001171 */ 		}
-/* 001171 */ 	}
-/* 001173 */ 	var argnlist = __call__ (make_invocable_arguments, null, flm_spec, args, __kwargtrans__ ({latex_walker: latex_walker, parsing_state: parsing_state}));
-/* 001177 */ 	var nodeargd = (function () {
-/* 001177 */ 		var __accu0__ = latexnodes_nodes;
-/* 001177 */ 		return __call__ (__accu0__.ParsedArguments, __accu0__, __kwargtrans__ ({argnlist: argnlist, arguments_spec_list: flm_spec.arguments_spec_list}));
-/* 001177 */ 	}) ();
-/* 001182 */ 	if (__t__ (body_nodelist !== null)) {
-/* 001183 */ 		__setitem__ (nkwargs, 'nodelist', body_nodelist);
-/* 001183 */ 	}
-/* 001185 */ 	if (__t__ (node_kwargs !== null)) {
-/* 001186 */ 		(function () {
-/* 001186 */ 			var __accu0__ = nkwargs;
-/* 001186 */ 			return __call__ (__accu0__.py_update, __accu0__, node_kwargs);
-/* 001186 */ 		}) ();
-/* 001186 */ 	}
-/* 001188 */ 	var node = (function () {
-/* 001188 */ 		var __accu0__ = latex_walker;
-/* 001188 */ 		return __call__ (__accu0__.make_node, __accu0__, node_type, __kwargtrans__ (__mergekwargtrans__ ({spec: flm_spec, nodeargd: nodeargd, parsing_state: parsing_state}, nkwargs)));
-/* 001188 */ 	}) ();
-/* 001196 */ 	var node = (function () {
-/* 001196 */ 		var __accu0__ = flm_spec;
-/* 001196 */ 		return __call__ (__accu0__.finalize_node, __accu0__, node);
-/* 001196 */ 	}) ();
-/* 001198 */ 	return node;
-/* 001198 */ };
+/* 001125 */ 	}
+/* 001125 */ 	else {
+/* 001125 */ 	}
+/* 001127 */ 	var argnlist = (function () {
+/* 001127 */ 		var __accu0__ = [];
+/* 001127 */ 		var __iterable0__ = flm_spec.arguments_spec_list;
+/* 001127 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 001127 */ 			var _ = __getitem__ (__iterable0__, __index0__);
+/* 001127 */ 			(function () {
+/* 001127 */ 				var __accu1__ = __accu0__;
+/* 001127 */ 				return __call__ (__accu1__.append, __accu1__, null);
+/* 001127 */ 			}) ();
+/* 001127 */ 		}
+/* 001127 */ 		return __accu0__;
+/* 001127 */ 	}) ();
+/* 001129 */ 	if (__t__ (args === null)) {
+/* 001130 */ 		return argnlist;
+/* 001130 */ 	}
+/* 001132 */ 	var __iterable0__ = (function () {
+/* 001132 */ 		var __accu0__ = args;
+/* 001132 */ 		return __call__ (__accu0__.py_items, __accu0__);
+/* 001132 */ 	}) ();
+/* 001132 */ 	for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 001132 */ 		var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 001132 */ 		var argname = __left0__ [0];
+/* 001132 */ 		var argvalue = __left0__ [1];
+/* 001134 */ 		var argj = null;
+/* 001135 */ 		var __iterable1__ = __call__ (enumerate, null, flm_spec.arguments_spec_list);
+/* 001135 */ 		for (var __index1__ = 0; __index1__ < len (__iterable1__); __index1__++) {
+/* 001135 */ 			var __left0__ = __getitem__ (__iterable1__, __index1__);
+/* 001135 */ 			var candidateargj = __left0__ [0];
+/* 001135 */ 			var candidateargspec = __left0__ [1];
+/* 001136 */ 			if (__t__ (__eq__ (candidateargspec.argname, argname))) {
+/* 001137 */ 				var argj = candidateargj;
+/* 001137 */ 				break;
+/* 001137 */ 			}
+/* 001137 */ 		}
+/* 001139 */ 		if (__t__ (argj === null)) {
+/* 001140 */ 			(function () {
+/* 001140 */ 				var __accu0__ = logger;
+/* 001140 */ 				return __call__ (__accu0__.error, __accu0__, 'Cannot find argument %r in spec %r', argname, flm_spec.arguments_spec_list);
+/* 001140 */ 			}) ();
+/* 001142 */ 			var __except0__ = __call__ (ValueError, null, 'No argument named ‘{}’ in spec'.format (argname));
+/* 001142 */ 			__except0__.__cause__ = null;
+/* 001142 */ 			throw __except0__;
+/* 001142 */ 		}
+/* 001145 */ 		__setitem__ (argnlist, argj, __call__ (_make_argvalue, null, argvalue, latex_walker, parsing_state));
+/* 001145 */ 	}
+/* 001147 */ 	return argnlist;
+/* 001147 */ };
+/* 001150 */ export var make_invocable_node_instance = function (node_type, flm_spec) {
+/* 001150 */ 	var args = null;
+/* 001150 */ 	var body_nodelist = null;
+/* 001150 */ 	var node_kwargs = null;
+/* 001150 */ 	if (arguments.length) {
+/* 001150 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001150 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001150 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001150 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001150 */ 				switch (__attrib0__) {
+/* 001150 */ 					case 'node_type': var node_type = __allkwargs0__ [__attrib0__]; break;
+/* 001150 */ 					case 'flm_spec': var flm_spec = __allkwargs0__ [__attrib0__]; break;
+/* 001150 */ 					case 'args': var args = __allkwargs0__ [__attrib0__]; break;
+/* 001150 */ 					case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
+/* 001150 */ 					case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 001150 */ 					case 'body_nodelist': var body_nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 001150 */ 					case 'node_kwargs': var node_kwargs = __allkwargs0__ [__attrib0__]; break;
+/* 001150 */ 				}
+/* 001150 */ 			}
+/* 001150 */ 		}
+/* 001150 */ 	}
+/* 001150 */ 	else {
+/* 001150 */ 	}
+/* 001157 */ 	var nkwargs = dict ({'pos': null, 'pos_end': null});
+/* 001162 */ 	if (__t__ (node_type === latexnodes_nodes.LatexMacroNode)) {
+/* 001163 */ 		__setitem__ (nkwargs, 'macroname', flm_spec.macroname);
+/* 001164 */ 		if (__t__ (body_nodelist !== null)) {
+/* 001165 */ 			var __except0__ = __call__ (ValueError, null, 'For a LatexMacroNode you must have body_nodelist=None');
+/* 001165 */ 			__except0__.__cause__ = null;
+/* 001165 */ 			throw __except0__;
+/* 001165 */ 		}
+/* 001165 */ 	}
+/* 001167 */ 	else if (__t__ (node_type === latexnodes_nodes.LatexEnvironmentNode)) {
+/* 001168 */ 		__setitem__ (nkwargs, 'environmentname', flm_spec.environmentname);
+/* 001168 */ 	}
+/* 001170 */ 	else if (__t__ (node_type === latexnodes_nodes.LatexSpecialsNode)) {
+/* 001171 */ 		__setitem__ (nkwargs, 'specials_chars', flm_spec.specials_chars);
+/* 001172 */ 		if (__t__ (body_nodelist !== null)) {
+/* 001173 */ 			var __except0__ = __call__ (ValueError, null, 'For a LatexSpecialsNode you must have body_nodelist=None');
+/* 001173 */ 			__except0__.__cause__ = null;
+/* 001173 */ 			throw __except0__;
+/* 001173 */ 		}
+/* 001173 */ 	}
+/* 001175 */ 	var argnlist = __call__ (make_invocable_arguments, null, flm_spec, args, __kwargtrans__ ({latex_walker: latex_walker, parsing_state: parsing_state}));
+/* 001179 */ 	var nodeargd = (function () {
+/* 001179 */ 		var __accu0__ = latexnodes_nodes;
+/* 001179 */ 		return __call__ (__accu0__.ParsedArguments, __accu0__, __kwargtrans__ ({argnlist: argnlist, arguments_spec_list: flm_spec.arguments_spec_list}));
+/* 001179 */ 	}) ();
+/* 001184 */ 	if (__t__ (body_nodelist !== null)) {
+/* 001185 */ 		__setitem__ (nkwargs, 'nodelist', body_nodelist);
+/* 001185 */ 	}
+/* 001187 */ 	if (__t__ (node_kwargs !== null)) {
+/* 001188 */ 		(function () {
+/* 001188 */ 			var __accu0__ = nkwargs;
+/* 001188 */ 			return __call__ (__accu0__.py_update, __accu0__, node_kwargs);
+/* 001188 */ 		}) ();
+/* 001188 */ 	}
+/* 001190 */ 	var node = (function () {
+/* 001190 */ 		var __accu0__ = latex_walker;
+/* 001190 */ 		return __call__ (__accu0__.make_node, __accu0__, node_type, __kwargtrans__ (__mergekwargtrans__ ({spec: flm_spec, nodeargd: nodeargd, parsing_state: parsing_state}, nkwargs)));
+/* 001190 */ 	}) ();
+/* 001198 */ 	var node = (function () {
+/* 001198 */ 		var __accu0__ = flm_spec;
+/* 001198 */ 		return __call__ (__accu0__.finalize_node, __accu0__, node);
+/* 001198 */ 	}) ();
+/* 001200 */ 	return node;
+/* 001200 */ };
 /* 000006 */ 
 //# sourceMappingURL=flm.flmenvironment.map

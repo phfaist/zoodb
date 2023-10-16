@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-08-14 17:27:46
+/* 000001 */ // Transcrypt'ed from Python, 2023-10-16 20:52:35
 /* 000006 */ var re = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000006 */ import * as __module_re__ from './re.js';
@@ -401,193 +401,188 @@
 /* 000213 */ 			return __call__ (_parse_counter_formatter_from_tag_template, null, counter_formatter, tag_template_initials_counters);
 /* 000213 */ 		}
 /* 000213 */ 	}
-/* 000222 */ 	var counter_formatter_template = null;
-/* 000223 */ 	try {
-/* 000224 */ 		var counter_formatter_template = __getitem__ (counter_formatter, 'template');
+/* 000218 */ 	var counter_formatter_template = null;
+/* 000219 */ 	try {
+/* 000222 */ 		var counter_formatter_template = __getitem__ (counter_formatter, 'template');
+/* 000222 */ 	}
+/* 000222 */ 	catch (__except0__) {
+/* 000224 */ 		// pass;
 /* 000224 */ 	}
-/* 000224 */ 	catch (__except0__) {
-/* 000224 */ 		if (isinstance (__except0__, Exception)) {
-/* 000225 */ 			// pass;
-/* 000225 */ 		}
-/* 000225 */ 		else {
-/* 000225 */ 			throw __except0__;
-/* 000225 */ 		}
-/* 000225 */ 	}
-/* 000226 */ 	if (__t__ (counter_formatter_template)) {
-/* 000227 */ 		var tmpl = __getitem__ (counter_formatter, 'template');
-/* 000229 */ 		return __call__ (_replace_dollar_template_delayed, null, tmpl, named_counter_formatters);
-/* 000229 */ 	}
-/* 000231 */ 	var __except0__ = __call__ (ValueError, null, 'Invalid counter_formatter: ‘{}’'.format (__call__ (repr, null, counter_formatter)));
-/* 000231 */ 	__except0__.__cause__ = null;
-/* 000231 */ 	throw __except0__;
-/* 000231 */ };
-/* 000233 */ export var _parse_counter_formatter_from_tag_template = function (tag_template, tag_template_initials_counters) {
-/* 000233 */ 	if (typeof tag_template_initials_counters == 'undefined' || (tag_template_initials_counters != null && tag_template_initials_counters.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000233 */ 		var tag_template_initials_counters = _standard_tag_template_initials_formatters;
-/* 000233 */ 	};
-/* 000233 */ 	if (arguments.length) {
-/* 000233 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 000233 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000233 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000233 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 000233 */ 				switch (__attrib0__) {
-/* 000233 */ 					case 'tag_template': var tag_template = __allkwargs0__ [__attrib0__]; break;
-/* 000233 */ 					case 'tag_template_initials_counters': var tag_template_initials_counters = __allkwargs0__ [__attrib0__]; break;
-/* 000233 */ 				}
-/* 000233 */ 			}
-/* 000233 */ 		}
-/* 000233 */ 	}
-/* 000233 */ 	else {
-/* 000233 */ 	}
-/* 000237 */ 	var rx = (function () {
-/* 000237 */ 		var __accu0__ = re;
-/* 000237 */ 		return __call__ (__accu0__.compile, __accu0__, __add__ (__add__ ('[', (function () {
-/* 000237 */ 			var __accu1__ = '';
-/* 000237 */ 			return __call__ (__accu1__.join, __accu1__, (function () {
-/* 000237 */ 				var __accu2__ = tag_template_initials_counters;
-/* 000237 */ 				return __call__ (__accu2__.py_keys, __accu2__);
-/* 000237 */ 			}) ());
-/* 000237 */ 		}) ()), ']'));
+/* 000225 */ 	if (__t__ (counter_formatter_template)) {
+/* 000226 */ 		var tmpl = __getitem__ (counter_formatter, 'template');
+/* 000228 */ 		return __call__ (_replace_dollar_template_delayed, null, tmpl, named_counter_formatters);
+/* 000228 */ 	}
+/* 000230 */ 	var __except0__ = __call__ (ValueError, null, 'Invalid counter_formatter: ‘{}’'.format (__call__ (repr, null, counter_formatter)));
+/* 000230 */ 	__except0__.__cause__ = null;
+/* 000230 */ 	throw __except0__;
+/* 000230 */ };
+/* 000232 */ export var _parse_counter_formatter_from_tag_template = function (tag_template, tag_template_initials_counters) {
+/* 000232 */ 	if (typeof tag_template_initials_counters == 'undefined' || (tag_template_initials_counters != null && tag_template_initials_counters.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000232 */ 		var tag_template_initials_counters = _standard_tag_template_initials_formatters;
+/* 000232 */ 	};
+/* 000232 */ 	if (arguments.length) {
+/* 000232 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 000232 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000232 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000232 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 000232 */ 				switch (__attrib0__) {
+/* 000232 */ 					case 'tag_template': var tag_template = __allkwargs0__ [__attrib0__]; break;
+/* 000232 */ 					case 'tag_template_initials_counters': var tag_template_initials_counters = __allkwargs0__ [__attrib0__]; break;
+/* 000232 */ 				}
+/* 000232 */ 			}
+/* 000232 */ 		}
+/* 000232 */ 	}
+/* 000232 */ 	else {
+/* 000232 */ 	}
+/* 000236 */ 	var rx = (function () {
+/* 000236 */ 		var __accu0__ = re;
+/* 000236 */ 		return __call__ (__accu0__.compile, __accu0__, __add__ (__add__ ('[', (function () {
+/* 000236 */ 			var __accu1__ = '';
+/* 000236 */ 			return __call__ (__accu1__.join, __accu1__, (function () {
+/* 000236 */ 				var __accu2__ = tag_template_initials_counters;
+/* 000236 */ 				return __call__ (__accu2__.py_keys, __accu2__);
+/* 000236 */ 			}) ());
+/* 000236 */ 		}) ()), ']'));
+/* 000236 */ 	}) ();
+/* 000237 */ 	var m = (function () {
+/* 000237 */ 		var __accu0__ = rx;
+/* 000237 */ 		return __call__ (__accu0__.search, __accu0__, tag_template);
 /* 000237 */ 	}) ();
-/* 000238 */ 	var m = (function () {
-/* 000238 */ 		var __accu0__ = rx;
-/* 000238 */ 		return __call__ (__accu0__.search, __accu0__, tag_template);
-/* 000238 */ 	}) ();
-/* 000239 */ 	if (__t__ (m !== null)) {
-/* 000241 */ 		var left = __getslice__ (tag_template, 0, (function () {
+/* 000238 */ 	if (__t__ (m !== null)) {
+/* 000240 */ 		var left = __getslice__ (tag_template, 0, (function () {
+/* 000240 */ 			var __accu0__ = m;
+/* 000240 */ 			return __call__ (__accu0__.start, __accu0__);
+/* 000240 */ 		}) (), 1);
+/* 000241 */ 		var right = __getslice__ (tag_template, (function () {
 /* 000241 */ 			var __accu0__ = m;
-/* 000241 */ 			return __call__ (__accu0__.start, __accu0__);
-/* 000241 */ 		}) (), 1);
-/* 000242 */ 		var right = __getslice__ (tag_template, (function () {
+/* 000241 */ 			return __call__ (__accu0__.end, __accu0__);
+/* 000241 */ 		}) (), null, 1);
+/* 000242 */ 		var counter_formatter = __getitem__ (tag_template_initials_counters, (function () {
 /* 000242 */ 			var __accu0__ = m;
-/* 000242 */ 			return __call__ (__accu0__.end, __accu0__);
-/* 000242 */ 		}) (), null, 1);
-/* 000243 */ 		var counter_formatter = __getitem__ (tag_template_initials_counters, (function () {
-/* 000243 */ 			var __accu0__ = m;
-/* 000243 */ 			return __call__ (__accu0__.group, __accu0__);
-/* 000243 */ 		}) ());
-/* 000244 */ 		return (function __lambda__ (n) {
-/* 000244 */ 			if (arguments.length) {
-/* 000244 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000244 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000244 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000244 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000244 */ 						switch (__attrib0__) {
-/* 000244 */ 							case 'n': var n = __allkwargs0__ [__attrib0__]; break;
-/* 000244 */ 						}
-/* 000244 */ 					}
-/* 000244 */ 				}
-/* 000244 */ 			}
-/* 000244 */ 			else {
-/* 000244 */ 			}
-/* 000244 */ 			return __add__ (__add__ (left, __call__ (counter_formatter, null, n)), right);
-/* 000244 */ 		});
-/* 000244 */ 	}
-/* 000247 */ 	return (function __lambda__ (n) {
-/* 000247 */ 		if (arguments.length) {
-/* 000247 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000247 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000247 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000247 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000247 */ 					switch (__attrib0__) {
-/* 000247 */ 						case 'n': var n = __allkwargs0__ [__attrib0__]; break;
-/* 000247 */ 					}
-/* 000247 */ 				}
-/* 000247 */ 			}
-/* 000247 */ 		}
-/* 000247 */ 		else {
-/* 000247 */ 		}
-/* 000247 */ 		return tag_template;
-/* 000247 */ 	});
-/* 000247 */ };
-/* 000251 */ export var _default_formatter_join_spec = dict ({'default': dict ({'one_pre': '', 'one_post': '', 'pair_pre': '', 'pair_mid': ' ${and}\xa0', 'pair_post': '', 'range_pre': '', 'range_mid': '${endash}', 'range_pairmid': '${sep}', 'range_post': '', 'list_pre': '', 'list_mid': '${sep} ', 'list_midlast': '${sep} ${and}\xa0', 'list_post': '', 'and': 'and', 'sep': ',', 'endash': '–', 'empty': '(empty)'}), 'compact': dict ({'pair_mid': ',', 'range_mid': '–', 'range_pairmid': ',', 'list_mid': ',', 'list_midlast': ',', 'empty': '(empty)'})});
-/* 000285 */ export var parse_counter_format_num = parse_counter_formatter;
-/* 000291 */ export var build_counter_formatter = function (counter_formatter, default_counter_formatter_spec) {
-/* 000291 */ 	if (arguments.length) {
-/* 000291 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 000291 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000291 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000291 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 000291 */ 				switch (__attrib0__) {
-/* 000291 */ 					case 'counter_formatter': var counter_formatter = __allkwargs0__ [__attrib0__]; break;
-/* 000291 */ 					case 'default_counter_formatter_spec': var default_counter_formatter_spec = __allkwargs0__ [__attrib0__]; break;
-/* 000291 */ 					case 'counter_formatter_id': var counter_formatter_id = __allkwargs0__ [__attrib0__]; break;
-/* 000291 */ 				}
-/* 000291 */ 			}
-/* 000291 */ 		}
-/* 000291 */ 	}
-/* 000291 */ 	else {
-/* 000291 */ 	}
-/* 000299 */ 	if (__t__ (__call__ (isinstance, null, counter_formatter, CounterFormatter))) {
-/* 000300 */ 		return counter_formatter;
-/* 000300 */ 	}
-/* 000302 */ 	if (__t__ (counter_formatter === null)) {
-/* 000303 */ 		return __call__ (CounterFormatter, null, __kwargtrans__ (default_counter_formatter_spec));
-/* 000303 */ 	}
-/* 000305 */ 	var default_counter_formatter_spec = __call__ (dict, null, default_counter_formatter_spec);
-/* 000307 */ 	if (__t__ (__call__ (isinstance, null, counter_formatter, str))) {
-/* 000308 */ 		var d = default_counter_formatter_spec;
-/* 000309 */ 		__setitem__ (d, 'format_num', counter_formatter);
-/* 000310 */ 		__setitem__ (d, 'counter_formatter_id', counter_formatter_id);
-/* 000311 */ 		return __call__ (CounterFormatter, null, __kwargtrans__ (d));
-/* 000311 */ 	}
-/* 000313 */ 	if (__t__ (__call__ (isinstance, null, counter_formatter, dict))) {
-/* 000314 */ 		if (__t__ (__in__ ('template', counter_formatter))) {
-/* 000315 */ 			var d = default_counter_formatter_spec;
-/* 000316 */ 			__setitem__ (d, 'format_num', counter_formatter);
-/* 000317 */ 			__setitem__ (d, 'counter_formatter_id', counter_formatter_id);
-/* 000318 */ 			return __call__ (CounterFormatter, null, __kwargtrans__ (d));
-/* 000318 */ 		}
-/* 000319 */ 		var d = default_counter_formatter_spec;
-/* 000320 */ 		__setitem__ (d, 'counter_formatter_id', counter_formatter_id);
-/* 000321 */ 		(function () {
-/* 000321 */ 			var __accu0__ = d;
-/* 000321 */ 			return __call__ (__accu0__.py_update, __accu0__, counter_formatter);
-/* 000321 */ 		}) ();
-/* 000322 */ 		return __call__ (CounterFormatter, null, __kwargtrans__ (d));
-/* 000322 */ 	}
-/* 000324 */ 	var __except0__ = __call__ (ValueError, null, __add__ ('Invalid counter_formatter specification: ', __call__ (repr, null, counter_formatter)));
-/* 000324 */ 	__except0__.__cause__ = null;
-/* 000324 */ 	throw __except0__;
-/* 000324 */ };
-/* 000327 */ export var CounterFormatter =  __class__ ('CounterFormatter', [object], {
-/* 000327 */ 	__module__: __name__,
-/* 000338 */ 	get __init__ () {return __get__ (this, function (self, format_num, prefix_display, delimiters, join_spec, name_in_link, counter_formatter_id) {
-/* 000338 */ 		if (typeof prefix_display == 'undefined' || (prefix_display != null && prefix_display.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000338 */ 			var prefix_display = null;
-/* 000338 */ 		};
-/* 000338 */ 		if (typeof delimiters == 'undefined' || (delimiters != null && delimiters.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000338 */ 			var delimiters = null;
-/* 000338 */ 		};
-/* 000338 */ 		if (typeof join_spec == 'undefined' || (join_spec != null && join_spec.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000338 */ 			var join_spec = null;
-/* 000338 */ 		};
-/* 000338 */ 		if (typeof name_in_link == 'undefined' || (name_in_link != null && name_in_link.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000338 */ 			var name_in_link = true;
-/* 000338 */ 		};
-/* 000338 */ 		if (typeof counter_formatter_id == 'undefined' || (counter_formatter_id != null && counter_formatter_id.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000338 */ 			var counter_formatter_id = null;
-/* 000338 */ 		};
-/* 000338 */ 		if (arguments.length) {
-/* 000338 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000338 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000338 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000338 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000338 */ 					switch (__attrib0__) {
-/* 000338 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000338 */ 						case 'format_num': var format_num = __allkwargs0__ [__attrib0__]; break;
-/* 000338 */ 						case 'prefix_display': var prefix_display = __allkwargs0__ [__attrib0__]; break;
-/* 000338 */ 						case 'delimiters': var delimiters = __allkwargs0__ [__attrib0__]; break;
-/* 000338 */ 						case 'join_spec': var join_spec = __allkwargs0__ [__attrib0__]; break;
-/* 000338 */ 						case 'name_in_link': var name_in_link = __allkwargs0__ [__attrib0__]; break;
-/* 000338 */ 						case 'counter_formatter_id': var counter_formatter_id = __allkwargs0__ [__attrib0__]; break;
-/* 000338 */ 					}
-/* 000338 */ 				}
-/* 000338 */ 			}
-/* 000338 */ 		}
-/* 000338 */ 		else {
-/* 000338 */ 		}
-/* 000341 */ 		self.format_num = __call__ (parse_counter_formatter, null, format_num);
+/* 000242 */ 			return __call__ (__accu0__.group, __accu0__);
+/* 000242 */ 		}) ());
+/* 000243 */ 		return (function __lambda__ (n) {
+/* 000243 */ 			if (arguments.length) {
+/* 000243 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000243 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000243 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000243 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000243 */ 						switch (__attrib0__) {
+/* 000243 */ 							case 'n': var n = __allkwargs0__ [__attrib0__]; break;
+/* 000243 */ 						}
+/* 000243 */ 					}
+/* 000243 */ 				}
+/* 000243 */ 			}
+/* 000243 */ 			else {
+/* 000243 */ 			}
+/* 000243 */ 			return __add__ (__add__ (left, __call__ (counter_formatter, null, n)), right);
+/* 000243 */ 		});
+/* 000243 */ 	}
+/* 000246 */ 	return (function __lambda__ (n) {
+/* 000246 */ 		if (arguments.length) {
+/* 000246 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000246 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000246 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000246 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000246 */ 					switch (__attrib0__) {
+/* 000246 */ 						case 'n': var n = __allkwargs0__ [__attrib0__]; break;
+/* 000246 */ 					}
+/* 000246 */ 				}
+/* 000246 */ 			}
+/* 000246 */ 		}
+/* 000246 */ 		else {
+/* 000246 */ 		}
+/* 000246 */ 		return tag_template;
+/* 000246 */ 	});
+/* 000246 */ };
+/* 000250 */ export var _default_formatter_join_spec = dict ({'default': dict ({'one_pre': '', 'one_post': '', 'pair_pre': '', 'pair_mid': ' ${and}\xa0', 'pair_post': '', 'range_pre': '', 'range_mid': '${endash}', 'range_pairmid': '${sep}', 'range_post': '', 'list_pre': '', 'list_mid': '${sep} ', 'list_midlast': '${sep} ${and}\xa0', 'list_post': '', 'and': 'and', 'sep': ',', 'endash': '–', 'empty': '(empty)'}), 'compact': dict ({'pair_mid': ',', 'range_mid': '–', 'range_pairmid': ',', 'list_mid': ',', 'list_midlast': ',', 'empty': '(empty)'})});
+/* 000284 */ export var parse_counter_format_num = parse_counter_formatter;
+/* 000290 */ export var build_counter_formatter = function (counter_formatter, default_counter_formatter_spec) {
+/* 000290 */ 	if (arguments.length) {
+/* 000290 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 000290 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000290 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000290 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 000290 */ 				switch (__attrib0__) {
+/* 000290 */ 					case 'counter_formatter': var counter_formatter = __allkwargs0__ [__attrib0__]; break;
+/* 000290 */ 					case 'default_counter_formatter_spec': var default_counter_formatter_spec = __allkwargs0__ [__attrib0__]; break;
+/* 000290 */ 					case 'counter_formatter_id': var counter_formatter_id = __allkwargs0__ [__attrib0__]; break;
+/* 000290 */ 				}
+/* 000290 */ 			}
+/* 000290 */ 		}
+/* 000290 */ 	}
+/* 000290 */ 	else {
+/* 000290 */ 	}
+/* 000298 */ 	if (__t__ (__call__ (isinstance, null, counter_formatter, CounterFormatter))) {
+/* 000299 */ 		return counter_formatter;
+/* 000299 */ 	}
+/* 000301 */ 	if (__t__ (counter_formatter === null)) {
+/* 000302 */ 		return __call__ (CounterFormatter, null, __kwargtrans__ (default_counter_formatter_spec));
+/* 000302 */ 	}
+/* 000304 */ 	var default_counter_formatter_spec = __call__ (dict, null, default_counter_formatter_spec);
+/* 000306 */ 	if (__t__ (__call__ (isinstance, null, counter_formatter, str))) {
+/* 000307 */ 		var d = default_counter_formatter_spec;
+/* 000308 */ 		__setitem__ (d, 'format_num', counter_formatter);
+/* 000309 */ 		__setitem__ (d, 'counter_formatter_id', counter_formatter_id);
+/* 000310 */ 		return __call__ (CounterFormatter, null, __kwargtrans__ (d));
+/* 000310 */ 	}
+/* 000312 */ 	if (__t__ (__call__ (isinstance, null, counter_formatter, dict))) {
+/* 000313 */ 		if (__t__ (__in__ ('template', counter_formatter))) {
+/* 000314 */ 			var d = default_counter_formatter_spec;
+/* 000315 */ 			__setitem__ (d, 'format_num', counter_formatter);
+/* 000316 */ 			__setitem__ (d, 'counter_formatter_id', counter_formatter_id);
+/* 000317 */ 			return __call__ (CounterFormatter, null, __kwargtrans__ (d));
+/* 000317 */ 		}
+/* 000318 */ 		var d = default_counter_formatter_spec;
+/* 000319 */ 		__setitem__ (d, 'counter_formatter_id', counter_formatter_id);
+/* 000320 */ 		(function () {
+/* 000320 */ 			var __accu0__ = d;
+/* 000320 */ 			return __call__ (__accu0__.py_update, __accu0__, counter_formatter);
+/* 000320 */ 		}) ();
+/* 000321 */ 		return __call__ (CounterFormatter, null, __kwargtrans__ (d));
+/* 000321 */ 	}
+/* 000323 */ 	var __except0__ = __call__ (ValueError, null, __add__ ('Invalid counter_formatter specification: ', __call__ (repr, null, counter_formatter)));
+/* 000323 */ 	__except0__.__cause__ = null;
+/* 000323 */ 	throw __except0__;
+/* 000323 */ };
+/* 000326 */ export var CounterFormatter =  __class__ ('CounterFormatter', [object], {
+/* 000326 */ 	__module__: __name__,
+/* 000337 */ 	get __init__ () {return __get__ (this, function (self, format_num, prefix_display, delimiters, join_spec, name_in_link, counter_formatter_id) {
+/* 000337 */ 		if (typeof prefix_display == 'undefined' || (prefix_display != null && prefix_display.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000337 */ 			var prefix_display = null;
+/* 000337 */ 		};
+/* 000337 */ 		if (typeof delimiters == 'undefined' || (delimiters != null && delimiters.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000337 */ 			var delimiters = null;
+/* 000337 */ 		};
+/* 000337 */ 		if (typeof join_spec == 'undefined' || (join_spec != null && join_spec.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000337 */ 			var join_spec = null;
+/* 000337 */ 		};
+/* 000337 */ 		if (typeof name_in_link == 'undefined' || (name_in_link != null && name_in_link.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000337 */ 			var name_in_link = true;
+/* 000337 */ 		};
+/* 000337 */ 		if (typeof counter_formatter_id == 'undefined' || (counter_formatter_id != null && counter_formatter_id.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000337 */ 			var counter_formatter_id = null;
+/* 000337 */ 		};
+/* 000337 */ 		if (arguments.length) {
+/* 000337 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000337 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000337 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000337 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000337 */ 					switch (__attrib0__) {
+/* 000337 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000337 */ 						case 'format_num': var format_num = __allkwargs0__ [__attrib0__]; break;
+/* 000337 */ 						case 'prefix_display': var prefix_display = __allkwargs0__ [__attrib0__]; break;
+/* 000337 */ 						case 'delimiters': var delimiters = __allkwargs0__ [__attrib0__]; break;
+/* 000337 */ 						case 'join_spec': var join_spec = __allkwargs0__ [__attrib0__]; break;
+/* 000337 */ 						case 'name_in_link': var name_in_link = __allkwargs0__ [__attrib0__]; break;
+/* 000337 */ 						case 'counter_formatter_id': var counter_formatter_id = __allkwargs0__ [__attrib0__]; break;
+/* 000337 */ 					}
+/* 000337 */ 				}
+/* 000337 */ 			}
+/* 000337 */ 		}
+/* 000337 */ 		else {
+/* 000337 */ 		}
+/* 000341 */ 		self._format_num_fn = __call__ (parse_counter_formatter, null, format_num);
 /* 000342 */ 		if (__t__ (prefix_display === null)) {
 /* 000343 */ 			var prefix_display = dict ({'singular': '', 'plural': ''});
 /* 000343 */ 		}
@@ -630,81 +625,56 @@
 /* 000361 */ 		}) ();
 /* 000364 */ 		self.name_in_link = name_in_link;
 /* 000366 */ 		self.counter_formatter_id = counter_formatter_id;
-/* 000368 */ 		self._fields = tuple (['format_num', 'prefix_display', 'delimiters', 'join_spec', 'name_in_link', 'counter_formatter_id']);
-/* 000368 */ 	});},
-/* 000371 */ 	get asdict () {return __get__ (this, function (self) {
-/* 000371 */ 		if (arguments.length) {
-/* 000371 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000371 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000371 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000371 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000371 */ 					switch (__attrib0__) {
-/* 000371 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000371 */ 					}
-/* 000371 */ 				}
-/* 000371 */ 			}
-/* 000371 */ 		}
-/* 000371 */ 		else {
-/* 000371 */ 		}
-/* 000372 */ 		return (function () {
-/* 000372 */ 			var __accu0__ = [];
-/* 000372 */ 			var __iterable0__ = self._fields;
-/* 000372 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000372 */ 				var k = __getitem__ (__iterable0__, __index0__);
-/* 000372 */ 				(function () {
-/* 000372 */ 					var __accu1__ = __accu0__;
-/* 000372 */ 					return __call__ (__accu1__.append, __accu1__, [k, __call__ (getattr, null, self, k)]);
-/* 000372 */ 				}) ();
-/* 000372 */ 			}
-/* 000372 */ 			return dict (__accu0__);
-/* 000372 */ 		}) ();
-/* 000372 */ 	});},
-/* 000374 */ 	get __repr__ () {return __get__ (this, function (self) {
-/* 000374 */ 		if (arguments.length) {
-/* 000374 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000374 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000374 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000374 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000374 */ 					switch (__attrib0__) {
-/* 000374 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000374 */ 					}
-/* 000374 */ 				}
-/* 000374 */ 			}
-/* 000374 */ 		}
-/* 000374 */ 		else {
-/* 000374 */ 		}
-/* 000377 */ 		return __add__ (__add__ ('{}('.format (self.__class__.__name__), (function () {
-/* 000377 */ 			var __accu0__ = ', ';
-/* 000377 */ 			return __call__ (__accu0__.join, __accu0__, (function () {
-/* 000377 */ 				var __accu1__ = [];
-/* 000377 */ 				var __iterable0__ = self._fields;
-/* 000377 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000377 */ 					var k = __getitem__ (__iterable0__, __index0__);
-/* 000377 */ 					(function () {
-/* 000377 */ 						var __accu2__ = __accu1__;
-/* 000377 */ 						return __call__ (__accu2__.append, __accu2__, '{}={}'.format (k, __call__ (repr, null, __call__ (getattr, null, self, k))));
-/* 000377 */ 					}) ();
-/* 000377 */ 				}
-/* 000377 */ 				return py_iter (__accu1__);
-/* 000377 */ 			}) ());
-/* 000377 */ 		}) ()), ')');
-/* 000377 */ 	});},
-/* 000381 */ 	get format_flm () {return __get__ (this, function (self, value, prefix_variant, with_delimiters, with_prefix, wrap_format_num, wrap_link_fn) {
-/* 000381 */ 		if (typeof prefix_variant == 'undefined' || (prefix_variant != null && prefix_variant.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000381 */ 			var prefix_variant = null;
-/* 000381 */ 		};
-/* 000381 */ 		if (typeof with_delimiters == 'undefined' || (with_delimiters != null && with_delimiters.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000381 */ 			var with_delimiters = true;
-/* 000381 */ 		};
-/* 000381 */ 		if (typeof with_prefix == 'undefined' || (with_prefix != null && with_prefix.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000381 */ 			var with_prefix = true;
-/* 000381 */ 		};
-/* 000381 */ 		if (typeof wrap_format_num == 'undefined' || (wrap_format_num != null && wrap_format_num.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000381 */ 			var wrap_format_num = null;
-/* 000381 */ 		};
-/* 000381 */ 		if (typeof wrap_link_fn == 'undefined' || (wrap_link_fn != null && wrap_link_fn.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000381 */ 			var wrap_link_fn = null;
-/* 000381 */ 		};
+/* 000369 */ 		self._fields = tuple (['format_num', 'prefix_display', 'delimiters', 'join_spec', 'name_in_link', 'counter_formatter_id']);
+/* 000369 */ 	});},
+/* 000375 */ 	get format_num () {return __get__ (this, function (self, n) {
+/* 000375 */ 		if (arguments.length) {
+/* 000375 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000375 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000375 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000375 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000375 */ 					switch (__attrib0__) {
+/* 000375 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000375 */ 						case 'n': var n = __allkwargs0__ [__attrib0__]; break;
+/* 000375 */ 					}
+/* 000375 */ 				}
+/* 000375 */ 			}
+/* 000375 */ 		}
+/* 000375 */ 		else {
+/* 000375 */ 		}
+/* 000376 */ 		return (function () {
+/* 000376 */ 			var __accu0__ = self;
+/* 000376 */ 			return __call__ (__accu0__._format_num_fn, __accu0__, n);
+/* 000376 */ 		}) ();
+/* 000376 */ 	});},
+/* 000378 */ 	get asdict () {return __get__ (this, function (self) {
+/* 000378 */ 		if (arguments.length) {
+/* 000378 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000378 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000378 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000378 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000378 */ 					switch (__attrib0__) {
+/* 000378 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000378 */ 					}
+/* 000378 */ 				}
+/* 000378 */ 			}
+/* 000378 */ 		}
+/* 000378 */ 		else {
+/* 000378 */ 		}
+/* 000379 */ 		return (function () {
+/* 000379 */ 			var __accu0__ = [];
+/* 000379 */ 			var __iterable0__ = self._fields;
+/* 000379 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000379 */ 				var k = __getitem__ (__iterable0__, __index0__);
+/* 000379 */ 				(function () {
+/* 000379 */ 					var __accu1__ = __accu0__;
+/* 000379 */ 					return __call__ (__accu1__.append, __accu1__, [k, __call__ (getattr, null, self, k)]);
+/* 000379 */ 				}) ();
+/* 000379 */ 			}
+/* 000379 */ 			return dict (__accu0__);
+/* 000379 */ 		}) ();
+/* 000379 */ 	});},
+/* 000381 */ 	get __repr__ () {return __get__ (this, function (self) {
 /* 000381 */ 		if (arguments.length) {
 /* 000381 */ 			var __ilastarg0__ = arguments.length - 1;
 /* 000381 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -712,554 +682,505 @@
 /* 000381 */ 				for (var __attrib0__ in __allkwargs0__) {
 /* 000381 */ 					switch (__attrib0__) {
 /* 000381 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000381 */ 						case 'value': var value = __allkwargs0__ [__attrib0__]; break;
-/* 000381 */ 						case 'prefix_variant': var prefix_variant = __allkwargs0__ [__attrib0__]; break;
-/* 000381 */ 						case 'with_delimiters': var with_delimiters = __allkwargs0__ [__attrib0__]; break;
-/* 000381 */ 						case 'with_prefix': var with_prefix = __allkwargs0__ [__attrib0__]; break;
-/* 000381 */ 						case 'wrap_format_num': var wrap_format_num = __allkwargs0__ [__attrib0__]; break;
-/* 000381 */ 						case 'wrap_link_fn': var wrap_link_fn = __allkwargs0__ [__attrib0__]; break;
 /* 000381 */ 					}
 /* 000381 */ 				}
 /* 000381 */ 			}
 /* 000381 */ 		}
 /* 000381 */ 		else {
 /* 000381 */ 		}
-/* 000383 */ 		var __left0__ = (function () {
-/* 000383 */ 			var __accu0__ = self;
-/* 000383 */ 			return __call__ (__accu0__._get_format_pre_post, __accu0__, with_delimiters, with_prefix, 1, prefix_variant);
-/* 000383 */ 		}) ();
-/* 000383 */ 		var prefix = __left0__ [0];
-/* 000383 */ 		var pre = __left0__ [1];
-/* 000383 */ 		var post = __left0__ [2];
-/* 000389 */ 		var s_num = (function () {
-/* 000389 */ 			var __accu0__ = self;
-/* 000389 */ 			return __call__ (__accu0__.format_num, __accu0__, value);
-/* 000389 */ 		}) ();
-/* 000390 */ 		if (__t__ (wrap_format_num !== null)) {
-/* 000391 */ 			var s_num = __call__ (wrap_format_num, null, s_num);
-/* 000391 */ 		}
-/* 000392 */ 		var s = __add__ (__add__ (__add__ (prefix, pre), s_num), post);
-/* 000393 */ 		if (__t__ (wrap_link_fn !== null)) {
-/* 000394 */ 			return __call__ (wrap_link_fn, null, value, s);
-/* 000394 */ 		}
-/* 000395 */ 		return s;
-/* 000395 */ 	});},
-/* 000397 */ 	get _get_format_pre_post () {return __get__ (this, function (self, with_delimiters, with_prefix, num_values, prefix_variant) {
-/* 000397 */ 		if (arguments.length) {
-/* 000397 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000397 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000397 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000397 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000397 */ 					switch (__attrib0__) {
-/* 000397 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000397 */ 						case 'with_delimiters': var with_delimiters = __allkwargs0__ [__attrib0__]; break;
-/* 000397 */ 						case 'with_prefix': var with_prefix = __allkwargs0__ [__attrib0__]; break;
-/* 000397 */ 						case 'num_values': var num_values = __allkwargs0__ [__attrib0__]; break;
-/* 000397 */ 						case 'prefix_variant': var prefix_variant = __allkwargs0__ [__attrib0__]; break;
-/* 000397 */ 					}
-/* 000397 */ 				}
-/* 000397 */ 			}
-/* 000397 */ 		}
-/* 000397 */ 		else {
-/* 000397 */ 		}
-/* 000399 */ 		var __left0__ = tuple (['', '', '']);
-/* 000399 */ 		var prefix = __left0__ [0];
-/* 000399 */ 		var pre = __left0__ [1];
-/* 000399 */ 		var post = __left0__ [2];
-/* 000401 */ 		if (__t__ (with_delimiters)) {
-/* 000402 */ 			var pre = __getitem__ (self.delimiters, 0);
-/* 000403 */ 			var post = __getitem__ (self.delimiters, 1);
-/* 000403 */ 		}
-/* 000405 */ 		if (__t__ (with_prefix)) {
-/* 000406 */ 			var prefixinfo = self.prefix_display;
-/* 000407 */ 			if (__t__ (__t__ (prefix_variant !== null) && __in__ (prefix_variant, self.prefix_display))) {
-/* 000408 */ 				var prefixinfo = __getitem__ (self.prefix_display, prefix_variant);
-/* 000408 */ 			}
-/* 000409 */ 			if (__t__ (__eq__ (num_values, 1))) {
-/* 000410 */ 				var prefix = __getitem__ (prefixinfo, 'singular');
-/* 000410 */ 			}
-/* 000411 */ 			else if (__t__ (__in__ (num_values, prefixinfo))) {
-/* 000412 */ 				var prefix = __getitem__ (prefixinfo, num_values);
-/* 000412 */ 			}
-/* 000413 */ 			else {
-/* 000414 */ 				var prefix = __getitem__ (prefixinfo, 'plural');
-/* 000414 */ 			}
-/* 000414 */ 		}
-/* 000416 */ 		return tuple ([prefix, pre, post]);
-/* 000416 */ 	});},
-/* 000419 */ 	get format_many_flm () {return __get__ (this, function (self, py_values, prefix_variant, with_delimiters, with_prefix, wrap_link_fn, wrap_format_num, get_raw_s_items, s_items_join) {
-/* 000419 */ 		if (typeof prefix_variant == 'undefined' || (prefix_variant != null && prefix_variant.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000419 */ 			var prefix_variant = null;
-/* 000419 */ 		};
-/* 000419 */ 		if (typeof with_delimiters == 'undefined' || (with_delimiters != null && with_delimiters.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000419 */ 			var with_delimiters = true;
-/* 000419 */ 		};
-/* 000419 */ 		if (typeof with_prefix == 'undefined' || (with_prefix != null && with_prefix.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000419 */ 			var with_prefix = true;
-/* 000419 */ 		};
-/* 000419 */ 		if (typeof wrap_link_fn == 'undefined' || (wrap_link_fn != null && wrap_link_fn.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000419 */ 			var wrap_link_fn = null;
-/* 000419 */ 		};
-/* 000419 */ 		if (typeof wrap_format_num == 'undefined' || (wrap_format_num != null && wrap_format_num.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000419 */ 			var wrap_format_num = null;
-/* 000419 */ 		};
-/* 000419 */ 		if (typeof get_raw_s_items == 'undefined' || (get_raw_s_items != null && get_raw_s_items.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000419 */ 			var get_raw_s_items = false;
-/* 000419 */ 		};
-/* 000419 */ 		if (typeof s_items_join == 'undefined' || (s_items_join != null && s_items_join.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000419 */ 			var s_items_join = null;
-/* 000419 */ 		};
-/* 000419 */ 		if (arguments.length) {
-/* 000419 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000419 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000419 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000419 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000419 */ 					switch (__attrib0__) {
-/* 000419 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 						case 'py_values': var py_values = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 						case 'prefix_variant': var prefix_variant = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 						case 'with_delimiters': var with_delimiters = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 						case 'with_prefix': var with_prefix = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 						case 'wrap_link_fn': var wrap_link_fn = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 						case 'wrap_format_num': var wrap_format_num = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 						case 'get_raw_s_items': var get_raw_s_items = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 						case 's_items_join': var s_items_join = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 					}
-/* 000419 */ 				}
+/* 000384 */ 		return __add__ (__add__ ('{}('.format (self.__class__.__name__), (function () {
+/* 000384 */ 			var __accu0__ = ', ';
+/* 000384 */ 			return __call__ (__accu0__.join, __accu0__, (function () {
+/* 000384 */ 				var __accu1__ = [];
+/* 000384 */ 				var __iterable0__ = self._fields;
+/* 000384 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000384 */ 					var k = __getitem__ (__iterable0__, __index0__);
+/* 000384 */ 					(function () {
+/* 000384 */ 						var __accu2__ = __accu1__;
+/* 000384 */ 						return __call__ (__accu2__.append, __accu2__, '{}={}'.format (k, __call__ (repr, null, __call__ (getattr, null, self, k))));
+/* 000384 */ 					}) ();
+/* 000384 */ 				}
+/* 000384 */ 				return py_iter (__accu1__);
+/* 000384 */ 			}) ());
+/* 000384 */ 		}) ()), ')');
+/* 000384 */ 	});},
+/* 000388 */ 	get format_flm () {return __get__ (this, function (self, value, prefix_variant, with_delimiters, with_prefix, wrap_format_num, wrap_link_fn) {
+/* 000388 */ 		if (typeof prefix_variant == 'undefined' || (prefix_variant != null && prefix_variant.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000388 */ 			var prefix_variant = null;
+/* 000388 */ 		};
+/* 000388 */ 		if (typeof with_delimiters == 'undefined' || (with_delimiters != null && with_delimiters.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000388 */ 			var with_delimiters = true;
+/* 000388 */ 		};
+/* 000388 */ 		if (typeof with_prefix == 'undefined' || (with_prefix != null && with_prefix.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000388 */ 			var with_prefix = true;
+/* 000388 */ 		};
+/* 000388 */ 		if (typeof wrap_format_num == 'undefined' || (wrap_format_num != null && wrap_format_num.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000388 */ 			var wrap_format_num = null;
+/* 000388 */ 		};
+/* 000388 */ 		if (typeof wrap_link_fn == 'undefined' || (wrap_link_fn != null && wrap_link_fn.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000388 */ 			var wrap_link_fn = null;
+/* 000388 */ 		};
+/* 000388 */ 		if (arguments.length) {
+/* 000388 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000388 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000388 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000388 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000388 */ 					switch (__attrib0__) {
+/* 000388 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000388 */ 						case 'value': var value = __allkwargs0__ [__attrib0__]; break;
+/* 000388 */ 						case 'prefix_variant': var prefix_variant = __allkwargs0__ [__attrib0__]; break;
+/* 000388 */ 						case 'with_delimiters': var with_delimiters = __allkwargs0__ [__attrib0__]; break;
+/* 000388 */ 						case 'with_prefix': var with_prefix = __allkwargs0__ [__attrib0__]; break;
+/* 000388 */ 						case 'wrap_format_num': var wrap_format_num = __allkwargs0__ [__attrib0__]; break;
+/* 000388 */ 						case 'wrap_link_fn': var wrap_link_fn = __allkwargs0__ [__attrib0__]; break;
+/* 000388 */ 					}
+/* 000388 */ 				}
+/* 000388 */ 			}
+/* 000388 */ 		}
+/* 000388 */ 		else {
+/* 000388 */ 		}
+/* 000390 */ 		var __left0__ = (function () {
+/* 000390 */ 			var __accu0__ = self;
+/* 000390 */ 			return __call__ (__accu0__._get_format_pre_post, __accu0__, with_delimiters, with_prefix, 1, prefix_variant);
+/* 000390 */ 		}) ();
+/* 000390 */ 		var prefix = __left0__ [0];
+/* 000390 */ 		var pre = __left0__ [1];
+/* 000390 */ 		var post = __left0__ [2];
+/* 000396 */ 		var s_num = (function () {
+/* 000396 */ 			var __accu0__ = self;
+/* 000396 */ 			return __call__ (__accu0__.format_num, __accu0__, value);
+/* 000396 */ 		}) ();
+/* 000397 */ 		if (__t__ (wrap_format_num !== null)) {
+/* 000398 */ 			var s_num = __call__ (wrap_format_num, null, s_num);
+/* 000398 */ 		}
+/* 000399 */ 		var s = __add__ (__add__ (__add__ (prefix, pre), s_num), post);
+/* 000400 */ 		if (__t__ (wrap_link_fn !== null)) {
+/* 000401 */ 			return __call__ (wrap_link_fn, null, value, s);
+/* 000401 */ 		}
+/* 000402 */ 		return s;
+/* 000402 */ 	});},
+/* 000404 */ 	get _get_format_pre_post () {return __get__ (this, function (self, with_delimiters, with_prefix, num_values, prefix_variant) {
+/* 000404 */ 		if (arguments.length) {
+/* 000404 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000404 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000404 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000404 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000404 */ 					switch (__attrib0__) {
+/* 000404 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000404 */ 						case 'with_delimiters': var with_delimiters = __allkwargs0__ [__attrib0__]; break;
+/* 000404 */ 						case 'with_prefix': var with_prefix = __allkwargs0__ [__attrib0__]; break;
+/* 000404 */ 						case 'num_values': var num_values = __allkwargs0__ [__attrib0__]; break;
+/* 000404 */ 						case 'prefix_variant': var prefix_variant = __allkwargs0__ [__attrib0__]; break;
+/* 000404 */ 					}
+/* 000404 */ 				}
+/* 000404 */ 			}
+/* 000404 */ 		}
+/* 000404 */ 		else {
+/* 000404 */ 		}
+/* 000406 */ 		var __left0__ = tuple (['', '', '']);
+/* 000406 */ 		var prefix = __left0__ [0];
+/* 000406 */ 		var pre = __left0__ [1];
+/* 000406 */ 		var post = __left0__ [2];
+/* 000408 */ 		if (__t__ (with_delimiters)) {
+/* 000409 */ 			var pre = __getitem__ (self.delimiters, 0);
+/* 000410 */ 			var post = __getitem__ (self.delimiters, 1);
+/* 000410 */ 		}
+/* 000412 */ 		if (__t__ (with_prefix)) {
+/* 000413 */ 			var prefixinfo = self.prefix_display;
+/* 000414 */ 			if (__t__ (__t__ (prefix_variant !== null) && __in__ (prefix_variant, self.prefix_display))) {
+/* 000415 */ 				var prefixinfo = __getitem__ (self.prefix_display, prefix_variant);
+/* 000415 */ 			}
+/* 000416 */ 			if (__t__ (__eq__ (num_values, 1))) {
+/* 000417 */ 				var prefix = __getitem__ (prefixinfo, 'singular');
+/* 000417 */ 			}
+/* 000418 */ 			else if (__t__ (__in__ (num_values, prefixinfo))) {
+/* 000419 */ 				var prefix = __getitem__ (prefixinfo, num_values);
 /* 000419 */ 			}
-/* 000419 */ 		}
-/* 000419 */ 		else {
-/* 000419 */ 		}
-/* 000423 */ 		var join_spec = self.join_spec;
-/* 000424 */ 		var name_in_link = self.name_in_link;
-/* 000426 */ 		if (__t__ (s_items_join === null)) {
-/* 000427 */ 			var s_items_join = (function __lambda__ (a, b) {
-/* 000427 */ 				if (arguments.length) {
-/* 000427 */ 					var __ilastarg0__ = arguments.length - 1;
-/* 000427 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000427 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000427 */ 						for (var __attrib0__ in __allkwargs0__) {
-/* 000427 */ 							switch (__attrib0__) {
-/* 000427 */ 								case 'a': var a = __allkwargs0__ [__attrib0__]; break;
-/* 000427 */ 								case 'b': var b = __allkwargs0__ [__attrib0__]; break;
-/* 000427 */ 							}
-/* 000427 */ 						}
-/* 000427 */ 					}
-/* 000427 */ 				}
-/* 000427 */ 				else {
-/* 000427 */ 				}
-/* 000427 */ 				return __add__ (a, b);
-/* 000427 */ 			});
-/* 000427 */ 		}
-/* 000429 */ 		if (__t__ (__eq__ (__call__ (len, null, py_values), 0))) {
-/* 000430 */ 			return __getitem__ (join_spec, 'empty');
-/* 000430 */ 		}
-/* 000432 */ 		var py_values = (function () {
-/* 000432 */ 			var __accu0__ = [];
-/* 000432 */ 			var __iterable0__ = py_values;
-/* 000432 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000432 */ 				var v = __getitem__ (__iterable0__, __index0__);
-/* 000432 */ 				(function () {
-/* 000432 */ 					var __accu1__ = __accu0__;
-/* 000432 */ 					return __call__ (__accu1__.append, __accu1__, __call__ (_expect_int, null, v));
-/* 000432 */ 				}) ();
-/* 000432 */ 			}
-/* 000432 */ 			return __accu0__;
-/* 000432 */ 		}) ();
-/* 000437 */ 		var py_values = __call__ (sorted, null, py_values, __kwargtrans__ ({key: int}));
-/* 000439 */ 		var num_values = __call__ (len, null, py_values);
-/* 000441 */ 		var only_one_value = false;
-/* 000442 */ 		if (__t__ (__eq__ (num_values, 1))) {
-/* 000443 */ 			var only_one_value = true;
-/* 000443 */ 		}
-/* 000445 */ 		var list_of_ranges = [];
-/* 000446 */ 		var cur_range = null;
-/* 000447 */ 		var __iterable0__ = py_values;
-/* 000447 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000447 */ 			var v = __getitem__ (__iterable0__, __index0__);
-/* 000448 */ 			if (__t__ (!__t__ ((cur_range)))) {
-/* 000449 */ 				var cur_range = tuple ([v, v]);
-/* 000449 */ 				continue;
-/* 000449 */ 			}
-/* 000451 */ 			if (__t__ (__eq__ (v, __add__ (__getitem__ (cur_range, 1), 1)))) {
-/* 000452 */ 				var cur_range = tuple ([__getitem__ (cur_range, 0), v]);
-/* 000452 */ 				continue;
-/* 000452 */ 			}
-/* 000454 */ 			(function () {
-/* 000454 */ 				var __accu0__ = list_of_ranges;
-/* 000454 */ 				return __call__ (__accu0__.append, __accu0__, cur_range);
-/* 000454 */ 			}) ();
-/* 000455 */ 			var cur_range = tuple ([v, v]);
-/* 000455 */ 		}
-/* 000457 */ 		(function () {
-/* 000457 */ 			var __accu0__ = list_of_ranges;
-/* 000457 */ 			return __call__ (__accu0__.append, __accu0__, cur_range);
-/* 000457 */ 		}) ();
-/* 000458 */ 		if (__t__ (__eq__ (__call__ (len, null, list_of_ranges), 1))) {
-/* 000459 */ 			if (__t__ (__eq__ (__add__ (__getitem__ (__getitem__ (list_of_ranges, 0), 0), 1), __getitem__ (__getitem__ (list_of_ranges, 0), 1)))) {
-/* 000462 */ 				var list_of_ranges = [tuple ([__getitem__ (__getitem__ (list_of_ranges, 0), 0), __getitem__ (__getitem__ (list_of_ranges, 0), 0)]), tuple ([__getitem__ (__getitem__ (list_of_ranges, 0), 1), __getitem__ (__getitem__ (list_of_ranges, 0), 1)])];
-/* 000462 */ 			}
+/* 000420 */ 			else {
+/* 000421 */ 				var prefix = __getitem__ (prefixinfo, 'plural');
+/* 000421 */ 			}
+/* 000421 */ 		}
+/* 000423 */ 		return tuple ([prefix, pre, post]);
+/* 000423 */ 	});},
+/* 000426 */ 	get format_many_flm () {return __get__ (this, function (self, py_values, prefix_variant, with_delimiters, with_prefix, wrap_link_fn, wrap_format_num, get_raw_s_items, s_items_join) {
+/* 000426 */ 		if (typeof prefix_variant == 'undefined' || (prefix_variant != null && prefix_variant.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000426 */ 			var prefix_variant = null;
+/* 000426 */ 		};
+/* 000426 */ 		if (typeof with_delimiters == 'undefined' || (with_delimiters != null && with_delimiters.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000426 */ 			var with_delimiters = true;
+/* 000426 */ 		};
+/* 000426 */ 		if (typeof with_prefix == 'undefined' || (with_prefix != null && with_prefix.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000426 */ 			var with_prefix = true;
+/* 000426 */ 		};
+/* 000426 */ 		if (typeof wrap_link_fn == 'undefined' || (wrap_link_fn != null && wrap_link_fn.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000426 */ 			var wrap_link_fn = null;
+/* 000426 */ 		};
+/* 000426 */ 		if (typeof wrap_format_num == 'undefined' || (wrap_format_num != null && wrap_format_num.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000426 */ 			var wrap_format_num = null;
+/* 000426 */ 		};
+/* 000426 */ 		if (typeof get_raw_s_items == 'undefined' || (get_raw_s_items != null && get_raw_s_items.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000426 */ 			var get_raw_s_items = false;
+/* 000426 */ 		};
+/* 000426 */ 		if (typeof s_items_join == 'undefined' || (s_items_join != null && s_items_join.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000426 */ 			var s_items_join = null;
+/* 000426 */ 		};
+/* 000426 */ 		if (arguments.length) {
+/* 000426 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000426 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000426 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000426 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000426 */ 					switch (__attrib0__) {
+/* 000426 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000426 */ 						case 'py_values': var py_values = __allkwargs0__ [__attrib0__]; break;
+/* 000426 */ 						case 'prefix_variant': var prefix_variant = __allkwargs0__ [__attrib0__]; break;
+/* 000426 */ 						case 'with_delimiters': var with_delimiters = __allkwargs0__ [__attrib0__]; break;
+/* 000426 */ 						case 'with_prefix': var with_prefix = __allkwargs0__ [__attrib0__]; break;
+/* 000426 */ 						case 'wrap_link_fn': var wrap_link_fn = __allkwargs0__ [__attrib0__]; break;
+/* 000426 */ 						case 'wrap_format_num': var wrap_format_num = __allkwargs0__ [__attrib0__]; break;
+/* 000426 */ 						case 'get_raw_s_items': var get_raw_s_items = __allkwargs0__ [__attrib0__]; break;
+/* 000426 */ 						case 's_items_join': var s_items_join = __allkwargs0__ [__attrib0__]; break;
+/* 000426 */ 					}
+/* 000426 */ 				}
+/* 000426 */ 			}
+/* 000426 */ 		}
+/* 000426 */ 		else {
+/* 000426 */ 		}
+/* 000430 */ 		var join_spec = self.join_spec;
+/* 000431 */ 		var name_in_link = self.name_in_link;
+/* 000433 */ 		if (__t__ (s_items_join === null)) {
+/* 000434 */ 			var s_items_join = (function __lambda__ (a, b) {
+/* 000434 */ 				if (arguments.length) {
+/* 000434 */ 					var __ilastarg0__ = arguments.length - 1;
+/* 000434 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000434 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000434 */ 						for (var __attrib0__ in __allkwargs0__) {
+/* 000434 */ 							switch (__attrib0__) {
+/* 000434 */ 								case 'a': var a = __allkwargs0__ [__attrib0__]; break;
+/* 000434 */ 								case 'b': var b = __allkwargs0__ [__attrib0__]; break;
+/* 000434 */ 							}
+/* 000434 */ 						}
+/* 000434 */ 					}
+/* 000434 */ 				}
+/* 000434 */ 				else {
+/* 000434 */ 				}
+/* 000434 */ 				return __add__ (a, b);
+/* 000434 */ 			});
+/* 000434 */ 		}
+/* 000436 */ 		if (__t__ (__eq__ (__call__ (len, null, py_values), 0))) {
+/* 000437 */ 			return __getitem__ (join_spec, 'empty');
+/* 000437 */ 		}
+/* 000439 */ 		var py_values = (function () {
+/* 000439 */ 			var __accu0__ = [];
+/* 000439 */ 			var __iterable0__ = py_values;
+/* 000439 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000439 */ 				var v = __getitem__ (__iterable0__, __index0__);
+/* 000439 */ 				(function () {
+/* 000439 */ 					var __accu1__ = __accu0__;
+/* 000439 */ 					return __call__ (__accu1__.append, __accu1__, __call__ (_expect_int, null, v));
+/* 000439 */ 				}) ();
+/* 000439 */ 			}
+/* 000439 */ 			return __accu0__;
+/* 000439 */ 		}) ();
+/* 000444 */ 		var py_values = __call__ (sorted, null, py_values, __kwargtrans__ ({key: int}));
+/* 000446 */ 		var num_values = __call__ (len, null, py_values);
+/* 000448 */ 		var only_one_value = false;
+/* 000449 */ 		if (__t__ (__eq__ (num_values, 1))) {
+/* 000450 */ 			var only_one_value = true;
+/* 000450 */ 		}
+/* 000452 */ 		var list_of_ranges = [];
+/* 000453 */ 		var cur_range = null;
+/* 000454 */ 		var __iterable0__ = py_values;
+/* 000454 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000454 */ 			var v = __getitem__ (__iterable0__, __index0__);
+/* 000455 */ 			if (__t__ (!__t__ ((cur_range)))) {
+/* 000456 */ 				var cur_range = tuple ([v, v]);
+/* 000456 */ 				continue;
+/* 000456 */ 			}
+/* 000458 */ 			if (__t__ (__eq__ (v, __add__ (__getitem__ (cur_range, 1), 1)))) {
+/* 000459 */ 				var cur_range = tuple ([__getitem__ (cur_range, 0), v]);
+/* 000459 */ 				continue;
+/* 000459 */ 			}
+/* 000461 */ 			(function () {
+/* 000461 */ 				var __accu0__ = list_of_ranges;
+/* 000461 */ 				return __call__ (__accu0__.append, __accu0__, cur_range);
+/* 000461 */ 			}) ();
+/* 000462 */ 			var cur_range = tuple ([v, v]);
 /* 000462 */ 		}
-/* 000465 */ 		var _format_num = function (n) {
-/* 000465 */ 			if (arguments.length) {
-/* 000465 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000465 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000465 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000465 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000465 */ 						switch (__attrib0__) {
-/* 000465 */ 							case 'n': var n = __allkwargs0__ [__attrib0__]; break;
-/* 000465 */ 						}
-/* 000465 */ 					}
-/* 000465 */ 				}
-/* 000465 */ 			}
-/* 000465 */ 			else {
-/* 000465 */ 			}
-/* 000466 */ 			if (__t__ (wrap_format_num !== null)) {
-/* 000467 */ 				return __call__ (wrap_format_num, null, (function () {
-/* 000467 */ 					var __accu0__ = self;
-/* 000467 */ 					return __call__ (__accu0__.format_num, __accu0__, n);
-/* 000467 */ 				}) ());
-/* 000467 */ 			}
-/* 000468 */ 			return (function () {
-/* 000468 */ 				var __accu0__ = self;
-/* 000468 */ 				return __call__ (__accu0__.format_num, __accu0__, n);
-/* 000468 */ 			}) ();
-/* 000468 */ 		};
-/* 000470 */ 		var _render_range_items = function (a, b) {
-/* 000470 */ 			if (arguments.length) {
-/* 000470 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000470 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000470 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000470 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000470 */ 						switch (__attrib0__) {
-/* 000470 */ 							case 'a': var a = __allkwargs0__ [__attrib0__]; break;
-/* 000470 */ 							case 'b': var b = __allkwargs0__ [__attrib0__]; break;
-/* 000470 */ 						}
-/* 000470 */ 					}
-/* 000470 */ 				}
-/* 000470 */ 			}
-/* 000470 */ 			else {
-/* 000470 */ 			}
-/* 000471 */ 			if (__t__ (__eq__ (a, b))) {
-/* 000472 */ 				return [dict ({'s': __call__ (_format_num, null, a), 'n': a})];
+/* 000464 */ 		(function () {
+/* 000464 */ 			var __accu0__ = list_of_ranges;
+/* 000464 */ 			return __call__ (__accu0__.append, __accu0__, cur_range);
+/* 000464 */ 		}) ();
+/* 000465 */ 		if (__t__ (__eq__ (__call__ (len, null, list_of_ranges), 1))) {
+/* 000466 */ 			if (__t__ (__eq__ (__add__ (__getitem__ (__getitem__ (list_of_ranges, 0), 0), 1), __getitem__ (__getitem__ (list_of_ranges, 0), 1)))) {
+/* 000469 */ 				var list_of_ranges = [tuple ([__getitem__ (__getitem__ (list_of_ranges, 0), 0), __getitem__ (__getitem__ (list_of_ranges, 0), 0)]), tuple ([__getitem__ (__getitem__ (list_of_ranges, 0), 1), __getitem__ (__getitem__ (list_of_ranges, 0), 1)])];
+/* 000469 */ 			}
+/* 000469 */ 		}
+/* 000472 */ 		var _format_num = function (n) {
+/* 000472 */ 			if (arguments.length) {
+/* 000472 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000472 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000472 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000472 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000472 */ 						switch (__attrib0__) {
+/* 000472 */ 							case 'n': var n = __allkwargs0__ [__attrib0__]; break;
+/* 000472 */ 						}
+/* 000472 */ 					}
+/* 000472 */ 				}
 /* 000472 */ 			}
-/* 000473 */ 			var s_a = __call__ (_format_num, null, a);
-/* 000474 */ 			var s_b = __call__ (_format_num, null, b);
-/* 000475 */ 			if (__t__ (__eq__ (b, __add__ (a, 1)))) {
-/* 000476 */ 				var mid = __getitem__ (join_spec, 'range_pairmid');
-/* 000476 */ 			}
+/* 000472 */ 			else {
+/* 000472 */ 			}
+/* 000473 */ 			if (__t__ (wrap_format_num !== null)) {
+/* 000474 */ 				return __call__ (wrap_format_num, null, (function () {
+/* 000474 */ 					var __accu0__ = self;
+/* 000474 */ 					return __call__ (__accu0__.format_num, __accu0__, n);
+/* 000474 */ 				}) ());
+/* 000474 */ 			}
+/* 000475 */ 			return (function () {
+/* 000475 */ 				var __accu0__ = self;
+/* 000475 */ 				return __call__ (__accu0__.format_num, __accu0__, n);
+/* 000475 */ 			}) ();
+/* 000475 */ 		};
+/* 000477 */ 		var _render_range_items = function (a, b) {
+/* 000477 */ 			if (arguments.length) {
+/* 000477 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000477 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000477 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000477 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000477 */ 						switch (__attrib0__) {
+/* 000477 */ 							case 'a': var a = __allkwargs0__ [__attrib0__]; break;
+/* 000477 */ 							case 'b': var b = __allkwargs0__ [__attrib0__]; break;
+/* 000477 */ 						}
+/* 000477 */ 					}
+/* 000477 */ 				}
+/* 000477 */ 			}
 /* 000477 */ 			else {
-/* 000478 */ 				var mid = __getitem__ (join_spec, 'range_mid');
-/* 000478 */ 			}
-/* 000479 */ 			return [dict ({'s': __getitem__ (join_spec, 'range_pre'), 'n': false}), dict ({'s': s_a, 'n': a}), dict ({'s': mid, 'n': false}), dict ({'s': s_b, 'n': b}), dict ({'s': __getitem__ (join_spec, 'range_post'), 'n': false})];
-/* 000479 */ 		};
-/* 000487 */ 		if (__t__ (__eq__ (__call__ (len, null, list_of_ranges), 1))) {
-/* 000490 */ 			var s_items = __add__ (__add__ ([dict ({'s': __getitem__ (join_spec, 'one_pre'), 'n': null})], __call__ (_render_range_items, null, ...__getitem__ (list_of_ranges, 0))), [dict ({'s': __getitem__ (join_spec, 'one_post'), 'n': null})]);
-/* 000490 */ 		}
-/* 000493 */ 		else if (__t__ (__eq__ (__call__ (len, null, list_of_ranges), 2))) {
-/* 000498 */ 			var s_items = __add__ (__add__ (__add__ (__add__ ([dict ({'s': __getitem__ (join_spec, 'pair_pre'), 'n': false})], __call__ (_render_range_items, null, ...__getitem__ (list_of_ranges, 0))), [dict ({'s': __getitem__ (join_spec, 'pair_mid'), 'n': false})]), __call__ (_render_range_items, null, ...__getitem__ (list_of_ranges, 1))), [dict ({'s': __getitem__ (join_spec, 'pair_post'), 'n': false})]);
-/* 000498 */ 		}
-/* 000500 */ 		else {
-/* 000502 */ 			var s_items = [dict ({'s': __getitem__ (join_spec, 'list_pre'), 'n': false})];
-/* 000503 */ 			var __iterable0__ = __call__ (enumerate, null, __getslice__ (list_of_ranges, 0, __neg__ (1), 1));
-/* 000503 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000503 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000503 */ 				var rngj = __left0__ [0];
-/* 000503 */ 				var rng = __left0__ [1];
-/* 000504 */ 				if (__t__ (__gt__ (rngj, 0))) {
-/* 000505 */ 					var s_items = __call__ (__iadd__, null, s_items, [dict ({'s': __getitem__ (join_spec, 'list_mid'), 'n': false})]);
-/* 000505 */ 				}
-/* 000506 */ 				var s_items = __call__ (__iadd__, null, s_items, __call__ (_render_range_items, null, ...rng));
-/* 000506 */ 			}
-/* 000509 */ 			var s_items = __call__ (__iadd__, null, s_items, __add__ (__add__ ([dict ({'s': __getitem__ (join_spec, 'list_midlast'), 'n': false})], __call__ (_render_range_items, null, ...__getitem__ (list_of_ranges, __neg__ (1)))), [dict ({'s': __getitem__ (join_spec, 'list_post'), 'n': false})]));
-/* 000509 */ 		}
-/* 000513 */ 		var __left0__ = (function () {
-/* 000513 */ 			var __accu0__ = self;
-/* 000513 */ 			return __call__ (__accu0__._get_format_pre_post, __accu0__, with_delimiters, with_prefix, num_values, prefix_variant);
-/* 000513 */ 		}) ();
-/* 000513 */ 		var s_prefix = __left0__ [0];
-/* 000513 */ 		var s_pre = __left0__ [1];
-/* 000513 */ 		var s_post = __left0__ [2];
-/* 000517 */ 		var first_n = null;
-/* 000518 */ 		if (__t__ (!__t__ ((name_in_link)))) {
-/* 000519 */ 			var first_n = false;
-/* 000519 */ 		}
-/* 000520 */ 		else {
-/* 000521 */ 			var __iterable0__ = s_items;
-/* 000521 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000521 */ 				var si = __getitem__ (__iterable0__, __index0__);
-/* 000522 */ 				var nn = (function () {
-/* 000522 */ 					var __accu0__ = si;
-/* 000522 */ 					return __call__ (__accu0__.py_get, __accu0__, 'n', null);
-/* 000522 */ 				}) ();
-/* 000523 */ 				if (__t__ (__t__ (nn !== null) && nn !== false)) {
-/* 000524 */ 					var first_n = nn;
-/* 000524 */ 					break;
-/* 000524 */ 				}
-/* 000524 */ 			}
-/* 000524 */ 		}
-/* 000527 */ 		var s_pre_items = [];
-/* 000528 */ 		if (__t__ (__call__ (len, null, s_prefix))) {
-/* 000529 */ 			(function () {
-/* 000529 */ 				var __accu0__ = s_pre_items;
-/* 000529 */ 				return __call__ (__accu0__.append, __accu0__, dict ({'s': s_prefix, 'n': first_n}));
-/* 000529 */ 			}) ();
-/* 000529 */ 		}
-/* 000530 */ 		(function () {
-/* 000530 */ 			var __accu0__ = s_pre_items;
-/* 000530 */ 			return __call__ (__accu0__.append, __accu0__, dict ({'s': s_pre, 'n': (__t__ (__t__ (name_in_link) && only_one_value) ? null : false)}));
-/* 000530 */ 		}) ();
-/* 000536 */ 		var s_items = __add__ (__add__ (s_pre_items, s_items), [dict ({'s': s_post, 'n': (__t__ (only_one_value) ? null : false)})]);
-/* 000545 */ 		if (__t__ (__t__ (wrap_link_fn !== null) || get_raw_s_items)) {
-/* 000546 */ 			var s_all = [];
-/* 000547 */ 			var cur_s = null;
-/* 000548 */ 			var cur_n = false;
-/* 000549 */ 			var __iterable0__ = s_items;
-/* 000549 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000549 */ 				var s_item = __getitem__ (__iterable0__, __index0__);
-/* 000550 */ 				var si = __getitem__ (s_item, 's');
-/* 000551 */ 				var ni = (function () {
-/* 000551 */ 					var __accu0__ = s_item;
-/* 000551 */ 					return __call__ (__accu0__.py_get, __accu0__, 'n', null);
-/* 000551 */ 				}) ();
-/* 000552 */ 				if (__t__ (__t__ (ni === false) && __t__ (cur_n === false) && cur_s !== null)) {
-/* 000553 */ 					var cur_s = __call__ (s_items_join, null, cur_s, si);
-/* 000553 */ 					continue;
-/* 000553 */ 				}
-/* 000555 */ 				if (__t__ (__t__ (cur_n !== false) && (__t__ (ni === null) || __t__ (cur_n === null) || __eq__ (ni, cur_n)))) {
-/* 000556 */ 					if (__t__ (__t__ (ni !== null) && cur_n === null)) {
-/* 000557 */ 						var cur_n = ni;
-/* 000557 */ 					}
-/* 000559 */ 					if (__t__ (cur_s === null)) {
-/* 000560 */ 						var cur_s = si;
-/* 000560 */ 					}
-/* 000561 */ 					else {
-/* 000563 */ 						var cur_s = __call__ (s_items_join, null, cur_s, si);
-/* 000563 */ 					}
-/* 000563 */ 					continue;
-/* 000563 */ 				}
-/* 000566 */ 				if (__t__ (cur_s !== null)) {
-/* 000567 */ 					(function () {
-/* 000567 */ 						var __accu0__ = s_all;
-/* 000567 */ 						return __call__ (__accu0__.append, __accu0__, dict ({'s': cur_s, 'n': cur_n}));
-/* 000567 */ 					}) ();
-/* 000567 */ 				}
-/* 000569 */ 				var cur_s = si;
-/* 000570 */ 				var cur_n = ni;
-/* 000570 */ 			}
-/* 000572 */ 			if (__t__ (cur_s !== null)) {
-/* 000573 */ 				(function () {
-/* 000573 */ 					var __accu0__ = s_all;
-/* 000573 */ 					return __call__ (__accu0__.append, __accu0__, dict ({'s': cur_s, 'n': cur_n}));
-/* 000573 */ 				}) ();
-/* 000573 */ 			}
-/* 000575 */ 			var s_items = s_all;
-/* 000575 */ 		}
-/* 000579 */ 		if (__t__ (get_raw_s_items)) {
-/* 000580 */ 			return s_items;
-/* 000580 */ 		}
-/* 000582 */ 		if (__t__ (wrap_link_fn !== null)) {
-/* 000583 */ 			var s = (function () {
-/* 000583 */ 				var __accu0__ = '';
-/* 000583 */ 				return __call__ (__accu0__.join, __accu0__, (function () {
-/* 000583 */ 					var __accu1__ = [];
-/* 000583 */ 					var __iterable0__ = s_items;
-/* 000583 */ 					for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000587 */ 						var x = __getitem__ (__iterable0__, __index0__);
-/* 000587 */ 						(function () {
-/* 000587 */ 							var __accu2__ = __accu1__;
-/* 000584 */ 							return __call__ (__accu2__.append, __accu2__, (__t__ (__t__ (__getitem__ (x, 'n') !== null) && __getitem__ (x, 'n') !== false) ? __call__ (wrap_link_fn, null, __getitem__ (x, 'n'), __getitem__ (x, 's')) : __getitem__ (x, 's')));
-/* 000584 */ 						}) ();
-/* 000584 */ 					}
-/* 000584 */ 					return __accu1__;
-/* 000584 */ 				}) ());
-/* 000584 */ 			}) ();
-/* 000584 */ 		}
-/* 000587 */ 		else {
-/* 000591 */ 			var s = (function () {
-/* 000591 */ 				var __accu0__ = '';
-/* 000591 */ 				return __call__ (__accu0__.join, __accu0__, (function () {
-/* 000591 */ 					var __accu1__ = [];
-/* 000591 */ 					var __iterable0__ = s_items;
-/* 000591 */ 					for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000591 */ 						var x = __getitem__ (__iterable0__, __index0__);
-/* 000591 */ 						(function () {
-/* 000591 */ 							var __accu2__ = __accu1__;
-/* 000591 */ 							return __call__ (__accu2__.append, __accu2__, __getitem__ (x, 's'));
+/* 000477 */ 			}
+/* 000478 */ 			if (__t__ (__eq__ (a, b))) {
+/* 000479 */ 				return [dict ({'s': __call__ (_format_num, null, a), 'n': a})];
+/* 000479 */ 			}
+/* 000480 */ 			var s_a = __call__ (_format_num, null, a);
+/* 000481 */ 			var s_b = __call__ (_format_num, null, b);
+/* 000482 */ 			if (__t__ (__eq__ (b, __add__ (a, 1)))) {
+/* 000483 */ 				var mid = __getitem__ (join_spec, 'range_pairmid');
+/* 000483 */ 			}
+/* 000484 */ 			else {
+/* 000485 */ 				var mid = __getitem__ (join_spec, 'range_mid');
+/* 000485 */ 			}
+/* 000486 */ 			return [dict ({'s': __getitem__ (join_spec, 'range_pre'), 'n': false}), dict ({'s': s_a, 'n': a}), dict ({'s': mid, 'n': false}), dict ({'s': s_b, 'n': b}), dict ({'s': __getitem__ (join_spec, 'range_post'), 'n': false})];
+/* 000486 */ 		};
+/* 000494 */ 		if (__t__ (__eq__ (__call__ (len, null, list_of_ranges), 1))) {
+/* 000497 */ 			var s_items = __add__ (__add__ ([dict ({'s': __getitem__ (join_spec, 'one_pre'), 'n': null})], __call__ (_render_range_items, null, ...__getitem__ (list_of_ranges, 0))), [dict ({'s': __getitem__ (join_spec, 'one_post'), 'n': null})]);
+/* 000497 */ 		}
+/* 000500 */ 		else if (__t__ (__eq__ (__call__ (len, null, list_of_ranges), 2))) {
+/* 000505 */ 			var s_items = __add__ (__add__ (__add__ (__add__ ([dict ({'s': __getitem__ (join_spec, 'pair_pre'), 'n': false})], __call__ (_render_range_items, null, ...__getitem__ (list_of_ranges, 0))), [dict ({'s': __getitem__ (join_spec, 'pair_mid'), 'n': false})]), __call__ (_render_range_items, null, ...__getitem__ (list_of_ranges, 1))), [dict ({'s': __getitem__ (join_spec, 'pair_post'), 'n': false})]);
+/* 000505 */ 		}
+/* 000507 */ 		else {
+/* 000509 */ 			var s_items = [dict ({'s': __getitem__ (join_spec, 'list_pre'), 'n': false})];
+/* 000510 */ 			var __iterable0__ = __call__ (enumerate, null, __getslice__ (list_of_ranges, 0, __neg__ (1), 1));
+/* 000510 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000510 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000510 */ 				var rngj = __left0__ [0];
+/* 000510 */ 				var rng = __left0__ [1];
+/* 000511 */ 				if (__t__ (__gt__ (rngj, 0))) {
+/* 000512 */ 					var s_items = __call__ (__iadd__, null, s_items, [dict ({'s': __getitem__ (join_spec, 'list_mid'), 'n': false})]);
+/* 000512 */ 				}
+/* 000513 */ 				var s_items = __call__ (__iadd__, null, s_items, __call__ (_render_range_items, null, ...rng));
+/* 000513 */ 			}
+/* 000516 */ 			var s_items = __call__ (__iadd__, null, s_items, __add__ (__add__ ([dict ({'s': __getitem__ (join_spec, 'list_midlast'), 'n': false})], __call__ (_render_range_items, null, ...__getitem__ (list_of_ranges, __neg__ (1)))), [dict ({'s': __getitem__ (join_spec, 'list_post'), 'n': false})]));
+/* 000516 */ 		}
+/* 000520 */ 		var __left0__ = (function () {
+/* 000520 */ 			var __accu0__ = self;
+/* 000520 */ 			return __call__ (__accu0__._get_format_pre_post, __accu0__, with_delimiters, with_prefix, num_values, prefix_variant);
+/* 000520 */ 		}) ();
+/* 000520 */ 		var s_prefix = __left0__ [0];
+/* 000520 */ 		var s_pre = __left0__ [1];
+/* 000520 */ 		var s_post = __left0__ [2];
+/* 000524 */ 		var first_n = null;
+/* 000525 */ 		if (__t__ (!__t__ ((name_in_link)))) {
+/* 000526 */ 			var first_n = false;
+/* 000526 */ 		}
+/* 000527 */ 		else {
+/* 000528 */ 			var __iterable0__ = s_items;
+/* 000528 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000528 */ 				var si = __getitem__ (__iterable0__, __index0__);
+/* 000529 */ 				var nn = (function () {
+/* 000529 */ 					var __accu0__ = si;
+/* 000529 */ 					return __call__ (__accu0__.py_get, __accu0__, 'n', null);
+/* 000529 */ 				}) ();
+/* 000530 */ 				if (__t__ (__t__ (nn !== null) && nn !== false)) {
+/* 000531 */ 					var first_n = nn;
+/* 000531 */ 					break;
+/* 000531 */ 				}
+/* 000531 */ 			}
+/* 000531 */ 		}
+/* 000534 */ 		var s_pre_items = [];
+/* 000535 */ 		if (__t__ (__call__ (len, null, s_prefix))) {
+/* 000536 */ 			(function () {
+/* 000536 */ 				var __accu0__ = s_pre_items;
+/* 000536 */ 				return __call__ (__accu0__.append, __accu0__, dict ({'s': s_prefix, 'n': first_n}));
+/* 000536 */ 			}) ();
+/* 000536 */ 		}
+/* 000537 */ 		(function () {
+/* 000537 */ 			var __accu0__ = s_pre_items;
+/* 000537 */ 			return __call__ (__accu0__.append, __accu0__, dict ({'s': s_pre, 'n': (__t__ (__t__ (name_in_link) && only_one_value) ? null : false)}));
+/* 000537 */ 		}) ();
+/* 000543 */ 		var s_items = __add__ (__add__ (s_pre_items, s_items), [dict ({'s': s_post, 'n': (__t__ (only_one_value) ? null : false)})]);
+/* 000552 */ 		if (__t__ (__t__ (wrap_link_fn !== null) || get_raw_s_items)) {
+/* 000553 */ 			var s_all = [];
+/* 000554 */ 			var cur_s = null;
+/* 000555 */ 			var cur_n = false;
+/* 000556 */ 			var __iterable0__ = s_items;
+/* 000556 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000556 */ 				var s_item = __getitem__ (__iterable0__, __index0__);
+/* 000557 */ 				var si = __getitem__ (s_item, 's');
+/* 000558 */ 				var ni = (function () {
+/* 000558 */ 					var __accu0__ = s_item;
+/* 000558 */ 					return __call__ (__accu0__.py_get, __accu0__, 'n', null);
+/* 000558 */ 				}) ();
+/* 000559 */ 				if (__t__ (__t__ (ni === false) && __t__ (cur_n === false) && cur_s !== null)) {
+/* 000560 */ 					var cur_s = __call__ (s_items_join, null, cur_s, si);
+/* 000560 */ 					continue;
+/* 000560 */ 				}
+/* 000562 */ 				if (__t__ (__t__ (cur_n !== false) && (__t__ (ni === null) || __t__ (cur_n === null) || __eq__ (ni, cur_n)))) {
+/* 000563 */ 					if (__t__ (__t__ (ni !== null) && cur_n === null)) {
+/* 000564 */ 						var cur_n = ni;
+/* 000564 */ 					}
+/* 000566 */ 					if (__t__ (cur_s === null)) {
+/* 000567 */ 						var cur_s = si;
+/* 000567 */ 					}
+/* 000568 */ 					else {
+/* 000570 */ 						var cur_s = __call__ (s_items_join, null, cur_s, si);
+/* 000570 */ 					}
+/* 000570 */ 					continue;
+/* 000570 */ 				}
+/* 000573 */ 				if (__t__ (cur_s !== null)) {
+/* 000574 */ 					(function () {
+/* 000574 */ 						var __accu0__ = s_all;
+/* 000574 */ 						return __call__ (__accu0__.append, __accu0__, dict ({'s': cur_s, 'n': cur_n}));
+/* 000574 */ 					}) ();
+/* 000574 */ 				}
+/* 000576 */ 				var cur_s = si;
+/* 000577 */ 				var cur_n = ni;
+/* 000577 */ 			}
+/* 000579 */ 			if (__t__ (cur_s !== null)) {
+/* 000580 */ 				(function () {
+/* 000580 */ 					var __accu0__ = s_all;
+/* 000580 */ 					return __call__ (__accu0__.append, __accu0__, dict ({'s': cur_s, 'n': cur_n}));
+/* 000580 */ 				}) ();
+/* 000580 */ 			}
+/* 000582 */ 			var s_items = s_all;
+/* 000582 */ 		}
+/* 000586 */ 		if (__t__ (get_raw_s_items)) {
+/* 000587 */ 			return s_items;
+/* 000587 */ 		}
+/* 000589 */ 		if (__t__ (wrap_link_fn !== null)) {
+/* 000590 */ 			var s = (function () {
+/* 000590 */ 				var __accu0__ = '';
+/* 000590 */ 				return __call__ (__accu0__.join, __accu0__, (function () {
+/* 000590 */ 					var __accu1__ = [];
+/* 000590 */ 					var __iterable0__ = s_items;
+/* 000590 */ 					for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000594 */ 						var x = __getitem__ (__iterable0__, __index0__);
+/* 000594 */ 						(function () {
+/* 000594 */ 							var __accu2__ = __accu1__;
+/* 000591 */ 							return __call__ (__accu2__.append, __accu2__, (__t__ (__t__ (__getitem__ (x, 'n') !== null) && __getitem__ (x, 'n') !== false) ? __call__ (wrap_link_fn, null, __getitem__ (x, 'n'), __getitem__ (x, 's')) : __getitem__ (x, 's')));
 /* 000591 */ 						}) ();
 /* 000591 */ 					}
 /* 000591 */ 					return __accu1__;
 /* 000591 */ 				}) ());
 /* 000591 */ 			}) ();
 /* 000591 */ 		}
-/* 000593 */ 		return s;
-/* 000593 */ 	});}
-/* 000593 */ });
-/* 000597 */ export var _expect_int = function (v) {
-/* 000597 */ 	if (arguments.length) {
-/* 000597 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 000597 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000597 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000597 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 000597 */ 				switch (__attrib0__) {
-/* 000597 */ 					case 'v': var v = __allkwargs0__ [__attrib0__]; break;
-/* 000597 */ 				}
-/* 000597 */ 			}
-/* 000597 */ 		}
-/* 000597 */ 	}
-/* 000597 */ 	else {
-/* 000597 */ 	}
-/* 000598 */ 	try {
-/* 000599 */ 		return __call__ (int, null, v);
-/* 000599 */ 	}
-/* 000599 */ 	catch (__except0__) {
-/* 000599 */ 		if (isinstance (__except0__, py_TypeError)) {
-/* 000601 */ 			var __except1__ = __call__ (ValueError, null, __add__ ('Invalid value, expected integer: ', __call__ (repr, null, v)));
-/* 000601 */ 			__except1__.__cause__ = null;
-/* 000601 */ 			throw __except1__;
-/* 000601 */ 		}
-/* 000601 */ 		else {
-/* 000601 */ 			throw __except0__;
-/* 000601 */ 		}
-/* 000601 */ 	}
-/* 000601 */ };
-/* 000607 */ export var Counter =  __class__ ('Counter', [object], {
-/* 000607 */ 	__module__: __name__,
-/* 000613 */ 	get __init__ () {return __get__ (this, function (self, counter_formatter, initial_value) {
-/* 000613 */ 		if (typeof initial_value == 'undefined' || (initial_value != null && initial_value.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000613 */ 			var initial_value = 0;
-/* 000613 */ 		};
-/* 000613 */ 		if (arguments.length) {
-/* 000613 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000613 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000613 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000613 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000613 */ 					switch (__attrib0__) {
-/* 000613 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000613 */ 						case 'counter_formatter': var counter_formatter = __allkwargs0__ [__attrib0__]; break;
-/* 000613 */ 						case 'initial_value': var initial_value = __allkwargs0__ [__attrib0__]; break;
-/* 000613 */ 					}
-/* 000613 */ 				}
-/* 000613 */ 			}
-/* 000613 */ 		}
-/* 000613 */ 		else {
-/* 000613 */ 		}
-/* 000614 */ 		self.formatter = counter_formatter;
-/* 000615 */ 		self.value = initial_value;
-/* 000615 */ 	});},
-/* 000617 */ 	get set_value () {return __get__ (this, function (self, value) {
-/* 000617 */ 		if (arguments.length) {
-/* 000617 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000617 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000617 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000617 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000617 */ 					switch (__attrib0__) {
-/* 000617 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000617 */ 						case 'value': var value = __allkwargs0__ [__attrib0__]; break;
-/* 000617 */ 					}
-/* 000617 */ 				}
-/* 000617 */ 			}
-/* 000617 */ 		}
-/* 000617 */ 		else {
-/* 000617 */ 		}
-/* 000618 */ 		self.value = value;
-/* 000619 */ 		return self.value;
-/* 000619 */ 	});},
-/* 000621 */ 	get step () {return __get__ (this, function (self) {
-/* 000621 */ 		if (arguments.length) {
-/* 000621 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000621 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000621 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000621 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000621 */ 					switch (__attrib0__) {
-/* 000621 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000621 */ 					}
-/* 000621 */ 				}
-/* 000621 */ 			}
-/* 000621 */ 		}
-/* 000621 */ 		else {
-/* 000621 */ 		}
-/* 000622 */ 		self.value = __call__ (__iadd__, null, self.value, 1);
-/* 000623 */ 		return self.value;
-/* 000623 */ 	});},
-/* 000625 */ 	get reset () {return __get__ (this, function (self) {
-/* 000625 */ 		if (arguments.length) {
-/* 000625 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000625 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000625 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000625 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000625 */ 					switch (__attrib0__) {
-/* 000625 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000625 */ 					}
-/* 000625 */ 				}
-/* 000625 */ 			}
-/* 000625 */ 		}
-/* 000625 */ 		else {
-/* 000625 */ 		}
-/* 000626 */ 		self.value = self.initial_value;
-/* 000627 */ 		return self.value;
-/* 000627 */ 	});},
-/* 000629 */ 	get format_flm () {return __get__ (this, function (self, value) {
-/* 000629 */ 		if (typeof value == 'undefined' || (value != null && value.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000629 */ 			var value = null;
-/* 000629 */ 		};
-/* 000629 */ 		var kwargs = dict ();
-/* 000629 */ 		if (arguments.length) {
-/* 000629 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000629 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000629 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000629 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000629 */ 					switch (__attrib0__) {
-/* 000629 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000629 */ 						case 'value': var value = __allkwargs0__ [__attrib0__]; break;
-/* 000629 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000629 */ 					}
-/* 000629 */ 				}
-/* 000629 */ 				delete kwargs.__kwargtrans__;
-/* 000629 */ 			}
-/* 000629 */ 		}
-/* 000629 */ 		else {
-/* 000629 */ 		}
-/* 000630 */ 		if (__t__ (value === null)) {
-/* 000631 */ 			var value = self.value;
-/* 000631 */ 		}
-/* 000632 */ 		var kwargs2 = dict ({'with_prefix': false});
-/* 000633 */ 		(function () {
-/* 000633 */ 			var __accu0__ = kwargs2;
-/* 000633 */ 			return __call__ (__accu0__.py_update, __accu0__, kwargs);
-/* 000633 */ 		}) ();
-/* 000634 */ 		return (function () {
-/* 000634 */ 			var __accu0__ = self.formatter;
-/* 000634 */ 			return __call__ (__accu0__.format_flm, __accu0__, value, __kwargtrans__ (kwargs2));
-/* 000634 */ 		}) ();
-/* 000634 */ 	});},
-/* 000636 */ 	get step_and_format_flm () {return __get__ (this, function (self) {
-/* 000636 */ 		if (arguments.length) {
-/* 000636 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000636 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000636 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000636 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000636 */ 					switch (__attrib0__) {
-/* 000636 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000636 */ 					}
-/* 000636 */ 				}
-/* 000636 */ 			}
-/* 000636 */ 		}
-/* 000636 */ 		else {
-/* 000636 */ 		}
-/* 000637 */ 		var val = (function () {
-/* 000637 */ 			var __accu0__ = self;
-/* 000637 */ 			return __call__ (__accu0__.step, __accu0__);
-/* 000637 */ 		}) ();
-/* 000638 */ 		return tuple ([val, (function () {
-/* 000638 */ 			var __accu0__ = self;
-/* 000638 */ 			return __call__ (__accu0__.format_flm, __accu0__, val);
-/* 000638 */ 		}) ()]);
-/* 000638 */ 	});}
-/* 000638 */ });
-/* 000641 */ export var CounterAlias =  __class__ ('CounterAlias', [object], {
-/* 000641 */ 	__module__: __name__,
-/* 000648 */ 	get __init__ () {return __get__ (this, function (self, counter_formatter, alias_counter) {
+/* 000594 */ 		else {
+/* 000598 */ 			var s = (function () {
+/* 000598 */ 				var __accu0__ = '';
+/* 000598 */ 				return __call__ (__accu0__.join, __accu0__, (function () {
+/* 000598 */ 					var __accu1__ = [];
+/* 000598 */ 					var __iterable0__ = s_items;
+/* 000598 */ 					for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000598 */ 						var x = __getitem__ (__iterable0__, __index0__);
+/* 000598 */ 						(function () {
+/* 000598 */ 							var __accu2__ = __accu1__;
+/* 000598 */ 							return __call__ (__accu2__.append, __accu2__, __getitem__ (x, 's'));
+/* 000598 */ 						}) ();
+/* 000598 */ 					}
+/* 000598 */ 					return __accu1__;
+/* 000598 */ 				}) ());
+/* 000598 */ 			}) ();
+/* 000598 */ 		}
+/* 000600 */ 		return s;
+/* 000600 */ 	});}
+/* 000600 */ });
+/* 000604 */ export var _expect_int = function (v) {
+/* 000604 */ 	if (arguments.length) {
+/* 000604 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 000604 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000604 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000604 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 000604 */ 				switch (__attrib0__) {
+/* 000604 */ 					case 'v': var v = __allkwargs0__ [__attrib0__]; break;
+/* 000604 */ 				}
+/* 000604 */ 			}
+/* 000604 */ 		}
+/* 000604 */ 	}
+/* 000604 */ 	else {
+/* 000604 */ 	}
+/* 000605 */ 	try {
+/* 000606 */ 		return __call__ (int, null, v);
+/* 000606 */ 	}
+/* 000606 */ 	catch (__except0__) {
+/* 000606 */ 		if (isinstance (__except0__, py_TypeError)) {
+/* 000608 */ 			var __except1__ = __call__ (ValueError, null, __add__ ('Invalid value, expected integer: ', __call__ (repr, null, v)));
+/* 000608 */ 			__except1__.__cause__ = null;
+/* 000608 */ 			throw __except1__;
+/* 000608 */ 		}
+/* 000608 */ 		else {
+/* 000608 */ 			throw __except0__;
+/* 000608 */ 		}
+/* 000608 */ 	}
+/* 000608 */ };
+/* 000634 */ export var Counter =  __class__ ('Counter', [object], {
+/* 000634 */ 	__module__: __name__,
+/* 000640 */ 	get __init__ () {return __get__ (this, function (self, counter_formatter, initial_value) {
+/* 000640 */ 		if (typeof initial_value == 'undefined' || (initial_value != null && initial_value.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000640 */ 			var initial_value = 0;
+/* 000640 */ 		};
+/* 000640 */ 		if (arguments.length) {
+/* 000640 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000640 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000640 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000640 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000640 */ 					switch (__attrib0__) {
+/* 000640 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000640 */ 						case 'counter_formatter': var counter_formatter = __allkwargs0__ [__attrib0__]; break;
+/* 000640 */ 						case 'initial_value': var initial_value = __allkwargs0__ [__attrib0__]; break;
+/* 000640 */ 					}
+/* 000640 */ 				}
+/* 000640 */ 			}
+/* 000640 */ 		}
+/* 000640 */ 		else {
+/* 000640 */ 		}
+/* 000641 */ 		self.formatter = counter_formatter;
+/* 000642 */ 		self.value = initial_value;
+/* 000642 */ 	});},
+/* 000644 */ 	get set_value () {return __get__ (this, function (self, value) {
+/* 000644 */ 		if (arguments.length) {
+/* 000644 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000644 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000644 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000644 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000644 */ 					switch (__attrib0__) {
+/* 000644 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000644 */ 						case 'value': var value = __allkwargs0__ [__attrib0__]; break;
+/* 000644 */ 					}
+/* 000644 */ 				}
+/* 000644 */ 			}
+/* 000644 */ 		}
+/* 000644 */ 		else {
+/* 000644 */ 		}
+/* 000645 */ 		self.value = value;
+/* 000646 */ 		return self.value;
+/* 000646 */ 	});},
+/* 000648 */ 	get step () {return __get__ (this, function (self) {
 /* 000648 */ 		if (arguments.length) {
 /* 000648 */ 			var __ilastarg0__ = arguments.length - 1;
 /* 000648 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -1267,34 +1188,37 @@
 /* 000648 */ 				for (var __attrib0__ in __allkwargs0__) {
 /* 000648 */ 					switch (__attrib0__) {
 /* 000648 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000648 */ 						case 'counter_formatter': var counter_formatter = __allkwargs0__ [__attrib0__]; break;
-/* 000648 */ 						case 'alias_counter': var alias_counter = __allkwargs0__ [__attrib0__]; break;
 /* 000648 */ 					}
 /* 000648 */ 				}
 /* 000648 */ 			}
 /* 000648 */ 		}
 /* 000648 */ 		else {
 /* 000648 */ 		}
-/* 000649 */ 		self.formatter = counter_formatter;
-/* 000650 */ 		self.alias_counter = alias_counter;
+/* 000649 */ 		self.value = __call__ (__iadd__, null, self.value, 1);
+/* 000650 */ 		return self.value;
 /* 000650 */ 	});},
-/* 000653 */ 	get _get_value () {return __get__ (this, function (self) {
-/* 000653 */ 		if (arguments.length) {
-/* 000653 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000653 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000653 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000653 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000653 */ 					switch (__attrib0__) {
-/* 000653 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000653 */ 					}
-/* 000653 */ 				}
-/* 000653 */ 			}
-/* 000653 */ 		}
-/* 000653 */ 		else {
-/* 000653 */ 		}
-/* 000654 */ 		return self.alias_counter.value;
+/* 000652 */ 	get reset () {return __get__ (this, function (self) {
+/* 000652 */ 		if (arguments.length) {
+/* 000652 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000652 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000652 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000652 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000652 */ 					switch (__attrib0__) {
+/* 000652 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000652 */ 					}
+/* 000652 */ 				}
+/* 000652 */ 			}
+/* 000652 */ 		}
+/* 000652 */ 		else {
+/* 000652 */ 		}
+/* 000653 */ 		self.value = self.initial_value;
+/* 000654 */ 		return self.value;
 /* 000654 */ 	});},
-/* 000656 */ 	get step () {return __get__ (this, function (self) {
+/* 000656 */ 	get format_flm () {return __get__ (this, function (self, value) {
+/* 000656 */ 		if (typeof value == 'undefined' || (value != null && value.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000656 */ 			var value = null;
+/* 000656 */ 		};
+/* 000656 */ 		var kwargs = dict ();
 /* 000656 */ 		if (arguments.length) {
 /* 000656 */ 			var __ilastarg0__ = arguments.length - 1;
 /* 000656 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -1302,94 +1226,185 @@
 /* 000656 */ 				for (var __attrib0__ in __allkwargs0__) {
 /* 000656 */ 					switch (__attrib0__) {
 /* 000656 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000656 */ 						case 'value': var value = __allkwargs0__ [__attrib0__]; break;
+/* 000656 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
 /* 000656 */ 					}
 /* 000656 */ 				}
+/* 000656 */ 				delete kwargs.__kwargtrans__;
 /* 000656 */ 			}
 /* 000656 */ 		}
 /* 000656 */ 		else {
 /* 000656 */ 		}
-/* 000657 */ 		return (function () {
-/* 000657 */ 			var __accu0__ = self.alias_counter;
-/* 000657 */ 			return __call__ (__accu0__.step, __accu0__);
-/* 000657 */ 		}) ();
-/* 000657 */ 	});},
-/* 000659 */ 	get reset () {return __get__ (this, function (self) {
-/* 000659 */ 		if (arguments.length) {
-/* 000659 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000659 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000659 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000659 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000659 */ 					switch (__attrib0__) {
-/* 000659 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000659 */ 					}
-/* 000659 */ 				}
-/* 000659 */ 			}
-/* 000659 */ 		}
-/* 000659 */ 		else {
-/* 000659 */ 		}
-/* 000660 */ 		return (function () {
-/* 000660 */ 			var __accu0__ = self.alias_counter;
-/* 000660 */ 			return __call__ (__accu0__.reset, __accu0__);
+/* 000657 */ 		if (__t__ (value === null)) {
+/* 000658 */ 			var value = self.value;
+/* 000658 */ 		}
+/* 000659 */ 		var kwargs2 = dict ({'with_prefix': false});
+/* 000660 */ 		(function () {
+/* 000660 */ 			var __accu0__ = kwargs2;
+/* 000660 */ 			return __call__ (__accu0__.py_update, __accu0__, kwargs);
 /* 000660 */ 		}) ();
-/* 000660 */ 	});},
-/* 000662 */ 	get format_flm () {return __get__ (this, function (self, value) {
-/* 000662 */ 		if (typeof value == 'undefined' || (value != null && value.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000662 */ 			var value = null;
-/* 000662 */ 		};
-/* 000662 */ 		var kwargs = dict ();
-/* 000662 */ 		if (arguments.length) {
-/* 000662 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000662 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000662 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000662 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000662 */ 					switch (__attrib0__) {
-/* 000662 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000662 */ 						case 'value': var value = __allkwargs0__ [__attrib0__]; break;
-/* 000662 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000662 */ 					}
-/* 000662 */ 				}
-/* 000662 */ 				delete kwargs.__kwargtrans__;
-/* 000662 */ 			}
-/* 000662 */ 		}
-/* 000662 */ 		else {
-/* 000662 */ 		}
-/* 000663 */ 		if (__t__ (value === null)) {
-/* 000664 */ 			var value = self.value;
-/* 000664 */ 		}
-/* 000665 */ 		var kwargs2 = dict ({'with_prefix': false});
-/* 000666 */ 		(function () {
-/* 000666 */ 			var __accu0__ = kwargs2;
-/* 000666 */ 			return __call__ (__accu0__.py_update, __accu0__, kwargs);
-/* 000666 */ 		}) ();
-/* 000667 */ 		return (function () {
-/* 000667 */ 			var __accu0__ = self.formatter;
-/* 000667 */ 			return __call__ (__accu0__.format_flm, __accu0__, value, __kwargtrans__ (kwargs2));
-/* 000667 */ 		}) ();
-/* 000667 */ 	});},
-/* 000669 */ 	get step_and_format_flm () {return __get__ (this, function (self) {
-/* 000669 */ 		if (arguments.length) {
-/* 000669 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000669 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000669 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000669 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000669 */ 					switch (__attrib0__) {
-/* 000669 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000669 */ 					}
-/* 000669 */ 				}
-/* 000669 */ 			}
-/* 000669 */ 		}
-/* 000669 */ 		else {
-/* 000669 */ 		}
-/* 000670 */ 		var val = (function () {
-/* 000670 */ 			var __accu0__ = self;
-/* 000670 */ 			return __call__ (__accu0__.step, __accu0__);
-/* 000670 */ 		}) ();
-/* 000671 */ 		return tuple ([val, (function () {
-/* 000671 */ 			var __accu0__ = self;
-/* 000671 */ 			return __call__ (__accu0__.format_flm, __accu0__, val);
-/* 000671 */ 		}) ()]);
-/* 000671 */ 	});}
-/* 000671 */ });
-/* 000671 */ Object.defineProperty (CounterAlias, 'value', property.call (CounterAlias, CounterAlias._get_value));;
+/* 000661 */ 		return (function () {
+/* 000661 */ 			var __accu0__ = self.formatter;
+/* 000661 */ 			return __call__ (__accu0__.format_flm, __accu0__, value, __kwargtrans__ (kwargs2));
+/* 000661 */ 		}) ();
+/* 000661 */ 	});},
+/* 000663 */ 	get step_and_format_flm () {return __get__ (this, function (self) {
+/* 000663 */ 		if (arguments.length) {
+/* 000663 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000663 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000663 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000663 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000663 */ 					switch (__attrib0__) {
+/* 000663 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000663 */ 					}
+/* 000663 */ 				}
+/* 000663 */ 			}
+/* 000663 */ 		}
+/* 000663 */ 		else {
+/* 000663 */ 		}
+/* 000664 */ 		var val = (function () {
+/* 000664 */ 			var __accu0__ = self;
+/* 000664 */ 			return __call__ (__accu0__.step, __accu0__);
+/* 000664 */ 		}) ();
+/* 000665 */ 		return tuple ([val, (function () {
+/* 000665 */ 			var __accu0__ = self;
+/* 000665 */ 			return __call__ (__accu0__.format_flm, __accu0__, val);
+/* 000665 */ 		}) ()]);
+/* 000665 */ 	});}
+/* 000665 */ });
+/* 000668 */ export var CounterAlias =  __class__ ('CounterAlias', [object], {
+/* 000668 */ 	__module__: __name__,
+/* 000675 */ 	get __init__ () {return __get__ (this, function (self, counter_formatter, alias_counter) {
+/* 000675 */ 		if (arguments.length) {
+/* 000675 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000675 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000675 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000675 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000675 */ 					switch (__attrib0__) {
+/* 000675 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000675 */ 						case 'counter_formatter': var counter_formatter = __allkwargs0__ [__attrib0__]; break;
+/* 000675 */ 						case 'alias_counter': var alias_counter = __allkwargs0__ [__attrib0__]; break;
+/* 000675 */ 					}
+/* 000675 */ 				}
+/* 000675 */ 			}
+/* 000675 */ 		}
+/* 000675 */ 		else {
+/* 000675 */ 		}
+/* 000676 */ 		self.formatter = counter_formatter;
+/* 000677 */ 		self.alias_counter = alias_counter;
+/* 000677 */ 	});},
+/* 000680 */ 	get _get_value () {return __get__ (this, function (self) {
+/* 000680 */ 		if (arguments.length) {
+/* 000680 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000680 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000680 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000680 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000680 */ 					switch (__attrib0__) {
+/* 000680 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000680 */ 					}
+/* 000680 */ 				}
+/* 000680 */ 			}
+/* 000680 */ 		}
+/* 000680 */ 		else {
+/* 000680 */ 		}
+/* 000681 */ 		return self.alias_counter.value;
+/* 000681 */ 	});},
+/* 000683 */ 	get step () {return __get__ (this, function (self) {
+/* 000683 */ 		if (arguments.length) {
+/* 000683 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000683 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000683 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000683 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000683 */ 					switch (__attrib0__) {
+/* 000683 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000683 */ 					}
+/* 000683 */ 				}
+/* 000683 */ 			}
+/* 000683 */ 		}
+/* 000683 */ 		else {
+/* 000683 */ 		}
+/* 000684 */ 		return (function () {
+/* 000684 */ 			var __accu0__ = self.alias_counter;
+/* 000684 */ 			return __call__ (__accu0__.step, __accu0__);
+/* 000684 */ 		}) ();
+/* 000684 */ 	});},
+/* 000686 */ 	get reset () {return __get__ (this, function (self) {
+/* 000686 */ 		if (arguments.length) {
+/* 000686 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000686 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000686 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000686 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000686 */ 					switch (__attrib0__) {
+/* 000686 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000686 */ 					}
+/* 000686 */ 				}
+/* 000686 */ 			}
+/* 000686 */ 		}
+/* 000686 */ 		else {
+/* 000686 */ 		}
+/* 000687 */ 		return (function () {
+/* 000687 */ 			var __accu0__ = self.alias_counter;
+/* 000687 */ 			return __call__ (__accu0__.reset, __accu0__);
+/* 000687 */ 		}) ();
+/* 000687 */ 	});},
+/* 000689 */ 	get format_flm () {return __get__ (this, function (self, value) {
+/* 000689 */ 		if (typeof value == 'undefined' || (value != null && value.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000689 */ 			var value = null;
+/* 000689 */ 		};
+/* 000689 */ 		var kwargs = dict ();
+/* 000689 */ 		if (arguments.length) {
+/* 000689 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000689 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000689 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000689 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000689 */ 					switch (__attrib0__) {
+/* 000689 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000689 */ 						case 'value': var value = __allkwargs0__ [__attrib0__]; break;
+/* 000689 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000689 */ 					}
+/* 000689 */ 				}
+/* 000689 */ 				delete kwargs.__kwargtrans__;
+/* 000689 */ 			}
+/* 000689 */ 		}
+/* 000689 */ 		else {
+/* 000689 */ 		}
+/* 000690 */ 		if (__t__ (value === null)) {
+/* 000691 */ 			var value = self.value;
+/* 000691 */ 		}
+/* 000692 */ 		var kwargs2 = dict ({'with_prefix': false});
+/* 000693 */ 		(function () {
+/* 000693 */ 			var __accu0__ = kwargs2;
+/* 000693 */ 			return __call__ (__accu0__.py_update, __accu0__, kwargs);
+/* 000693 */ 		}) ();
+/* 000694 */ 		return (function () {
+/* 000694 */ 			var __accu0__ = self.formatter;
+/* 000694 */ 			return __call__ (__accu0__.format_flm, __accu0__, value, __kwargtrans__ (kwargs2));
+/* 000694 */ 		}) ();
+/* 000694 */ 	});},
+/* 000696 */ 	get step_and_format_flm () {return __get__ (this, function (self) {
+/* 000696 */ 		if (arguments.length) {
+/* 000696 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000696 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000696 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000696 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000696 */ 					switch (__attrib0__) {
+/* 000696 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000696 */ 					}
+/* 000696 */ 				}
+/* 000696 */ 			}
+/* 000696 */ 		}
+/* 000696 */ 		else {
+/* 000696 */ 		}
+/* 000697 */ 		var val = (function () {
+/* 000697 */ 			var __accu0__ = self;
+/* 000697 */ 			return __call__ (__accu0__.step, __accu0__);
+/* 000697 */ 		}) ();
+/* 000698 */ 		return tuple ([val, (function () {
+/* 000698 */ 			var __accu0__ = self;
+/* 000698 */ 			return __call__ (__accu0__.format_flm, __accu0__, val);
+/* 000698 */ 		}) ()]);
+/* 000698 */ 	});}
+/* 000698 */ });
+/* 000698 */ Object.defineProperty (CounterAlias, 'value', property.call (CounterAlias, CounterAlias._get_value));;
 /* 000006 */ 
 //# sourceMappingURL=flm.counter.map

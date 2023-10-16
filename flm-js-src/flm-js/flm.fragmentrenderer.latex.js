@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-08-14 17:27:47
+/* 000001 */ // Transcrypt'ed from Python, 2023-10-16 20:52:36
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
@@ -9,7 +9,7 @@
 /* 000008 */ import {UnicodeToLatexEncoder} from './pylatexenc.latexencode.js';
 /* 000006 */ import * as __module_re__ from './re.js';
 /* 000006 */ __nest__ (re, '', __module_re__);
-/* 000006 */ export {UnicodeToLatexEncoder, pyltxenc_lenc_get_builtin, FragmentRenderer};
+/* 000006 */ export {FragmentRenderer, UnicodeToLatexEncoder, pyltxenc_lenc_get_builtin};
 /* 000001 */ var __name__ = 'flm.fragmentrenderer.latex';
 /* 000012 */ export var logger = (function () {
 /* 000012 */ 	var __accu0__ = logging;
@@ -471,342 +471,328 @@
 /* 000194 */ 		}
 /* 000194 */ 		else {
 /* 000194 */ 		}
-/* 000203 */ 		return __add__ (__add__ (__getitem__ (delimiters, 0), (function () {
-/* 000203 */ 			var __accu0__ = nodelist;
-/* 000203 */ 			return __call__ (__accu0__.latex_verbatim, __accu0__);
-/* 000203 */ 		}) ()), __getitem__ (delimiters, 1));
-/* 000203 */ 	});},
-/* 000206 */ 	get render_text_format () {return __get__ (this, function (self, text_formats, nodelist, render_context) {
-/* 000206 */ 		if (arguments.length) {
-/* 000206 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000206 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000206 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000206 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000206 */ 					switch (__attrib0__) {
-/* 000206 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000206 */ 						case 'text_formats': var text_formats = __allkwargs0__ [__attrib0__]; break;
-/* 000206 */ 						case 'nodelist': var nodelist = __allkwargs0__ [__attrib0__]; break;
-/* 000206 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000206 */ 					}
-/* 000206 */ 				}
-/* 000206 */ 			}
-/* 000206 */ 		}
-/* 000206 */ 		else {
-/* 000206 */ 		}
-/* 000210 */ 		var content = (function () {
-/* 000210 */ 			var __accu0__ = self;
-/* 000210 */ 			return __call__ (__accu0__.render_nodelist, __accu0__, nodelist, render_context, __kwargtrans__ ({is_block_level: false}));
-/* 000210 */ 		}) ();
-/* 000216 */ 		return (function () {
-/* 000216 */ 			var __accu0__ = self;
-/* 000216 */ 			return __call__ (__accu0__.wrap_in_text_format_macro, __accu0__, content, text_formats, render_context);
-/* 000216 */ 		}) ();
-/* 000216 */ 	});},
-/* 000219 */ 	use_endnote_latex_command: null,
-/* 000220 */ 	use_citation_latex_command: null,
-/* 000222 */ 	get render_semantic_span () {return __get__ (this, function (self, content, role, render_context) {
-/* 000222 */ 		var annotations = null;
-/* 000222 */ 		var target_id = null;
-/* 000222 */ 		if (arguments.length) {
-/* 000222 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000222 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000222 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000222 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000222 */ 					switch (__attrib0__) {
-/* 000222 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000222 */ 						case 'content': var content = __allkwargs0__ [__attrib0__]; break;
-/* 000222 */ 						case 'role': var role = __allkwargs0__ [__attrib0__]; break;
-/* 000222 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000222 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
-/* 000222 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
-/* 000222 */ 					}
-/* 000222 */ 				}
-/* 000222 */ 			}
-/* 000222 */ 		}
-/* 000222 */ 		else {
-/* 000222 */ 		}
-/* 000225 */ 		if (__t__ (__t__ (self.use_endnote_latex_command !== null) && __eq__ (role, 'endnotes'))) {
-/* 000226 */ 			var content = __add__ (__add__ (__add__ (__add__ ('\\', self.use_endnote_latex_command), '{'), content), '}');
-/* 000226 */ 		}
-/* 000229 */ 		if (__t__ (__t__ (self.use_citation_latex_command !== null) && __eq__ (role, 'citations'))) {
-/* 000230 */ 			var content = __add__ (__add__ (__add__ (__add__ ('\\', self.use_citation_latex_command), '{'), content), '}');
-/* 000230 */ 		}
-/* 000234 */ 		return content;
-/* 000234 */ 	});},
-/* 000237 */ 	get render_semantic_block () {return __get__ (this, function (self, content, role, render_context) {
-/* 000237 */ 		var annotations = null;
-/* 000237 */ 		var target_id = null;
-/* 000237 */ 		if (arguments.length) {
-/* 000237 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000237 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000237 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000237 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000237 */ 					switch (__attrib0__) {
-/* 000237 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000237 */ 						case 'content': var content = __allkwargs0__ [__attrib0__]; break;
-/* 000237 */ 						case 'role': var role = __allkwargs0__ [__attrib0__]; break;
-/* 000237 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000237 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
-/* 000237 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
-/* 000237 */ 					}
-/* 000237 */ 				}
-/* 000237 */ 			}
-/* 000237 */ 		}
-/* 000237 */ 		else {
-/* 000237 */ 		}
-/* 000240 */ 		if (__t__ (!__t__ ((annotations)))) {
-/* 000241 */ 			var annotations = [];
-/* 000241 */ 		}
+/* 000202 */ 		var __left0__ = delimiters;
+/* 000202 */ 		var begin_delim = __left0__ [0];
+/* 000202 */ 		var end_delim = __left0__ [1];
+/* 000203 */ 		if (__t__ (environmentname)) {
+/* 000204 */ 			var begin_delim = '\\begin{}{}{}'.format ('{', environmentname, '}');
+/* 000205 */ 			var end_delim = '\\end{}{}{}'.format ('{', environmentname, '}');
+/* 000205 */ 		}
+/* 000208 */ 		return __add__ (__add__ (begin_delim, (function () {
+/* 000208 */ 			var __accu0__ = nodelist;
+/* 000208 */ 			return __call__ (__accu0__.latex_verbatim, __accu0__);
+/* 000208 */ 		}) ()), end_delim);
+/* 000208 */ 	});},
+/* 000211 */ 	get render_text_format () {return __get__ (this, function (self, text_formats, nodelist, render_context) {
+/* 000211 */ 		if (arguments.length) {
+/* 000211 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000211 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000211 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000211 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000211 */ 					switch (__attrib0__) {
+/* 000211 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000211 */ 						case 'text_formats': var text_formats = __allkwargs0__ [__attrib0__]; break;
+/* 000211 */ 						case 'nodelist': var nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 000211 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000211 */ 					}
+/* 000211 */ 				}
+/* 000211 */ 			}
+/* 000211 */ 		}
+/* 000211 */ 		else {
+/* 000211 */ 		}
+/* 000215 */ 		var content = (function () {
+/* 000215 */ 			var __accu0__ = self;
+/* 000215 */ 			return __call__ (__accu0__.render_nodelist, __accu0__, nodelist, render_context, __kwargtrans__ ({is_block_level: false}));
+/* 000215 */ 		}) ();
+/* 000221 */ 		return (function () {
+/* 000221 */ 			var __accu0__ = self;
+/* 000221 */ 			return __call__ (__accu0__.wrap_in_text_format_macro, __accu0__, content, text_formats, render_context);
+/* 000221 */ 		}) ();
+/* 000221 */ 	});},
+/* 000224 */ 	use_endnote_latex_command: null,
+/* 000225 */ 	use_citation_latex_command: null,
+/* 000227 */ 	get render_semantic_span () {return __get__ (this, function (self, content, role, render_context) {
+/* 000227 */ 		var annotations = null;
+/* 000227 */ 		var target_id = null;
+/* 000227 */ 		if (arguments.length) {
+/* 000227 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000227 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000227 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000227 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000227 */ 					switch (__attrib0__) {
+/* 000227 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000227 */ 						case 'content': var content = __allkwargs0__ [__attrib0__]; break;
+/* 000227 */ 						case 'role': var role = __allkwargs0__ [__attrib0__]; break;
+/* 000227 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000227 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
+/* 000227 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
+/* 000227 */ 					}
+/* 000227 */ 				}
+/* 000227 */ 			}
+/* 000227 */ 		}
+/* 000227 */ 		else {
+/* 000227 */ 		}
+/* 000230 */ 		if (__t__ (__t__ (self.use_endnote_latex_command !== null) && __eq__ (role, 'endnotes'))) {
+/* 000231 */ 			var content = __add__ (__add__ (__add__ (__add__ ('\\', self.use_endnote_latex_command), '{'), content), '}');
+/* 000231 */ 		}
+/* 000234 */ 		if (__t__ (__t__ (self.use_citation_latex_command !== null) && __eq__ (role, 'citations'))) {
+/* 000235 */ 			var content = __add__ (__add__ (__add__ (__add__ ('\\', self.use_citation_latex_command), '{'), content), '}');
+/* 000235 */ 		}
+/* 000239 */ 		return content;
+/* 000239 */ 	});},
+/* 000242 */ 	get render_semantic_block () {return __get__ (this, function (self, content, role, render_context) {
+/* 000242 */ 		var annotations = null;
+/* 000242 */ 		var target_id = null;
+/* 000242 */ 		if (arguments.length) {
+/* 000242 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000242 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000242 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000242 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000242 */ 					switch (__attrib0__) {
+/* 000242 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000242 */ 						case 'content': var content = __allkwargs0__ [__attrib0__]; break;
+/* 000242 */ 						case 'role': var role = __allkwargs0__ [__attrib0__]; break;
+/* 000242 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000242 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
+/* 000242 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
+/* 000242 */ 					}
+/* 000242 */ 				}
+/* 000242 */ 			}
+/* 000242 */ 		}
 /* 000242 */ 		else {
-/* 000243 */ 			var annotations = (function () {
-/* 000243 */ 				var __accu0__ = [];
-/* 000243 */ 				var __iterable0__ = annotations;
-/* 000243 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000243 */ 					var a = __getitem__ (__iterable0__, __index0__);
-/* 000243 */ 					(function () {
-/* 000243 */ 						var __accu1__ = __accu0__;
-/* 000243 */ 						return __call__ (__accu1__.append, __accu1__, (function () {
-/* 000243 */ 							var __accu2__ = a;
-/* 000243 */ 							return __call__ (__accu2__.py_replace, __accu2__, '\n', ' ');
-/* 000243 */ 						}) ());
-/* 000243 */ 					}) ();
-/* 000243 */ 				}
-/* 000243 */ 				return __accu0__;
-/* 000243 */ 			}) ();
-/* 000243 */ 		}
-/* 000247 */ 		var begincmd = __add__ (__add__ ('% --- begin ', (function () {
-/* 000247 */ 			var __accu0__ = ',';
-/* 000247 */ 			return __call__ (__accu0__.join, __accu0__, annotations);
-/* 000247 */ 		}) ()), ' ---\n');
-/* 000248 */ 		var endcmd = __add__ (__add__ ('% --- end ', (function () {
-/* 000248 */ 			var __accu0__ = ',';
-/* 000248 */ 			return __call__ (__accu0__.join, __accu0__, annotations);
-/* 000248 */ 		}) ()), ' ---\n');
-/* 000250 */ 		if (__t__ (__t__ (role) && __in__ (role, self.latex_semantic_block_environments))) {
-/* 000251 */ 			var envname = __getitem__ (self.latex_semantic_block_environments, role);
-/* 000252 */ 			var begincmd = __add__ (__add__ ('\\begin{', envname), '}');
-/* 000253 */ 			var endcmd = __add__ (__add__ (__add__ ('\\end{', envname), '}'), '%\n');
-/* 000253 */ 		}
-/* 000255 */ 		var lblcmd = '';
-/* 000256 */ 		if (__t__ (target_id)) {
-/* 000257 */ 			var lblcmd = (function () {
-/* 000257 */ 				var __accu0__ = self;
-/* 000257 */ 				return __call__ (__accu0__.pin_label_here, __accu0__, target_id, '<block>', __kwargtrans__ ({insert_phantom_section: true}));
-/* 000257 */ 			}) ();
-/* 000257 */ 		}
-/* 000262 */ 		return __add__ (__add__ (begincmd, lblcmd), (function () {
-/* 000262 */ 			var __accu0__ = self;
-/* 000262 */ 			return __call__ (__accu0__._latex_join, __accu0__, content, endcmd);
-/* 000262 */ 		}) ());
-/* 000262 */ 	});},
-/* 000266 */ 	get render_enumeration () {return __get__ (this, function (self, iter_items_nodelists, counter_formatter, render_context) {
-/* 000266 */ 		var target_id_generator = null;
-/* 000266 */ 		var annotations = null;
-/* 000266 */ 		var nested_depth = null;
-/* 000266 */ 		if (arguments.length) {
-/* 000266 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000266 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000266 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000266 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000266 */ 					switch (__attrib0__) {
-/* 000266 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000266 */ 						case 'iter_items_nodelists': var iter_items_nodelists = __allkwargs0__ [__attrib0__]; break;
-/* 000266 */ 						case 'counter_formatter': var counter_formatter = __allkwargs0__ [__attrib0__]; break;
-/* 000266 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000266 */ 						case 'target_id_generator': var target_id_generator = __allkwargs0__ [__attrib0__]; break;
-/* 000266 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
-/* 000266 */ 						case 'nested_depth': var nested_depth = __allkwargs0__ [__attrib0__]; break;
-/* 000266 */ 					}
-/* 000266 */ 				}
-/* 000266 */ 			}
-/* 000266 */ 		}
-/* 000266 */ 		else {
-/* 000266 */ 		}
-/* 000277 */ 		var s_items = [];
-/* 000279 */ 		var __iterable0__ = __call__ (enumerate, null, iter_items_nodelists);
-/* 000279 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000279 */ 			var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000279 */ 			var j = __left0__ [0];
-/* 000279 */ 			var item_content_nodelist = __left0__ [1];
-/* 000281 */ 			var use_block_level = true;
-/* 000282 */ 			if (__t__ (item_content_nodelist.parsing_state.is_block_level === false)) {
-/* 000285 */ 				var use_block_level = false;
-/* 000285 */ 			}
-/* 000287 */ 			// pass;
-/* 000291 */ 			// pass;
-/* 000295 */ 			var item_content = (function () {
-/* 000295 */ 				var __accu0__ = self;
-/* 000295 */ 				return __call__ (__accu0__.render_nodelist, __accu0__, item_content_nodelist, __kwargtrans__ ({render_context: render_context, is_block_level: use_block_level}));
-/* 000295 */ 			}) ();
-/* 000301 */ 			var enumno = __add__ (1, j);
-/* 000303 */ 			var tag_nodelist = __call__ (counter_formatter, null, enumno);
-/* 000304 */ 			if (__t__ (__call__ (isinstance, null, tag_nodelist, str))) {
-/* 000305 */ 				var tag_content = (function () {
-/* 000305 */ 					var __accu0__ = self;
-/* 000305 */ 					return __call__ (__accu0__.render_value, __accu0__, tag_nodelist, render_context);
-/* 000305 */ 				}) ();
-/* 000305 */ 			}
-/* 000306 */ 			else {
-/* 000307 */ 				var tag_content = (function () {
-/* 000307 */ 					var __accu0__ = self;
-/* 000307 */ 					return __call__ (__accu0__.render_nodelist, __accu0__, tag_nodelist, __kwargtrans__ ({render_context: render_context, is_block_level: false}));
-/* 000307 */ 				}) ();
-/* 000307 */ 			}
-/* 000313 */ 			var itemlabel = '';
-/* 000314 */ 			if (__t__ (target_id_generator !== null)) {
-/* 000315 */ 				var this_target_id = __call__ (target_id_generator, null, enumno);
-/* 000316 */ 				var itemlabel = (function () {
-/* 000316 */ 					var __accu0__ = self;
-/* 000316 */ 					return __call__ (__accu0__.pin_label_here, __accu0__, this_target_id, tag_content, __kwargtrans__ ({insert_phantom_section: true}));
-/* 000316 */ 				}) ();
-/* 000316 */ 			}
-/* 000319 */ 			(function () {
-/* 000319 */ 				var __accu0__ = s_items;
-/* 000319 */ 				return __call__ (__accu0__.append, __accu0__, __add__ (__add__ (__add__ (__add__ (__add__ ('%\n', '\\item[{'), tag_content), '}]'), itemlabel), item_content));
-/* 000319 */ 			}) ();
-/* 000319 */ 		}
-/* 000325 */ 		if (__t__ (!__t__ ((annotations)))) {
-/* 000326 */ 			var annotations = [];
-/* 000326 */ 		}
-/* 000327 */ 		else {
-/* 000328 */ 			var annotations = (function () {
-/* 000328 */ 				var __accu0__ = [];
-/* 000328 */ 				var __iterable0__ = annotations;
-/* 000328 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000328 */ 					var a = __getitem__ (__iterable0__, __index0__);
-/* 000328 */ 					(function () {
-/* 000328 */ 						var __accu1__ = __accu0__;
-/* 000328 */ 						return __call__ (__accu1__.append, __accu1__, (function () {
-/* 000328 */ 							var __accu2__ = a;
-/* 000328 */ 							return __call__ (__accu2__.py_replace, __accu2__, '\n', ' ');
-/* 000328 */ 						}) ());
-/* 000328 */ 					}) ();
-/* 000328 */ 				}
-/* 000328 */ 				return __accu0__;
-/* 000328 */ 			}) ();
-/* 000328 */ 		}
-/* 000330 */ 		var ltx_environment = 'itemize';
-/* 000332 */ 		if (__t__ (__t__ (__ge__ (__call__ (len, null, annotations), 1)) && __in__ (__getitem__ (annotations, 0), tuple (['enumerate', 'description', 'itemize'])))) {
-/* 000335 */ 			var ltx_environment = __getitem__ (annotations, 0);
-/* 000335 */ 		}
-/* 000337 */ 		return (function () {
-/* 000337 */ 			var __accu0__ = self;
-/* 000340 */ 			return __call__ (__accu0__.wrap_in_latex_enumeration_environment, __accu0__, ltx_environment, __add__ (['enumeration'], annotations), (function () {
-/* 000340 */ 				var __accu1__ = self;
-/* 000340 */ 				return __call__ (__accu1__.render_join, __accu1__, s_items, render_context);
-/* 000340 */ 			}) (), render_context);
-/* 000340 */ 		}) ();
-/* 000340 */ 	});},
-/* 000345 */ 	get render_heading () {return __get__ (this, function (self, heading_nodelist, render_context) {
-/* 000345 */ 		var heading_level = 1;
-/* 000345 */ 		var target_id = null;
-/* 000345 */ 		var inline_heading = false;
-/* 000345 */ 		var annotations = null;
-/* 000345 */ 		if (arguments.length) {
-/* 000345 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000345 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000345 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000345 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000345 */ 					switch (__attrib0__) {
-/* 000345 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000345 */ 						case 'heading_nodelist': var heading_nodelist = __allkwargs0__ [__attrib0__]; break;
-/* 000345 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000345 */ 						case 'heading_level': var heading_level = __allkwargs0__ [__attrib0__]; break;
-/* 000345 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
-/* 000345 */ 						case 'inline_heading': var inline_heading = __allkwargs0__ [__attrib0__]; break;
-/* 000345 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
-/* 000345 */ 					}
-/* 000345 */ 				}
-/* 000345 */ 			}
-/* 000345 */ 		}
-/* 000345 */ 		else {
-/* 000345 */ 		}
-/* 000349 */ 		if (__t__ (!__in__ (heading_level, self.heading_commands_by_level))) {
-/* 000351 */ 			var __except0__ = __call__ (ValueError, null, 'Unknown heading_level={}, expected one of {}'.format (heading_level, __call__ (list, null, (function () {
-/* 000351 */ 				var __accu0__ = self.heading_commands_by_level;
-/* 000351 */ 				return __call__ (__accu0__.py_keys, __accu0__);
-/* 000351 */ 			}) ())));
-/* 000351 */ 			__except0__.__cause__ = null;
-/* 000351 */ 			throw __except0__;
-/* 000351 */ 		}
-/* 000353 */ 		var heading_command = __getitem__ (self.heading_commands_by_level, heading_level);
-/* 000355 */ 		var title_content = (function () {
-/* 000355 */ 			var __accu0__ = self;
-/* 000355 */ 			return __call__ (__accu0__.render_inline_content, __accu0__, heading_nodelist, render_context);
-/* 000355 */ 		}) ();
-/* 000357 */ 		var labelcmd = '';
-/* 000358 */ 		if (__t__ (target_id)) {
-/* 000359 */ 			var labelcmd = __add__ (__add__ (__add__ ('\\label{', self.latex_label_prefix), target_id), '}%\n');
+/* 000242 */ 		}
+/* 000245 */ 		if (__t__ (!__t__ ((annotations)))) {
+/* 000246 */ 			var annotations = [];
+/* 000246 */ 		}
+/* 000247 */ 		else {
+/* 000248 */ 			var annotations = (function () {
+/* 000248 */ 				var __accu0__ = [];
+/* 000248 */ 				var __iterable0__ = annotations;
+/* 000248 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000248 */ 					var a = __getitem__ (__iterable0__, __index0__);
+/* 000248 */ 					(function () {
+/* 000248 */ 						var __accu1__ = __accu0__;
+/* 000248 */ 						return __call__ (__accu1__.append, __accu1__, (function () {
+/* 000248 */ 							var __accu2__ = a;
+/* 000248 */ 							return __call__ (__accu2__.py_replace, __accu2__, '\n', ' ');
+/* 000248 */ 						}) ());
+/* 000248 */ 					}) ();
+/* 000248 */ 				}
+/* 000248 */ 				return __accu0__;
+/* 000248 */ 			}) ();
+/* 000248 */ 		}
+/* 000252 */ 		var begincmd = __add__ (__add__ ('% --- begin ', (function () {
+/* 000252 */ 			var __accu0__ = ',';
+/* 000252 */ 			return __call__ (__accu0__.join, __accu0__, annotations);
+/* 000252 */ 		}) ()), ' ---\n');
+/* 000253 */ 		var endcmd = __add__ (__add__ ('% --- end ', (function () {
+/* 000253 */ 			var __accu0__ = ',';
+/* 000253 */ 			return __call__ (__accu0__.join, __accu0__, annotations);
+/* 000253 */ 		}) ()), ' ---\n');
+/* 000255 */ 		if (__t__ (__t__ (role) && __in__ (role, self.latex_semantic_block_environments))) {
+/* 000256 */ 			var envname = __getitem__ (self.latex_semantic_block_environments, role);
+/* 000257 */ 			var begincmd = __add__ (__add__ ('\\begin{', envname), '}');
+/* 000258 */ 			var endcmd = __add__ (__add__ (__add__ ('\\end{', envname), '}'), '%\n');
+/* 000258 */ 		}
+/* 000260 */ 		var lblcmd = '';
+/* 000261 */ 		if (__t__ (target_id)) {
+/* 000262 */ 			var lblcmd = (function () {
+/* 000262 */ 				var __accu0__ = self;
+/* 000262 */ 				return __call__ (__accu0__.pin_label_here, __accu0__, target_id, '<block>', __kwargtrans__ ({insert_phantom_section: true}));
+/* 000262 */ 			}) ();
+/* 000262 */ 		}
+/* 000267 */ 		return __add__ (__add__ (begincmd, lblcmd), (function () {
+/* 000267 */ 			var __accu0__ = self;
+/* 000267 */ 			return __call__ (__accu0__._latex_join, __accu0__, content, endcmd);
+/* 000267 */ 		}) ());
+/* 000267 */ 	});},
+/* 000271 */ 	get render_enumeration () {return __get__ (this, function (self, iter_items_nodelists, counter_formatter, render_context) {
+/* 000271 */ 		var target_id_generator = null;
+/* 000271 */ 		var annotations = null;
+/* 000271 */ 		var nested_depth = null;
+/* 000271 */ 		if (arguments.length) {
+/* 000271 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000271 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000271 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000271 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000271 */ 					switch (__attrib0__) {
+/* 000271 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000271 */ 						case 'iter_items_nodelists': var iter_items_nodelists = __allkwargs0__ [__attrib0__]; break;
+/* 000271 */ 						case 'counter_formatter': var counter_formatter = __allkwargs0__ [__attrib0__]; break;
+/* 000271 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000271 */ 						case 'target_id_generator': var target_id_generator = __allkwargs0__ [__attrib0__]; break;
+/* 000271 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
+/* 000271 */ 						case 'nested_depth': var nested_depth = __allkwargs0__ [__attrib0__]; break;
+/* 000271 */ 					}
+/* 000271 */ 				}
+/* 000271 */ 			}
+/* 000271 */ 		}
+/* 000271 */ 		else {
+/* 000271 */ 		}
+/* 000282 */ 		var s_items = [];
+/* 000284 */ 		var __iterable0__ = __call__ (enumerate, null, iter_items_nodelists);
+/* 000284 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000284 */ 			var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000284 */ 			var j = __left0__ [0];
+/* 000284 */ 			var item_content_nodelist = __left0__ [1];
+/* 000286 */ 			var use_block_level = true;
+/* 000287 */ 			if (__t__ (item_content_nodelist.parsing_state.is_block_level === false)) {
+/* 000290 */ 				var use_block_level = false;
+/* 000290 */ 			}
+/* 000292 */ 			// pass;
+/* 000296 */ 			// pass;
+/* 000300 */ 			var item_content = (function () {
+/* 000300 */ 				var __accu0__ = self;
+/* 000300 */ 				return __call__ (__accu0__.render_nodelist, __accu0__, item_content_nodelist, __kwargtrans__ ({render_context: render_context, is_block_level: use_block_level}));
+/* 000300 */ 			}) ();
+/* 000306 */ 			var enumno = __add__ (1, j);
+/* 000308 */ 			var tag_nodelist = __call__ (counter_formatter, null, enumno);
+/* 000309 */ 			if (__t__ (__call__ (isinstance, null, tag_nodelist, str))) {
+/* 000310 */ 				var tag_content = (function () {
+/* 000310 */ 					var __accu0__ = self;
+/* 000310 */ 					return __call__ (__accu0__.render_value, __accu0__, tag_nodelist, render_context);
+/* 000310 */ 				}) ();
+/* 000310 */ 			}
+/* 000311 */ 			else {
+/* 000312 */ 				var tag_content = (function () {
+/* 000312 */ 					var __accu0__ = self;
+/* 000312 */ 					return __call__ (__accu0__.render_nodelist, __accu0__, tag_nodelist, __kwargtrans__ ({render_context: render_context, is_block_level: false}));
+/* 000312 */ 				}) ();
+/* 000312 */ 			}
+/* 000318 */ 			var itemlabel = '';
+/* 000319 */ 			if (__t__ (target_id_generator !== null)) {
+/* 000320 */ 				var this_target_id = __call__ (target_id_generator, null, enumno);
+/* 000321 */ 				var itemlabel = (function () {
+/* 000321 */ 					var __accu0__ = self;
+/* 000321 */ 					return __call__ (__accu0__.pin_label_here, __accu0__, this_target_id, tag_content, __kwargtrans__ ({insert_phantom_section: true}));
+/* 000321 */ 				}) ();
+/* 000321 */ 			}
+/* 000324 */ 			(function () {
+/* 000324 */ 				var __accu0__ = s_items;
+/* 000324 */ 				return __call__ (__accu0__.append, __accu0__, __add__ (__add__ (__add__ (__add__ (__add__ ('%\n', '\\item[{'), tag_content), '}]'), itemlabel), item_content));
+/* 000324 */ 			}) ();
+/* 000324 */ 		}
+/* 000330 */ 		if (__t__ (!__t__ ((annotations)))) {
+/* 000331 */ 			var annotations = [];
+/* 000331 */ 		}
+/* 000332 */ 		else {
+/* 000333 */ 			var annotations = (function () {
+/* 000333 */ 				var __accu0__ = [];
+/* 000333 */ 				var __iterable0__ = annotations;
+/* 000333 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000333 */ 					var a = __getitem__ (__iterable0__, __index0__);
+/* 000333 */ 					(function () {
+/* 000333 */ 						var __accu1__ = __accu0__;
+/* 000333 */ 						return __call__ (__accu1__.append, __accu1__, (function () {
+/* 000333 */ 							var __accu2__ = a;
+/* 000333 */ 							return __call__ (__accu2__.py_replace, __accu2__, '\n', ' ');
+/* 000333 */ 						}) ());
+/* 000333 */ 					}) ();
+/* 000333 */ 				}
+/* 000333 */ 				return __accu0__;
+/* 000333 */ 			}) ();
+/* 000333 */ 		}
+/* 000335 */ 		var ltx_environment = 'itemize';
+/* 000337 */ 		if (__t__ (__t__ (__ge__ (__call__ (len, null, annotations), 1)) && __in__ (__getitem__ (annotations, 0), tuple (['enumerate', 'description', 'itemize'])))) {
+/* 000340 */ 			var ltx_environment = __getitem__ (annotations, 0);
+/* 000340 */ 		}
+/* 000342 */ 		return (function () {
+/* 000342 */ 			var __accu0__ = self;
+/* 000345 */ 			return __call__ (__accu0__.wrap_in_latex_enumeration_environment, __accu0__, ltx_environment, __add__ (['enumeration'], annotations), (function () {
+/* 000345 */ 				var __accu1__ = self;
+/* 000345 */ 				return __call__ (__accu1__.render_join, __accu1__, s_items, render_context);
+/* 000345 */ 			}) (), render_context);
+/* 000345 */ 		}) ();
+/* 000345 */ 	});},
+/* 000350 */ 	get render_heading () {return __get__ (this, function (self, heading_nodelist, render_context) {
+/* 000350 */ 		var heading_level = 1;
+/* 000350 */ 		var inline_heading = false;
+/* 000350 */ 		var target_id = null;
+/* 000350 */ 		var annotations = null;
+/* 000350 */ 		if (arguments.length) {
+/* 000350 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000350 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000350 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000350 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000350 */ 					switch (__attrib0__) {
+/* 000350 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000350 */ 						case 'heading_nodelist': var heading_nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 000350 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000350 */ 						case 'heading_level': var heading_level = __allkwargs0__ [__attrib0__]; break;
+/* 000350 */ 						case 'inline_heading': var inline_heading = __allkwargs0__ [__attrib0__]; break;
+/* 000350 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
+/* 000350 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
+/* 000350 */ 					}
+/* 000350 */ 				}
+/* 000350 */ 			}
+/* 000350 */ 		}
+/* 000350 */ 		else {
+/* 000350 */ 		}
+/* 000357 */ 		if (__t__ (!__in__ (heading_level, self.heading_commands_by_level))) {
+/* 000359 */ 			var __except0__ = __call__ (ValueError, null, 'Unknown heading_level={}, expected one of {}'.format (heading_level, __call__ (list, null, (function () {
+/* 000359 */ 				var __accu0__ = self.heading_commands_by_level;
+/* 000359 */ 				return __call__ (__accu0__.py_keys, __accu0__);
+/* 000359 */ 			}) ())));
+/* 000359 */ 			__except0__.__cause__ = null;
+/* 000359 */ 			throw __except0__;
 /* 000359 */ 		}
-/* 000361 */ 		return __add__ (__add__ (__add__ (__add__ (__add__ (__add__ ('\\', heading_command), '{'), title_content), '}'), '%\n'), labelcmd);
-/* 000361 */ 	});},
-/* 000366 */ 	get render_link () {return __get__ (this, function (self, ref_type, href, display_nodelist, render_context, annotations) {
-/* 000366 */ 		if (typeof annotations == 'undefined' || (annotations != null && annotations.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000366 */ 			var annotations = null;
-/* 000366 */ 		};
-/* 000366 */ 		if (arguments.length) {
-/* 000366 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000366 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000366 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000366 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000366 */ 					switch (__attrib0__) {
-/* 000366 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000366 */ 						case 'ref_type': var ref_type = __allkwargs0__ [__attrib0__]; break;
-/* 000366 */ 						case 'href': var href = __allkwargs0__ [__attrib0__]; break;
-/* 000366 */ 						case 'display_nodelist': var display_nodelist = __allkwargs0__ [__attrib0__]; break;
-/* 000366 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000366 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
-/* 000366 */ 					}
-/* 000366 */ 				}
-/* 000366 */ 			}
-/* 000366 */ 		}
-/* 000366 */ 		else {
-/* 000366 */ 		}
-/* 000368 */ 		var display_content = (function () {
-/* 000368 */ 			var __accu0__ = self;
-/* 000368 */ 			return __call__ (__accu0__.render_nodelist, __accu0__, display_nodelist, __kwargtrans__ ({render_context: render_context, is_block_level: false}));
-/* 000368 */ 		}) ();
-/* 000374 */ 		var annotations = __t__ (annotations) || [];
-/* 000376 */ 		if (__t__ (__t__ (self.use_endnote_latex_command !== null) && __in__ ('endnotes', annotations))) {
-/* 000377 */ 			var display_content = __add__ (__add__ (__add__ (__add__ ('\\', self.use_endnote_latex_command), '{'), display_content), '}');
-/* 000377 */ 		}
-/* 000380 */ 		if (__t__ (__t__ (self.use_citation_latex_command !== null) && __in__ ('citations', annotations))) {
-/* 000381 */ 			var display_content = __add__ (__add__ (__add__ (__add__ ('\\', self.use_citation_latex_command), '{'), display_content), '}');
-/* 000381 */ 		}
-/* 000385 */ 		if (__t__ (__eq__ (__getslice__ (href, 0, 1, 1), '#'))) {
-/* 000386 */ 			return (function () {
-/* 000386 */ 				var __accu0__ = self;
-/* 000386 */ 				return __call__ (__accu0__.render_latex_link_hyperref, __accu0__, display_content, __getslice__ (href, 1, null, 1));
-/* 000386 */ 			}) ();
-/* 000386 */ 		}
-/* 000390 */ 		return (function () {
-/* 000390 */ 			var __accu0__ = self;
-/* 000390 */ 			return __call__ (__accu0__.render_latex_link_href, __accu0__, display_content, href);
-/* 000390 */ 		}) ();
-/* 000390 */ 	});},
-/* 000395 */ 	debug_disable_link_hyperref: false,
-/* 000397 */ 	get render_latex_link_hyperref () {return __get__ (this, function (self, display_content, to_target_id) {
-/* 000397 */ 		if (arguments.length) {
-/* 000397 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000397 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000397 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000397 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000397 */ 					switch (__attrib0__) {
-/* 000397 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000397 */ 						case 'display_content': var display_content = __allkwargs0__ [__attrib0__]; break;
-/* 000397 */ 						case 'to_target_id': var to_target_id = __allkwargs0__ [__attrib0__]; break;
-/* 000397 */ 					}
-/* 000397 */ 				}
-/* 000397 */ 			}
-/* 000397 */ 		}
-/* 000397 */ 		else {
-/* 000397 */ 		}
-/* 000398 */ 		if (__t__ (self.debug_disable_link_hyperref)) {
-/* 000399 */ 			return display_content;
-/* 000399 */ 		}
-/* 000400 */ 		return __add__ (__add__ (__add__ (__add__ (__add__ ('\\hyperref[{', self.latex_label_prefix), to_target_id), '}]{'), display_content), '}');
-/* 000400 */ 	});},
-/* 000405 */ 	get render_latex_link_href () {return __get__ (this, function (self, display_content, href) {
+/* 000361 */ 		var heading_command = __getitem__ (self.heading_commands_by_level, heading_level);
+/* 000363 */ 		var title_content = (function () {
+/* 000363 */ 			var __accu0__ = self;
+/* 000363 */ 			return __call__ (__accu0__.render_inline_content, __accu0__, heading_nodelist, render_context);
+/* 000363 */ 		}) ();
+/* 000365 */ 		var labelcmd = '';
+/* 000366 */ 		if (__t__ (target_id)) {
+/* 000367 */ 			var labelcmd = __add__ (__add__ (__add__ ('\\label{', self.latex_label_prefix), target_id), '}%\n');
+/* 000367 */ 		}
+/* 000369 */ 		return __add__ (__add__ (__add__ (__add__ (__add__ (__add__ ('\\', heading_command), '{'), title_content), '}'), '%\n'), labelcmd);
+/* 000369 */ 	});},
+/* 000374 */ 	get render_link () {return __get__ (this, function (self, ref_type, href, display_nodelist, render_context, annotations) {
+/* 000374 */ 		if (typeof annotations == 'undefined' || (annotations != null && annotations.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000374 */ 			var annotations = null;
+/* 000374 */ 		};
+/* 000374 */ 		if (arguments.length) {
+/* 000374 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000374 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000374 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000374 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000374 */ 					switch (__attrib0__) {
+/* 000374 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000374 */ 						case 'ref_type': var ref_type = __allkwargs0__ [__attrib0__]; break;
+/* 000374 */ 						case 'href': var href = __allkwargs0__ [__attrib0__]; break;
+/* 000374 */ 						case 'display_nodelist': var display_nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 000374 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000374 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
+/* 000374 */ 					}
+/* 000374 */ 				}
+/* 000374 */ 			}
+/* 000374 */ 		}
+/* 000374 */ 		else {
+/* 000374 */ 		}
+/* 000376 */ 		var display_content = (function () {
+/* 000376 */ 			var __accu0__ = self;
+/* 000376 */ 			return __call__ (__accu0__.render_nodelist, __accu0__, display_nodelist, __kwargtrans__ ({render_context: render_context, is_block_level: false}));
+/* 000376 */ 		}) ();
+/* 000382 */ 		var annotations = __t__ (annotations) || [];
+/* 000384 */ 		if (__t__ (__t__ (self.use_endnote_latex_command !== null) && __in__ ('endnotes', annotations))) {
+/* 000385 */ 			var display_content = __add__ (__add__ (__add__ (__add__ ('\\', self.use_endnote_latex_command), '{'), display_content), '}');
+/* 000385 */ 		}
+/* 000388 */ 		if (__t__ (__t__ (self.use_citation_latex_command !== null) && __in__ ('citations', annotations))) {
+/* 000389 */ 			var display_content = __add__ (__add__ (__add__ (__add__ ('\\', self.use_citation_latex_command), '{'), display_content), '}');
+/* 000389 */ 		}
+/* 000393 */ 		if (__t__ (__eq__ (__getslice__ (href, 0, 1, 1), '#'))) {
+/* 000394 */ 			return (function () {
+/* 000394 */ 				var __accu0__ = self;
+/* 000394 */ 				return __call__ (__accu0__.render_latex_link_hyperref, __accu0__, display_content, __getslice__ (href, 1, null, 1));
+/* 000394 */ 			}) ();
+/* 000394 */ 		}
+/* 000398 */ 		return (function () {
+/* 000398 */ 			var __accu0__ = self;
+/* 000398 */ 			return __call__ (__accu0__.render_latex_link_href, __accu0__, display_content, href);
+/* 000398 */ 		}) ();
+/* 000398 */ 	});},
+/* 000403 */ 	debug_disable_link_hyperref: false,
+/* 000405 */ 	get render_latex_link_hyperref () {return __get__ (this, function (self, display_content, to_target_id) {
 /* 000405 */ 		if (arguments.length) {
 /* 000405 */ 			var __ilastarg0__ = arguments.length - 1;
 /* 000405 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -815,471 +801,492 @@
 /* 000405 */ 					switch (__attrib0__) {
 /* 000405 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
 /* 000405 */ 						case 'display_content': var display_content = __allkwargs0__ [__attrib0__]; break;
-/* 000405 */ 						case 'href': var href = __allkwargs0__ [__attrib0__]; break;
+/* 000405 */ 						case 'to_target_id': var to_target_id = __allkwargs0__ [__attrib0__]; break;
 /* 000405 */ 					}
 /* 000405 */ 				}
 /* 000405 */ 			}
 /* 000405 */ 		}
 /* 000405 */ 		else {
 /* 000405 */ 		}
-/* 000406 */ 		return __add__ (__add__ (__add__ (__add__ ('\\href{', (function () {
-/* 000406 */ 			var __accu0__ = href;
-/* 000406 */ 			return __call__ (__accu0__.py_replace, __accu0__, '%', '\\%');
-/* 000406 */ 		}) ()), '}{'), display_content), '}');
-/* 000406 */ 	});},
-/* 000408 */ 	get render_delayed_marker () {return __get__ (this, function (self, node, delayed_key, render_context) {
-/* 000408 */ 		if (arguments.length) {
-/* 000408 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000408 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000408 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000408 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000408 */ 					switch (__attrib0__) {
-/* 000408 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000408 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000408 */ 						case 'delayed_key': var delayed_key = __allkwargs0__ [__attrib0__]; break;
-/* 000408 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000408 */ 					}
-/* 000408 */ 				}
-/* 000408 */ 			}
-/* 000408 */ 		}
-/* 000408 */ 		else {
-/* 000408 */ 		}
-/* 000409 */ 		return __add__ (__add__ ('\\FLMDLYD{', __call__ (str, null, delayed_key)), '}');
-/* 000409 */ 	});},
-/* 000411 */ 	get render_delayed_dummy_placeholder () {return __get__ (this, function (self, node, delayed_key, render_context) {
-/* 000411 */ 		if (arguments.length) {
-/* 000411 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000411 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000411 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000411 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000411 */ 					switch (__attrib0__) {
-/* 000411 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000411 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000411 */ 						case 'delayed_key': var delayed_key = __allkwargs0__ [__attrib0__]; break;
-/* 000411 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000411 */ 					}
-/* 000411 */ 				}
-/* 000411 */ 			}
-/* 000411 */ 		}
-/* 000411 */ 		else {
-/* 000411 */ 		}
-/* 000412 */ 		return '% delayed:{}\n'.format (delayed_key);
-/* 000412 */ 	});},
-/* 000414 */ 	get replace_delayed_markers_with_final_values () {return __get__ (this, function (self, content, delayed_values) {
-/* 000414 */ 		if (arguments.length) {
-/* 000414 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000414 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000414 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000414 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000414 */ 					switch (__attrib0__) {
-/* 000414 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000414 */ 						case 'content': var content = __allkwargs0__ [__attrib0__]; break;
-/* 000414 */ 						case 'delayed_values': var delayed_values = __allkwargs0__ [__attrib0__]; break;
-/* 000414 */ 					}
-/* 000414 */ 				}
-/* 000414 */ 			}
-/* 000414 */ 		}
-/* 000414 */ 		else {
-/* 000414 */ 		}
-/* 000415 */ 		return (function () {
-/* 000415 */ 			var __accu0__ = _rx_delayed_markers;
-/* 000415 */ 			return __call__ (__accu0__.sub, __accu0__, (function __lambda__ (m) {
-/* 000415 */ 				if (arguments.length) {
-/* 000415 */ 					var __ilastarg0__ = arguments.length - 1;
-/* 000415 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000415 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000415 */ 						for (var __attrib0__ in __allkwargs0__) {
-/* 000415 */ 							switch (__attrib0__) {
-/* 000415 */ 								case 'm': var m = __allkwargs0__ [__attrib0__]; break;
-/* 000415 */ 							}
-/* 000415 */ 						}
-/* 000415 */ 					}
-/* 000415 */ 				}
-/* 000415 */ 				else {
-/* 000415 */ 				}
-/* 000416 */ 				return __getitem__ (delayed_values, __call__ (int, null, (function () {
-/* 000416 */ 					var __accu1__ = m;
-/* 000416 */ 					return __call__ (__accu1__.group, __accu1__, 'key');
-/* 000416 */ 				}) ()));
-/* 000416 */ 			}), content);
-/* 000416 */ 		}) ();
-/* 000416 */ 	});},
-/* 000423 */ 	get render_float () {return __get__ (this, function (self, float_instance, render_context) {
-/* 000423 */ 		if (arguments.length) {
-/* 000423 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000423 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000423 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000423 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000423 */ 					switch (__attrib0__) {
-/* 000423 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000423 */ 						case 'float_instance': var float_instance = __allkwargs0__ [__attrib0__]; break;
-/* 000423 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000406 */ 		if (__t__ (self.debug_disable_link_hyperref)) {
+/* 000407 */ 			return display_content;
+/* 000407 */ 		}
+/* 000408 */ 		return __add__ (__add__ (__add__ (__add__ (__add__ ('\\hyperref[{', self.latex_label_prefix), to_target_id), '}]{'), display_content), '}');
+/* 000408 */ 	});},
+/* 000413 */ 	get render_latex_link_href () {return __get__ (this, function (self, display_content, href) {
+/* 000413 */ 		if (arguments.length) {
+/* 000413 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000413 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000413 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000413 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000413 */ 					switch (__attrib0__) {
+/* 000413 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000413 */ 						case 'display_content': var display_content = __allkwargs0__ [__attrib0__]; break;
+/* 000413 */ 						case 'href': var href = __allkwargs0__ [__attrib0__]; break;
+/* 000413 */ 					}
+/* 000413 */ 				}
+/* 000413 */ 			}
+/* 000413 */ 		}
+/* 000413 */ 		else {
+/* 000413 */ 		}
+/* 000414 */ 		return __add__ (__add__ (__add__ (__add__ ('\\href{', (function () {
+/* 000414 */ 			var __accu0__ = href;
+/* 000414 */ 			return __call__ (__accu0__.py_replace, __accu0__, '%', '\\%');
+/* 000414 */ 		}) ()), '}{'), display_content), '}');
+/* 000414 */ 	});},
+/* 000416 */ 	get render_delayed_marker () {return __get__ (this, function (self, node, delayed_key, render_context) {
+/* 000416 */ 		if (arguments.length) {
+/* 000416 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000416 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000416 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000416 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000416 */ 					switch (__attrib0__) {
+/* 000416 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000416 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000416 */ 						case 'delayed_key': var delayed_key = __allkwargs0__ [__attrib0__]; break;
+/* 000416 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000416 */ 					}
+/* 000416 */ 				}
+/* 000416 */ 			}
+/* 000416 */ 		}
+/* 000416 */ 		else {
+/* 000416 */ 		}
+/* 000417 */ 		return __add__ (__add__ ('\\FLMDLYD{', __call__ (str, null, delayed_key)), '}');
+/* 000417 */ 	});},
+/* 000419 */ 	get render_delayed_dummy_placeholder () {return __get__ (this, function (self, node, delayed_key, render_context) {
+/* 000419 */ 		if (arguments.length) {
+/* 000419 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000419 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000419 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000419 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000419 */ 					switch (__attrib0__) {
+/* 000419 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000419 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000419 */ 						case 'delayed_key': var delayed_key = __allkwargs0__ [__attrib0__]; break;
+/* 000419 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000419 */ 					}
+/* 000419 */ 				}
+/* 000419 */ 			}
+/* 000419 */ 		}
+/* 000419 */ 		else {
+/* 000419 */ 		}
+/* 000420 */ 		return '% delayed:{}\n'.format (delayed_key);
+/* 000420 */ 	});},
+/* 000422 */ 	get replace_delayed_markers_with_final_values () {return __get__ (this, function (self, content, delayed_values) {
+/* 000422 */ 		if (arguments.length) {
+/* 000422 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000422 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000422 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000422 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000422 */ 					switch (__attrib0__) {
+/* 000422 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000422 */ 						case 'content': var content = __allkwargs0__ [__attrib0__]; break;
+/* 000422 */ 						case 'delayed_values': var delayed_values = __allkwargs0__ [__attrib0__]; break;
+/* 000422 */ 					}
+/* 000422 */ 				}
+/* 000422 */ 			}
+/* 000422 */ 		}
+/* 000422 */ 		else {
+/* 000422 */ 		}
+/* 000423 */ 		return (function () {
+/* 000423 */ 			var __accu0__ = _rx_delayed_markers;
+/* 000423 */ 			return __call__ (__accu0__.sub, __accu0__, (function __lambda__ (m) {
+/* 000423 */ 				if (arguments.length) {
+/* 000423 */ 					var __ilastarg0__ = arguments.length - 1;
+/* 000423 */ 					if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000423 */ 						var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000423 */ 						for (var __attrib0__ in __allkwargs0__) {
+/* 000423 */ 							switch (__attrib0__) {
+/* 000423 */ 								case 'm': var m = __allkwargs0__ [__attrib0__]; break;
+/* 000423 */ 							}
+/* 000423 */ 						}
 /* 000423 */ 					}
 /* 000423 */ 				}
-/* 000423 */ 			}
-/* 000423 */ 		}
-/* 000423 */ 		else {
-/* 000423 */ 		}
-/* 000426 */ 		var full_figcaption_rendered_list = [];
-/* 000427 */ 		var float_designator = null;
-/* 000428 */ 		if (__t__ (float_instance.number !== null)) {
-/* 000431 */ 			var float_designator = __add__ (__add__ ((function () {
-/* 000431 */ 				var __accu0__ = self;
-/* 000431 */ 				return __call__ (__accu0__.render_value, __accu0__, float_instance.float_type_info.float_caption_name, render_context);
-/* 000436 */ 			}) (), '~'), (function () {
-/* 000436 */ 				var __accu0__ = self;
-/* 000436 */ 				return __call__ (__accu0__.render_nodelist, __accu0__, float_instance.formatted_counter_value_flm.nodes, __kwargtrans__ ({render_context: render_context}));
-/* 000436 */ 			}) ());
-/* 000436 */ 		}
-/* 000441 */ 		else if (__t__ (float_instance.caption_nodelist)) {
-/* 000445 */ 			var float_designator = (function () {
-/* 000445 */ 				var __accu0__ = self;
-/* 000445 */ 				return __call__ (__accu0__.render_value, __accu0__, float_instance.float_type_info.float_caption_name, render_context);
-/* 000445 */ 			}) ();
-/* 000445 */ 		}
-/* 000448 */ 		else {
-/* 000452 */ 			// pass;
-/* 000452 */ 		}
-/* 000454 */ 		var labelcmd = '';
-/* 000455 */ 		if (__t__ (float_designator !== null)) {
-/* 000456 */ 			(function () {
-/* 000456 */ 				var __accu0__ = full_figcaption_rendered_list;
-/* 000456 */ 				return __call__ (__accu0__.append, __accu0__, float_designator);
-/* 000456 */ 			}) ();
-/* 000458 */ 			if (__t__ (float_instance.target_id !== null)) {
-/* 000459 */ 				var labelcmd = (function () {
-/* 000459 */ 					var __accu0__ = self;
-/* 000459 */ 					return __call__ (__accu0__.pin_label_here, __accu0__, float_instance.target_id, float_designator, __kwargtrans__ ({insert_phantom_section: true}));
-/* 000459 */ 				}) ();
-/* 000459 */ 			}
-/* 000459 */ 		}
-/* 000463 */ 		if (__t__ (float_instance.caption_nodelist)) {
-/* 000467 */ 			(function () {
-/* 000467 */ 				var __accu0__ = full_figcaption_rendered_list;
-/* 000467 */ 				return __call__ (__accu0__.append, __accu0__, ': ');
-/* 000467 */ 			}) ();
-/* 000470 */ 			(function () {
-/* 000470 */ 				var __accu0__ = full_figcaption_rendered_list;
-/* 000471 */ 				return __call__ (__accu0__.append, __accu0__, (function () {
-/* 000471 */ 					var __accu1__ = self;
-/* 000471 */ 					return __call__ (__accu1__.render_nodelist, __accu1__, float_instance.caption_nodelist, __kwargtrans__ ({render_context: render_context}));
-/* 000471 */ 				}) ());
-/* 000471 */ 			}) ();
-/* 000471 */ 		}
-/* 000477 */ 		var rendered_float_caption = null;
-/* 000478 */ 		if (__t__ (full_figcaption_rendered_list)) {
-/* 000481 */ 			var rendered_float_caption = __add__ ('\\par', (function () {
-/* 000481 */ 				var __accu0__ = self;
-/* 000483 */ 				return __call__ (__accu0__.render_semantic_block, __accu0__, __add__ (labelcmd, (function () {
-/* 000483 */ 					var __accu1__ = self;
-/* 000483 */ 					return __call__ (__accu1__.render_join, __accu1__, full_figcaption_rendered_list, render_context);
-/* 000483 */ 				}) ()), __kwargtrans__ ({role: 'figure_caption', render_context: render_context}));
-/* 000483 */ 			}) ());
-/* 000483 */ 		}
-/* 000489 */ 		var float_content_block_content = (function () {
-/* 000489 */ 			var __accu0__ = self;
-/* 000489 */ 			return __call__ (__accu0__.render_nodelist, __accu0__, float_instance.content_nodelist, __kwargtrans__ ({render_context: render_context, is_block_level: true}));
-/* 000489 */ 		}) ();
-/* 000495 */ 		if (__t__ (rendered_float_caption !== null)) {
-/* 000496 */ 			var float_content_with_caption = (function () {
-/* 000496 */ 				var __accu0__ = self;
-/* 000496 */ 				return __call__ (__accu0__.render_join_blocks, __accu0__, [float_content_block_content, rendered_float_caption], render_context);
-/* 000496 */ 			}) ();
-/* 000496 */ 		}
-/* 000500 */ 		else {
-/* 000501 */ 			var float_content_with_caption = float_content_block_content;
-/* 000501 */ 		}
-/* 000503 */ 		return __add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ ('\\begin{', float_instance.float_type), '}[h!]%\n'), '\\centering{}'), float_content_with_caption), '\\end{'), float_instance.float_type), '}');
-/* 000503 */ 	});},
-/* 000510 */ 	graphics_raster_magnification: 1,
-/* 000511 */ 	graphics_vector_magnification: 1,
-/* 000513 */ 	get render_graphics_block () {return __get__ (this, function (self, graphics_resource, render_context) {
-/* 000513 */ 		if (arguments.length) {
-/* 000513 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000513 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000513 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000513 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000513 */ 					switch (__attrib0__) {
-/* 000513 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000513 */ 						case 'graphics_resource': var graphics_resource = __allkwargs0__ [__attrib0__]; break;
-/* 000513 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000513 */ 					}
-/* 000513 */ 				}
-/* 000513 */ 			}
-/* 000513 */ 		}
-/* 000513 */ 		else {
-/* 000513 */ 		}
-/* 000515 */ 		var __left0__ = (function () {
-/* 000515 */ 			var __accu0__ = self;
-/* 000515 */ 			return __call__ (__accu0__.collect_graphics_resource, __accu0__, graphics_resource, render_context);
-/* 000515 */ 		}) ();
-/* 000515 */ 		var src_url = __left0__ [0];
-/* 000515 */ 		var incloptions = __left0__ [1];
-/* 000517 */ 		var opts = '';
-/* 000518 */ 		if (__t__ (incloptions !== null)) {
-/* 000519 */ 			var opts = __add__ (__add__ ('[', incloptions), ']');
-/* 000519 */ 		}
-/* 000521 */ 		return __add__ (__add__ (__add__ (__add__ ('\\includegraphics', opts), '{'), src_url), '}');
-/* 000521 */ 	});},
-/* 000523 */ 	get collect_graphics_resource () {return __get__ (this, function (self, graphics_resource, render_context) {
-/* 000523 */ 		if (arguments.length) {
-/* 000523 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000523 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000523 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000523 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000523 */ 					switch (__attrib0__) {
-/* 000523 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000523 */ 						case 'graphics_resource': var graphics_resource = __allkwargs0__ [__attrib0__]; break;
-/* 000523 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000523 */ 					}
-/* 000523 */ 				}
-/* 000523 */ 			}
-/* 000523 */ 		}
-/* 000523 */ 		else {
-/* 000523 */ 		}
-/* 000527 */ 		var whoptc = null;
-/* 000528 */ 		if (__t__ (graphics_resource.physical_dimensions !== null)) {
-/* 000530 */ 			var __left0__ = graphics_resource.physical_dimensions;
-/* 000530 */ 			var width_pt = __left0__ [0];
-/* 000530 */ 			var height_pt = __left0__ [1];
-/* 000532 */ 			if (__t__ (__eq__ (graphics_resource.graphics_type, 'raster'))) {
-/* 000533 */ 				if (__t__ (width_pt !== null)) {
-/* 000534 */ 					var width_pt = __call__ (__imul__, null, width_pt, self.graphics_raster_magnification);
-/* 000534 */ 				}
-/* 000535 */ 				if (__t__ (height_pt !== null)) {
-/* 000536 */ 					var height_pt = __call__ (__imul__, null, height_pt, self.graphics_raster_magnification);
-/* 000536 */ 				}
-/* 000536 */ 			}
-/* 000537 */ 			else if (__t__ (__eq__ (graphics_resource.graphics_type, 'vector'))) {
-/* 000538 */ 				if (__t__ (width_pt !== null)) {
-/* 000539 */ 					var width_pt = __call__ (__imul__, null, width_pt, self.graphics_vector_magnification);
-/* 000539 */ 				}
-/* 000540 */ 				if (__t__ (height_pt !== null)) {
-/* 000541 */ 					var height_pt = __call__ (__imul__, null, height_pt, self.graphics_vector_magnification);
-/* 000541 */ 				}
-/* 000541 */ 			}
-/* 000543 */ 			var whoptc = '';
-/* 000544 */ 			if (__t__ (width_pt !== null)) {
-/* 000545 */ 				var whoptc = __call__ (__iadd__, null, whoptc, 'width={}pt,'.format (width_pt));
-/* 000545 */ 			}
-/* 000546 */ 			if (__t__ (height_pt !== null)) {
-/* 000547 */ 				var whoptc = __call__ (__iadd__, null, whoptc, 'height={}pt,'.format (height_pt));
-/* 000547 */ 			}
-/* 000547 */ 		}
-/* 000549 */ 		return tuple ([graphics_resource.src_url, whoptc]);
-/* 000549 */ 	});},
-/* 000551 */ 	get render_cells () {return __get__ (this, function (self, cells_model, render_context, target_id) {
-/* 000551 */ 		if (typeof target_id == 'undefined' || (target_id != null && target_id.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000551 */ 			var target_id = null;
-/* 000551 */ 		};
-/* 000551 */ 		if (arguments.length) {
-/* 000551 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000551 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000551 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000551 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000551 */ 					switch (__attrib0__) {
-/* 000551 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000551 */ 						case 'cells_model': var cells_model = __allkwargs0__ [__attrib0__]; break;
-/* 000551 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000551 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
-/* 000551 */ 					}
-/* 000551 */ 				}
-/* 000551 */ 			}
-/* 000551 */ 		}
-/* 000551 */ 		else {
-/* 000551 */ 		}
-/* 000556 */ 		var stab_contents = '';
-/* 000558 */ 		var cell_spans_styles = '';
-/* 000559 */ 		var cell_hlines = [];
-/* 000560 */ 		var cell_vlines = [];
-/* 000562 */ 		var __left0__ = tuple ([__call__ (len, null, cells_model.grid_data), __call__ (len, null, __getitem__ (cells_model.grid_data, 0))]);
-/* 000562 */ 		var tabheight = __left0__ [0];
-/* 000562 */ 		var tabwidth = __left0__ [1];
-/* 000564 */ 		var __iterable0__ = cells_model.grid_data;
-/* 000564 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000564 */ 			var row = __getitem__ (__iterable0__, __index0__);
-/* 000565 */ 			var stab_rowitems = [];
-/* 000567 */ 			var __iterable1__ = row;
-/* 000567 */ 			for (var __index1__ = 0; __index1__ < len (__iterable1__); __index1__++) {
-/* 000567 */ 				var cellinfo = __getitem__ (__iterable1__, __index1__);
-/* 000568 */ 				if (__t__ (__t__ (cellinfo !== null) && __t__ (__getitem__ (cellinfo, 'cell') !== null) && __getitem__ (cellinfo, 'is_topleft'))) {
-/* 000571 */ 					var cell = __getitem__ (cellinfo, 'cell');
-/* 000572 */ 					var cell_content = (function () {
-/* 000572 */ 						var __accu0__ = self;
-/* 000572 */ 						return __call__ (__accu0__.render_nodelist, __accu0__, cell.content_nodes, __kwargtrans__ ({render_context: render_context}));
-/* 000572 */ 					}) ();
-/* 000579 */ 					var thiscellspanopts = [];
-/* 000580 */ 					var rowj = cell.placement.row_range.start;
-/* 000581 */ 					var rowjend = cell.placement.row_range.end;
-/* 000582 */ 					var numrows = __sub__ (rowjend, rowj);
-/* 000583 */ 					if (__t__ (__gt__ (numrows, 1))) {
-/* 000584 */ 						(function () {
-/* 000584 */ 							var __accu0__ = thiscellspanopts;
-/* 000584 */ 							return __call__ (__accu0__.append, __accu0__, 'r={}'.format (numrows));
-/* 000584 */ 						}) ();
-/* 000584 */ 					}
-/* 000586 */ 					var colj = cell.placement.col_range.start;
-/* 000587 */ 					var coljend = cell.placement.col_range.end;
-/* 000588 */ 					var numcols = __sub__ (coljend, colj);
-/* 000589 */ 					if (__t__ (__gt__ (numcols, 1))) {
-/* 000590 */ 						(function () {
-/* 000590 */ 							var __accu0__ = thiscellspanopts;
-/* 000590 */ 							return __call__ (__accu0__.append, __accu0__, 'c={}'.format (numcols));
-/* 000590 */ 						}) ();
-/* 000590 */ 					}
-/* 000592 */ 					var thiscellstyles = 'm';
-/* 000593 */ 					if (__t__ (__in__ ('l', cell.styles))) {
-/* 000594 */ 						var thiscellstyles = 'l';
-/* 000594 */ 					}
-/* 000595 */ 					else if (__t__ (__in__ ('c', cell.styles))) {
-/* 000596 */ 						var thiscellstyles = 'c';
-/* 000596 */ 					}
-/* 000597 */ 					else if (__t__ (__in__ ('r', cell.styles))) {
-/* 000598 */ 						var thiscellstyles = 'r';
+/* 000423 */ 				else {
+/* 000423 */ 				}
+/* 000424 */ 				return __getitem__ (delayed_values, __call__ (int, null, (function () {
+/* 000424 */ 					var __accu1__ = m;
+/* 000424 */ 					return __call__ (__accu1__.group, __accu1__, 'key');
+/* 000424 */ 				}) ()));
+/* 000424 */ 			}), content);
+/* 000424 */ 		}) ();
+/* 000424 */ 	});},
+/* 000431 */ 	get render_float () {return __get__ (this, function (self, float_instance, render_context) {
+/* 000431 */ 		if (arguments.length) {
+/* 000431 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000431 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000431 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000431 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000431 */ 					switch (__attrib0__) {
+/* 000431 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000431 */ 						case 'float_instance': var float_instance = __allkwargs0__ [__attrib0__]; break;
+/* 000431 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000431 */ 					}
+/* 000431 */ 				}
+/* 000431 */ 			}
+/* 000431 */ 		}
+/* 000431 */ 		else {
+/* 000431 */ 		}
+/* 000434 */ 		var full_figcaption_rendered_list = [];
+/* 000435 */ 		var float_designator = null;
+/* 000436 */ 		if (__t__ (float_instance.number !== null)) {
+/* 000439 */ 			var float_designator = __add__ (__add__ ((function () {
+/* 000439 */ 				var __accu0__ = self;
+/* 000439 */ 				return __call__ (__accu0__.render_value, __accu0__, float_instance.float_type_info.float_caption_name, render_context);
+/* 000444 */ 			}) (), '~'), (function () {
+/* 000444 */ 				var __accu0__ = self;
+/* 000444 */ 				return __call__ (__accu0__.render_nodelist, __accu0__, float_instance.formatted_counter_value_flm.nodes, __kwargtrans__ ({render_context: render_context}));
+/* 000444 */ 			}) ());
+/* 000444 */ 		}
+/* 000449 */ 		else if (__t__ (float_instance.caption_nodelist)) {
+/* 000453 */ 			var float_designator = (function () {
+/* 000453 */ 				var __accu0__ = self;
+/* 000453 */ 				return __call__ (__accu0__.render_value, __accu0__, float_instance.float_type_info.float_caption_name, render_context);
+/* 000453 */ 			}) ();
+/* 000453 */ 		}
+/* 000456 */ 		else {
+/* 000460 */ 			// pass;
+/* 000460 */ 		}
+/* 000462 */ 		var labelcmd = '';
+/* 000463 */ 		if (__t__ (float_designator !== null)) {
+/* 000464 */ 			(function () {
+/* 000464 */ 				var __accu0__ = full_figcaption_rendered_list;
+/* 000464 */ 				return __call__ (__accu0__.append, __accu0__, float_designator);
+/* 000464 */ 			}) ();
+/* 000466 */ 			if (__t__ (float_instance.target_id !== null)) {
+/* 000467 */ 				var labelcmd = (function () {
+/* 000467 */ 					var __accu0__ = self;
+/* 000467 */ 					return __call__ (__accu0__.pin_label_here, __accu0__, float_instance.target_id, float_designator, __kwargtrans__ ({insert_phantom_section: true}));
+/* 000467 */ 				}) ();
+/* 000467 */ 			}
+/* 000467 */ 		}
+/* 000471 */ 		if (__t__ (float_instance.caption_nodelist)) {
+/* 000475 */ 			(function () {
+/* 000475 */ 				var __accu0__ = full_figcaption_rendered_list;
+/* 000475 */ 				return __call__ (__accu0__.append, __accu0__, ': ');
+/* 000475 */ 			}) ();
+/* 000478 */ 			(function () {
+/* 000478 */ 				var __accu0__ = full_figcaption_rendered_list;
+/* 000479 */ 				return __call__ (__accu0__.append, __accu0__, (function () {
+/* 000479 */ 					var __accu1__ = self;
+/* 000479 */ 					return __call__ (__accu1__.render_nodelist, __accu1__, float_instance.caption_nodelist, __kwargtrans__ ({render_context: render_context}));
+/* 000479 */ 				}) ());
+/* 000479 */ 			}) ();
+/* 000479 */ 		}
+/* 000485 */ 		var rendered_float_caption = null;
+/* 000486 */ 		if (__t__ (full_figcaption_rendered_list)) {
+/* 000489 */ 			var rendered_float_caption = __add__ ('\\par', (function () {
+/* 000489 */ 				var __accu0__ = self;
+/* 000491 */ 				return __call__ (__accu0__.render_semantic_block, __accu0__, __add__ (labelcmd, (function () {
+/* 000491 */ 					var __accu1__ = self;
+/* 000491 */ 					return __call__ (__accu1__.render_join, __accu1__, full_figcaption_rendered_list, render_context);
+/* 000491 */ 				}) ()), __kwargtrans__ ({role: 'figure_caption', render_context: render_context}));
+/* 000491 */ 			}) ());
+/* 000491 */ 		}
+/* 000497 */ 		var float_content_block_content = (function () {
+/* 000497 */ 			var __accu0__ = self;
+/* 000497 */ 			return __call__ (__accu0__.render_nodelist, __accu0__, float_instance.content_nodelist, __kwargtrans__ ({render_context: render_context, is_block_level: true}));
+/* 000497 */ 		}) ();
+/* 000503 */ 		if (__t__ (rendered_float_caption !== null)) {
+/* 000504 */ 			var float_content_with_caption = (function () {
+/* 000504 */ 				var __accu0__ = self;
+/* 000504 */ 				return __call__ (__accu0__.render_join_blocks, __accu0__, [float_content_block_content, rendered_float_caption], render_context);
+/* 000504 */ 			}) ();
+/* 000504 */ 		}
+/* 000508 */ 		else {
+/* 000509 */ 			var float_content_with_caption = float_content_block_content;
+/* 000509 */ 		}
+/* 000511 */ 		return __add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ ('\\begin{', float_instance.float_type), '}[h!]%\n'), '\\centering{}'), float_content_with_caption), '\\end{'), float_instance.float_type), '}');
+/* 000511 */ 	});},
+/* 000518 */ 	graphics_raster_magnification: 1,
+/* 000519 */ 	graphics_vector_magnification: 1,
+/* 000521 */ 	get render_graphics_block () {return __get__ (this, function (self, graphics_resource, render_context) {
+/* 000521 */ 		if (arguments.length) {
+/* 000521 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000521 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000521 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000521 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000521 */ 					switch (__attrib0__) {
+/* 000521 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000521 */ 						case 'graphics_resource': var graphics_resource = __allkwargs0__ [__attrib0__]; break;
+/* 000521 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000521 */ 					}
+/* 000521 */ 				}
+/* 000521 */ 			}
+/* 000521 */ 		}
+/* 000521 */ 		else {
+/* 000521 */ 		}
+/* 000523 */ 		var __left0__ = (function () {
+/* 000523 */ 			var __accu0__ = self;
+/* 000523 */ 			return __call__ (__accu0__.collect_graphics_resource, __accu0__, graphics_resource, render_context);
+/* 000523 */ 		}) ();
+/* 000523 */ 		var src_url = __left0__ [0];
+/* 000523 */ 		var incloptions = __left0__ [1];
+/* 000525 */ 		var opts = '';
+/* 000526 */ 		if (__t__ (incloptions !== null)) {
+/* 000527 */ 			var opts = __add__ (__add__ ('[', incloptions), ']');
+/* 000527 */ 		}
+/* 000529 */ 		return __add__ (__add__ (__add__ (__add__ ('\\includegraphics', opts), '{'), src_url), '}');
+/* 000529 */ 	});},
+/* 000531 */ 	get collect_graphics_resource () {return __get__ (this, function (self, graphics_resource, render_context) {
+/* 000531 */ 		if (arguments.length) {
+/* 000531 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000531 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000531 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000531 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000531 */ 					switch (__attrib0__) {
+/* 000531 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000531 */ 						case 'graphics_resource': var graphics_resource = __allkwargs0__ [__attrib0__]; break;
+/* 000531 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000531 */ 					}
+/* 000531 */ 				}
+/* 000531 */ 			}
+/* 000531 */ 		}
+/* 000531 */ 		else {
+/* 000531 */ 		}
+/* 000535 */ 		var whoptc = null;
+/* 000536 */ 		if (__t__ (graphics_resource.physical_dimensions !== null)) {
+/* 000538 */ 			var __left0__ = graphics_resource.physical_dimensions;
+/* 000538 */ 			var width_pt = __left0__ [0];
+/* 000538 */ 			var height_pt = __left0__ [1];
+/* 000540 */ 			if (__t__ (__eq__ (graphics_resource.graphics_type, 'raster'))) {
+/* 000541 */ 				if (__t__ (width_pt !== null)) {
+/* 000542 */ 					var width_pt = __call__ (__imul__, null, width_pt, self.graphics_raster_magnification);
+/* 000542 */ 				}
+/* 000543 */ 				if (__t__ (height_pt !== null)) {
+/* 000544 */ 					var height_pt = __call__ (__imul__, null, height_pt, self.graphics_raster_magnification);
+/* 000544 */ 				}
+/* 000544 */ 			}
+/* 000545 */ 			else if (__t__ (__eq__ (graphics_resource.graphics_type, 'vector'))) {
+/* 000546 */ 				if (__t__ (width_pt !== null)) {
+/* 000547 */ 					var width_pt = __call__ (__imul__, null, width_pt, self.graphics_vector_magnification);
+/* 000547 */ 				}
+/* 000548 */ 				if (__t__ (height_pt !== null)) {
+/* 000549 */ 					var height_pt = __call__ (__imul__, null, height_pt, self.graphics_vector_magnification);
+/* 000549 */ 				}
+/* 000549 */ 			}
+/* 000551 */ 			var whoptc = '';
+/* 000552 */ 			if (__t__ (width_pt !== null)) {
+/* 000553 */ 				var whoptc = __call__ (__iadd__, null, whoptc, 'width={}pt,'.format (width_pt));
+/* 000553 */ 			}
+/* 000554 */ 			if (__t__ (height_pt !== null)) {
+/* 000555 */ 				var whoptc = __call__ (__iadd__, null, whoptc, 'height={}pt,'.format (height_pt));
+/* 000555 */ 			}
+/* 000555 */ 		}
+/* 000557 */ 		return tuple ([graphics_resource.src_url, whoptc]);
+/* 000557 */ 	});},
+/* 000559 */ 	get render_cells () {return __get__ (this, function (self, cells_model, render_context, target_id) {
+/* 000559 */ 		if (typeof target_id == 'undefined' || (target_id != null && target_id.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000559 */ 			var target_id = null;
+/* 000559 */ 		};
+/* 000559 */ 		if (arguments.length) {
+/* 000559 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000559 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000559 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000559 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000559 */ 					switch (__attrib0__) {
+/* 000559 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000559 */ 						case 'cells_model': var cells_model = __allkwargs0__ [__attrib0__]; break;
+/* 000559 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000559 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
+/* 000559 */ 					}
+/* 000559 */ 				}
+/* 000559 */ 			}
+/* 000559 */ 		}
+/* 000559 */ 		else {
+/* 000559 */ 		}
+/* 000564 */ 		var stab_contents = '';
+/* 000566 */ 		var cell_spans_styles = '';
+/* 000567 */ 		var cell_hlines = [];
+/* 000568 */ 		var cell_vlines = [];
+/* 000570 */ 		var __left0__ = tuple ([__call__ (len, null, cells_model.grid_data), __call__ (len, null, __getitem__ (cells_model.grid_data, 0))]);
+/* 000570 */ 		var tabheight = __left0__ [0];
+/* 000570 */ 		var tabwidth = __left0__ [1];
+/* 000572 */ 		var __iterable0__ = cells_model.grid_data;
+/* 000572 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000572 */ 			var row = __getitem__ (__iterable0__, __index0__);
+/* 000573 */ 			var stab_rowitems = [];
+/* 000575 */ 			var __iterable1__ = row;
+/* 000575 */ 			for (var __index1__ = 0; __index1__ < len (__iterable1__); __index1__++) {
+/* 000575 */ 				var cellinfo = __getitem__ (__iterable1__, __index1__);
+/* 000576 */ 				if (__t__ (__t__ (cellinfo !== null) && __t__ (__getitem__ (cellinfo, 'cell') !== null) && __getitem__ (cellinfo, 'is_topleft'))) {
+/* 000579 */ 					var cell = __getitem__ (cellinfo, 'cell');
+/* 000580 */ 					var cell_content = (function () {
+/* 000580 */ 						var __accu0__ = self;
+/* 000580 */ 						return __call__ (__accu0__.render_nodelist, __accu0__, cell.content_nodes, __kwargtrans__ ({render_context: render_context}));
+/* 000580 */ 					}) ();
+/* 000587 */ 					var thiscellspanopts = [];
+/* 000588 */ 					var rowj = cell.placement.row_range.start;
+/* 000589 */ 					var rowjend = cell.placement.row_range.end;
+/* 000590 */ 					var numrows = __sub__ (rowjend, rowj);
+/* 000591 */ 					if (__t__ (__gt__ (numrows, 1))) {
+/* 000592 */ 						(function () {
+/* 000592 */ 							var __accu0__ = thiscellspanopts;
+/* 000592 */ 							return __call__ (__accu0__.append, __accu0__, 'r={}'.format (numrows));
+/* 000592 */ 						}) ();
+/* 000592 */ 					}
+/* 000594 */ 					var colj = cell.placement.col_range.start;
+/* 000595 */ 					var coljend = cell.placement.col_range.end;
+/* 000596 */ 					var numcols = __sub__ (coljend, colj);
+/* 000597 */ 					if (__t__ (__gt__ (numcols, 1))) {
+/* 000598 */ 						(function () {
+/* 000598 */ 							var __accu0__ = thiscellspanopts;
+/* 000598 */ 							return __call__ (__accu0__.append, __accu0__, 'c={}'.format (numcols));
+/* 000598 */ 						}) ();
 /* 000598 */ 					}
-/* 000600 */ 					var bgcol = null;
-/* 000601 */ 					if (__t__ (__in__ ('green', cell.styles))) {
-/* 000602 */ 						var bgcol = 'flmTabCellColorGreen';
+/* 000600 */ 					var thiscellstyles = 'm';
+/* 000601 */ 					if (__t__ (__in__ ('l', cell.styles))) {
+/* 000602 */ 						var thiscellstyles = 'l';
 /* 000602 */ 					}
-/* 000603 */ 					else if (__t__ (__in__ ('red', cell.styles))) {
-/* 000604 */ 						var bgcol = 'flmTabCellColorRed';
+/* 000603 */ 					else if (__t__ (__in__ ('c', cell.styles))) {
+/* 000604 */ 						var thiscellstyles = 'c';
 /* 000604 */ 					}
-/* 000605 */ 					else if (__t__ (__in__ ('blue', cell.styles))) {
-/* 000606 */ 						var bgcol = 'flmTabCellColorBlue';
+/* 000605 */ 					else if (__t__ (__in__ ('r', cell.styles))) {
+/* 000606 */ 						var thiscellstyles = 'r';
 /* 000606 */ 					}
-/* 000607 */ 					else if (__t__ (__in__ ('yellow', cell.styles))) {
-/* 000608 */ 						var bgcol = 'flmTabCellColorYellow';
-/* 000608 */ 					}
-/* 000610 */ 					if (__t__ (bgcol)) {
-/* 000611 */ 						var thiscellstyles = __call__ (__iadd__, null, thiscellstyles, ', bg={}'.format (bgcol));
-/* 000611 */ 					}
-/* 000613 */ 					if (__t__ (__t__ (__in__ ('H', cell.styles)) || __in__ ('rH', cell.styles))) {
-/* 000614 */ 						var thiscellstyles = __call__ (__iadd__, null, thiscellstyles, ', font={\\flmCellsHeaderFont}');
+/* 000608 */ 					var bgcol = null;
+/* 000609 */ 					if (__t__ (__in__ ('green', cell.styles))) {
+/* 000610 */ 						var bgcol = 'flmTabCellColorGreen';
+/* 000610 */ 					}
+/* 000611 */ 					else if (__t__ (__in__ ('red', cell.styles))) {
+/* 000612 */ 						var bgcol = 'flmTabCellColorRed';
+/* 000612 */ 					}
+/* 000613 */ 					else if (__t__ (__in__ ('blue', cell.styles))) {
+/* 000614 */ 						var bgcol = 'flmTabCellColorBlue';
 /* 000614 */ 					}
-/* 000616 */ 					if (__t__ (__in__ ('H', cell.styles))) {
-/* 000617 */ 						if (__t__ (__eq__ (coljend, __add__ (colj, 1)))) {
-/* 000618 */ 							var colnstr = '{}'.format (__add__ (1, colj));
-/* 000618 */ 						}
-/* 000619 */ 						else {
-/* 000620 */ 							var colnstr = '{}-{}'.format (__add__ (1, colj), coljend);
-/* 000620 */ 						}
-/* 000623 */ 						if (__t__ (__lt__ (rowjend, tabheight))) {
-/* 000624 */ 							(function () {
-/* 000624 */ 								var __accu0__ = cell_hlines;
-/* 000624 */ 								return __call__ (__accu0__.append, __accu0__, tuple ([__call__ (str, null, __add__ (1, rowjend)), colnstr, '.4pt,solid']));
-/* 000624 */ 							}) ();
-/* 000624 */ 						}
-/* 000624 */ 					}
-/* 000626 */ 					if (__t__ (__t__ (__in__ ('lvert', cell.styles)) || __in__ ('rvert', cell.styles))) {
-/* 000627 */ 						if (__t__ (__eq__ (rowjend, __add__ (rowj, 1)))) {
-/* 000628 */ 							var rownstr = '{}'.format (__add__ (1, rowj));
+/* 000615 */ 					else if (__t__ (__in__ ('yellow', cell.styles))) {
+/* 000616 */ 						var bgcol = 'flmTabCellColorYellow';
+/* 000616 */ 					}
+/* 000618 */ 					if (__t__ (bgcol)) {
+/* 000619 */ 						var thiscellstyles = __call__ (__iadd__, null, thiscellstyles, ', bg={}'.format (bgcol));
+/* 000619 */ 					}
+/* 000621 */ 					if (__t__ (__t__ (__in__ ('H', cell.styles)) || __in__ ('rH', cell.styles))) {
+/* 000622 */ 						var thiscellstyles = __call__ (__iadd__, null, thiscellstyles, ', font={\\flmCellsHeaderFont}');
+/* 000622 */ 					}
+/* 000624 */ 					if (__t__ (__in__ ('H', cell.styles))) {
+/* 000625 */ 						if (__t__ (__eq__ (coljend, __add__ (colj, 1)))) {
+/* 000626 */ 							var colnstr = '{}'.format (__add__ (1, colj));
+/* 000626 */ 						}
+/* 000627 */ 						else {
+/* 000628 */ 							var colnstr = '{}-{}'.format (__add__ (1, colj), coljend);
 /* 000628 */ 						}
-/* 000629 */ 						else {
-/* 000630 */ 							var rownstr = '{}-{}'.format (__add__ (1, rowj), rowjend);
-/* 000630 */ 						}
-/* 000632 */ 						if (__t__ (__in__ ('lvert', cell.styles))) {
-/* 000633 */ 							(function () {
-/* 000633 */ 								var __accu0__ = cell_vlines;
-/* 000633 */ 								return __call__ (__accu0__.append, __accu0__, tuple ([rownstr, __call__ (str, null, __add__ (1, colj)), '.4pt,solid']));
-/* 000633 */ 							}) ();
-/* 000633 */ 						}
-/* 000634 */ 						if (__t__ (__in__ ('rvert', cell.styles))) {
-/* 000635 */ 							(function () {
-/* 000635 */ 								var __accu0__ = cell_vlines;
-/* 000635 */ 								return __call__ (__accu0__.append, __accu0__, tuple ([rownstr, __call__ (str, null, __add__ (2, colj)), '.4pt,solid']));
-/* 000635 */ 							}) ();
-/* 000635 */ 						}
-/* 000635 */ 					}
-/* 000637 */ 					if (__t__ (__t__ (__gt__ (__call__ (len, null, thiscellspanopts), 0)) || __ne__ (thiscellstyles, 'm'))) {
-/* 000640 */ 						var cell_spans_styles = __call__ (__iadd__, null, cell_spans_styles, __add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (',\n  cell{', __call__ (str, null, __add__ (1, rowj))), '}{'), __call__ (str, null, __add__ (1, colj))), '}='), '{'), (function () {
-/* 000640 */ 							var __accu0__ = ',';
-/* 000640 */ 							return __call__ (__accu0__.join, __accu0__, thiscellspanopts);
-/* 000640 */ 						}) ()), '}{'), thiscellstyles), '}'));
-/* 000640 */ 					}
-/* 000640 */ 				}
-/* 000643 */ 				else {
-/* 000645 */ 					var cell_content = '';
-/* 000645 */ 				}
-/* 000647 */ 				(function () {
-/* 000647 */ 					var __accu0__ = stab_rowitems;
-/* 000647 */ 					return __call__ (__accu0__.append, __accu0__, cell_content);
-/* 000647 */ 				}) ();
-/* 000647 */ 			}
-/* 000649 */ 			var stab_contents = __call__ (__iadd__, null, stab_contents, __add__ (__add__ ((function () {
-/* 000649 */ 				var __accu0__ = '&';
-/* 000649 */ 				return __call__ (__accu0__.join, __accu0__, stab_rowitems);
-/* 000649 */ 			}) (), '\\\\'), '\n'));
-/* 000649 */ 		}
-/* 000660 */ 		var s = __add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ ('\\begin{center}', '\n\\long\\def\\flmTempTypesetThisTable#1{%'), '\n\\begin{tblr}{#1,'), '\n'), '  hspan=minimal'), cell_spans_styles), (function () {
-/* 000660 */ 			var __accu0__ = '';
-/* 000660 */ 			return __call__ (__accu0__.join, __accu0__, (function () {
-/* 000660 */ 				var __accu1__ = [];
-/* 000660 */ 				var __iterable0__ = cell_hlines;
-/* 000660 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000661 */ 					var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000661 */ 					var rownrng = __left0__ [0];
-/* 000661 */ 					var colnrng = __left0__ [1];
-/* 000661 */ 					var lsty = __left0__ [2];
-/* 000661 */ 					(function () {
-/* 000661 */ 						var __accu2__ = __accu1__;
-/* 000661 */ 						return __call__ (__accu2__.append, __accu2__, __add__ (__add__ (__add__ (__add__ (__add__ (__add__ (',\n  hline{', rownrng), '}={'), colnrng), '}{'), lsty), '}'));
-/* 000661 */ 					}) ();
-/* 000661 */ 				}
-/* 000661 */ 				return __accu1__;
-/* 000661 */ 			}) ());
-/* 000662 */ 		}) ()), (function () {
-/* 000662 */ 			var __accu0__ = '';
-/* 000662 */ 			return __call__ (__accu0__.join, __accu0__, (function () {
-/* 000662 */ 				var __accu1__ = [];
-/* 000662 */ 				var __iterable0__ = cell_vlines;
-/* 000662 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000663 */ 					var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000663 */ 					var rownrng = __left0__ [0];
-/* 000663 */ 					var colnrng = __left0__ [1];
-/* 000663 */ 					var lsty = __left0__ [2];
-/* 000663 */ 					(function () {
-/* 000663 */ 						var __accu2__ = __accu1__;
-/* 000663 */ 						return __call__ (__accu2__.append, __accu2__, __add__ (__add__ (__add__ (__add__ (__add__ (__add__ (',\n  vline{', colnrng), '}={'), rownrng), '}{'), lsty), '}'));
-/* 000663 */ 					}) ();
-/* 000663 */ 				}
-/* 000663 */ 				return __accu1__;
-/* 000663 */ 			}) ());
-/* 000663 */ 		}) ()), '}'), '\n'), '\\toprule'), '\n');
-/* 000668 */ 		var s = __call__ (__iadd__, null, s, stab_contents);
-/* 000669 */ 		var s = __call__ (__iadd__, null, s, __add__ ('\\bottomrule', '\n'));
-/* 000670 */ 		var s = __call__ (__iadd__, null, s, __add__ ('\\end{tblr}%', '\n'));
-/* 000671 */ 		var s = __call__ (__iadd__, null, s, __add__ ('}%', '\n'));
-/* 000673 */ 		var s = __call__ (__iadd__, null, s, __add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ ('\\def\\flmTmpMaxW{\\dimexpr ', self.max_table_width_latexdim), '\\relax}%'), '\n'), '\\setbox0=\\hbox{\\flmTempTypesetThisTable{colspec={'), __mul__ ('c', tabwidth)), '}}}%'), '\n'), '\\ifdim\\wd0<\\flmTmpMaxW\\relax'), '\n'), '  \\leavevmode\\box0 '), '\n'), '\\else'), '\n'), '  \\flmTempTypesetThisTable{width=\\flmTmpMaxW,colspec={'), __mul__ ('X[-1]', tabwidth)), '}}'), '\n'), '\\fi'), '\n'));
-/* 000684 */ 		var s = __call__ (__iadd__, null, s, '\\end{center}');
-/* 000686 */ 		return s;
-/* 000686 */ 	});},
-/* 000688 */ 	max_table_width_latexdim: '0.96\\linewidth'
-/* 000688 */ });
-/* 000693 */ export var _rx_delayed_markers = (function () {
-/* 000693 */ 	var __accu0__ = re;
-/* 000693 */ 	return __call__ (__accu0__.compile, __accu0__, '\\\\FLMDLYD\\{(?P<key>\\d+)\\}');
-/* 000693 */ }) ();
-/* 000702 */ export var _latex_preamble_suggested_defs = '\n\n\\usepackage{amsmath}\n\\usepackage{amssymb}\n\n\\usepackage{graphicx}\n\\usepackage{xcolor}\n\n\\providecommand\\phantomsection{}\n\n\\ifdefined\\defterm\\else\n\\newenvironment{defterm}{%\n  \\par\\vspace{0.5ex plus 0.5ex}\\noindent\n  \\begingroup\\itshape\n}{%\n  \\endgroup\\par\\vspace{0.5ex plus 0.5ex}%\n}\n\\fi\n\n\\providecommand\\displayterm[1]{\\textbf{#1}}\n\n\\providecommand\\flmThmHeadingTheoremLike[1]{\\textbf{#1}.\\hspace{.8em}\\ignorespaces}\n\\providecommand\\flmThmHeadingDefinitionLike[1]{\\textbf{#1}.\\hspace{.8em}\\ignorespaces}\n\\providecommand\\flmThmHeadingProofLike[1]{\\textit{#1}.\\hspace{.8em}\\ignorespaces}\n\\providecommand\\flmTheoremHeading{\\flmThmHeadingTheoremLike}\n\\ifdefined\\flmThmTheoremLike\\else\n\\newenvironment{flmThmTheoremLike}{%\n  \\par\\vspace{0.5ex plus 0.5ex}\\noindent\n  \\let\\flmTheoremHeading\\flmThmHeadingTheoremLike\n}{%\n  \\par\\vspace{0.5ex plus 0.5ex}%\n}\n\\fi\n\\ifdefined\\flmThmDefinitionLike\\else\n\\newenvironment{flmThmDefinitionLike}{%\n  \\par\\vspace{0.5ex plus 0.5ex}\\noindent\n  \\let\\flmTheoremHeading\\flmThmHeadingDefinitionLike\n}{%\n  \\par\\vspace{0.5ex plus 0.5ex}%\n}\n\\fi\n\\ifdefined\\flmThmProofLike\\else\n\\newenvironment{flmThmProofLike}{%\n  \\par\\vspace{0.5ex plus 0.5ex}\\noindent\n  \\let\\flmTheoremHeading\\flmThmHeadingProofLike\n}{%\n  \\par\\vspace{0.5ex plus 0.5ex}%\n}\n\\fi\n\n% for cells/tables\n\\usepackage{tabularray}\n\\UseTblrLibrary{booktabs}\n\\definecolor{flmTabCellColorGreen}{RGB}{200,255,200}\n\\definecolor{flmTabCellColorBlue}{RGB}{200,220,255}\n\\definecolor{flmTabCellColorYellow}{RGB}{255,255,200}\n\\definecolor{flmTabCellColorRed}{RGB}{255,200,200}\n\\providecommand\\flmCellsHeaderFont{\\bfseries}\n\n';
-/* 000766 */ export var FragmentRendererInformation =  __class__ ('FragmentRendererInformation', [object], {
-/* 000766 */ 	__module__: __name__,
-/* 000767 */ 	FragmentRendererClass: LatexFragmentRenderer,
-/* 000770 */ 	get get_style_information () {return function (fragment_renderer) {
-/* 000770 */ 		if (arguments.length) {
-/* 000770 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000770 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000770 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000770 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000770 */ 					switch (__attrib0__) {
-/* 000770 */ 						case 'fragment_renderer': var fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 000770 */ 					}
-/* 000770 */ 				}
-/* 000770 */ 			}
-/* 000770 */ 		}
-/* 000770 */ 		else {
-/* 000770 */ 		}
-/* 000771 */ 		return dict ({'preamble_suggested_defs': _latex_preamble_suggested_defs});
-/* 000771 */ 	};},
-/* 000775 */ 	format_name: 'latex'
-/* 000775 */ });
+/* 000631 */ 						if (__t__ (__lt__ (rowjend, tabheight))) {
+/* 000632 */ 							(function () {
+/* 000632 */ 								var __accu0__ = cell_hlines;
+/* 000632 */ 								return __call__ (__accu0__.append, __accu0__, tuple ([__call__ (str, null, __add__ (1, rowjend)), colnstr, '.4pt,solid']));
+/* 000632 */ 							}) ();
+/* 000632 */ 						}
+/* 000632 */ 					}
+/* 000634 */ 					if (__t__ (__t__ (__in__ ('lvert', cell.styles)) || __in__ ('rvert', cell.styles))) {
+/* 000635 */ 						if (__t__ (__eq__ (rowjend, __add__ (rowj, 1)))) {
+/* 000636 */ 							var rownstr = '{}'.format (__add__ (1, rowj));
+/* 000636 */ 						}
+/* 000637 */ 						else {
+/* 000638 */ 							var rownstr = '{}-{}'.format (__add__ (1, rowj), rowjend);
+/* 000638 */ 						}
+/* 000640 */ 						if (__t__ (__in__ ('lvert', cell.styles))) {
+/* 000641 */ 							(function () {
+/* 000641 */ 								var __accu0__ = cell_vlines;
+/* 000641 */ 								return __call__ (__accu0__.append, __accu0__, tuple ([rownstr, __call__ (str, null, __add__ (1, colj)), '.4pt,solid']));
+/* 000641 */ 							}) ();
+/* 000641 */ 						}
+/* 000642 */ 						if (__t__ (__in__ ('rvert', cell.styles))) {
+/* 000643 */ 							(function () {
+/* 000643 */ 								var __accu0__ = cell_vlines;
+/* 000643 */ 								return __call__ (__accu0__.append, __accu0__, tuple ([rownstr, __call__ (str, null, __add__ (2, colj)), '.4pt,solid']));
+/* 000643 */ 							}) ();
+/* 000643 */ 						}
+/* 000643 */ 					}
+/* 000645 */ 					if (__t__ (__t__ (__gt__ (__call__ (len, null, thiscellspanopts), 0)) || __ne__ (thiscellstyles, 'm'))) {
+/* 000648 */ 						var cell_spans_styles = __call__ (__iadd__, null, cell_spans_styles, __add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (',\n  cell{', __call__ (str, null, __add__ (1, rowj))), '}{'), __call__ (str, null, __add__ (1, colj))), '}='), '{'), (function () {
+/* 000648 */ 							var __accu0__ = ',';
+/* 000648 */ 							return __call__ (__accu0__.join, __accu0__, thiscellspanopts);
+/* 000648 */ 						}) ()), '}{'), thiscellstyles), '}'));
+/* 000648 */ 					}
+/* 000648 */ 				}
+/* 000651 */ 				else {
+/* 000653 */ 					var cell_content = '';
+/* 000653 */ 				}
+/* 000655 */ 				(function () {
+/* 000655 */ 					var __accu0__ = stab_rowitems;
+/* 000655 */ 					return __call__ (__accu0__.append, __accu0__, cell_content);
+/* 000655 */ 				}) ();
+/* 000655 */ 			}
+/* 000657 */ 			var stab_contents = __call__ (__iadd__, null, stab_contents, __add__ (__add__ ((function () {
+/* 000657 */ 				var __accu0__ = '&';
+/* 000657 */ 				return __call__ (__accu0__.join, __accu0__, stab_rowitems);
+/* 000657 */ 			}) (), '\\\\'), '\n'));
+/* 000657 */ 		}
+/* 000668 */ 		var s = __add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ ('\\begin{center}', '\n\\long\\def\\flmTempTypesetThisTable#1{%'), '\n\\begin{tblr}{#1,'), '\n'), '  hspan=minimal'), cell_spans_styles), (function () {
+/* 000668 */ 			var __accu0__ = '';
+/* 000668 */ 			return __call__ (__accu0__.join, __accu0__, (function () {
+/* 000668 */ 				var __accu1__ = [];
+/* 000668 */ 				var __iterable0__ = cell_hlines;
+/* 000668 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000669 */ 					var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000669 */ 					var rownrng = __left0__ [0];
+/* 000669 */ 					var colnrng = __left0__ [1];
+/* 000669 */ 					var lsty = __left0__ [2];
+/* 000669 */ 					(function () {
+/* 000669 */ 						var __accu2__ = __accu1__;
+/* 000669 */ 						return __call__ (__accu2__.append, __accu2__, __add__ (__add__ (__add__ (__add__ (__add__ (__add__ (',\n  hline{', rownrng), '}={'), colnrng), '}{'), lsty), '}'));
+/* 000669 */ 					}) ();
+/* 000669 */ 				}
+/* 000669 */ 				return __accu1__;
+/* 000669 */ 			}) ());
+/* 000670 */ 		}) ()), (function () {
+/* 000670 */ 			var __accu0__ = '';
+/* 000670 */ 			return __call__ (__accu0__.join, __accu0__, (function () {
+/* 000670 */ 				var __accu1__ = [];
+/* 000670 */ 				var __iterable0__ = cell_vlines;
+/* 000670 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000671 */ 					var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000671 */ 					var rownrng = __left0__ [0];
+/* 000671 */ 					var colnrng = __left0__ [1];
+/* 000671 */ 					var lsty = __left0__ [2];
+/* 000671 */ 					(function () {
+/* 000671 */ 						var __accu2__ = __accu1__;
+/* 000671 */ 						return __call__ (__accu2__.append, __accu2__, __add__ (__add__ (__add__ (__add__ (__add__ (__add__ (',\n  vline{', colnrng), '}={'), rownrng), '}{'), lsty), '}'));
+/* 000671 */ 					}) ();
+/* 000671 */ 				}
+/* 000671 */ 				return __accu1__;
+/* 000671 */ 			}) ());
+/* 000671 */ 		}) ()), '}'), '\n'), '\\toprule'), '\n');
+/* 000676 */ 		var s = __call__ (__iadd__, null, s, stab_contents);
+/* 000677 */ 		var s = __call__ (__iadd__, null, s, __add__ ('\\bottomrule', '\n'));
+/* 000678 */ 		var s = __call__ (__iadd__, null, s, __add__ ('\\end{tblr}%', '\n'));
+/* 000679 */ 		var s = __call__ (__iadd__, null, s, __add__ ('}%', '\n'));
+/* 000681 */ 		var s = __call__ (__iadd__, null, s, __add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ (__add__ ('\\def\\flmTmpMaxW{\\dimexpr ', self.max_table_width_latexdim), '\\relax}%'), '\n'), '\\setbox0=\\hbox{\\flmTempTypesetThisTable{colspec={'), __mul__ ('c', tabwidth)), '}}}%'), '\n'), '\\ifdim\\wd0<\\flmTmpMaxW\\relax'), '\n'), '  \\leavevmode\\box0 '), '\n'), '\\else'), '\n'), '  \\flmTempTypesetThisTable{width=\\flmTmpMaxW,colspec={'), __mul__ ('X[-1]', tabwidth)), '}}'), '\n'), '\\fi'), '\n'));
+/* 000692 */ 		var s = __call__ (__iadd__, null, s, '\\end{center}');
+/* 000694 */ 		return s;
+/* 000694 */ 	});},
+/* 000696 */ 	max_table_width_latexdim: '0.96\\linewidth'
+/* 000696 */ });
+/* 000701 */ export var _rx_delayed_markers = (function () {
+/* 000701 */ 	var __accu0__ = re;
+/* 000701 */ 	return __call__ (__accu0__.compile, __accu0__, '\\\\FLMDLYD\\{(?P<key>\\d+)\\}');
+/* 000701 */ }) ();
+/* 000710 */ export var _latex_preamble_suggested_defs = '\n\n\\usepackage{amsmath}\n\\usepackage{amssymb}\n\n\\usepackage{graphicx}\n\\usepackage{xcolor}\n\n\\providecommand\\phantomsection{}\n\n\\ifdefined\\defterm\\else\n\\newenvironment{defterm}{%\n  \\par\\vspace{0.5ex plus 0.5ex}\\noindent\n  \\begingroup\\itshape\n}{%\n  \\endgroup\\par\\vspace{0.5ex plus 0.5ex}%\n}\n\\fi\n\n\\providecommand\\displayterm[1]{\\textbf{#1}}\n\n\\providecommand\\flmThmHeadingTheoremLike[1]{\\textbf{#1}.\\hspace{.8em}\\ignorespaces}\n\\providecommand\\flmThmHeadingDefinitionLike[1]{\\textbf{#1}.\\hspace{.8em}\\ignorespaces}\n\\providecommand\\flmThmHeadingProofLike[1]{\\textit{#1}.\\hspace{.8em}\\ignorespaces}\n\\providecommand\\flmTheoremHeading{\\flmThmHeadingTheoremLike}\n\\ifdefined\\flmThmTheoremLike\\else\n\\newenvironment{flmThmTheoremLike}{%\n  \\par\\vspace{0.5ex plus 0.5ex}\\noindent\n  \\let\\flmTheoremHeading\\flmThmHeadingTheoremLike\n}{%\n  \\par\\vspace{0.5ex plus 0.5ex}%\n}\n\\fi\n\\ifdefined\\flmThmDefinitionLike\\else\n\\newenvironment{flmThmDefinitionLike}{%\n  \\par\\vspace{0.5ex plus 0.5ex}\\noindent\n  \\let\\flmTheoremHeading\\flmThmHeadingDefinitionLike\n}{%\n  \\par\\vspace{0.5ex plus 0.5ex}%\n}\n\\fi\n\\ifdefined\\flmThmProofLike\\else\n\\newenvironment{flmThmProofLike}{%\n  \\par\\vspace{0.5ex plus 0.5ex}\\noindent\n  \\let\\flmTheoremHeading\\flmThmHeadingProofLike\n}{%\n  \\par\\vspace{0.5ex plus 0.5ex}%\n}\n\\fi\n\n% for cells/tables\n\\usepackage{tabularray}\n\\UseTblrLibrary{booktabs}\n\\definecolor{flmTabCellColorGreen}{RGB}{200,255,200}\n\\definecolor{flmTabCellColorBlue}{RGB}{200,220,255}\n\\definecolor{flmTabCellColorYellow}{RGB}{255,255,200}\n\\definecolor{flmTabCellColorRed}{RGB}{255,200,200}\n\\providecommand\\flmCellsHeaderFont{\\bfseries}\n\n';
+/* 000774 */ export var FragmentRendererInformation =  __class__ ('FragmentRendererInformation', [object], {
+/* 000774 */ 	__module__: __name__,
+/* 000775 */ 	FragmentRendererClass: LatexFragmentRenderer,
+/* 000778 */ 	get get_style_information () {return function (fragment_renderer) {
+/* 000778 */ 		if (arguments.length) {
+/* 000778 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000778 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000778 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000778 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000778 */ 					switch (__attrib0__) {
+/* 000778 */ 						case 'fragment_renderer': var fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 000778 */ 					}
+/* 000778 */ 				}
+/* 000778 */ 			}
+/* 000778 */ 		}
+/* 000778 */ 		else {
+/* 000778 */ 		}
+/* 000779 */ 		return dict ({'preamble_suggested_defs': _latex_preamble_suggested_defs});
+/* 000779 */ 	};},
+/* 000783 */ 	format_name: 'latex'
+/* 000783 */ });
 /* 000006 */ 
 //# sourceMappingURL=flm.fragmentrenderer.latex.map

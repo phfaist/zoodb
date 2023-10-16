@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-08-14 17:27:46
+/* 000001 */ // Transcrypt'ed from Python, 2023-10-16 20:52:35
 /* 000007 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000018 */ import * as headings from './flm.feature.headings.js';
 /* 000017 */ import {Feature} from './flm.feature._base.js';
@@ -8,7 +8,7 @@
 /* 000009 */ import * as macrospec from './pylatexenc.macrospec.js';
 /* 000008 */ import * as latexnodes_nodes from './pylatexenc.latexnodes.nodes.js';
 /* 000007 */ import {ParsedArgumentsInfo, ParsingStateDelta} from './pylatexenc.latexnodes.js';
-/* 000007 */ export {build_counter_formatter, headings, flmspecinfo, Feature, CounterAlias, FLMArgumentSpec, make_invocable_node_instance, latexnodes_nodes, macrospec, ParsingStateDelta, ParsedArgumentsInfo, Counter};
+/* 000007 */ export {CounterAlias, headings, FLMArgumentSpec, flmspecinfo, latexnodes_nodes, make_invocable_node_instance, ParsedArgumentsInfo, build_counter_formatter, macrospec, ParsingStateDelta, Feature, Counter};
 /* 000001 */ var __name__ = 'flm.feature.theorems';
 /* 000024 */ export var optional_text_arg = __call__ (FLMArgumentSpec, null, __kwargtrans__ ({parser: '[', argname: 'thmtitle', flm_doc: 'An optional theorem environment title'}));
 /* 000032 */ export var TheoremEnvironment =  __class__ ('TheoremEnvironment', [flmspecinfo.FLMEnvironmentSpecBase], {
@@ -229,456 +229,456 @@
 /* 000192 */ 				throw __except0__;
 /* 000192 */ 			}
 /* 000192 */ 		}
-/* 000213 */ 		var thmtitle_nodelist = null;
-/* 000214 */ 		if (__t__ (__getitem__ (flmarg_thmtitle, 'has_relation_ref'))) {
-/* 000216 */ 			if (__t__ (__getitem__ (flmarg_thmtitle, 'relation_ref_show_ref'))) {
-/* 000218 */ 				var __left0__ = __getitem__ (flmarg_thmtitle, 'relation_ref_target');
-/* 000218 */ 				var ref_type = __left0__ [0];
-/* 000218 */ 				var ref_label = __left0__ [1];
-/* 000221 */ 				var thm_relation_ref_instance = (function () {
-/* 000221 */ 					var __accu0__ = refs_mgr;
-/* 000221 */ 					return __call__ (__accu0__.get_ref, __accu0__, ref_type, ref_label, node.latex_walker.resource_info);
-/* 000221 */ 				}) ();
-/* 000225 */ 				var thm_relation_ref_flm_text = thm_relation_ref_instance.formatted_ref_flm_text;
-/* 000226 */ 				var thm_relation_ref_flm_frag = (function () {
-/* 000226 */ 					var __accu0__ = render_context;
-/* 000226 */ 					return __call__ (__accu0__.make_standalone_fragment, __accu0__, thm_relation_ref_flm_text, __kwargtrans__ ({what: 'Thm relation ref'}));
-/* 000226 */ 				}) ();
-/* 000230 */ 				var thmtitle_nodelist = thm_relation_ref_flm_frag.nodes;
-/* 000230 */ 			}
-/* 000230 */ 		}
-/* 000232 */ 		else if (__t__ (__getitem__ (flmarg_thmtitle, 'nodelist') !== null)) {
-/* 000234 */ 			var thmtitle_nodelist = __getitem__ (flmarg_thmtitle, 'nodelist');
-/* 000234 */ 		}
-/* 000237 */ 		if (__t__ (thmtitle_nodelist !== null)) {
-/* 000239 */ 			var heading_nodelist = (function () {
-/* 000239 */ 				var __accu0__ = node.latex_walker;
-/* 000242 */ 				return __call__ (__accu0__.make_nodelist, __accu0__, __add__ (__add__ (__add__ (__call__ (list, null, title_heading_formatted_flm_frag_nodes), [(function () {
-/* 000242 */ 					var __accu1__ = node.latex_walker;
-/* 000242 */ 					return __call__ (__accu1__.make_node, __accu1__, latexnodes_nodes.LatexCharsNode, __kwargtrans__ ({chars: __getitem__ (self.theorem_type_spec, 'heading_title_pre'), pos: node.pos, pos_end: node.pos, parsing_state: node.parsing_state}));
-/* 000250 */ 				}) ()]), __call__ (list, null, thmtitle_nodelist)), [(function () {
-/* 000250 */ 					var __accu1__ = node.latex_walker;
-/* 000250 */ 					return __call__ (__accu1__.make_node, __accu1__, latexnodes_nodes.LatexCharsNode, __kwargtrans__ ({chars: __getitem__ (self.theorem_type_spec, 'heading_title_post'), pos: node.pos, pos_end: node.pos, parsing_state: node.parsing_state}));
-/* 000250 */ 				}) ()]), __kwargtrans__ ({parsing_state: node.parsing_state, pos: node.pos}));
-/* 000250 */ 			}) ();
-/* 000250 */ 		}
-/* 000260 */ 		else {
-/* 000264 */ 			var heading_nodelist = title_heading_formatted_flm_frag_nodes;
-/* 000264 */ 		}
-/* 000269 */ 		var heading_node = __call__ (make_invocable_node_instance, null, latexnodes_nodes.LatexMacroNode, __kwargtrans__ ({flm_spec: (function () {
-/* 000269 */ 			var __accu0__ = headings;
-/* 000269 */ 			return __call__ (__accu0__.HeadingMacro, __accu0__, __kwargtrans__ ({macroname: null, heading_level: __getitem__ (self.theorem_type_spec, 'theorem_heading_level'), inline_heading: true}));
-/* 000269 */ 		}) (), args: dict ({'text': heading_nodelist}), latex_walker: node.latex_walker, parsing_state: node.parsing_state}));
-/* 000281 */ 		heading_node.flm_heading_target_id = target_id;
-/* 000297 */ 		var final_content_node = (function () {
-/* 000297 */ 			var __accu0__ = node.latex_walker;
-/* 000297 */ 			return __call__ (__accu0__.make_node, __accu0__, latexnodes_nodes.LatexCharsNode, __kwargtrans__ ({chars: __getitem__ (self.theorem_type_spec, 'body_final_content'), pos: node.pos, pos_end: node.pos, parsing_state: node.parsing_state}));
-/* 000297 */ 		}) ();
-/* 000304 */ 		final_content_node.flm_strip_preceding_whitespace = true;
-/* 000307 */ 		if (__t__ (__getitem__ (self.theorem_type_spec, 'body_final_content'))) {
-/* 000312 */ 			var body_nodelist = __add__ (__add__ ([heading_node], __call__ (list, null, node.nodelist)), [final_content_node]);
-/* 000312 */ 		}
-/* 000315 */ 		else {
-/* 000322 */ 			var body_nodelist = __add__ ([heading_node], __call__ (list, null, node.nodelist));
-/* 000322 */ 		}
-/* 000325 */ 		var body_nodelist = (function () {
-/* 000325 */ 			var __accu0__ = node.latex_walker;
-/* 000325 */ 			return __call__ (__accu0__.make_nodelist, __accu0__, body_nodelist, __kwargtrans__ ({parsing_state: node.parsing_state}));
-/* 000325 */ 		}) ();
-/* 000330 */ 		var rendered_contents = (function () {
-/* 000330 */ 			var __accu0__ = fragment_renderer;
-/* 000330 */ 			return __call__ (__accu0__.render_nodelist, __accu0__, body_nodelist, render_context);
-/* 000330 */ 		}) ();
-/* 000335 */ 		return (function () {
-/* 000335 */ 			var __accu0__ = fragment_renderer;
-/* 000335 */ 			return __call__ (__accu0__.render_semantic_block, __accu0__, rendered_contents, __getitem__ (self.theorem_spec, 'theorem_type'), render_context, __kwargtrans__ ({annotations: [self.environmentname]}));
-/* 000335 */ 		}) ();
-/* 000335 */ 	});}
-/* 000335 */ });
-/* 000345 */ export var _default_theorem_environments_simpleset = dict ({'theoremlike': dict ({'theorem': dict ({'title': dict ({'lowercase': 'theorem', 'abbreviated': dict ({'singular': 'Thm.', 'plural': 'Thms.'})})}), 'proposition': dict ({'title': dict ({'lowercase': 'proposition', 'abbreviated': dict ({'singular': 'Prop.', 'plural': 'Props.'})})}), 'lemma': dict ({'title': dict ({'lowercase': 'lemma', 'abbreviated': dict ({'singular': 'Lem.', 'plural': 'Lems.'})})}), 'corollary': dict ({'title': dict ({'lowercase': 'corollary', 'abbreviated': dict ({'singular': 'Cor.', 'plural': 'Cors.'})})})}), 'definitionlike': dict ({'definition': dict ({'title': dict ({'lowercase': 'definition', 'abbreviated': dict ({'singular': 'Def.', 'plural': 'Defs.'})})})}), 'prooflike': dict ({'proof': dict ({'title': dict ({'lowercase': 'proof', 'abbreviated': dict ({'singular': 'Proof', 'plural': 'Proofs'})})})})});
-/* 000440 */ export var _default_theorem_environments_defaultset = dict ({'theoremlike': __call__ (dict, null, __getitem__ (_default_theorem_environments_simpleset, 'theoremlike'), __kwargtrans__ (dict ({'conjecture': dict ({'title': dict ({'lowercase': 'conjecture', 'abbreviated': dict ({'singular': 'Conj.', 'plural': 'Conjs.'})})})}))), 'definitionlike': __call__ (dict, null, __getitem__ (_default_theorem_environments_simpleset, 'definitionlike'), __kwargtrans__ (dict ({'remark': dict ({'title': dict ({'lowercase': 'remark', 'abbreviated': dict ({'singular': 'Rem.', 'plural': 'Rems.'})})})}))), 'prooflike': __call__ (dict, null, __getitem__ (_default_theorem_environments_simpleset, 'prooflike'))});
-/* 000492 */ export var _default_theorem_environments_richset = dict ({'theoremlike': __call__ (dict, null, __getitem__ (_default_theorem_environments_defaultset, 'theoremlike')), 'definitionlike': __call__ (dict, null, __getitem__ (_default_theorem_environments_defaultset, 'definitionlike'), __kwargtrans__ (dict ({'idea': dict ({'title': dict ({'lowercase': 'idea', 'abbreviated': dict ({'singular': 'Idea', 'plural': 'Ideas'})})}), 'question': dict ({'title': dict ({'lowercase': 'question', 'abbreviated': dict ({'singular': 'Qtn.', 'plural': 'Qtns.'})})}), 'claim': dict ({'title': dict ({'lowercase': 'claim', 'abbreviated': dict ({'singular': 'Clm.', 'plural': 'Clms.'})})}), 'observation': dict ({'title': dict ({'lowercase': 'observation', 'abbreviated': dict ({'singular': 'Obs.', 'plural': 'Obs.'})})}), 'problem': dict ({'title': dict ({'lowercase': 'problem', 'abbreviated': dict ({'singular': 'Prob.', 'plural': 'Probs.'})})})}))), 'prooflike': __call__ (dict, null, __getitem__ (_default_theorem_environments_defaultset, 'prooflike'))});
-/* 000496 */ export var default_theorem_environments = dict ({'simpleset': _default_theorem_environments_simpleset, 'defaultset': _default_theorem_environments_defaultset, 'richset': _default_theorem_environments_richset});
-/* 000502 */ export var default_theorem_theorem_types = dict ({'theoremlike': dict ({'numbered': true, 'shared_numbering': true, 'counter_formatter': null, 'theorem_heading_level': 'theorem', 'heading_title_pre': ' (', 'heading_title_post': ')', 'title_enable_relation_ref': false, 'body_final_content': ''}), 'definitionlike': dict ({'numbered': true, 'shared_numbering': true, 'counter_formatter': null, 'theorem_heading_level': 'theorem', 'heading_title_pre': ' (', 'heading_title_post': ')', 'title_enable_relation_ref': false}), 'prooflike': dict ({'numbered': false, 'title_enable_relation_ref': true, 'body_final_content': '\xa0□'})});
-/* 000534 */ export var default_thm_shared_counter_formatter_spec = dict ({'format_num': 'arabic', 'delimiters': tuple (['', '']), 'join_spec': 'default'});
-/* 000541 */ export var default_allowed_ref_label_prefixes = ['thm', 'prop', 'cor', 'lem', 'rem', 'def', 'dfn', 'x', 'topic'];
-/* 000548 */ export var FeatureTheorems =  __class__ ('FeatureTheorems', [Feature], {
-/* 000548 */ 	__module__: __name__,
-/* 000550 */ 	feature_name: 'theorems',
-/* 000552 */ 	feature_dependencies: ['refs'],
-/* 000563 */ 	feature_default_config: dict ({'environments': __getitem__ (default_theorem_environments, 'defaultset'), 'theorem_types': default_theorem_theorem_types, 'shared_counter_formatter': 'arabic', 'allowed_ref_label_prefixes': default_allowed_ref_label_prefixes}),
-/* 000563 */ 	RenderManager: __class__ ('RenderManager', [Feature.RenderManager], {
-/* 000563 */ 		__module__: __name__,
-/* 000565 */ 		get initialize () {return __get__ (this, function (self) {
-/* 000565 */ 			if (arguments.length) {
-/* 000565 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000565 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000565 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000565 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000565 */ 						switch (__attrib0__) {
-/* 000565 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000565 */ 						}
-/* 000565 */ 					}
-/* 000565 */ 				}
-/* 000565 */ 			}
-/* 000565 */ 			else {
-/* 000565 */ 			}
-/* 000566 */ 			self.shared_counter = __call__ (Counter, null, self.feature.shared_counter_formatter);
-/* 000568 */ 			var refs_mgr = (function () {
-/* 000568 */ 				var __accu0__ = self.render_context;
-/* 000568 */ 				return __call__ (__accu0__.feature_render_manager, __accu0__, 'refs');
-/* 000568 */ 			}) ();
-/* 000570 */ 			self.counters = dict ({});
-/* 000571 */ 			var __iterable0__ = (function () {
-/* 000571 */ 				var __accu0__ = self.feature.thm_counter_formatters;
-/* 000571 */ 				return __call__ (__accu0__.py_items, __accu0__);
-/* 000571 */ 			}) ();
-/* 000571 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000571 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000571 */ 				var env_name = __left0__ [0];
-/* 000571 */ 				var counter_formatter = __left0__ [1];
-/* 000572 */ 				var thm_spec = __getitem__ (self.feature.environments, env_name);
-/* 000573 */ 				var thm_type_spec = __getitem__ (self.feature.theorem_types, __getitem__ (thm_spec, 'theorem_type'));
-/* 000574 */ 				if (__t__ (__getitem__ (thm_type_spec, 'shared_numbering'))) {
-/* 000575 */ 					__setitem__ (self.counters, env_name, __call__ (CounterAlias, null, __kwargtrans__ ({counter_formatter: counter_formatter, alias_counter: self.shared_counter})));
-/* 000575 */ 				}
-/* 000578 */ 				else {
-/* 000580 */ 					__setitem__ (self.counters, env_name, __call__ (Counter, null, __kwargtrans__ ({counter_formatter: counter_formatter})));
-/* 000580 */ 				}
-/* 000585 */ 				(function () {
-/* 000585 */ 					var __accu0__ = refs_mgr;
-/* 000585 */ 					return __call__ (__accu0__.register_counter_formatter, __accu0__, __kwargtrans__ ({counter_formatter: counter_formatter}));
-/* 000585 */ 				}) ();
-/* 000585 */ 			}
-/* 000585 */ 		});}
-/* 000585 */ 	}),
-/* 000590 */ 	get __init__ () {return __get__ (this, function (self, environments, theorem_types, shared_counter_formatter, allowed_ref_label_prefixes) {
-/* 000590 */ 		if (typeof environments == 'undefined' || (environments != null && environments.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000590 */ 			var environments = null;
-/* 000590 */ 		};
-/* 000590 */ 		if (typeof theorem_types == 'undefined' || (theorem_types != null && theorem_types.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000590 */ 			var theorem_types = null;
-/* 000590 */ 		};
-/* 000590 */ 		if (typeof shared_counter_formatter == 'undefined' || (shared_counter_formatter != null && shared_counter_formatter.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000590 */ 			var shared_counter_formatter = null;
-/* 000590 */ 		};
-/* 000590 */ 		if (typeof allowed_ref_label_prefixes == 'undefined' || (allowed_ref_label_prefixes != null && allowed_ref_label_prefixes.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000590 */ 			var allowed_ref_label_prefixes = null;
-/* 000590 */ 		};
-/* 000590 */ 		if (arguments.length) {
-/* 000590 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000590 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000590 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000590 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000590 */ 					switch (__attrib0__) {
-/* 000590 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000590 */ 						case 'environments': var environments = __allkwargs0__ [__attrib0__]; break;
-/* 000590 */ 						case 'theorem_types': var theorem_types = __allkwargs0__ [__attrib0__]; break;
-/* 000590 */ 						case 'shared_counter_formatter': var shared_counter_formatter = __allkwargs0__ [__attrib0__]; break;
-/* 000590 */ 						case 'allowed_ref_label_prefixes': var allowed_ref_label_prefixes = __allkwargs0__ [__attrib0__]; break;
-/* 000590 */ 					}
-/* 000590 */ 				}
-/* 000590 */ 			}
+/* 000204 */ 		var thmtitle_nodelist = null;
+/* 000205 */ 		if (__t__ (__getitem__ (flmarg_thmtitle, 'has_relation_ref'))) {
+/* 000207 */ 			if (__t__ (__getitem__ (flmarg_thmtitle, 'relation_ref_show_ref'))) {
+/* 000209 */ 				var __left0__ = __getitem__ (flmarg_thmtitle, 'relation_ref_target');
+/* 000209 */ 				var ref_type = __left0__ [0];
+/* 000209 */ 				var ref_label = __left0__ [1];
+/* 000212 */ 				var thm_relation_ref_instance = (function () {
+/* 000212 */ 					var __accu0__ = refs_mgr;
+/* 000212 */ 					return __call__ (__accu0__.get_ref, __accu0__, ref_type, ref_label, node.latex_walker.resource_info);
+/* 000212 */ 				}) ();
+/* 000216 */ 				var thm_relation_ref_flm_text = thm_relation_ref_instance.formatted_ref_flm_text;
+/* 000217 */ 				var thm_relation_ref_flm_frag = (function () {
+/* 000217 */ 					var __accu0__ = render_context;
+/* 000217 */ 					return __call__ (__accu0__.make_standalone_fragment, __accu0__, thm_relation_ref_flm_text, __kwargtrans__ ({what: 'Thm relation ref'}));
+/* 000217 */ 				}) ();
+/* 000221 */ 				var thmtitle_nodelist = thm_relation_ref_flm_frag.nodes;
+/* 000221 */ 			}
+/* 000221 */ 		}
+/* 000223 */ 		else if (__t__ (__getitem__ (flmarg_thmtitle, 'nodelist') !== null)) {
+/* 000225 */ 			var thmtitle_nodelist = __getitem__ (flmarg_thmtitle, 'nodelist');
+/* 000225 */ 		}
+/* 000228 */ 		if (__t__ (thmtitle_nodelist !== null)) {
+/* 000230 */ 			var heading_nodelist = (function () {
+/* 000230 */ 				var __accu0__ = node.latex_walker;
+/* 000233 */ 				return __call__ (__accu0__.make_nodelist, __accu0__, __add__ (__add__ (__add__ (__call__ (list, null, title_heading_formatted_flm_frag_nodes), [(function () {
+/* 000233 */ 					var __accu1__ = node.latex_walker;
+/* 000233 */ 					return __call__ (__accu1__.make_node, __accu1__, latexnodes_nodes.LatexCharsNode, __kwargtrans__ ({chars: __getitem__ (self.theorem_type_spec, 'heading_title_pre'), pos: node.pos, pos_end: node.pos, parsing_state: node.parsing_state}));
+/* 000241 */ 				}) ()]), __call__ (list, null, thmtitle_nodelist)), [(function () {
+/* 000241 */ 					var __accu1__ = node.latex_walker;
+/* 000241 */ 					return __call__ (__accu1__.make_node, __accu1__, latexnodes_nodes.LatexCharsNode, __kwargtrans__ ({chars: __getitem__ (self.theorem_type_spec, 'heading_title_post'), pos: node.pos, pos_end: node.pos, parsing_state: node.parsing_state}));
+/* 000241 */ 				}) ()]), __kwargtrans__ ({parsing_state: node.parsing_state, pos: node.pos}));
+/* 000241 */ 			}) ();
+/* 000241 */ 		}
+/* 000251 */ 		else {
+/* 000255 */ 			var heading_nodelist = title_heading_formatted_flm_frag_nodes;
+/* 000255 */ 		}
+/* 000260 */ 		var heading_node = __call__ (make_invocable_node_instance, null, latexnodes_nodes.LatexMacroNode, __kwargtrans__ ({flm_spec: (function () {
+/* 000260 */ 			var __accu0__ = headings;
+/* 000260 */ 			return __call__ (__accu0__.HeadingMacro, __accu0__, __kwargtrans__ ({macroname: null, heading_level: __getitem__ (self.theorem_type_spec, 'theorem_heading_level'), inline_heading: true}));
+/* 000260 */ 		}) (), args: dict ({'text': heading_nodelist}), latex_walker: node.latex_walker, parsing_state: node.parsing_state}));
+/* 000272 */ 		heading_node.flm_heading_target_id = target_id;
+/* 000288 */ 		var final_content_node = (function () {
+/* 000288 */ 			var __accu0__ = node.latex_walker;
+/* 000288 */ 			return __call__ (__accu0__.make_node, __accu0__, latexnodes_nodes.LatexCharsNode, __kwargtrans__ ({chars: __getitem__ (self.theorem_type_spec, 'body_final_content'), pos: node.pos, pos_end: node.pos, parsing_state: node.parsing_state}));
+/* 000288 */ 		}) ();
+/* 000295 */ 		final_content_node.flm_strip_preceding_whitespace = true;
+/* 000298 */ 		if (__t__ (__getitem__ (self.theorem_type_spec, 'body_final_content'))) {
+/* 000303 */ 			var body_nodelist = __add__ (__add__ ([heading_node], __call__ (list, null, node.nodelist)), [final_content_node]);
+/* 000303 */ 		}
+/* 000306 */ 		else {
+/* 000313 */ 			var body_nodelist = __add__ ([heading_node], __call__ (list, null, node.nodelist));
+/* 000313 */ 		}
+/* 000316 */ 		var body_nodelist = (function () {
+/* 000316 */ 			var __accu0__ = node.latex_walker;
+/* 000316 */ 			return __call__ (__accu0__.make_nodelist, __accu0__, body_nodelist, __kwargtrans__ ({parsing_state: node.parsing_state}));
+/* 000316 */ 		}) ();
+/* 000321 */ 		var rendered_contents = (function () {
+/* 000321 */ 			var __accu0__ = fragment_renderer;
+/* 000321 */ 			return __call__ (__accu0__.render_nodelist, __accu0__, body_nodelist, render_context);
+/* 000321 */ 		}) ();
+/* 000326 */ 		return (function () {
+/* 000326 */ 			var __accu0__ = fragment_renderer;
+/* 000326 */ 			return __call__ (__accu0__.render_semantic_block, __accu0__, rendered_contents, __getitem__ (self.theorem_spec, 'theorem_type'), render_context, __kwargtrans__ ({annotations: [self.environmentname]}));
+/* 000326 */ 		}) ();
+/* 000326 */ 	});}
+/* 000326 */ });
+/* 000336 */ export var _default_theorem_environments_simpleset = dict ({'theoremlike': dict ({'theorem': dict ({'title': dict ({'lowercase': 'theorem', 'abbreviated': dict ({'singular': 'Thm.', 'plural': 'Thms.'})})}), 'proposition': dict ({'title': dict ({'lowercase': 'proposition', 'abbreviated': dict ({'singular': 'Prop.', 'plural': 'Props.'})})}), 'lemma': dict ({'title': dict ({'lowercase': 'lemma', 'abbreviated': dict ({'singular': 'Lem.', 'plural': 'Lems.'})})}), 'corollary': dict ({'title': dict ({'lowercase': 'corollary', 'abbreviated': dict ({'singular': 'Cor.', 'plural': 'Cors.'})})})}), 'definitionlike': dict ({'definition': dict ({'title': dict ({'lowercase': 'definition', 'abbreviated': dict ({'singular': 'Def.', 'plural': 'Defs.'})})})}), 'prooflike': dict ({'proof': dict ({'title': dict ({'lowercase': 'proof', 'abbreviated': dict ({'singular': 'Proof', 'plural': 'Proofs'})})})})});
+/* 000431 */ export var _default_theorem_environments_defaultset = dict ({'theoremlike': __call__ (dict, null, __getitem__ (_default_theorem_environments_simpleset, 'theoremlike'), __kwargtrans__ (dict ({'conjecture': dict ({'title': dict ({'lowercase': 'conjecture', 'abbreviated': dict ({'singular': 'Conj.', 'plural': 'Conjs.'})})})}))), 'definitionlike': __call__ (dict, null, __getitem__ (_default_theorem_environments_simpleset, 'definitionlike'), __kwargtrans__ (dict ({'remark': dict ({'title': dict ({'lowercase': 'remark', 'abbreviated': dict ({'singular': 'Rem.', 'plural': 'Rems.'})})})}))), 'prooflike': __call__ (dict, null, __getitem__ (_default_theorem_environments_simpleset, 'prooflike'))});
+/* 000483 */ export var _default_theorem_environments_richset = dict ({'theoremlike': __call__ (dict, null, __getitem__ (_default_theorem_environments_defaultset, 'theoremlike')), 'definitionlike': __call__ (dict, null, __getitem__ (_default_theorem_environments_defaultset, 'definitionlike'), __kwargtrans__ (dict ({'idea': dict ({'title': dict ({'lowercase': 'idea', 'abbreviated': dict ({'singular': 'Idea', 'plural': 'Ideas'})})}), 'question': dict ({'title': dict ({'lowercase': 'question', 'abbreviated': dict ({'singular': 'Qtn.', 'plural': 'Qtns.'})})}), 'claim': dict ({'title': dict ({'lowercase': 'claim', 'abbreviated': dict ({'singular': 'Clm.', 'plural': 'Clms.'})})}), 'observation': dict ({'title': dict ({'lowercase': 'observation', 'abbreviated': dict ({'singular': 'Obs.', 'plural': 'Obs.'})})}), 'problem': dict ({'title': dict ({'lowercase': 'problem', 'abbreviated': dict ({'singular': 'Prob.', 'plural': 'Probs.'})})})}))), 'prooflike': __call__ (dict, null, __getitem__ (_default_theorem_environments_defaultset, 'prooflike'))});
+/* 000487 */ export var default_theorem_environments = dict ({'simpleset': _default_theorem_environments_simpleset, 'defaultset': _default_theorem_environments_defaultset, 'richset': _default_theorem_environments_richset});
+/* 000493 */ export var default_theorem_theorem_types = dict ({'theoremlike': dict ({'numbered': true, 'shared_numbering': true, 'counter_formatter': null, 'theorem_heading_level': 'theorem', 'heading_title_pre': ' (', 'heading_title_post': ')', 'title_enable_relation_ref': false, 'body_final_content': ''}), 'definitionlike': dict ({'numbered': true, 'shared_numbering': true, 'counter_formatter': null, 'theorem_heading_level': 'theorem', 'heading_title_pre': ' (', 'heading_title_post': ')', 'title_enable_relation_ref': false}), 'prooflike': dict ({'numbered': false, 'title_enable_relation_ref': true, 'body_final_content': '\xa0□'})});
+/* 000525 */ export var default_thm_shared_counter_formatter_spec = dict ({'format_num': 'arabic', 'delimiters': tuple (['', '']), 'join_spec': 'default'});
+/* 000532 */ export var default_allowed_ref_label_prefixes = ['thm', 'prop', 'cor', 'lem', 'rem', 'def', 'dfn', 'x', 'topic'];
+/* 000539 */ export var FeatureTheorems =  __class__ ('FeatureTheorems', [Feature], {
+/* 000539 */ 	__module__: __name__,
+/* 000541 */ 	feature_name: 'theorems',
+/* 000543 */ 	feature_dependencies: ['refs'],
+/* 000554 */ 	feature_default_config: dict ({'environments': __getitem__ (default_theorem_environments, 'defaultset'), 'theorem_types': default_theorem_theorem_types, 'shared_counter_formatter': 'arabic', 'allowed_ref_label_prefixes': default_allowed_ref_label_prefixes}),
+/* 000554 */ 	RenderManager: __class__ ('RenderManager', [Feature.RenderManager], {
+/* 000554 */ 		__module__: __name__,
+/* 000556 */ 		get initialize () {return __get__ (this, function (self) {
+/* 000556 */ 			if (arguments.length) {
+/* 000556 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000556 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000556 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000556 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000556 */ 						switch (__attrib0__) {
+/* 000556 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000556 */ 						}
+/* 000556 */ 					}
+/* 000556 */ 				}
+/* 000556 */ 			}
+/* 000556 */ 			else {
+/* 000556 */ 			}
+/* 000557 */ 			self.shared_counter = __call__ (Counter, null, self.feature.shared_counter_formatter);
+/* 000559 */ 			var refs_mgr = (function () {
+/* 000559 */ 				var __accu0__ = self.render_context;
+/* 000559 */ 				return __call__ (__accu0__.feature_render_manager, __accu0__, 'refs');
+/* 000559 */ 			}) ();
+/* 000561 */ 			self.counters = dict ({});
+/* 000562 */ 			var __iterable0__ = (function () {
+/* 000562 */ 				var __accu0__ = self.feature.thm_counter_formatters;
+/* 000562 */ 				return __call__ (__accu0__.py_items, __accu0__);
+/* 000562 */ 			}) ();
+/* 000562 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000562 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000562 */ 				var env_name = __left0__ [0];
+/* 000562 */ 				var counter_formatter = __left0__ [1];
+/* 000563 */ 				var thm_spec = __getitem__ (self.feature.environments, env_name);
+/* 000564 */ 				var thm_type_spec = __getitem__ (self.feature.theorem_types, __getitem__ (thm_spec, 'theorem_type'));
+/* 000565 */ 				if (__t__ (__getitem__ (thm_type_spec, 'shared_numbering'))) {
+/* 000566 */ 					__setitem__ (self.counters, env_name, __call__ (CounterAlias, null, __kwargtrans__ ({counter_formatter: counter_formatter, alias_counter: self.shared_counter})));
+/* 000566 */ 				}
+/* 000569 */ 				else {
+/* 000571 */ 					__setitem__ (self.counters, env_name, __call__ (Counter, null, __kwargtrans__ ({counter_formatter: counter_formatter})));
+/* 000571 */ 				}
+/* 000576 */ 				(function () {
+/* 000576 */ 					var __accu0__ = refs_mgr;
+/* 000576 */ 					return __call__ (__accu0__.register_counter_formatter, __accu0__, __kwargtrans__ ({counter_formatter: counter_formatter}));
+/* 000576 */ 				}) ();
+/* 000576 */ 			}
+/* 000576 */ 		});}
+/* 000576 */ 	}),
+/* 000581 */ 	get __init__ () {return __get__ (this, function (self, environments, theorem_types, shared_counter_formatter, allowed_ref_label_prefixes) {
+/* 000581 */ 		if (typeof environments == 'undefined' || (environments != null && environments.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000581 */ 			var environments = null;
+/* 000581 */ 		};
+/* 000581 */ 		if (typeof theorem_types == 'undefined' || (theorem_types != null && theorem_types.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000581 */ 			var theorem_types = null;
+/* 000581 */ 		};
+/* 000581 */ 		if (typeof shared_counter_formatter == 'undefined' || (shared_counter_formatter != null && shared_counter_formatter.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000581 */ 			var shared_counter_formatter = null;
+/* 000581 */ 		};
+/* 000581 */ 		if (typeof allowed_ref_label_prefixes == 'undefined' || (allowed_ref_label_prefixes != null && allowed_ref_label_prefixes.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000581 */ 			var allowed_ref_label_prefixes = null;
+/* 000581 */ 		};
+/* 000581 */ 		if (arguments.length) {
+/* 000581 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000581 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000581 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000581 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000581 */ 					switch (__attrib0__) {
+/* 000581 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000581 */ 						case 'environments': var environments = __allkwargs0__ [__attrib0__]; break;
+/* 000581 */ 						case 'theorem_types': var theorem_types = __allkwargs0__ [__attrib0__]; break;
+/* 000581 */ 						case 'shared_counter_formatter': var shared_counter_formatter = __allkwargs0__ [__attrib0__]; break;
+/* 000581 */ 						case 'allowed_ref_label_prefixes': var allowed_ref_label_prefixes = __allkwargs0__ [__attrib0__]; break;
+/* 000581 */ 					}
+/* 000581 */ 				}
+/* 000581 */ 			}
+/* 000581 */ 		}
+/* 000581 */ 		else {
+/* 000581 */ 		}
+/* 000586 */ 		__call__ (__call__ (__super__, null, FeatureTheorems, '__init__'), null, self);
+/* 000587 */ 		if (__t__ (environments === null)) {
+/* 000588 */ 			var environments = __getitem__ (default_theorem_environments, 'defaultset');
+/* 000588 */ 		}
+/* 000589 */ 		if (__t__ (__call__ (isinstance, null, environments, str))) {
+/* 000590 */ 			var environments = __getitem__ (default_theorem_environments, environments);
 /* 000590 */ 		}
-/* 000590 */ 		else {
-/* 000590 */ 		}
-/* 000595 */ 		__call__ (__call__ (__super__, null, FeatureTheorems, '__init__'), null, self);
-/* 000596 */ 		if (__t__ (environments === null)) {
-/* 000597 */ 			var environments = __getitem__ (default_theorem_environments, 'defaultset');
-/* 000597 */ 		}
-/* 000598 */ 		if (__t__ (__call__ (isinstance, null, environments, str))) {
-/* 000599 */ 			var environments = __getitem__ (default_theorem_environments, environments);
-/* 000599 */ 		}
-/* 000601 */ 		if (__t__ (theorem_types === null)) {
-/* 000602 */ 			var theorem_types = default_theorem_theorem_types;
-/* 000602 */ 		}
-/* 000606 */ 		self.theorem_types = (function () {
-/* 000606 */ 			var __accu0__ = [];
-/* 000608 */ 			var __iterable0__ = (function () {
-/* 000608 */ 				var __accu1__ = __call__ (dict, null, theorem_types);
-/* 000608 */ 				return __call__ (__accu1__.py_items, __accu1__);
-/* 000608 */ 			}) ();
-/* 000608 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000608 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000608 */ 				var thm_type = __left0__ [0];
-/* 000608 */ 				var thm_type_spec = __left0__ [1];
-/* 000608 */ 				if (__t__ (thm_type_spec !== null)) {
-/* 000609 */ 					(function () {
-/* 000609 */ 						var __accu1__ = __accu0__;
-/* 000607 */ 						return __call__ (__accu1__.append, __accu1__, [thm_type, (function () {
-/* 000607 */ 							var __accu2__ = self;
-/* 000607 */ 							return __call__ (__accu2__._standardize_type_spec, __accu2__, thm_type, thm_type_spec);
-/* 000607 */ 						}) ()]);
-/* 000607 */ 					}) ();
-/* 000607 */ 				}
-/* 000607 */ 			}
-/* 000607 */ 			return dict (__accu0__);
-/* 000607 */ 		}) ();
-/* 000614 */ 		self.environments = dict ({});
-/* 000615 */ 		var __iterable0__ = (function () {
-/* 000615 */ 			var __accu0__ = environments;
-/* 000615 */ 			return __call__ (__accu0__.py_items, __accu0__);
-/* 000615 */ 		}) ();
-/* 000615 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000615 */ 			var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000615 */ 			var thm_type = __left0__ [0];
-/* 000615 */ 			var env_list = __left0__ [1];
-/* 000616 */ 			var __iterable1__ = (function () {
-/* 000616 */ 				var __accu0__ = env_list;
-/* 000616 */ 				return __call__ (__accu0__.py_items, __accu0__);
-/* 000616 */ 			}) ();
-/* 000616 */ 			for (var __index1__ = 0; __index1__ < len (__iterable1__); __index1__++) {
-/* 000616 */ 				var __left0__ = __getitem__ (__iterable1__, __index1__);
-/* 000616 */ 				var env_name = __left0__ [0];
-/* 000616 */ 				var thm_spec = __left0__ [1];
-/* 000617 */ 				if (__t__ (__in__ ('env_name', self.environments))) {
-/* 000618 */ 					var __except0__ = __call__ (ValueError, null, 'Duplicate definition of theorem environment ‘{}’'.format (env_name));
-/* 000618 */ 					__except0__.__cause__ = null;
-/* 000618 */ 					throw __except0__;
-/* 000618 */ 				}
-/* 000622 */ 				__setitem__ (self.environments, env_name, (function () {
-/* 000622 */ 					var __accu0__ = self;
-/* 000622 */ 					return __call__ (__accu0__._standardize_thm_spec, __accu0__, thm_type, env_name, thm_spec);
-/* 000622 */ 				}) ());
-/* 000622 */ 			}
-/* 000622 */ 		}
-/* 000626 */ 		self.shared_counter_formatter = __call__ (build_counter_formatter, null, shared_counter_formatter, default_thm_shared_counter_formatter_spec, __kwargtrans__ ({counter_formatter_id: '_theorems_shared'}));
-/* 000632 */ 		var use_default_counter_formatter_spec = (function () {
-/* 000632 */ 			var __accu0__ = self.shared_counter_formatter;
-/* 000632 */ 			return __call__ (__accu0__.asdict, __accu0__);
-/* 000632 */ 		}) ();
-/* 000634 */ 		self.thm_counter_formatters = dict ({});
-/* 000635 */ 		var __iterable0__ = (function () {
-/* 000635 */ 			var __accu0__ = self.environments;
-/* 000635 */ 			return __call__ (__accu0__.py_items, __accu0__);
-/* 000635 */ 		}) ();
-/* 000635 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000635 */ 			var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000635 */ 			var env_name = __left0__ [0];
-/* 000635 */ 			var thm_spec = __left0__ [1];
-/* 000636 */ 			var thm_type_spec = __getitem__ (self.theorem_types, __getitem__ (thm_spec, 'theorem_type'));
-/* 000637 */ 			if (__t__ (!__t__ ((__getitem__ (thm_type_spec, 'numbered'))))) {
-/* 000637 */ 				continue;
-/* 000637 */ 			}
-/* 000641 */ 			var counter_formatter_spec = (function () {
-/* 000641 */ 				var __accu0__ = thm_type_spec;
-/* 000641 */ 				return __call__ (__accu0__.py_get, __accu0__, 'counter_formatter', null);
-/* 000641 */ 			}) ();
-/* 000642 */ 			if (__t__ (counter_formatter_spec === null)) {
-/* 000643 */ 				var counter_formatter_spec = dict ({});
-/* 000643 */ 			}
-/* 000644 */ 			else if (__t__ (__call__ (isinstance, null, counter_formatter_spec, str))) {
-/* 000645 */ 				var counter_formatter_spec = dict ({'format_num': counter_formatter_spec});
-/* 000645 */ 			}
-/* 000646 */ 			else {
-/* 000647 */ 				var counter_formatter_spec = __call__ (dict, null, counter_formatter_spec);
-/* 000647 */ 			}
-/* 000653 */ 			__setitem__ (counter_formatter_spec, 'prefix_display', (function () {
-/* 000653 */ 				var __accu0__ = self;
-/* 000653 */ 				return __call__ (__accu0__._make_counter_formatter_prefix_for_thm, __accu0__, env_name, thm_spec);
-/* 000653 */ 			}) ());
-/* 000657 */ 			__setitem__ (self.thm_counter_formatters, env_name, __call__ (build_counter_formatter, null, counter_formatter_spec, use_default_counter_formatter_spec, __kwargtrans__ ({counter_formatter_id: env_name})));
-/* 000657 */ 		}
-/* 000663 */ 		self.allowed_ref_label_prefixes = __call__ (list, null, (__t__ (allowed_ref_label_prefixes !== null) ? allowed_ref_label_prefixes : default_allowed_ref_label_prefixes));
-/* 000663 */ 	});},
-/* 000670 */ 	get _standardize_type_spec () {return __get__ (this, function (self, thm_type, thm_type_spec) {
-/* 000670 */ 		if (arguments.length) {
-/* 000670 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000670 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000670 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000670 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000670 */ 					switch (__attrib0__) {
-/* 000670 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000670 */ 						case 'thm_type': var thm_type = __allkwargs0__ [__attrib0__]; break;
-/* 000670 */ 						case 'thm_type_spec': var thm_type_spec = __allkwargs0__ [__attrib0__]; break;
-/* 000670 */ 					}
-/* 000670 */ 				}
-/* 000670 */ 			}
-/* 000670 */ 		}
-/* 000670 */ 		else {
-/* 000670 */ 		}
-/* 000672 */ 		var spec = __call__ (dict, null, __getitem__ (default_theorem_theorem_types, 'theoremlike'));
-/* 000673 */ 		(function () {
-/* 000673 */ 			var __accu0__ = spec;
-/* 000673 */ 			return __call__ (__accu0__.py_update, __accu0__, thm_type_spec);
-/* 000673 */ 		}) ();
-/* 000674 */ 		return spec;
-/* 000674 */ 	});},
-/* 000676 */ 	get _standardize_thm_spec () {return __get__ (this, function (self, thm_type, env_name, thm_spec) {
-/* 000676 */ 		if (arguments.length) {
-/* 000676 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000676 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000676 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000676 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000676 */ 					switch (__attrib0__) {
-/* 000676 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000676 */ 						case 'thm_type': var thm_type = __allkwargs0__ [__attrib0__]; break;
-/* 000676 */ 						case 'env_name': var env_name = __allkwargs0__ [__attrib0__]; break;
-/* 000676 */ 						case 'thm_spec': var thm_spec = __allkwargs0__ [__attrib0__]; break;
-/* 000676 */ 					}
-/* 000676 */ 				}
-/* 000676 */ 			}
-/* 000676 */ 		}
-/* 000676 */ 		else {
-/* 000676 */ 		}
-/* 000677 */ 		if (__t__ (thm_spec === true)) {
-/* 000678 */ 			var thm_spec = env_name;
-/* 000678 */ 		}
-/* 000679 */ 		if (__t__ (__call__ (isinstance, null, thm_spec, str))) {
-/* 000680 */ 			var thm_spec = dict ({'title': thm_spec});
-/* 000680 */ 		}
-/* 000681 */ 		else {
-/* 000682 */ 			var thm_spec = __call__ (dict, null, thm_spec);
-/* 000682 */ 		}
-/* 000684 */ 		__setitem__ (thm_spec, 'theorem_type', thm_type);
-/* 000687 */ 		var new_title_spec = dict ({});
-/* 000688 */ 		var title = (function () {
-/* 000688 */ 			var __accu0__ = thm_spec;
-/* 000688 */ 			return __call__ (__accu0__.py_get, __accu0__, 'title', null);
-/* 000688 */ 		}) ();
-/* 000689 */ 		if (__t__ (title === null)) {
-/* 000690 */ 			var title = env_name;
-/* 000690 */ 		}
-/* 000691 */ 		if (__t__ (__call__ (isinstance, null, title, str))) {
-/* 000692 */ 			var title = dict ({'lowercase': dict ({'singular': title, 'plural': __add__ (title, 's')})});
-/* 000692 */ 		}
-/* 000695 */ 		if (__t__ (__in__ ('lowercase', title))) {
-/* 000696 */ 			var lowercase = __getitem__ (title, 'lowercase');
-/* 000697 */ 			if (__t__ (__call__ (isinstance, null, lowercase, str))) {
-/* 000698 */ 				__setitem__ (new_title_spec, 'lowercase', dict ({'singular': lowercase, 'plural': __add__ (lowercase, 's')}));
-/* 000698 */ 			}
-/* 000701 */ 			else {
-/* 000703 */ 				__setitem__ (new_title_spec, 'lowercase', lowercase);
-/* 000703 */ 			}
-/* 000703 */ 		}
-/* 000704 */ 		else {
-/* 000706 */ 			__setitem__ (new_title_spec, 'lowercase', dict ({'singular': '??', 'plural': '???'}));
-/* 000706 */ 		}
-/* 000708 */ 		if (__t__ (__in__ ('capital', title))) {
-/* 000709 */ 			var capital = __getitem__ (title, 'capital');
-/* 000710 */ 			if (__t__ (__call__ (isinstance, null, capital, str))) {
-/* 000711 */ 				__setitem__ (new_title_spec, 'capital', dict ({'singular': capital, 'plural': __add__ (capital, 's')}));
-/* 000711 */ 			}
-/* 000714 */ 			else {
-/* 000716 */ 				__setitem__ (new_title_spec, 'capital', capital);
-/* 000716 */ 			}
-/* 000716 */ 		}
-/* 000717 */ 		else {
-/* 000720 */ 			__setitem__ (new_title_spec, 'capital', dict ({'singular': (function () {
-/* 000720 */ 				var __accu0__ = __getitem__ (__getitem__ (new_title_spec, 'lowercase'), 'singular');
-/* 000720 */ 				return __call__ (__accu0__.capitalize, __accu0__);
-/* 000721 */ 			}) (), 'plural': (function () {
-/* 000721 */ 				var __accu0__ = __getitem__ (__getitem__ (new_title_spec, 'lowercase'), 'plural');
-/* 000721 */ 				return __call__ (__accu0__.capitalize, __accu0__);
-/* 000721 */ 			}) ()}));
-/* 000721 */ 		}
-/* 000724 */ 		if (__t__ (__in__ ('abbreviated', title))) {
-/* 000725 */ 			var abbreviated = __getitem__ (title, 'abbreviated');
-/* 000726 */ 			if (__t__ (__call__ (isinstance, null, abbreviated, str))) {
-/* 000727 */ 				__setitem__ (new_title_spec, 'abbreviated', dict ({'singular': abbreviated, 'plural': __add__ (abbreviated, 's')}));
-/* 000727 */ 			}
-/* 000730 */ 			else {
-/* 000732 */ 				__setitem__ (new_title_spec, 'abbreviated', abbreviated);
-/* 000732 */ 			}
-/* 000732 */ 		}
-/* 000733 */ 		else {
-/* 000737 */ 			__setitem__ (new_title_spec, 'abbreviated', dict ({'singular': __add__ (__getslice__ (__getitem__ (__getitem__ (new_title_spec, 'capital'), 'singular'), 0, 3, 1), '.'), 'plural': __add__ ((function () {
-/* 000737 */ 				var __accu0__ = __getslice__ (__getitem__ (__getitem__ (new_title_spec, 'capital'), 'plural'), 0, 3, 1);
-/* 000737 */ 				return __call__ (__accu0__.rstrip, __accu0__, 's');
-/* 000737 */ 			}) (), 's.')}));
-/* 000737 */ 		}
-/* 000740 */ 		__setitem__ (thm_spec, 'title', new_title_spec);
-/* 000742 */ 		return thm_spec;
-/* 000742 */ 	});},
-/* 000745 */ 	get _make_counter_formatter_prefix_for_thm () {return __get__ (this, function (self, env_name, thm_spec) {
-/* 000745 */ 		if (arguments.length) {
-/* 000745 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000745 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000745 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000745 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000745 */ 					switch (__attrib0__) {
-/* 000745 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000745 */ 						case 'env_name': var env_name = __allkwargs0__ [__attrib0__]; break;
-/* 000745 */ 						case 'thm_spec': var thm_spec = __allkwargs0__ [__attrib0__]; break;
-/* 000745 */ 					}
-/* 000745 */ 				}
-/* 000745 */ 			}
-/* 000745 */ 		}
-/* 000745 */ 		else {
-/* 000745 */ 		}
-/* 000746 */ 		var prefix = dict ({});
-/* 000748 */ 		var _add_space_values = function (x) {
-/* 000748 */ 			if (arguments.length) {
-/* 000748 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000748 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000748 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000748 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000748 */ 						switch (__attrib0__) {
-/* 000748 */ 							case 'x': var x = __allkwargs0__ [__attrib0__]; break;
-/* 000748 */ 						}
-/* 000748 */ 					}
-/* 000748 */ 				}
-/* 000748 */ 			}
-/* 000748 */ 			else {
-/* 000748 */ 			}
-/* 000749 */ 			return (function () {
-/* 000749 */ 				var __accu0__ = [];
-/* 000749 */ 				var __iterable0__ = (function () {
-/* 000749 */ 					var __accu1__ = x;
-/* 000749 */ 					return __call__ (__accu1__.py_items, __accu1__);
-/* 000749 */ 				}) ();
-/* 000749 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000749 */ 					var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000749 */ 					var k = __left0__ [0];
-/* 000749 */ 					var v = __left0__ [1];
-/* 000749 */ 					(function () {
-/* 000749 */ 						var __accu1__ = __accu0__;
-/* 000749 */ 						return __call__ (__accu1__.append, __accu1__, [k, __add__ (v, '~')]);
-/* 000749 */ 					}) ();
-/* 000749 */ 				}
-/* 000749 */ 				return dict (__accu0__);
-/* 000749 */ 			}) ();
-/* 000749 */ 		};
-/* 000751 */ 		__setitem__ (prefix, 'lowercase', __call__ (_add_space_values, null, __getitem__ (__getitem__ (thm_spec, 'title'), 'lowercase')));
-/* 000752 */ 		__setitem__ (prefix, 'capital', __call__ (_add_space_values, null, __getitem__ (__getitem__ (thm_spec, 'title'), 'capital')));
-/* 000753 */ 		__setitem__ (prefix, 'abbreviated', __call__ (_add_space_values, null, __getitem__ (__getitem__ (thm_spec, 'title'), 'abbreviated')));
-/* 000755 */ 		(function () {
-/* 000755 */ 			var __accu0__ = prefix;
-/* 000755 */ 			return __call__ (__accu0__.py_update, __accu0__, __getitem__ (prefix, 'capital'));
+/* 000592 */ 		if (__t__ (theorem_types === null)) {
+/* 000593 */ 			var theorem_types = default_theorem_theorem_types;
+/* 000593 */ 		}
+/* 000597 */ 		self.theorem_types = (function () {
+/* 000597 */ 			var __accu0__ = [];
+/* 000599 */ 			var __iterable0__ = (function () {
+/* 000599 */ 				var __accu1__ = __call__ (dict, null, theorem_types);
+/* 000599 */ 				return __call__ (__accu1__.py_items, __accu1__);
+/* 000599 */ 			}) ();
+/* 000599 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000599 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000599 */ 				var thm_type = __left0__ [0];
+/* 000599 */ 				var thm_type_spec = __left0__ [1];
+/* 000599 */ 				if (__t__ (thm_type_spec !== null)) {
+/* 000600 */ 					(function () {
+/* 000600 */ 						var __accu1__ = __accu0__;
+/* 000598 */ 						return __call__ (__accu1__.append, __accu1__, [thm_type, (function () {
+/* 000598 */ 							var __accu2__ = self;
+/* 000598 */ 							return __call__ (__accu2__._standardize_type_spec, __accu2__, thm_type, thm_type_spec);
+/* 000598 */ 						}) ()]);
+/* 000598 */ 					}) ();
+/* 000598 */ 				}
+/* 000598 */ 			}
+/* 000598 */ 			return dict (__accu0__);
+/* 000598 */ 		}) ();
+/* 000605 */ 		self.environments = dict ({});
+/* 000606 */ 		var __iterable0__ = (function () {
+/* 000606 */ 			var __accu0__ = environments;
+/* 000606 */ 			return __call__ (__accu0__.py_items, __accu0__);
+/* 000606 */ 		}) ();
+/* 000606 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000606 */ 			var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000606 */ 			var thm_type = __left0__ [0];
+/* 000606 */ 			var env_list = __left0__ [1];
+/* 000607 */ 			var __iterable1__ = (function () {
+/* 000607 */ 				var __accu0__ = env_list;
+/* 000607 */ 				return __call__ (__accu0__.py_items, __accu0__);
+/* 000607 */ 			}) ();
+/* 000607 */ 			for (var __index1__ = 0; __index1__ < len (__iterable1__); __index1__++) {
+/* 000607 */ 				var __left0__ = __getitem__ (__iterable1__, __index1__);
+/* 000607 */ 				var env_name = __left0__ [0];
+/* 000607 */ 				var thm_spec = __left0__ [1];
+/* 000608 */ 				if (__t__ (__in__ ('env_name', self.environments))) {
+/* 000609 */ 					var __except0__ = __call__ (ValueError, null, 'Duplicate definition of theorem environment ‘{}’'.format (env_name));
+/* 000609 */ 					__except0__.__cause__ = null;
+/* 000609 */ 					throw __except0__;
+/* 000609 */ 				}
+/* 000613 */ 				__setitem__ (self.environments, env_name, (function () {
+/* 000613 */ 					var __accu0__ = self;
+/* 000613 */ 					return __call__ (__accu0__._standardize_thm_spec, __accu0__, thm_type, env_name, thm_spec);
+/* 000613 */ 				}) ());
+/* 000613 */ 			}
+/* 000613 */ 		}
+/* 000617 */ 		self.shared_counter_formatter = __call__ (build_counter_formatter, null, shared_counter_formatter, default_thm_shared_counter_formatter_spec, __kwargtrans__ ({counter_formatter_id: '_theorems_shared'}));
+/* 000623 */ 		var use_default_counter_formatter_spec = (function () {
+/* 000623 */ 			var __accu0__ = self.shared_counter_formatter;
+/* 000623 */ 			return __call__ (__accu0__.asdict, __accu0__);
+/* 000623 */ 		}) ();
+/* 000625 */ 		self.thm_counter_formatters = dict ({});
+/* 000626 */ 		var __iterable0__ = (function () {
+/* 000626 */ 			var __accu0__ = self.environments;
+/* 000626 */ 			return __call__ (__accu0__.py_items, __accu0__);
+/* 000626 */ 		}) ();
+/* 000626 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000626 */ 			var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000626 */ 			var env_name = __left0__ [0];
+/* 000626 */ 			var thm_spec = __left0__ [1];
+/* 000627 */ 			var thm_type_spec = __getitem__ (self.theorem_types, __getitem__ (thm_spec, 'theorem_type'));
+/* 000628 */ 			if (__t__ (!__t__ ((__getitem__ (thm_type_spec, 'numbered'))))) {
+/* 000628 */ 				continue;
+/* 000628 */ 			}
+/* 000632 */ 			var counter_formatter_spec = (function () {
+/* 000632 */ 				var __accu0__ = thm_type_spec;
+/* 000632 */ 				return __call__ (__accu0__.py_get, __accu0__, 'counter_formatter', null);
+/* 000632 */ 			}) ();
+/* 000633 */ 			if (__t__ (counter_formatter_spec === null)) {
+/* 000634 */ 				var counter_formatter_spec = dict ({});
+/* 000634 */ 			}
+/* 000635 */ 			else if (__t__ (__call__ (isinstance, null, counter_formatter_spec, str))) {
+/* 000636 */ 				var counter_formatter_spec = dict ({'format_num': counter_formatter_spec});
+/* 000636 */ 			}
+/* 000637 */ 			else {
+/* 000638 */ 				var counter_formatter_spec = __call__ (dict, null, counter_formatter_spec);
+/* 000638 */ 			}
+/* 000644 */ 			__setitem__ (counter_formatter_spec, 'prefix_display', (function () {
+/* 000644 */ 				var __accu0__ = self;
+/* 000644 */ 				return __call__ (__accu0__._make_counter_formatter_prefix_for_thm, __accu0__, env_name, thm_spec);
+/* 000644 */ 			}) ());
+/* 000648 */ 			__setitem__ (self.thm_counter_formatters, env_name, __call__ (build_counter_formatter, null, counter_formatter_spec, use_default_counter_formatter_spec, __kwargtrans__ ({counter_formatter_id: env_name})));
+/* 000648 */ 		}
+/* 000654 */ 		self.allowed_ref_label_prefixes = __call__ (list, null, (__t__ (allowed_ref_label_prefixes !== null) ? allowed_ref_label_prefixes : default_allowed_ref_label_prefixes));
+/* 000654 */ 	});},
+/* 000661 */ 	get _standardize_type_spec () {return __get__ (this, function (self, thm_type, thm_type_spec) {
+/* 000661 */ 		if (arguments.length) {
+/* 000661 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000661 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000661 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000661 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000661 */ 					switch (__attrib0__) {
+/* 000661 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000661 */ 						case 'thm_type': var thm_type = __allkwargs0__ [__attrib0__]; break;
+/* 000661 */ 						case 'thm_type_spec': var thm_type_spec = __allkwargs0__ [__attrib0__]; break;
+/* 000661 */ 					}
+/* 000661 */ 				}
+/* 000661 */ 			}
+/* 000661 */ 		}
+/* 000661 */ 		else {
+/* 000661 */ 		}
+/* 000663 */ 		var spec = __call__ (dict, null, __getitem__ (default_theorem_theorem_types, 'theoremlike'));
+/* 000664 */ 		(function () {
+/* 000664 */ 			var __accu0__ = spec;
+/* 000664 */ 			return __call__ (__accu0__.py_update, __accu0__, thm_type_spec);
+/* 000664 */ 		}) ();
+/* 000665 */ 		return spec;
+/* 000665 */ 	});},
+/* 000667 */ 	get _standardize_thm_spec () {return __get__ (this, function (self, thm_type, env_name, thm_spec) {
+/* 000667 */ 		if (arguments.length) {
+/* 000667 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000667 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000667 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000667 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000667 */ 					switch (__attrib0__) {
+/* 000667 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000667 */ 						case 'thm_type': var thm_type = __allkwargs0__ [__attrib0__]; break;
+/* 000667 */ 						case 'env_name': var env_name = __allkwargs0__ [__attrib0__]; break;
+/* 000667 */ 						case 'thm_spec': var thm_spec = __allkwargs0__ [__attrib0__]; break;
+/* 000667 */ 					}
+/* 000667 */ 				}
+/* 000667 */ 			}
+/* 000667 */ 		}
+/* 000667 */ 		else {
+/* 000667 */ 		}
+/* 000668 */ 		if (__t__ (thm_spec === true)) {
+/* 000669 */ 			var thm_spec = env_name;
+/* 000669 */ 		}
+/* 000670 */ 		if (__t__ (__call__ (isinstance, null, thm_spec, str))) {
+/* 000671 */ 			var thm_spec = dict ({'title': thm_spec});
+/* 000671 */ 		}
+/* 000672 */ 		else {
+/* 000673 */ 			var thm_spec = __call__ (dict, null, thm_spec);
+/* 000673 */ 		}
+/* 000675 */ 		__setitem__ (thm_spec, 'theorem_type', thm_type);
+/* 000678 */ 		var new_title_spec = dict ({});
+/* 000679 */ 		var title = (function () {
+/* 000679 */ 			var __accu0__ = thm_spec;
+/* 000679 */ 			return __call__ (__accu0__.py_get, __accu0__, 'title', null);
+/* 000679 */ 		}) ();
+/* 000680 */ 		if (__t__ (title === null)) {
+/* 000681 */ 			var title = env_name;
+/* 000681 */ 		}
+/* 000682 */ 		if (__t__ (__call__ (isinstance, null, title, str))) {
+/* 000683 */ 			var title = dict ({'lowercase': dict ({'singular': title, 'plural': __add__ (title, 's')})});
+/* 000683 */ 		}
+/* 000686 */ 		if (__t__ (__in__ ('lowercase', title))) {
+/* 000687 */ 			var lowercase = __getitem__ (title, 'lowercase');
+/* 000688 */ 			if (__t__ (__call__ (isinstance, null, lowercase, str))) {
+/* 000689 */ 				__setitem__ (new_title_spec, 'lowercase', dict ({'singular': lowercase, 'plural': __add__ (lowercase, 's')}));
+/* 000689 */ 			}
+/* 000692 */ 			else {
+/* 000694 */ 				__setitem__ (new_title_spec, 'lowercase', lowercase);
+/* 000694 */ 			}
+/* 000694 */ 		}
+/* 000695 */ 		else {
+/* 000697 */ 			__setitem__ (new_title_spec, 'lowercase', dict ({'singular': '??', 'plural': '???'}));
+/* 000697 */ 		}
+/* 000699 */ 		if (__t__ (__in__ ('capital', title))) {
+/* 000700 */ 			var capital = __getitem__ (title, 'capital');
+/* 000701 */ 			if (__t__ (__call__ (isinstance, null, capital, str))) {
+/* 000702 */ 				__setitem__ (new_title_spec, 'capital', dict ({'singular': capital, 'plural': __add__ (capital, 's')}));
+/* 000702 */ 			}
+/* 000705 */ 			else {
+/* 000707 */ 				__setitem__ (new_title_spec, 'capital', capital);
+/* 000707 */ 			}
+/* 000707 */ 		}
+/* 000708 */ 		else {
+/* 000711 */ 			__setitem__ (new_title_spec, 'capital', dict ({'singular': (function () {
+/* 000711 */ 				var __accu0__ = __getitem__ (__getitem__ (new_title_spec, 'lowercase'), 'singular');
+/* 000711 */ 				return __call__ (__accu0__.capitalize, __accu0__);
+/* 000712 */ 			}) (), 'plural': (function () {
+/* 000712 */ 				var __accu0__ = __getitem__ (__getitem__ (new_title_spec, 'lowercase'), 'plural');
+/* 000712 */ 				return __call__ (__accu0__.capitalize, __accu0__);
+/* 000712 */ 			}) ()}));
+/* 000712 */ 		}
+/* 000715 */ 		if (__t__ (__in__ ('abbreviated', title))) {
+/* 000716 */ 			var abbreviated = __getitem__ (title, 'abbreviated');
+/* 000717 */ 			if (__t__ (__call__ (isinstance, null, abbreviated, str))) {
+/* 000718 */ 				__setitem__ (new_title_spec, 'abbreviated', dict ({'singular': abbreviated, 'plural': __add__ (abbreviated, 's')}));
+/* 000718 */ 			}
+/* 000721 */ 			else {
+/* 000723 */ 				__setitem__ (new_title_spec, 'abbreviated', abbreviated);
+/* 000723 */ 			}
+/* 000723 */ 		}
+/* 000724 */ 		else {
+/* 000728 */ 			__setitem__ (new_title_spec, 'abbreviated', dict ({'singular': __add__ (__getslice__ (__getitem__ (__getitem__ (new_title_spec, 'capital'), 'singular'), 0, 3, 1), '.'), 'plural': __add__ ((function () {
+/* 000728 */ 				var __accu0__ = __getslice__ (__getitem__ (__getitem__ (new_title_spec, 'capital'), 'plural'), 0, 3, 1);
+/* 000728 */ 				return __call__ (__accu0__.rstrip, __accu0__, 's');
+/* 000728 */ 			}) (), 's.')}));
+/* 000728 */ 		}
+/* 000731 */ 		__setitem__ (thm_spec, 'title', new_title_spec);
+/* 000733 */ 		return thm_spec;
+/* 000733 */ 	});},
+/* 000736 */ 	get _make_counter_formatter_prefix_for_thm () {return __get__ (this, function (self, env_name, thm_spec) {
+/* 000736 */ 		if (arguments.length) {
+/* 000736 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000736 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000736 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000736 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000736 */ 					switch (__attrib0__) {
+/* 000736 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000736 */ 						case 'env_name': var env_name = __allkwargs0__ [__attrib0__]; break;
+/* 000736 */ 						case 'thm_spec': var thm_spec = __allkwargs0__ [__attrib0__]; break;
+/* 000736 */ 					}
+/* 000736 */ 				}
+/* 000736 */ 			}
+/* 000736 */ 		}
+/* 000736 */ 		else {
+/* 000736 */ 		}
+/* 000737 */ 		var prefix = dict ({});
+/* 000739 */ 		var _add_space_values = function (x) {
+/* 000739 */ 			if (arguments.length) {
+/* 000739 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000739 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000739 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000739 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000739 */ 						switch (__attrib0__) {
+/* 000739 */ 							case 'x': var x = __allkwargs0__ [__attrib0__]; break;
+/* 000739 */ 						}
+/* 000739 */ 					}
+/* 000739 */ 				}
+/* 000739 */ 			}
+/* 000739 */ 			else {
+/* 000739 */ 			}
+/* 000740 */ 			return (function () {
+/* 000740 */ 				var __accu0__ = [];
+/* 000740 */ 				var __iterable0__ = (function () {
+/* 000740 */ 					var __accu1__ = x;
+/* 000740 */ 					return __call__ (__accu1__.py_items, __accu1__);
+/* 000740 */ 				}) ();
+/* 000740 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000740 */ 					var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000740 */ 					var k = __left0__ [0];
+/* 000740 */ 					var v = __left0__ [1];
+/* 000740 */ 					(function () {
+/* 000740 */ 						var __accu1__ = __accu0__;
+/* 000740 */ 						return __call__ (__accu1__.append, __accu1__, [k, __add__ (v, '~')]);
+/* 000740 */ 					}) ();
+/* 000740 */ 				}
+/* 000740 */ 				return dict (__accu0__);
+/* 000740 */ 			}) ();
+/* 000740 */ 		};
+/* 000742 */ 		__setitem__ (prefix, 'lowercase', __call__ (_add_space_values, null, __getitem__ (__getitem__ (thm_spec, 'title'), 'lowercase')));
+/* 000743 */ 		__setitem__ (prefix, 'capital', __call__ (_add_space_values, null, __getitem__ (__getitem__ (thm_spec, 'title'), 'capital')));
+/* 000744 */ 		__setitem__ (prefix, 'abbreviated', __call__ (_add_space_values, null, __getitem__ (__getitem__ (thm_spec, 'title'), 'abbreviated')));
+/* 000746 */ 		(function () {
+/* 000746 */ 			var __accu0__ = prefix;
+/* 000746 */ 			return __call__ (__accu0__.py_update, __accu0__, __getitem__ (prefix, 'capital'));
+/* 000746 */ 		}) ();
+/* 000748 */ 		return prefix;
+/* 000748 */ 	});},
+/* 000751 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
+/* 000751 */ 		if (arguments.length) {
+/* 000751 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000751 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000751 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000751 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000751 */ 					switch (__attrib0__) {
+/* 000751 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000751 */ 					}
+/* 000751 */ 				}
+/* 000751 */ 			}
+/* 000751 */ 		}
+/* 000751 */ 		else {
+/* 000751 */ 		}
+/* 000753 */ 		var environment_specs = [];
+/* 000755 */ 		var __iterable0__ = (function () {
+/* 000755 */ 			var __accu0__ = self.environments;
+/* 000755 */ 			return __call__ (__accu0__.py_items, __accu0__);
 /* 000755 */ 		}) ();
-/* 000757 */ 		return prefix;
-/* 000757 */ 	});},
-/* 000760 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
-/* 000760 */ 		if (arguments.length) {
-/* 000760 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000760 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000760 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000760 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000760 */ 					switch (__attrib0__) {
-/* 000760 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000760 */ 					}
-/* 000760 */ 				}
-/* 000760 */ 			}
-/* 000760 */ 		}
-/* 000760 */ 		else {
-/* 000760 */ 		}
-/* 000762 */ 		var environment_specs = [];
-/* 000764 */ 		var __iterable0__ = (function () {
-/* 000764 */ 			var __accu0__ = self.environments;
-/* 000764 */ 			return __call__ (__accu0__.py_items, __accu0__);
-/* 000764 */ 		}) ();
-/* 000764 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000764 */ 			var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000764 */ 			var env_name = __left0__ [0];
-/* 000764 */ 			var thm_spec = __left0__ [1];
-/* 000765 */ 			(function () {
-/* 000765 */ 				var __accu0__ = environment_specs;
-/* 000765 */ 				return __call__ (__accu0__.append, __accu0__, __call__ (TheoremEnvironment, null, __kwargtrans__ ({environmentname: env_name, theorem_spec: thm_spec, theorem_type_spec: __getitem__ (self.theorem_types, __getitem__ (thm_spec, 'theorem_type')), allowed_ref_label_prefixes: self.allowed_ref_label_prefixes})));
-/* 000765 */ 			}) ();
-/* 000765 */ 		}
-/* 000772 */ 		return dict ({'environments': environment_specs});
-/* 000772 */ 	});}
-/* 000772 */ });
-/* 000779 */ export var FeatureClass = FeatureTheorems;
+/* 000755 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000755 */ 			var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000755 */ 			var env_name = __left0__ [0];
+/* 000755 */ 			var thm_spec = __left0__ [1];
+/* 000756 */ 			(function () {
+/* 000756 */ 				var __accu0__ = environment_specs;
+/* 000756 */ 				return __call__ (__accu0__.append, __accu0__, __call__ (TheoremEnvironment, null, __kwargtrans__ ({environmentname: env_name, theorem_spec: thm_spec, theorem_type_spec: __getitem__ (self.theorem_types, __getitem__ (thm_spec, 'theorem_type')), allowed_ref_label_prefixes: self.allowed_ref_label_prefixes})));
+/* 000756 */ 			}) ();
+/* 000756 */ 		}
+/* 000763 */ 		return dict ({'environments': environment_specs});
+/* 000763 */ 	});}
+/* 000763 */ });
+/* 000770 */ export var FeatureClass = FeatureTheorems;
 /* 000007 */ 
 //# sourceMappingURL=flm.feature.theorems.map

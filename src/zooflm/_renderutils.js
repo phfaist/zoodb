@@ -107,8 +107,7 @@ export function make_render_shorthands({render_context, render_value_options})
 
     const ref = (object_type, object_id, {display_flm}={}) => {
         const refsmgr = render_context.feature_render_manager('refs');
-        return refsmgr.render_ref(object_type, object_id, display_flm ?? null,
-                                  null, render_context);
+        return refsmgr.render_ref(object_type, object_id, display_flm ?? null, null);
     };
 
     return { ne, rdr, rdrblock, ref };

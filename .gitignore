@@ -35,3 +35,5 @@ flm-src
 
 .11ty-parcel-temp
 .parcel-cache
+
+COPY_IN_FLM_JS_SOURCES.txt
