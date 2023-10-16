@@ -17,7 +17,7 @@ function percent_encode_path(p)
 
 export function url_has_protocol(url)
 {
-    return (new URL(url, 'xyzdummyproto://')).protocol !== 'xyzdummyproto:';
+    return (new URL(url, 'xyzdummyproto://example.com/')).protocol !== 'xyzdummyproto:';
 }
 
 
