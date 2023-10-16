@@ -362,6 +362,7 @@ export class ZooDb
                     + `${validation_errors_str}\n`
                 ;
                 if (!this.silent) {
+                    console.log('Validation failed for data:', obj_to_validate);
                     console.error(errormsg);
                 }
                 let e = new Error( errormsg );
