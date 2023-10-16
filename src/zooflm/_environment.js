@@ -737,6 +737,7 @@ export function install_standard_features(self, zooflm_options)
         self.feature_href,
         self.feature_verbatim,
         self.feature_math,
+        self.feature_enumeration,
         self.feature_headings,
         self.feature_refs,
         self.feature_endnotes,
