@@ -638,9 +638,9 @@ export function zooflm_default_options(footnote_counter_formatter='alph')
             },
             enumerate: {
                 // uses default formatters 1., 2., ... incl. nested (i), etc.
-                counter_formatter: null
+                counter_formatter: null,
             },
-        }
+        },
 
         endnote_categories: [
             EndnoteCategory(
