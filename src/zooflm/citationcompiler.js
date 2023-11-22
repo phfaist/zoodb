@@ -130,7 +130,7 @@ export function install_csl_flm_output_format(zooflmenviron)
                 // `text` is valid FLM --- keep text directly
                 //debug(`citation text chunk is valid FLM: ${JSON.stringify(text)}`);
             } catch (err) {
-                debug(`Invalid FLM: ${JSON.stringify(text)}: ${err}`);
+                debug(`Invalid FLM: ${JSON.stringify(text)}: ${zooflm.get_zooflm_error_string(err)}`);
                 // not valid FLM -- escape anything suspicious and use that
                 text = escape_flm(text);
                 //text = `\\begin{verbatimtext}${text}\\end{verbatimtext}`;
