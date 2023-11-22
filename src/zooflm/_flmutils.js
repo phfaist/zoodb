@@ -1,4 +1,6 @@
 
+import { repr } from './_flm-js/py.js';
+
 //
 // Use e.g. as:
 //
@@ -72,7 +74,7 @@ function _to_string_safe(x)
 function _repr_safe(x)
 {
     try {
-        return `${x.__repr__()}`;
+        return `${repr(x)}`;
     } catch (tostrerr) {
         return `[failed to convert repr]`;
     }
@@ -90,7 +92,7 @@ export function get_zooflm_error_string(err)
     if (err && err.__class__ != null) {
         const clsname = _to_string_safe(err.__class__.__name__);
         if (err.__repr__) {
-            return `${clsname}: ${_repr_safe(err.args)}`;
+            return `${clsname}: ${_repr_safe(err)}`;
         }
         if (err.__str__) {
             return `${clsname}: ${_to_string_safe(err)}`;
