@@ -81,5 +81,44 @@ describe('zoodb.citationmanager._manager', function() {
             debug(`Yay, got error as expected from server.`);
             
         });
+
+
+        it('can handle an error from a source w/o hanging chained sources with noncanonical ID',
+           async function () {
+            // adjust timeout for this test
+            this.timeout(5000);
+
+            // This test checks that an error in the arXiv source (which causes it to fail)
+            // will properly be handled and reported, and that all dependent sources (here, the
+            // doi source) will be terminated as well.  I had a bug earlier where compilations
+            // hang indefinitely because the manager forgot to terminate the other sources if
+            // a dependee source threw an exception.
+
+            let arxivsource = new CitationSourceArxiv();
+            let doisource = new CitationSourceDoi();
+            let manager = new CitationDatabaseManager(
+                {
+                    arxiv: arxivsource,
+                    doi: doisource,
+                },
+                {
+                    cache_fs: fs,
+                    cache_file: '_zoodb_test_nocache.junk.json',
+                    skip_save_cache: true,
+                }
+            );
+            await manager.initialize();
+
+            await assert.rejects(
+                async () => {
+                    await manager.retrieve_citations([
+                        { cite_prefix: 'arxiv', cite_key: '1806.1032' },
+                    ]);
+                }
+            );
+
+            debug(`Yay, got error as expected from server.`);
+            
+        });
     });
 });
