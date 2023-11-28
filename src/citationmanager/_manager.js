@@ -277,6 +277,10 @@ export class CitationDatabaseManager
             } else {
                 Promise.all( parent_chainers_promises ).then( () => {
                     source.add_retrieve_done();
+                } ).catch( (err) => {
+                    debug(`Calling add_retrieve_done() for citation source ‘${source.cite_prefix}’ `
+                          + `because another source that feeds into this one failed with an error.`);
+                    source.add_retrieve_done();
                 } );
             }
         }

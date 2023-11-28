@@ -180,7 +180,11 @@ export class CitationSourceArxiv extends CitationSourceBase
 
     async handle_arxiv_article_response(atom_article)
     {
-        const arxivurl = atom_article['atom:id']['#'];
+        const arxivurl = atom_article?.['atom:id']?.['#'];
+        if (arxivurl == null) {
+            debug(`No ['atom:id']['#'] in response from arxiv.org:`, atom_article);
+            throw new Error(`Malformed arXiv response, possible error in identifier`);
+        }
         const m = _arxivurlregexp.exec(arxivurl);
         if (m === null) {
             throw new Error(`Retreived arXiv entry does not have a valid id URL: `
@@ -288,7 +292,8 @@ export class CitationSourceArxiv extends CitationSourceBase
         {
             if (!versionslist || !versionslist.length) {
                 console.error(
-                    `No arXiv data received for arXiv id ‘${arxivid}’, what happened?!?`
+                    `No arXiv data received for arXiv id ‘${arxivid}’.  You might have provided `
+                    + `an identifier in a noncanonical form (e.g. '2201.1234' instead of '2201.01234').`
                 );
                 throw new Error(`No arXiv data found for ‘${arxivid}’`);
             }

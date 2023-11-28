@@ -25,6 +25,7 @@ describe('zoodb.citationmanager.source.arxiv', function () {
                     skip_save_cache: true,
                 }
             );
+            await manager.initialize();
 
             // fetch a citation that doesn't chain to a DOI because we didn't install
             // a doi fetcher on this manager.
@@ -57,6 +58,7 @@ describe('zoodb.citationmanager.source.arxiv', function () {
                     skip_save_cache: true,
                 }
             );
+            await manager.initialize();
 
             await manager.retrieve_citations([
                 { cite_prefix: 'arxiv', cite_key: '1902.07714' },
@@ -92,6 +94,7 @@ describe('zoodb.citationmanager.source.arxiv', function () {
                     skip_save_cache: true,
                 }
             );
+            await manager.initialize();
 
             await manager.retrieve_citations([
                 { cite_prefix: 'arxiv', cite_key: 'quant-ph/0406196' },
@@ -120,6 +123,7 @@ describe('zoodb.citationmanager.source.arxiv', function () {
                     skip_save_cache: true,
                 }
             );
+            await manager.initialize();
 
             // fetch a malformed citation
 

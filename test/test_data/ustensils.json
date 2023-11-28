@@ -1,0 +1,17 @@
+[
+    {
+        "ust_id": "fork",
+        "name": "Fork",
+        "description": "Has \\emph{pointy} spikes to get food to eat"
+    },
+    {
+        "ust_id": "knife",
+        "name": "Knife",
+        "description": "Enables you to cut your food in small pieces before eating it"
+    },
+    {
+        "ust_id": "spoon",
+        "name": "Spoon",
+        "description": "Can be used to eat some good \\href{https://en.wikipedia.org/wiki/Soup}{soup}."
+    }
+]

@@ -18,6 +18,7 @@ inspect the source code directly.
    :maxdepth: 3
 
    zoodb
+   zoodb.schemaloader
    zoodb.zooflm
    zoodb.dbdataloader
    zoodb.dbprocessor

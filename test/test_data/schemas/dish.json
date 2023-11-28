@@ -1,0 +1,52 @@
+{
+    "_zoo_primarykey": "dish_id",
+    "_zoo_relations": [
+        {
+            "object_field": "relations.eaten_with",
+            "to_object_type": "ustensil",
+            "relation_primary_key_field": "ust_id",
+            "relation_add_object_field": "ustensil",
+            "backreference": {
+                "field": "can_eat_dishes"
+            },
+        },
+    ],
+
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "dish_id": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string",
+            "_flm": "standalone"
+        },
+        "description": {
+            "type": "string",
+            "_flm": "full"
+        },
+        "relations": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "eaten_with": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "ust_id": {
+                                "type": "string"
+                            },
+                            "how": {
+                                "type": "string",
+                                "_flm": "full"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,31 @@
+[
+    {
+        "dish_id": "pasta",
+        "name": "Pasta",
+        "description": "Like, you know, \\emph{spaghetti}.",
+        "relations": {
+            "eaten_with": [
+                {
+                    "ust_id": "fork",
+                    "how": "Roll spaghetti around the fork by turning the fork on its axis."
+                },
+                {
+                    "ust_id": "knife",
+                    "how": "To help guide the pasta around the fork.  Not to cut the pasta!"
+                }
+            ]
+        }
+    },
+    {
+        "dish_id": "soup",
+        "name": "Soup",
+        "description": "A very liquid food dish.  Can have vegetables, etc.  Test some citation \\cite{arxiv:1211.3141}",
+        "relations": {
+            "eaten_with": [
+                {
+                    "ust_id": "spoon"
+                }
+            ]
+        }
+    }
+]

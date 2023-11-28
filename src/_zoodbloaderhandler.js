@@ -80,7 +80,7 @@ export class ZooDbDataLoaderHandler
      * automatically called by the :class:`ZooDb` instance when you call
      * :meth:`ZooDb.install_data_loader_handler()`.
      */
-    initialize(zoodb)
+    async initialize(zoodb)
     {
         this.zoodb = zoodb;
 
@@ -105,7 +105,7 @@ export class ZooDbDataLoaderHandler
         }
 
         if (this._first_load_done) {
-            return this.reload();
+            return await this.reload();
         }
 
         debug(`Initiating loading the zoo data using our registered data db_data_loader`);

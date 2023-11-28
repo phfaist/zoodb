@@ -237,7 +237,7 @@ export class ZooDb
             // check that all object IDs are suitably unique
             let unique_ids_check_seen = {};
             let normalize_id_fn = this.normalize_id_for_uniqueness_check;
-            for (const [objid, obj] of object_db) {
+            for (const [objid, obj] of Object.entries(object_db)) {
                 const object_id_unique_normalized = normalize_id_fn(objid);
                 const other_object = unique_ids_check_seen[object_id_unique_normalized];
                 if (other_object !== undefined) {
