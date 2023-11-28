@@ -79,8 +79,8 @@ export class CitationDatabaseManager
 
     /**
      * Load citation information from the cache file.  Does nothing if the cache
-     * file does not exist.  This method is automatically called by the
-     * constructor.
+     * file does not exist.  This method is automatically called by
+     * initialize().
      */
     async load_cache()
     {

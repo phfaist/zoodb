@@ -306,11 +306,26 @@ export class CitationSourceBase
      *
      *    Make sure you use `await` on the return value of this function!
      *
-     * The `fetch_options` are options that are directly specified to the
-     * `fetch()` method which is either directly provided by the browser or
-     * pulled in via node-fetch.  (For instance: ``{ method: 'post', body:
+     * If the server responds by a code different than 200, then the error
+     * is displayed in `console.error` and an error is thrown.  Remote calls
+     * are perfurmed using the `fetch()` method which is either directly
+     * provided by the browser or pulled in via the *node-fetch* npm package.
+     * The content of the remote resource is returned as a string.
+     * 
+     * The `fetch_options` are options that are directly specified to `fetch()`.
+     * (For instance: ``{ method: 'post', body:
      * `max_results=${id_list.length}&id_list=${id_list.join(',')}`, headers:
      * ... }``.)
+     * 
+     * If `get_response_object` is provided as one of the `fetch_options`,
+     * then this option is intercepted by this function and not provided
+     * to `fetch()`.  If this option is set to true (default false), then
+     * the raw response object returned by `await fetch()` is returned
+     * directly, without attempting to read any data from the response.
+     * The response object is returned without any further processing,
+     * without even consulting the response status code.  It is up to the
+     * caller to handle and report any errors.
+     * 
      */
     async fetch_url(url, fetch_options=undefined)
     {

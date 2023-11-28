@@ -11,6 +11,18 @@ const debug = debug_module('zoodb.citationmanager.source.arxiv');
 import { CitationSourceBase } from './base.js';
 
 
+const _rx_arxiv = /^(\d{4}\.\d{4,}|[a-zA-Z.-]+\.\d{7})(v\d+)?$/;
+
+/**
+ * Checks if the `arxivid` looks like a valid arXiv identifier by testing it
+ * against a regular expression.  Use this function to catch malformed arXiv
+ * IDs before querying them to the server.
+ */
+export function check_valid_arxiv_id(arxivid)
+{
+    return _rx_arxiv.test(arxivid); // returns true or false
+}
+
 /**
  * Fetch bibliographic citation information from `the arXiv
  * <https://arxiv.org/>`_.
@@ -67,6 +79,18 @@ export class CitationSourceArxiv extends CitationSourceBase
 
     add_retrieve(ids)
     {
+        // check ids for validity. If an ID isn't valid (has wrong # of digits, for
+        // instance), then arxiv.org simply responds with a "400 Bad Request" which
+        // is tough to debug.
+        //
+        // FIXME/TODO: check for validity earlier, when parsing the citation ideally,
+        // so we can report error location!!
+        for (const arxivid of ids) {
+            if ( ! check_valid_arxiv_id(arxivid) ) {
+                throw new Error(`Malformed arXiv identifier: ${arxivid}`);
+            }
+        }
+
         super.add_retrieve(ids);
 
         Object.assign(
