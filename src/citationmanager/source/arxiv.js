@@ -11,7 +11,7 @@ const debug = debug_module('zoodb.citationmanager.source.arxiv');
 import { CitationSourceBase } from './base.js';
 
 
-const _rx_arxiv = /^(\d{4}\.\d{4,}|[a-zA-Z.-]+\.\d{7})(v\d+)?$/;
+const _rx_arxiv = /^(\d{4}\.\d{4,}|[a-zA-Z.-]+\/\d{7})(v\d+)?$/;
 
 /**
  * Checks if the `arxivid` looks like a valid arXiv identifier by testing it
