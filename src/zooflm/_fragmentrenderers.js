@@ -9,6 +9,7 @@ import {
 import * as flm_fragmentrenderer_html from './_flm-js/flm.fragmentrenderer.html.js'; 
 import * as flm_fragmentrenderer_text from './_flm-js/flm.fragmentrenderer.text.js';
 
+import { get_zooflm_error_string } from './_flmutils.js';
 
 
 function _is_local_url(urlstring)
@@ -130,11 +131,6 @@ export function render_text_standalone(fragment)
 
 function _report_render_error(err)
 {
-    let errstr = null;
-    try {
-        errstr = ((err && err.__class__ != null) ? repr(err) : ''+err);
-    } catch (tostrerr) {
-        errstr = ''+err;
-    }
+    const errstr = get_zooflm_error_string(err);
     console.error("\n🚨🚨🚨 FLM RENDERING ERROR 🚨🚨🚨\n\n" + errstr, err);
 }
