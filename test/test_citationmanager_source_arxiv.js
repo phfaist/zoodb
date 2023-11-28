@@ -124,7 +124,7 @@ describe('zoodb.citationmanager.source.arxiv', function () {
             // fetch a malformed citation
 
             let promise = manager.retrieve_citations([
-                { cite_prefix: 'arxiv', cite_key: 'arxiv:quant-ph/050807' },
+                { cite_prefix: 'arxiv', cite_key: 'quant-ph/050807' },
             ]);
             await assert.rejects(promise, /malformed/i);
         });

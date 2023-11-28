@@ -77,6 +77,7 @@ export class CitationSourceArxiv extends CitationSourceBase
         this.override_arxiv_dois = this.options.override_arxiv_dois ?? {};
     }
 
+    // see documentation in base class. The `ids` do NOT include the cite_prefix.
     add_retrieve(ids)
     {
         // check ids for validity. If an ID isn't valid (has wrong # of digits, for
@@ -87,7 +88,9 @@ export class CitationSourceArxiv extends CitationSourceBase
         // so we can report error location!!
         for (const arxivid of ids) {
             if ( ! check_valid_arxiv_id(arxivid) ) {
-                throw new Error(`Malformed arXiv identifier: ${arxivid}`);
+                throw new Error(
+                    `Malformed arXiv identifier: ‘${arxivid}’ [key ‘${this.cite_prefix}:${arxivid}’]`
+                );
             }
         }
 

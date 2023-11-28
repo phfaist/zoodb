@@ -158,7 +158,7 @@ export class CitationSourceBase
 
     /**
      * Add a list of citation IDs to the list of citation keys to retrieve.  The
-     * IDs do not include the citation prefix.  This method may be called
+     * IDs do NOT include the citation prefix.  This method may be called
      * multiple times, as we become aware of more citation keys to retrieve in
      * this source.
      */
