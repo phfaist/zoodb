@@ -86,7 +86,9 @@ Here's an example of how an FLM file would look like:
 .. code:: latex
 
    ---
-   # This is the YAML front matter.
+   # This is the YAML front matter.  It sets fields 'title',
+   # 'authors', and 'date', which are assumed to be
+   # appropriately declared in the object schema.
    title: 'The title of my article'
    authors:
      - 'Philippe Faist'
