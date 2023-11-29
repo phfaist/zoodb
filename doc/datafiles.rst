@@ -56,6 +56,13 @@ you can load all objects from a single YAML file.)
 
 
 
+Collections of JSON files
+-------------------------
+
+JSON files are valid YAML 1.2 files, so the YAML loader can also load JSON
+files!
+
+
 Collections of FLM files
 ------------------------
 
