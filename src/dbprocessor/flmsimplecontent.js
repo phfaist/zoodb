@@ -231,7 +231,7 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
             }
             if (this.config.flm_error_policy == 'abort') {
                 debug(`FLM Error & policy is 'abort', aborting compilation`);
-                throw new Error(`FLM Error compiling ${what}: ${err} --- ${errmsgstr}`);
+                throw new Error(`FLM Error compiling ${what}: ${errmsgstr}`);
             } else if (this.config.flm_error_policy == 'continue') {
                 // report the error in the text field itself, as a fake fragment, so
                 // it can be debugged.
