@@ -12,6 +12,8 @@ describe('zoodb.citationmanager._manager', function() {
     describe('CitationDatabaseManager', function () {
 
         it('loads citations from multiple remote sources (arxiv & doi)', async function () {
+            // adjust timeout for this test
+            this.timeout(5000);
 
             let arxivsource = new CitationSourceArxiv();
             let doisource = new CitationSourceDoi();
