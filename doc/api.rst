@@ -25,5 +25,4 @@ inspect the source code directly.
    zoodb.citationmanager
    zoodb.resourcecollector
    zoodb.util
-   zoodb.search
    zoodb.std
