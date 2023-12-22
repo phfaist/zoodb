@@ -19,12 +19,10 @@
         "js-yaml": "^4.1.0",
         "jsonschema": "^1.4.1",
         "lodash": "^4.17.21",
-        "lunr": "^2.3.9",
         "node-fetch": "^3.2.10",
         "parse-full-name": "^1.2.6",
         "sax": "^1.2.4",
         "stream-parser": "^0.3.1",
-        "tippy.js": "^6.3.7",
         "url": "^0.11.0"
     },
     "main": "./src/index.js",
@@ -52,8 +50,6 @@
         "./zooflm/scanner": "./src/zooflm/scanner.js",
         "./util": "./src/util/index.js",
         "./util/*": "./src/util/*.js",
-        "./search/searchindex": "./src/search/searchindex.js",
-        "./search/searchwidget": "./src/search/searchwidget.js",
         "./std": "./src/std/index.js",
         "./std/*": "./src/std/*.js",
         "./flm-js/*": "./flm-js-src/flm-js/*.js"
