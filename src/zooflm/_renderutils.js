@@ -105,12 +105,22 @@ export function make_render_shorthands({render_context, render_value_options})
 
     const rdrblock = (x) => x.render(render_context, $$kw({ is_block_level: true }));
 
+    const refsmgr = (
+        render_context.supports_feature('refs')
+        ? render_context.feature_render_manager('refs')
+        : null
+    );
+
     const ref = (object_type, object_id, {display_flm}={}) => {
-        const refsmgr = render_context.feature_render_manager('refs');
         return refsmgr.render_ref(object_type, object_id, display_flm ?? null, null);
     };
 
-    return { ne, rdr, rdrblock, ref };
+    const refhref = (object_type, object_id) => {
+        const ref_instance = refsmgr.get_ref(object_type, object_id, null);
+        return ref_instance.target_href;
+    };
+
+    return { ne, rdr, rdrblock, ref, refhref };
 }
 
 
