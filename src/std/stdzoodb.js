@@ -76,6 +76,9 @@ export async function makeStandardZooDb(config)
 
             use_searchable_text_processor: null,
 
+            extra_db_processors: [],
+            custom_zoodb_properties: {},
+
             searchable_text_options: {
                 object_types: [], // ['code',]  // only e.g. search for codes
             },
@@ -160,6 +163,18 @@ export async function makeStandardZooDb(config)
         _this.zoodb_processors.push(_this.searchable_text_processor);
     }
 
+    //
+    // Any user-defined DB processors to include
+    //
+    if (_this.config.extra_db_processors
+        && _this.config.extra_db_processors.length > 0) {
+        _this.zoodb_processors.push( ... _this.config.extra_db_processors );
+    }
+
+    //
+    // Set up the main class & schema loader
+    //
+    
     let ZooDbClass = _this.config.ZooDbClass;
     let SchemaLoaderClass = _this.config.SchemaLoaderClass;
 
@@ -177,6 +192,12 @@ export async function makeStandardZooDb(config)
     // set attributes we prepared from _this
     for (const [k, v] of Object.entries(_this)) {
         zoodb[k] = v;
+    }
+    // and set any additional custom properties
+    if (_this.config.custom_zoodb_properties) {
+        for (const [k, v] of Object.entries(_this.config.custom_zoodb_properties)) {
+            zoodb[k] = v;
+        }
     }
 
     if (_this.config.schemas && SchemaLoaderClass) {
