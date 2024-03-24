@@ -11,6 +11,8 @@ import { CitationSourceDoi } from '../src/citationmanager/source/doi.js';
 describe('zoodb.citationmanager.source.arxiv', function () {
 
     describe('CitationSourceArxiv', function () {
+        // adjust timeout for these tests
+        this.timeout(5000);
 
         it('fetches bib information from an arXiv source', async function () {
 
