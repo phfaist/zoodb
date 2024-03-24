@@ -2,7 +2,7 @@
 
 ZooDb is a package to build an in-memory database of a "Zoo", a small-sized
 database with relations and formatted content. It is designed to be the backbone
-of the [Error Correctoin Zoo](https://errorcorrectionzoo.org/).
+of the [Error Correction Zoo](https://errorcorrectionzoo.org/).
 
 Features:
 
