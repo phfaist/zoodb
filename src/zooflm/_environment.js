@@ -477,50 +477,13 @@ export const FeatureZooGraphicsCollection = __class__(
                     
                     const feature = self.feature;
 
-                    //
-                    // compose full source path using the resource_info
-                    //
-                    const source_path = path.join(resource_info.get_source_directory(),
-                                                  graphics_path);
+                    return feature.get_graphics_resource_base(
+                        graphics_path,
+                        resource_info,
+                        self.render_context,
+                        self.override_get_graphics_resource,
+                    );
 
-                    if (self.override_get_graphics_resource) {
-                        let result = self.override_get_graphics_resource(
-                            { feature, graphics_path, resource_info, source_path }
-                        );
-                        if (result != null) {
-                            return result;
-                        }
-                    }
-
-                    if (!feature.has_graphics_for(source_path)) {
-                        throw new Error(
-                            `No such graphics ‘${source_path}’ (‘${graphics_path}’ `
-                            + `relative to ${resource_info})`
-                        );
-                    }
-
-                    const graphics_resource = feature.graphics_collection[source_path];
-
-                    //debug(`Got graphics_resource = `, graphics_resource);
-
-                    if (feature.src_url_resolver_fn != null) {
-                        const { src_url, srcset } = feature.src_url_resolver_fn({
-                            graphics_resource,
-                            render_context: self.render_context,
-                            source_path,
-                        });
-                        if (src_url === undefined) {
-                            throw new Error(
-                                `src_url_resolver_fn() did not return { src_url }.`
-                            );
-                        }
-                        return new GraphicsResource($$kw(
-                            Object.assign({}, graphics_resource.asdict(),
-                                          { src_url, srcset, })
-                        ));
-                    }
-
-                    return graphics_resource;
                 });},
 
             }
@@ -581,6 +544,60 @@ export const FeatureZooGraphicsCollection = __class__(
         (self, source_path) {
             return Object.hasOwn(self.graphics_collection, source_path);
         }); },
+
+        get get_graphics_resource_base () {return __get__(this, function
+        (self, graphics_path, resource_info, render_context, override_get_graphics_resource) {
+            // note, render_context is only required to provide as parameter to the
+            // custom callback "src_url_resolver_fn"
+
+            //
+            // compose full source path using the resource_info
+            //
+            const source_path = path.join(
+                resource_info.get_source_directory(),
+                graphics_path
+            );
+
+            if (override_get_graphics_resource) {
+                let result = override_get_graphics_resource(
+                    { feature, graphics_path, resource_info, source_path }
+                );
+                if (result != null) {
+                    return result;
+                }
+            }
+
+            if (!self.has_graphics_for(source_path)) {
+                throw new Error(
+                    `No such graphics ‘${source_path}’ (‘${graphics_path}’ `
+                    + `relative to ${resource_info})`
+                );
+            }
+
+            const graphics_resource = self.graphics_collection[source_path];
+
+            //debug(`Got graphics_resource = `, graphics_resource);
+
+            if (self.src_url_resolver_fn != null) {
+                const { src_url, srcset } = self.src_url_resolver_fn({
+                    graphics_resource,
+                    render_context,
+                    source_path,
+                });
+                if (src_url === undefined) {
+                    throw new Error(
+                        `src_url_resolver_fn() did not return { src_url }.`
+                    );
+                }
+                return new GraphicsResource($$kw(
+                    Object.assign({}, graphics_resource.asdict(),
+                                    { src_url, srcset, })
+                ));
+            }
+
+            return graphics_resource;
+        }); },
+
 
         // load/save references DB
         get dump_database() {return __get__(this, function
