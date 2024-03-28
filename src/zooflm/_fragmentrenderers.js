@@ -112,7 +112,7 @@ export function render_html_standalone(fragment)
 }
 
 /**
- * Utility to render a standalone fragment to HTML.  No document instance or
+ * Utility to render a standalone fragment to text.  No document instance or
  * render context is required.  This function will create a
  * :class:`ZooTextFragmentRenderer` instance under the hood.
  */
