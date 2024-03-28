@@ -37,6 +37,7 @@ import * as flm_feature_graphics from './_flm-js/flm.feature.graphics.js';
 //import * as flm_feature_cells from './_flm-js/flm.feature.cells.js';
 
 import * as flm_flmspecinfo from './_flm-js/flm.flmspecinfo.js';
+import * as flm_flmdocument from './_flm-js/flm.flmdocument.js';
 import * as flm_flmrendercontext from './_flm-js/flm.flmrendercontext.js';
 import * as pylatexenc_latexnodes from './_flm-js/pylatexenc.latexnodes.js';
 import * as pylatexenc_latexnodes_nodes from './_flm-js/pylatexenc.latexnodes.nodes.js';
@@ -57,7 +58,7 @@ export {
     flm_feature_headings, flm_feature_endnotes,
     flm_feature_refs, flm_feature_cite,
     flm_feature_floats, flm_feature_defterm, flm_feature_graphics,
-    flm_flmspecinfo, flm_flmenvironment, flm_flmrendercontext,
+    flm_flmspecinfo, flm_flmenvironment, flm_flmdocument, flm_flmrendercontext,
     pylatexenc_latexnodes, pylatexenc_latexnodes_nodes, pylatexenc_latexnodes_parsers,
     pylatexenc_macrospec,
 };
