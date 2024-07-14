@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-10-16 22:13:06
+/* 000001 */ // Transcrypt'ed from Python, 2024-07-14 20:46:42
 /* 000037 */ var logging = {};
 /* 000037 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000044 */ import {ParsingStateDeltaEnterMathMode, ParsingStateDeltaReplaceParsingState, get_updated_parsing_state_from_delta} from './pylatexenc.latexnodes._parsingstatedelta.js';
@@ -6,7 +6,7 @@
 /* 000040 */ import {LatexWalkerEndOfStream, LatexWalkerError, LatexWalkerLocatedError, LatexWalkerLocatedErrorFormatter, LatexWalkerNodesParseError, LatexWalkerTokenParseError, _basestring, format_pos, to_str} from './pylatexenc.latexnodes._exctypes.js';
 /* 000037 */ import * as __module_logging__ from './logging.js';
 /* 000037 */ __nest__ (logging, '', __module_logging__);
-/* 000037 */ export {LatexEnvironmentNode, _display_abbrev_str, LatexNode, _update_posposend_from_nodelist, LatexSpecialsNode, LatexNodeList, LatexCharsNode, to_str, _unicode_from_str, LatexWalkerLocatedError, LatexCommentNode, LatexWalkerEndOfStream, LatexWalkerLocatedErrorFormatter, ParsingStateDeltaEnterMathMode, LatexWalkerNodesParseError, _get_content_as_chars, LatexWalkerParseError, _display_str_delimiters, LatexNodesVisitor, _basestring, LatexMacroNode, LatexGroupNode, format_pos, LatexWalkerError, LatexMathNode, latex_node_types, get_updated_parsing_state_from_delta, __all__, LatexWalkerTokenParseError, ParsingStateDeltaReplaceParsingState, ParsedArguments};
+/* 000037 */ export {LatexNode, LatexWalkerTokenParseError, LatexGroupNode, LatexWalkerLocatedError, latex_node_types, LatexNodeList, ParsingStateDeltaEnterMathMode, LatexWalkerNodesParseError, LatexCommentNode, _display_str_delimiters, LatexSpecialsNode, LatexCharsNode, LatexWalkerLocatedErrorFormatter, format_pos, to_str, _unicode_from_str, LatexWalkerError, LatexWalkerParseError, ParsedArguments, _get_content_as_chars, LatexNodesVisitor, _display_abbrev_str, _update_posposend_from_nodelist, _basestring, ParsingStateDeltaReplaceParsingState, __all__, LatexWalkerEndOfStream, get_updated_parsing_state_from_delta, LatexMacroNode, LatexEnvironmentNode, LatexMathNode};
 /* 000001 */ var __name__ = 'pylatexenc.latexnodes._nodescollector';
 /* 000038 */ export var logger = (function () {
 /* 000038 */ 	var __accu0__ = logging;
@@ -602,7 +602,7 @@
 /* 000503 */ 		catch (__except0__) {
 /* 000503 */ 			if (isinstance (__except0__, LatexWalkerEndOfStream)) {
 /* 000503 */ 				var e = __except0__;
-/* 000508 */ 				var final_space = __call__ (getattr, null, e, 'final_space', null);
+/* 000508 */ 				var final_space = (__t__ (__call__ (hasattr, null, e, 'final_space')) ? __call__ (getattr, null, e, 'final_space') : null);
 /* 000509 */ 				if (__t__ (final_space)) {
 /* 000511 */ 					var final_space_pos = __add__ ((function () {
 /* 000511 */ 						var __accu0__ = token_reader;
@@ -1004,151 +1004,151 @@
 /* 000893 */ 		var node_class = LatexSpecialsNode;
 /* 000894 */ 		var what = (function () {
 /* 000894 */ 			var __accu0__ = 'specials ‘{}’';
-/* 000894 */ 			return __call__ (__accu0__.format, __accu0__, __call__ (getattr, null, specials_spec, 'specials_chars', '<unkonwn>'));
-/* 000894 */ 		}) ();
-/* 000896 */ 		return (function () {
-/* 000896 */ 			var __accu0__ = self;
-/* 000896 */ 			return __call__ (__accu0__.parse_invocable_token_type, __accu0__, tok, specials_spec, node_class, what);
-/* 000896 */ 		}) ();
-/* 000896 */ 	});},
-/* 000898 */ 	get parse_invocable_token_type () {return __get__ (this, function (self, tok, spec, node_class, what) {
-/* 000898 */ 		if (arguments.length) {
-/* 000898 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000898 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000898 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000898 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000898 */ 					switch (__attrib0__) {
-/* 000898 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000898 */ 						case 'tok': var tok = __allkwargs0__ [__attrib0__]; break;
-/* 000898 */ 						case 'spec': var spec = __allkwargs0__ [__attrib0__]; break;
-/* 000898 */ 						case 'node_class': var node_class = __allkwargs0__ [__attrib0__]; break;
-/* 000898 */ 						case 'what': var what = __allkwargs0__ [__attrib0__]; break;
-/* 000898 */ 					}
-/* 000898 */ 				}
-/* 000898 */ 			}
-/* 000898 */ 		}
-/* 000898 */ 		else {
-/* 000898 */ 		}
-/* 000918 */ 		var latex_walker = self.latex_walker;
-/* 000919 */ 		var token_reader = self.token_reader;
-/* 000921 */ 		if (__t__ (spec !== null)) {
-/* 000922 */ 			var node_parser = (function () {
-/* 000922 */ 				var __accu0__ = spec;
-/* 000922 */ 				return __call__ (__accu0__.get_node_parser, __accu0__, tok);
-/* 000922 */ 			}) ();
-/* 000922 */ 		}
-/* 000923 */ 		else {
-/* 000924 */ 			var node_parser = null;
-/* 000924 */ 		}
-/* 000926 */ 		if (__t__ (node_parser === null)) {
-/* 000928 */ 			var exc = (function () {
-/* 000928 */ 				var __accu0__ = latex_walker;
-/* 000930 */ 				return __call__ (__accu0__.check_tolerant_parsing_ignore_error, __accu0__, __call__ (LatexWalkerParseError, null, __kwargtrans__ ({msg: (function () {
-/* 000930 */ 					var __accu1__ = 'No parser found for callable token {!r}';
-/* 000930 */ 					return __call__ (__accu1__.format, __accu1__, tok);
-/* 000930 */ 				}) (), pos: tok.pos})));
-/* 000930 */ 			}) ();
-/* 000934 */ 			if (__t__ (exc !== null)) {
-/* 000935 */ 				// pass;
-/* 000938 */ 				var __except0__ = exc;
-/* 000938 */ 				__except0__.__cause__ = null;
-/* 000938 */ 				throw __except0__;
-/* 000938 */ 			}
-/* 000939 */ 			var result_node = null;
-/* 000940 */ 			var parsing_state_delta = null;
-/* 000940 */ 		}
-/* 000941 */ 		else {
-/* 000944 */ 			var __left0__ = (function () {
-/* 000944 */ 				var __accu0__ = latex_walker;
-/* 000947 */ 				return __call__ (__accu0__.parse_content, __accu0__, node_parser, token_reader, (function () {
-/* 000947 */ 					var __accu1__ = self;
-/* 000947 */ 					return __call__ (__accu1__.make_child_parsing_state, __accu1__, self.parsing_state, node_class);
-/* 000947 */ 				}) (), __kwargtrans__ ({open_context: tuple ([what, tok])}));
-/* 000947 */ 			}) ();
-/* 000947 */ 			var result_node = __left0__ [0];
-/* 000947 */ 			var parsing_state_delta = __left0__ [1];
-/* 000947 */ 		}
-/* 000951 */ 		(function () {
-/* 000951 */ 			var __accu0__ = self;
-/* 000951 */ 			return __call__ (__accu0__.update_state_from_parsing_state_delta, __accu0__, parsing_state_delta);
-/* 000951 */ 		}) ();
-/* 000953 */ 		if (__t__ (result_node === null)) {
-/* 000954 */ 			(function () {
-/* 000954 */ 				var __accu0__ = logger;
-/* 000954 */ 				return __call__ (__accu0__.warning, __accu0__, 'Parser %r produced no node (None) for token %r', node_parser, tok);
-/* 000954 */ 			}) ();
-/* 000955 */ 			return ;
-/* 000955 */ 		}
-/* 000957 */ 		var exc = (function () {
-/* 000957 */ 			var __accu0__ = self;
-/* 000957 */ 			return __call__ (__accu0__.push_to_nodelist, __accu0__, result_node);
-/* 000957 */ 		}) ();
-/* 000958 */ 		if (__t__ (exc !== null)) {
-/* 000959 */ 			exc.pos_end = result_node.pos_end;
-/* 000960 */ 			// pass;
-/* 000963 */ 			var __except0__ = exc;
-/* 000963 */ 			__except0__.__cause__ = null;
-/* 000963 */ 			throw __except0__;
-/* 000963 */ 		}
-/* 000963 */ 	});},
-/* 000966 */ 	get parse_math () {return __get__ (this, function (self, tok) {
-/* 000966 */ 		if (arguments.length) {
-/* 000966 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000966 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000966 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000966 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000966 */ 					switch (__attrib0__) {
-/* 000966 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000966 */ 						case 'tok': var tok = __allkwargs0__ [__attrib0__]; break;
-/* 000966 */ 					}
-/* 000966 */ 				}
-/* 000966 */ 			}
-/* 000966 */ 		}
-/* 000966 */ 		else {
-/* 000966 */ 		}
-/* 000981 */ 		// pass;
-/* 000985 */ 		(function () {
-/* 000985 */ 			var __accu0__ = self.token_reader;
-/* 000985 */ 			return __call__ (__accu0__.move_to_token, __accu0__, tok, __kwargtrans__ ({rewind_pre_space: false}));
-/* 000985 */ 		}) ();
-/* 000989 */ 		var child_math_parsing_state = (function () {
-/* 000989 */ 			var __accu0__ = self;
-/* 000989 */ 			return __call__ (__accu0__.make_child_parsing_state, __accu0__, self.parsing_state, LatexMathNode);
+/* 000895 */ 			return __call__ (__accu0__.format, __accu0__, (__t__ (__call__ (hasattr, null, specials_spec, 'specials_chars')) ? __call__ (getattr, null, specials_spec, 'specials_chars') : '<unkonwn>'));
+/* 000895 */ 		}) ();
+/* 000900 */ 		return (function () {
+/* 000900 */ 			var __accu0__ = self;
+/* 000900 */ 			return __call__ (__accu0__.parse_invocable_token_type, __accu0__, tok, specials_spec, node_class, what);
+/* 000900 */ 		}) ();
+/* 000900 */ 	});},
+/* 000902 */ 	get parse_invocable_token_type () {return __get__ (this, function (self, tok, spec, node_class, what) {
+/* 000902 */ 		if (arguments.length) {
+/* 000902 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000902 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000902 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000902 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000902 */ 					switch (__attrib0__) {
+/* 000902 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000902 */ 						case 'tok': var tok = __allkwargs0__ [__attrib0__]; break;
+/* 000902 */ 						case 'spec': var spec = __allkwargs0__ [__attrib0__]; break;
+/* 000902 */ 						case 'node_class': var node_class = __allkwargs0__ [__attrib0__]; break;
+/* 000902 */ 						case 'what': var what = __allkwargs0__ [__attrib0__]; break;
+/* 000902 */ 					}
+/* 000902 */ 				}
+/* 000902 */ 			}
+/* 000902 */ 		}
+/* 000902 */ 		else {
+/* 000902 */ 		}
+/* 000922 */ 		var latex_walker = self.latex_walker;
+/* 000923 */ 		var token_reader = self.token_reader;
+/* 000925 */ 		if (__t__ (spec !== null)) {
+/* 000926 */ 			var node_parser = (function () {
+/* 000926 */ 				var __accu0__ = spec;
+/* 000926 */ 				return __call__ (__accu0__.get_node_parser, __accu0__, tok);
+/* 000926 */ 			}) ();
+/* 000926 */ 		}
+/* 000927 */ 		else {
+/* 000928 */ 			var node_parser = null;
+/* 000928 */ 		}
+/* 000930 */ 		if (__t__ (node_parser === null)) {
+/* 000932 */ 			var exc = (function () {
+/* 000932 */ 				var __accu0__ = latex_walker;
+/* 000934 */ 				return __call__ (__accu0__.check_tolerant_parsing_ignore_error, __accu0__, __call__ (LatexWalkerParseError, null, __kwargtrans__ ({msg: (function () {
+/* 000934 */ 					var __accu1__ = 'No parser found for callable token {!r}';
+/* 000934 */ 					return __call__ (__accu1__.format, __accu1__, tok);
+/* 000934 */ 				}) (), pos: tok.pos})));
+/* 000934 */ 			}) ();
+/* 000938 */ 			if (__t__ (exc !== null)) {
+/* 000939 */ 				// pass;
+/* 000942 */ 				var __except0__ = exc;
+/* 000942 */ 				__except0__.__cause__ = null;
+/* 000942 */ 				throw __except0__;
+/* 000942 */ 			}
+/* 000943 */ 			var result_node = null;
+/* 000944 */ 			var parsing_state_delta = null;
+/* 000944 */ 		}
+/* 000945 */ 		else {
+/* 000948 */ 			var __left0__ = (function () {
+/* 000948 */ 				var __accu0__ = latex_walker;
+/* 000951 */ 				return __call__ (__accu0__.parse_content, __accu0__, node_parser, token_reader, (function () {
+/* 000951 */ 					var __accu1__ = self;
+/* 000951 */ 					return __call__ (__accu1__.make_child_parsing_state, __accu1__, self.parsing_state, node_class);
+/* 000951 */ 				}) (), __kwargtrans__ ({open_context: tuple ([what, tok])}));
+/* 000951 */ 			}) ();
+/* 000951 */ 			var result_node = __left0__ [0];
+/* 000951 */ 			var parsing_state_delta = __left0__ [1];
+/* 000951 */ 		}
+/* 000955 */ 		(function () {
+/* 000955 */ 			var __accu0__ = self;
+/* 000955 */ 			return __call__ (__accu0__.update_state_from_parsing_state_delta, __accu0__, parsing_state_delta);
+/* 000955 */ 		}) ();
+/* 000957 */ 		if (__t__ (result_node === null)) {
+/* 000958 */ 			(function () {
+/* 000958 */ 				var __accu0__ = logger;
+/* 000958 */ 				return __call__ (__accu0__.warning, __accu0__, 'Parser %r produced no node (None) for token %r', node_parser, tok);
+/* 000958 */ 			}) ();
+/* 000959 */ 			return ;
+/* 000959 */ 		}
+/* 000961 */ 		var exc = (function () {
+/* 000961 */ 			var __accu0__ = self;
+/* 000961 */ 			return __call__ (__accu0__.push_to_nodelist, __accu0__, result_node);
+/* 000961 */ 		}) ();
+/* 000962 */ 		if (__t__ (exc !== null)) {
+/* 000963 */ 			exc.pos_end = result_node.pos_end;
+/* 000964 */ 			// pass;
+/* 000967 */ 			var __except0__ = exc;
+/* 000967 */ 			__except0__.__cause__ = null;
+/* 000967 */ 			throw __except0__;
+/* 000967 */ 		}
+/* 000967 */ 	});},
+/* 000970 */ 	get parse_math () {return __get__ (this, function (self, tok) {
+/* 000970 */ 		if (arguments.length) {
+/* 000970 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000970 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000970 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000970 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000970 */ 					switch (__attrib0__) {
+/* 000970 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000970 */ 						case 'tok': var tok = __allkwargs0__ [__attrib0__]; break;
+/* 000970 */ 					}
+/* 000970 */ 				}
+/* 000970 */ 			}
+/* 000970 */ 		}
+/* 000970 */ 		else {
+/* 000970 */ 		}
+/* 000985 */ 		// pass;
+/* 000989 */ 		(function () {
+/* 000989 */ 			var __accu0__ = self.token_reader;
+/* 000989 */ 			return __call__ (__accu0__.move_to_token, __accu0__, tok, __kwargtrans__ ({rewind_pre_space: false}));
 /* 000989 */ 		}) ();
-/* 000993 */ 		// pass;
-/* 000997 */ 		var math_parser = (function () {
-/* 000997 */ 			var __accu0__ = self.latex_walker;
-/* 000997 */ 			return __call__ (__accu0__.make_latex_math_parser, __accu0__, __kwargtrans__ ({math_mode_delimiters: tok.arg}));
-/* 000997 */ 		}) ();
-/* 001003 */ 		var __left0__ = (function () {
-/* 001003 */ 			var __accu0__ = self.latex_walker;
-/* 001003 */ 			return __call__ (__accu0__.parse_content, __accu0__, math_parser, __kwargtrans__ ({token_reader: self.token_reader, parsing_state: child_math_parsing_state}));
-/* 001003 */ 		}) ();
-/* 001003 */ 		var mathnode = __left0__ [0];
-/* 001003 */ 		var parsing_state_delta = __left0__ [1];
-/* 001009 */ 		(function () {
-/* 001009 */ 			var __accu0__ = self;
-/* 001009 */ 			return __call__ (__accu0__.update_state_from_parsing_state_delta, __accu0__, parsing_state_delta);
-/* 001009 */ 		}) ();
-/* 001011 */ 		if (__t__ (mathnode === null)) {
-/* 001012 */ 			(function () {
-/* 001012 */ 				var __accu0__ = logger;
-/* 001012 */ 				return __call__ (__accu0__.warning, __accu0__, 'Math parser produced no node (None) for token %r', tok);
-/* 001012 */ 			}) ();
-/* 001013 */ 			return ;
-/* 001013 */ 		}
-/* 001015 */ 		var stop_exc = (function () {
-/* 001015 */ 			var __accu0__ = self;
-/* 001015 */ 			return __call__ (__accu0__.push_to_nodelist, __accu0__, mathnode);
-/* 001015 */ 		}) ();
-/* 001016 */ 		if (__t__ (stop_exc !== null)) {
-/* 001017 */ 			stop_exc.pos_end = mathnode.pos_end;
-/* 001018 */ 			// pass;
-/* 001021 */ 			var __except0__ = stop_exc;
-/* 001021 */ 			__except0__.__cause__ = null;
-/* 001021 */ 			throw __except0__;
-/* 001021 */ 		}
-/* 001021 */ 	});}
-/* 001021 */ });
+/* 000993 */ 		var child_math_parsing_state = (function () {
+/* 000993 */ 			var __accu0__ = self;
+/* 000993 */ 			return __call__ (__accu0__.make_child_parsing_state, __accu0__, self.parsing_state, LatexMathNode);
+/* 000993 */ 		}) ();
+/* 000997 */ 		// pass;
+/* 001001 */ 		var math_parser = (function () {
+/* 001001 */ 			var __accu0__ = self.latex_walker;
+/* 001001 */ 			return __call__ (__accu0__.make_latex_math_parser, __accu0__, __kwargtrans__ ({math_mode_delimiters: tok.arg}));
+/* 001001 */ 		}) ();
+/* 001007 */ 		var __left0__ = (function () {
+/* 001007 */ 			var __accu0__ = self.latex_walker;
+/* 001007 */ 			return __call__ (__accu0__.parse_content, __accu0__, math_parser, __kwargtrans__ ({token_reader: self.token_reader, parsing_state: child_math_parsing_state}));
+/* 001007 */ 		}) ();
+/* 001007 */ 		var mathnode = __left0__ [0];
+/* 001007 */ 		var parsing_state_delta = __left0__ [1];
+/* 001013 */ 		(function () {
+/* 001013 */ 			var __accu0__ = self;
+/* 001013 */ 			return __call__ (__accu0__.update_state_from_parsing_state_delta, __accu0__, parsing_state_delta);
+/* 001013 */ 		}) ();
+/* 001015 */ 		if (__t__ (mathnode === null)) {
+/* 001016 */ 			(function () {
+/* 001016 */ 				var __accu0__ = logger;
+/* 001016 */ 				return __call__ (__accu0__.warning, __accu0__, 'Math parser produced no node (None) for token %r', tok);
+/* 001016 */ 			}) ();
+/* 001017 */ 			return ;
+/* 001017 */ 		}
+/* 001019 */ 		var stop_exc = (function () {
+/* 001019 */ 			var __accu0__ = self;
+/* 001019 */ 			return __call__ (__accu0__.push_to_nodelist, __accu0__, mathnode);
+/* 001019 */ 		}) ();
+/* 001020 */ 		if (__t__ (stop_exc !== null)) {
+/* 001021 */ 			stop_exc.pos_end = mathnode.pos_end;
+/* 001022 */ 			// pass;
+/* 001025 */ 			var __except0__ = stop_exc;
+/* 001025 */ 			__except0__.__cause__ = null;
+/* 001025 */ 			throw __except0__;
+/* 001025 */ 		}
+/* 001025 */ 	});}
+/* 001025 */ });
 /* 000037 */ 
 //# sourceMappingURL=pylatexenc.latexnodes._nodescollector.map

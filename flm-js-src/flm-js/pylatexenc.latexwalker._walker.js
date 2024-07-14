@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2023-10-16 22:13:07
+/* 000001 */ // Transcrypt'ed from Python, 2024-07-14 20:46:42
 /* 000037 */ var logging = {};
 /* 000037 */ var re = {};
 /* 000037 */ var unique_object_id = {};
@@ -17,7 +17,7 @@
 /* 000039 */ import * as _util from './pylatexenc._util.js';
 /* 000037 */ import * as __module_re__ from './re.js';
 /* 000037 */ __nest__ (re, '', __module_re__);
-/* 000037 */ export {LatexEnvironmentNode, _display_abbrev_str, LatexNode, _update_posposend_from_nodelist, LatexSpecialsNode, macrospec, LatexNodeList, LatexCharsNode, to_str, _unicode_from_str, LatexWalkerLocatedError, LatexCommentNode, LatexWalkerEndOfStream, LatexWalkerLocatedErrorFormatter, LatexWalkerNodesParseError, _get_content_as_chars, LatexWalkerParseError, _display_str_delimiters, ParsingState, LatexNodesVisitor, LatexMacroNode, LatexGroupNode, _basestring, latexnodes, format_pos, LatexWalkerError, _util, LatexMathNode, latex_node_types, __all__, parsers, LatexWalkerTokenParseError, ParsedArguments};
+/* 000037 */ export {LatexNode, LatexWalkerTokenParseError, LatexGroupNode, LatexWalkerLocatedError, latex_node_types, LatexNodeList, LatexWalkerNodesParseError, LatexCommentNode, ParsingState, _display_str_delimiters, LatexSpecialsNode, LatexCharsNode, format_pos, LatexWalkerLocatedErrorFormatter, latexnodes, to_str, parsers, _unicode_from_str, LatexWalkerError, LatexWalkerParseError, ParsedArguments, _get_content_as_chars, LatexNodesVisitor, _display_abbrev_str, _update_posposend_from_nodelist, _util, macrospec, _basestring, __all__, LatexWalkerEndOfStream, LatexMacroNode, LatexEnvironmentNode, LatexMathNode};
 /* 000001 */ var __name__ = 'pylatexenc.latexwalker._walker';
 /* 000051 */ export var get_default_latex_context_db = macrospec.LatexContextDb;
 /* 000062 */ export var logger = (function () {
@@ -329,7 +329,7 @@
 /* 000379 */ 					}
 /* 000379 */ 				}
 /* 000382 */ 				if (__t__ (__t__ (__call__ (hasattr, null, e, 'pos')) && __t__ (e.lineno === null) && e.colno === null)) {
-/* 000383 */ 					var epos = __call__ (getattr, null, e, 'pos', null);
+/* 000383 */ 					var epos = __call__ (getattr, null, e, 'pos');
 /* 000384 */ 					var __left0__ = (function () {
 /* 000384 */ 						var __accu0__ = self.latex_walker;
 /* 000384 */ 						return __call__ (__accu0__.pos_to_lineno_colno, __accu0__, epos);
