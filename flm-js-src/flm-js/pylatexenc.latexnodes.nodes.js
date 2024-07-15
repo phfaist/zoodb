@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2024-07-14 20:46:41
+/* 000001 */ // Transcrypt'ed from Python, 2024-07-16 00:01:37
 /* 000037 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000038 */ import {ParsedArguments} from './pylatexenc.latexnodes._parsedargs.js';
 /* 000037 */ import {LatexWalkerParseError} from './pylatexenc.latexnodes._exctypes.js';
@@ -1454,7 +1454,7 @@
 /* 000923 */ 		}) ();
 /* 000932 */ 		return __call__ (make_nodelist, null, filtered_nodes, __kwargtrans__ ({parsing_state: self.parsing_state, pos: (__t__ (__call__ (len, null, filtered_nodes)) ? null : self.pos_end), pos_end: (__t__ (__call__ (len, null, filtered_nodes)) ? null : self.pos_end)}));
 /* 000932 */ 	});},
-/* 000936 */ 	get split_at_node () {return __get__ (this, function (self, node_predicate_fn, skip_none, keep_separators, max_split) {
+/* 000936 */ 	get split_at_node () {return __get__ (this, function (self, node_predicate_fn, skip_none, keep_separators, max_split, call_make_nodelist) {
 /* 000936 */ 		if (typeof skip_none == 'undefined' || (skip_none != null && skip_none.hasOwnProperty ("__kwargtrans__"))) {;
 /* 000936 */ 			var skip_none = true;
 /* 000936 */ 		};
@@ -1463,6 +1463,9 @@
 /* 000936 */ 		};
 /* 000936 */ 		if (typeof max_split == 'undefined' || (max_split != null && max_split.hasOwnProperty ("__kwargtrans__"))) {;
 /* 000936 */ 			var max_split = null;
+/* 000936 */ 		};
+/* 000936 */ 		if (typeof call_make_nodelist == 'undefined' || (call_make_nodelist != null && call_make_nodelist.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000936 */ 			var call_make_nodelist = true;
 /* 000936 */ 		};
 /* 000936 */ 		if (arguments.length) {
 /* 000936 */ 			var __ilastarg0__ = arguments.length - 1;
@@ -1475,6 +1478,7 @@
 /* 000936 */ 						case 'skip_none': var skip_none = __allkwargs0__ [__attrib0__]; break;
 /* 000936 */ 						case 'keep_separators': var keep_separators = __allkwargs0__ [__attrib0__]; break;
 /* 000936 */ 						case 'max_split': var max_split = __allkwargs0__ [__attrib0__]; break;
+/* 000936 */ 						case 'call_make_nodelist': var call_make_nodelist = __allkwargs0__ [__attrib0__]; break;
 /* 000936 */ 					}
 /* 000936 */ 				}
 /* 000936 */ 			}
@@ -1518,7 +1522,7 @@
 /* 000958 */ 				}) ();
 /* 000958 */ 			}
 /* 000958 */ 		}
-/* 000960 */ 		if (__t__ (self.latex_walker !== null)) {
+/* 000960 */ 		if (__t__ (__t__ (call_make_nodelist) && self.latex_walker !== null)) {
 /* 000961 */ 			var make_latex_node_list = self.latex_walker.make_nodelist;
 /* 000961 */ 		}
 /* 000962 */ 		else {
