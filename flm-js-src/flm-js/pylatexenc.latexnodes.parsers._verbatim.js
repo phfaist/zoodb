@@ -1,9 +1,9 @@
-/* 000001 */ // Transcrypt'ed from Python, 2024-07-16 00:01:37
+/* 000001 */ // Transcrypt'ed from Python, 2024-09-25 21:08:33
 /* 000037 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000040 */ import {LatexParserBase} from './pylatexenc.latexnodes.parsers._base.js';
-/* 000038 */ import {LatexCharsNode, LatexCommentNode, LatexEnvironmentNode, LatexGroupNode, LatexMacroNode, LatexMathNode, LatexNode, LatexNodeList, LatexNodesVisitor, LatexSpecialsNode, LatexWalkerParseError, ParsedArguments, __all__, _display_abbrev_str, _display_str_delimiters, _get_content_as_chars, _unicode_from_str, _update_posposend_from_nodelist, latex_node_types} from './pylatexenc.latexnodes.nodes.js';
-/* 000037 */ import {LatexWalkerEndOfStream, LatexWalkerError, LatexWalkerLocatedError, LatexWalkerLocatedErrorFormatter, LatexWalkerNodesParseError, LatexWalkerTokenParseError, _basestring, format_pos, logger, to_str} from './pylatexenc.latexnodes._exctypes.js';
-/* 000037 */ export {_unicode_from_str, _get_content_as_chars, format_pos, LatexNode, logger, _basestring, LatexWalkerLocatedError, ParsedArguments, _display_str_delimiters, LatexWalkerEndOfStream, LatexWalkerError, LatexMacroNode, LatexParserBase, LatexMathNode, latex_node_types, LatexEnvironmentNode, __all__, LatexSpecialsNode, LatexCharsNode, LatexGroupNode, LatexNodesVisitor, LatexWalkerNodesParseError, LatexWalkerLocatedErrorFormatter, LatexWalkerParseError, LatexCommentNode, to_str, _update_posposend_from_nodelist, _display_abbrev_str, LatexWalkerTokenParseError, LatexNodeList};
+/* 000038 */ import {LatexCharsNode, LatexCommentNode, LatexEnvironmentNode, LatexGroupNode, LatexMacroNode, LatexMathNode, LatexNode, LatexNodeList, LatexNodesVisitor, LatexSpecialsNode, LatexWalkerParseError, ParsedArguments, __all__, _display_abbrev_str, _display_str_delimiters, _get_content_as_chars, _unicode_from_str, _update_posposend_from_nodelist, latex_node_types, logger} from './pylatexenc.latexnodes.nodes.js';
+/* 000037 */ import {LatexWalkerEndOfStream, LatexWalkerError, LatexWalkerLocatedError, LatexWalkerLocatedErrorFormatter, LatexWalkerNodesParseError, LatexWalkerTokenParseError, _basestring, format_pos, to_str} from './pylatexenc.latexnodes._exctypes.js';
+/* 000037 */ export {LatexNode, LatexWalkerLocatedErrorFormatter, LatexNodeList, LatexWalkerTokenParseError, _display_str_delimiters, LatexWalkerLocatedError, LatexWalkerError, logger, LatexSpecialsNode, latex_node_types, ParsedArguments, format_pos, __all__, LatexWalkerEndOfStream, _display_abbrev_str, _basestring, LatexMathNode, LatexWalkerParseError, LatexNodesVisitor, LatexParserBase, _get_content_as_chars, _update_posposend_from_nodelist, _unicode_from_str, to_str, LatexEnvironmentNode, LatexCharsNode, LatexCommentNode, LatexGroupNode, LatexWalkerNodesParseError, LatexMacroNode};
 /* 000001 */ var __name__ = 'pylatexenc.latexnodes.parsers._verbatim';
 /* 000043 */ export var LatexVerbatimBaseParser =  __class__ ('LatexVerbatimBaseParser', [LatexParserBase], {
 /* 000043 */ 	__module__: __name__,
@@ -219,288 +219,291 @@
 /* 000141 */ 		var pos_end = verbatim_info.pos_end;
 /* 000143 */ 		var nodes = (function () {
 /* 000143 */ 			var __accu0__ = latex_walker;
-/* 000143 */ 			return __call__ (__accu0__.make_node, __accu0__, LatexCharsNode, __kwargtrans__ ({chars: verbatim_string, pos: pos_start, pos_end: pos_end, parsing_state: parsing_state}));
-/* 000143 */ 		}) ();
-/* 000151 */ 		if (__t__ (__t__ (!__t__ ((stop_condition_met))) && ended_with_eos)) {
-/* 000152 */ 			return (function () {
-/* 000152 */ 				var __accu0__ = self;
-/* 000152 */ 				return __call__ (__accu0__.error_end_of_stream, __accu0__, __kwargtrans__ ({pos: pos_end, recovery_nodes: nodes, latex_walker: latex_walker, verbatim_info: verbatim_info}));
-/* 000152 */ 			}) ();
-/* 000152 */ 		}
-/* 000157 */ 		return tuple ([nodes, null]);
-/* 000157 */ 	});}
-/* 000157 */ });
-/* 000161 */ export var LatexDelimitedVerbatimParser =  __class__ ('LatexDelimitedVerbatimParser', [LatexVerbatimBaseParser], {
-/* 000161 */ 	__module__: __name__,
-/* 000169 */ 	get __init__ () {return __get__ (this, function (self, delimiters, auto_delimiters) {
-/* 000169 */ 		if (typeof delimiters == 'undefined' || (delimiters != null && delimiters.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000169 */ 			var delimiters = null;
-/* 000169 */ 		};
-/* 000169 */ 		if (typeof auto_delimiters == 'undefined' || (auto_delimiters != null && auto_delimiters.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000169 */ 			var auto_delimiters = null;
-/* 000169 */ 		};
-/* 000169 */ 		var kwargs = dict ();
-/* 000169 */ 		if (arguments.length) {
-/* 000169 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000169 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000169 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000169 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000169 */ 					switch (__attrib0__) {
-/* 000169 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000169 */ 						case 'delimiters': var delimiters = __allkwargs0__ [__attrib0__]; break;
-/* 000169 */ 						case 'auto_delimiters': var auto_delimiters = __allkwargs0__ [__attrib0__]; break;
-/* 000169 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000169 */ 					}
-/* 000169 */ 				}
-/* 000169 */ 				delete kwargs.__kwargtrans__;
-/* 000169 */ 			}
-/* 000169 */ 		}
-/* 000169 */ 		else {
-/* 000169 */ 		}
-/* 000173 */ 		__call__ (__call__ (__super__, null, LatexDelimitedVerbatimParser, '__init__'), null, self, __kwargtrans__ (kwargs));
-/* 000175 */ 		self.delimiters = delimiters;
-/* 000177 */ 		if (__t__ (auto_delimiters !== null)) {
-/* 000178 */ 			self.auto_delimiters = __call__ (dict, null, auto_delimiters);
-/* 000178 */ 		}
+/* 000148 */ 			return __call__ (__accu0__.make_node, __accu0__, LatexCharsNode, __kwargtrans__ ({chars: verbatim_string, pos: pos_start, pos_end: pos_end, parsing_state: (function () {
+/* 000148 */ 				var __accu1__ = parsing_state;
+/* 000148 */ 				return __call__ (__accu1__.sub_context, __accu1__, __kwargtrans__ ({enable_double_newline_paragraphs: false, enable_macros: false, enable_environments: false, enable_specials: false, enable_comments: false, enable_groups: false, enable_math: false}));
+/* 000148 */ 			}) ()}));
+/* 000148 */ 		}) ();
+/* 000161 */ 		if (__t__ (__t__ (!__t__ ((stop_condition_met))) && ended_with_eos)) {
+/* 000162 */ 			return (function () {
+/* 000162 */ 				var __accu0__ = self;
+/* 000162 */ 				return __call__ (__accu0__.error_end_of_stream, __accu0__, __kwargtrans__ ({pos: pos_end, recovery_nodes: nodes, latex_walker: latex_walker, verbatim_info: verbatim_info}));
+/* 000162 */ 			}) ();
+/* 000162 */ 		}
+/* 000167 */ 		return tuple ([nodes, null]);
+/* 000167 */ 	});}
+/* 000167 */ });
+/* 000171 */ export var LatexDelimitedVerbatimParser =  __class__ ('LatexDelimitedVerbatimParser', [LatexVerbatimBaseParser], {
+/* 000171 */ 	__module__: __name__,
+/* 000179 */ 	get __init__ () {return __get__ (this, function (self, delimiters, auto_delimiters) {
+/* 000179 */ 		if (typeof delimiters == 'undefined' || (delimiters != null && delimiters.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000179 */ 			var delimiters = null;
+/* 000179 */ 		};
+/* 000179 */ 		if (typeof auto_delimiters == 'undefined' || (auto_delimiters != null && auto_delimiters.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000179 */ 			var auto_delimiters = null;
+/* 000179 */ 		};
+/* 000179 */ 		var kwargs = dict ();
+/* 000179 */ 		if (arguments.length) {
+/* 000179 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000179 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000179 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000179 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000179 */ 					switch (__attrib0__) {
+/* 000179 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000179 */ 						case 'delimiters': var delimiters = __allkwargs0__ [__attrib0__]; break;
+/* 000179 */ 						case 'auto_delimiters': var auto_delimiters = __allkwargs0__ [__attrib0__]; break;
+/* 000179 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000179 */ 					}
+/* 000179 */ 				}
+/* 000179 */ 				delete kwargs.__kwargtrans__;
+/* 000179 */ 			}
+/* 000179 */ 		}
 /* 000179 */ 		else {
-/* 000180 */ 			self.auto_delimiters = dict ({'{': '}', '[': ']', '<': '>', '(': ')'});
-/* 000180 */ 		}
-/* 000187 */ 		self.depth_counter = 1;
-/* 000190 */ 		self.parsed_delimiters = null;
-/* 000190 */ 	});},
-/* 000193 */ 	get new_char_check_stop_condition () {return __get__ (this, function (self, char, verbatim_string, verbatim_info, parsing_state) {
-/* 000193 */ 		if (arguments.length) {
-/* 000193 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000193 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000193 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000193 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000193 */ 					switch (__attrib0__) {
-/* 000193 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000193 */ 						case 'char': var char = __allkwargs0__ [__attrib0__]; break;
-/* 000193 */ 						case 'verbatim_string': var verbatim_string = __allkwargs0__ [__attrib0__]; break;
-/* 000193 */ 						case 'verbatim_info': var verbatim_info = __allkwargs0__ [__attrib0__]; break;
-/* 000193 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
-/* 000193 */ 					}
-/* 000193 */ 				}
-/* 000193 */ 			}
-/* 000193 */ 		}
-/* 000193 */ 		else {
-/* 000193 */ 		}
-/* 000199 */ 		if (__t__ (char === null)) {
-/* 000200 */ 			return false;
-/* 000200 */ 		}
-/* 000202 */ 		if (__t__ (__eq__ (char, __getitem__ (verbatim_info.parsed_delimiters, 1)))) {
-/* 000204 */ 			self.depth_counter = __call__ (__isub__, null, self.depth_counter, 1);
-/* 000205 */ 			if (__t__ (__le__ (self.depth_counter, 0))) {
-/* 000207 */ 				return true;
-/* 000207 */ 			}
-/* 000207 */ 		}
-/* 000208 */ 		else if (__t__ (__eq__ (char, __getitem__ (verbatim_info.parsed_delimiters, 0)))) {
-/* 000210 */ 			self.depth_counter = __call__ (__iadd__, null, self.depth_counter, 1);
+/* 000179 */ 		}
+/* 000183 */ 		__call__ (__call__ (__super__, null, LatexDelimitedVerbatimParser, '__init__'), null, self, __kwargtrans__ (kwargs));
+/* 000185 */ 		self.delimiters = delimiters;
+/* 000187 */ 		if (__t__ (auto_delimiters !== null)) {
+/* 000188 */ 			self.auto_delimiters = __call__ (dict, null, auto_delimiters);
+/* 000188 */ 		}
+/* 000189 */ 		else {
+/* 000190 */ 			self.auto_delimiters = dict ({'{': '}', '[': ']', '<': '>', '(': ')'});
+/* 000190 */ 		}
+/* 000197 */ 		self.depth_counter = 1;
+/* 000200 */ 		self.parsed_delimiters = null;
+/* 000200 */ 	});},
+/* 000203 */ 	get new_char_check_stop_condition () {return __get__ (this, function (self, char, verbatim_string, verbatim_info, parsing_state) {
+/* 000203 */ 		if (arguments.length) {
+/* 000203 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000203 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000203 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000203 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000203 */ 					switch (__attrib0__) {
+/* 000203 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000203 */ 						case 'char': var char = __allkwargs0__ [__attrib0__]; break;
+/* 000203 */ 						case 'verbatim_string': var verbatim_string = __allkwargs0__ [__attrib0__]; break;
+/* 000203 */ 						case 'verbatim_info': var verbatim_info = __allkwargs0__ [__attrib0__]; break;
+/* 000203 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 000203 */ 					}
+/* 000203 */ 				}
+/* 000203 */ 			}
+/* 000203 */ 		}
+/* 000203 */ 		else {
+/* 000203 */ 		}
+/* 000209 */ 		if (__t__ (char === null)) {
+/* 000210 */ 			return false;
 /* 000210 */ 		}
-/* 000212 */ 		return false;
-/* 000212 */ 	});},
-/* 000215 */ 	get parse () {return __get__ (this, function (self, latex_walker, token_reader, parsing_state) {
-/* 000215 */ 		var kwargs = dict ();
-/* 000215 */ 		if (arguments.length) {
-/* 000215 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000215 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000215 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000215 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000215 */ 					switch (__attrib0__) {
-/* 000215 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000215 */ 						case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
-/* 000215 */ 						case 'token_reader': var token_reader = __allkwargs0__ [__attrib0__]; break;
-/* 000215 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
-/* 000215 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000215 */ 					}
-/* 000215 */ 				}
-/* 000215 */ 				delete kwargs.__kwargtrans__;
-/* 000215 */ 			}
-/* 000215 */ 		}
-/* 000215 */ 		else {
-/* 000215 */ 		}
-/* 000217 */ 		var verbatim_info = (function () {
-/* 000217 */ 			var __accu0__ = LatexVerbatimBaseParser;
-/* 000217 */ 			return __call__ (__accu0__.VerbatimInfo, __accu0__);
-/* 000217 */ 		}) ();
-/* 000219 */ 		(function () {
-/* 000219 */ 			var __accu0__ = token_reader;
-/* 000219 */ 			return __call__ (__accu0__.skip_space_chars, __accu0__, parsing_state);
-/* 000219 */ 		}) ();
-/* 000221 */ 		verbatim_info.original_pos = (function () {
-/* 000221 */ 			var __accu0__ = token_reader;
-/* 000221 */ 			return __call__ (__accu0__.cur_pos, __accu0__);
-/* 000221 */ 		}) ();
-/* 000223 */ 		if (__t__ (self.delimiters === null)) {
-/* 000226 */ 			var open_delim_char = (function () {
-/* 000226 */ 				var __accu0__ = token_reader;
-/* 000226 */ 				return __call__ (__accu0__.next_chars, __accu0__, 1, __kwargtrans__ ({parsing_state: parsing_state}));
-/* 000226 */ 			}) ();
-/* 000228 */ 			var close_delim_char = (function () {
-/* 000228 */ 				var __accu0__ = self.auto_delimiters;
-/* 000228 */ 				return __call__ (__accu0__.py_get, __accu0__, open_delim_char, open_delim_char);
-/* 000228 */ 			}) ();
-/* 000230 */ 			verbatim_info.parsed_delimiters = tuple ([open_delim_char, close_delim_char]);
-/* 000230 */ 		}
-/* 000231 */ 		else {
-/* 000234 */ 			verbatim_info.parsed_delimiters = self.delimiters;
-/* 000236 */ 			var first_char = (function () {
+/* 000212 */ 		if (__t__ (__eq__ (char, __getitem__ (verbatim_info.parsed_delimiters, 1)))) {
+/* 000214 */ 			self.depth_counter = __call__ (__isub__, null, self.depth_counter, 1);
+/* 000215 */ 			if (__t__ (__le__ (self.depth_counter, 0))) {
+/* 000217 */ 				return true;
+/* 000217 */ 			}
+/* 000217 */ 		}
+/* 000218 */ 		else if (__t__ (__eq__ (char, __getitem__ (verbatim_info.parsed_delimiters, 0)))) {
+/* 000220 */ 			self.depth_counter = __call__ (__iadd__, null, self.depth_counter, 1);
+/* 000220 */ 		}
+/* 000222 */ 		return false;
+/* 000222 */ 	});},
+/* 000225 */ 	get parse () {return __get__ (this, function (self, latex_walker, token_reader, parsing_state) {
+/* 000225 */ 		var kwargs = dict ();
+/* 000225 */ 		if (arguments.length) {
+/* 000225 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000225 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000225 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000225 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000225 */ 					switch (__attrib0__) {
+/* 000225 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000225 */ 						case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
+/* 000225 */ 						case 'token_reader': var token_reader = __allkwargs0__ [__attrib0__]; break;
+/* 000225 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 000225 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000225 */ 					}
+/* 000225 */ 				}
+/* 000225 */ 				delete kwargs.__kwargtrans__;
+/* 000225 */ 			}
+/* 000225 */ 		}
+/* 000225 */ 		else {
+/* 000225 */ 		}
+/* 000227 */ 		var verbatim_info = (function () {
+/* 000227 */ 			var __accu0__ = LatexVerbatimBaseParser;
+/* 000227 */ 			return __call__ (__accu0__.VerbatimInfo, __accu0__);
+/* 000227 */ 		}) ();
+/* 000229 */ 		(function () {
+/* 000229 */ 			var __accu0__ = token_reader;
+/* 000229 */ 			return __call__ (__accu0__.skip_space_chars, __accu0__, parsing_state);
+/* 000229 */ 		}) ();
+/* 000231 */ 		verbatim_info.original_pos = (function () {
+/* 000231 */ 			var __accu0__ = token_reader;
+/* 000231 */ 			return __call__ (__accu0__.cur_pos, __accu0__);
+/* 000231 */ 		}) ();
+/* 000233 */ 		if (__t__ (self.delimiters === null)) {
+/* 000236 */ 			var open_delim_char = (function () {
 /* 000236 */ 				var __accu0__ = token_reader;
 /* 000236 */ 				return __call__ (__accu0__.next_chars, __accu0__, 1, __kwargtrans__ ({parsing_state: parsing_state}));
 /* 000236 */ 			}) ();
-/* 000237 */ 			if (__t__ (__ne__ (first_char, __getitem__ (verbatim_info.parsed_delimiters, 0)))) {
-/* 000239 */ 				var __except0__ = __call__ (LatexWalkerParseError, null, __kwargtrans__ ({msg: (function () {
-/* 000239 */ 					var __accu0__ = 'Expected opening delimiter ‘{}’ for verbatim content';
-/* 000239 */ 					return __call__ (__accu0__.format, __accu0__, __getitem__ (verbatim_info.parsed_delimiters, 0));
-/* 000239 */ 				}) (), pos: pos, error_type_info: dict ({'what': 'verbatim_expected_opening_delimiter_not_found', 'expected_delimiters': verbatim_info.parsed_delimiters})}));
-/* 000239 */ 				__except0__.__cause__ = null;
-/* 000239 */ 				throw __except0__;
-/* 000239 */ 			}
-/* 000239 */ 		}
-/* 000250 */ 		var __left0__ = (function () {
-/* 000250 */ 			var __accu0__ = self;
-/* 000250 */ 			return __call__ (__accu0__.read_verbatim_content, __accu0__, latex_walker, token_reader, parsing_state, __kwargtrans__ (__mergekwargtrans__ ({verbatim_info: verbatim_info}, kwargs)));
-/* 000250 */ 		}) ();
-/* 000250 */ 		var verbatim_node = __left0__ [0];
-/* 000250 */ 		var _ = __left0__ [1];
-/* 000253 */ 		var nodes = (function () {
-/* 000253 */ 			var __accu0__ = latex_walker;
-/* 000256 */ 			return __call__ (__accu0__.make_node, __accu0__, LatexGroupNode, __kwargtrans__ ({delimiters: verbatim_info.parsed_delimiters, nodelist: (function () {
-/* 000256 */ 				var __accu1__ = latex_walker;
-/* 000256 */ 				return __call__ (__accu1__.make_nodelist, __accu1__, [verbatim_node], __kwargtrans__ ({parsing_state: parsing_state}));
-/* 000261 */ 			}) (), pos: verbatim_info.original_pos, pos_end: __add__ (verbatim_node.pos_end, __call__ (len, null, __getitem__ (verbatim_info.parsed_delimiters, 1))), parsing_state: parsing_state}));
-/* 000261 */ 		}) ();
-/* 000265 */ 		return tuple ([nodes, null]);
-/* 000265 */ 	});}
-/* 000265 */ });
-/* 000269 */ export var LatexVerbatimEnvironmentContentsParser =  __class__ ('LatexVerbatimEnvironmentContentsParser', [LatexVerbatimBaseParser], {
-/* 000269 */ 	__module__: __name__,
-/* 000275 */ 	get __init__ () {return __get__ (this, function (self, environment_name) {
-/* 000275 */ 		if (typeof environment_name == 'undefined' || (environment_name != null && environment_name.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000275 */ 			var environment_name = 'verbatim';
-/* 000275 */ 		};
-/* 000275 */ 		var kwargs = dict ();
-/* 000275 */ 		if (arguments.length) {
-/* 000275 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000275 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000275 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000275 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000275 */ 					switch (__attrib0__) {
-/* 000275 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000275 */ 						case 'environment_name': var environment_name = __allkwargs0__ [__attrib0__]; break;
-/* 000275 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000275 */ 					}
-/* 000275 */ 				}
-/* 000275 */ 				delete kwargs.__kwargtrans__;
-/* 000275 */ 			}
-/* 000275 */ 		}
-/* 000275 */ 		else {
-/* 000275 */ 		}
-/* 000276 */ 		__call__ (__call__ (__super__, null, LatexVerbatimEnvironmentContentsParser, '__init__'), null, self, __kwargtrans__ (kwargs));
-/* 000277 */ 		self.environment_name = environment_name;
-/* 000277 */ 	});},
-/* 000279 */ 	get new_char_check_stop_condition () {return __get__ (this, function (self, char, verbatim_string, verbatim_info, parsing_state) {
-/* 000279 */ 		if (arguments.length) {
-/* 000279 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000279 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000279 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000279 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000279 */ 					switch (__attrib0__) {
-/* 000279 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000279 */ 						case 'char': var char = __allkwargs0__ [__attrib0__]; break;
-/* 000279 */ 						case 'verbatim_string': var verbatim_string = __allkwargs0__ [__attrib0__]; break;
-/* 000279 */ 						case 'verbatim_info': var verbatim_info = __allkwargs0__ [__attrib0__]; break;
-/* 000279 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
-/* 000279 */ 					}
-/* 000279 */ 				}
-/* 000279 */ 			}
-/* 000279 */ 		}
-/* 000279 */ 		else {
-/* 000279 */ 		}
-/* 000282 */ 		if (__t__ ((function () {
-/* 000282 */ 			var __accu0__ = verbatim_string;
-/* 000282 */ 			return __call__ (__accu0__.endswith, __accu0__, verbatim_info.end_environment_code);
-/* 000282 */ 		}) ())) {
-/* 000283 */ 			return dict ({'put_back_char': true});
-/* 000283 */ 		}
-/* 000284 */ 		return false;
-/* 000284 */ 	});},
-/* 000286 */ 	get finalize_verbatim_string () {return __get__ (this, function (self, verbatim_string, verbatim_info) {
-/* 000286 */ 		if (arguments.length) {
-/* 000286 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000286 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000286 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000286 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000286 */ 					switch (__attrib0__) {
-/* 000286 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000286 */ 						case 'verbatim_string': var verbatim_string = __allkwargs0__ [__attrib0__]; break;
-/* 000286 */ 						case 'verbatim_info': var verbatim_info = __allkwargs0__ [__attrib0__]; break;
-/* 000286 */ 					}
-/* 000286 */ 				}
-/* 000286 */ 			}
-/* 000286 */ 		}
-/* 000286 */ 		else {
-/* 000286 */ 		}
-/* 000288 */ 		var end_environment_code = verbatim_info.end_environment_code;
-/* 000289 */ 		assert ((function () {
-/* 000289 */ 			var __accu0__ = verbatim_string;
-/* 000289 */ 			return __call__ (__accu0__.endswith, __accu0__, end_environment_code);
-/* 000289 */ 		}) ());
-/* 000291 */ 		var verbatim_string = __getslice__ (verbatim_string, 0, __neg__ (__call__ (len, null, end_environment_code)), 1);
-/* 000293 */ 		var pos_start = verbatim_info.original_pos;
-/* 000295 */ 		if (__t__ ((function () {
-/* 000295 */ 			var __accu0__ = verbatim_string;
-/* 000295 */ 			return __call__ (__accu0__.startswith, __accu0__, '\n');
-/* 000295 */ 		}) ())) {
-/* 000298 */ 			var verbatim_string = __getslice__ (verbatim_string, 1, null, 1);
-/* 000299 */ 			var pos_start = __call__ (__iadd__, null, pos_start, 1);
-/* 000299 */ 		}
-/* 000301 */ 		verbatim_info.pos_start = pos_start;
-/* 000302 */ 		verbatim_info.pos_end = __add__ (pos_start, __call__ (len, null, verbatim_string));
-/* 000303 */ 		return verbatim_string;
-/* 000303 */ 	});},
-/* 000305 */ 	get parse () {return __get__ (this, function (self, latex_walker, token_reader, parsing_state) {
-/* 000305 */ 		var kwargs = dict ();
-/* 000305 */ 		if (arguments.length) {
-/* 000305 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000305 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000305 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000305 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000305 */ 					switch (__attrib0__) {
-/* 000305 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000305 */ 						case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
-/* 000305 */ 						case 'token_reader': var token_reader = __allkwargs0__ [__attrib0__]; break;
-/* 000305 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
-/* 000305 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000305 */ 					}
-/* 000305 */ 				}
-/* 000305 */ 				delete kwargs.__kwargtrans__;
-/* 000305 */ 			}
-/* 000305 */ 		}
-/* 000305 */ 		else {
-/* 000305 */ 		}
-/* 000307 */ 		var verbatim_info = (function () {
-/* 000307 */ 			var __accu0__ = LatexVerbatimBaseParser;
-/* 000307 */ 			return __call__ (__accu0__.VerbatimInfo, __accu0__);
-/* 000307 */ 		}) ();
-/* 000308 */ 		verbatim_info.original_pos = (function () {
-/* 000308 */ 			var __accu0__ = token_reader;
-/* 000308 */ 			return __call__ (__accu0__.cur_pos, __accu0__);
-/* 000308 */ 		}) ();
-/* 000310 */ 		verbatim_info.end_environment_code = __add__ (__add__ (__add__ (parsing_state.macro_escape_char, 'end{'), self.environment_name), '}');
-/* 000315 */ 		var __left0__ = (function () {
-/* 000315 */ 			var __accu0__ = self;
-/* 000315 */ 			return __call__ (__accu0__.read_verbatim_content, __accu0__, latex_walker, token_reader, parsing_state, verbatim_info, __kwargtrans__ (kwargs));
-/* 000315 */ 		}) ();
-/* 000315 */ 		var verbatim_chars_node = __left0__ [0];
-/* 000315 */ 		var _ = __left0__ [1];
-/* 000318 */ 		var nodes = (function () {
-/* 000318 */ 			var __accu0__ = latex_walker;
-/* 000318 */ 			return __call__ (__accu0__.make_nodelist, __accu0__, [verbatim_chars_node], __kwargtrans__ ({parsing_state: parsing_state}));
+/* 000238 */ 			var close_delim_char = (function () {
+/* 000238 */ 				var __accu0__ = self.auto_delimiters;
+/* 000238 */ 				return __call__ (__accu0__.py_get, __accu0__, open_delim_char, open_delim_char);
+/* 000238 */ 			}) ();
+/* 000240 */ 			verbatim_info.parsed_delimiters = tuple ([open_delim_char, close_delim_char]);
+/* 000240 */ 		}
+/* 000241 */ 		else {
+/* 000244 */ 			verbatim_info.parsed_delimiters = self.delimiters;
+/* 000246 */ 			var first_char = (function () {
+/* 000246 */ 				var __accu0__ = token_reader;
+/* 000246 */ 				return __call__ (__accu0__.next_chars, __accu0__, 1, __kwargtrans__ ({parsing_state: parsing_state}));
+/* 000246 */ 			}) ();
+/* 000247 */ 			if (__t__ (__ne__ (first_char, __getitem__ (verbatim_info.parsed_delimiters, 0)))) {
+/* 000249 */ 				var __except0__ = __call__ (LatexWalkerParseError, null, __kwargtrans__ ({msg: (function () {
+/* 000249 */ 					var __accu0__ = 'Expected opening delimiter ‘{}’ for verbatim content';
+/* 000249 */ 					return __call__ (__accu0__.format, __accu0__, __getitem__ (verbatim_info.parsed_delimiters, 0));
+/* 000249 */ 				}) (), pos: pos, error_type_info: dict ({'what': 'verbatim_expected_opening_delimiter_not_found', 'expected_delimiters': verbatim_info.parsed_delimiters})}));
+/* 000249 */ 				__except0__.__cause__ = null;
+/* 000249 */ 				throw __except0__;
+/* 000249 */ 			}
+/* 000249 */ 		}
+/* 000260 */ 		var __left0__ = (function () {
+/* 000260 */ 			var __accu0__ = self;
+/* 000260 */ 			return __call__ (__accu0__.read_verbatim_content, __accu0__, latex_walker, token_reader, parsing_state, __kwargtrans__ (__mergekwargtrans__ ({verbatim_info: verbatim_info}, kwargs)));
+/* 000260 */ 		}) ();
+/* 000260 */ 		var verbatim_node = __left0__ [0];
+/* 000260 */ 		var _ = __left0__ [1];
+/* 000263 */ 		var nodes = (function () {
+/* 000263 */ 			var __accu0__ = latex_walker;
+/* 000266 */ 			return __call__ (__accu0__.make_node, __accu0__, LatexGroupNode, __kwargtrans__ ({delimiters: verbatim_info.parsed_delimiters, nodelist: (function () {
+/* 000266 */ 				var __accu1__ = latex_walker;
+/* 000266 */ 				return __call__ (__accu1__.make_nodelist, __accu1__, [verbatim_node], __kwargtrans__ ({parsing_state: parsing_state}));
+/* 000271 */ 			}) (), pos: verbatim_info.original_pos, pos_end: __add__ (verbatim_node.pos_end, __call__ (len, null, __getitem__ (verbatim_info.parsed_delimiters, 1))), parsing_state: parsing_state}));
+/* 000271 */ 		}) ();
+/* 000275 */ 		return tuple ([nodes, null]);
+/* 000275 */ 	});}
+/* 000275 */ });
+/* 000279 */ export var LatexVerbatimEnvironmentContentsParser =  __class__ ('LatexVerbatimEnvironmentContentsParser', [LatexVerbatimBaseParser], {
+/* 000279 */ 	__module__: __name__,
+/* 000285 */ 	get __init__ () {return __get__ (this, function (self, environment_name) {
+/* 000285 */ 		if (typeof environment_name == 'undefined' || (environment_name != null && environment_name.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000285 */ 			var environment_name = 'verbatim';
+/* 000285 */ 		};
+/* 000285 */ 		var kwargs = dict ();
+/* 000285 */ 		if (arguments.length) {
+/* 000285 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000285 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000285 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000285 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000285 */ 					switch (__attrib0__) {
+/* 000285 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000285 */ 						case 'environment_name': var environment_name = __allkwargs0__ [__attrib0__]; break;
+/* 000285 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000285 */ 					}
+/* 000285 */ 				}
+/* 000285 */ 				delete kwargs.__kwargtrans__;
+/* 000285 */ 			}
+/* 000285 */ 		}
+/* 000285 */ 		else {
+/* 000285 */ 		}
+/* 000286 */ 		__call__ (__call__ (__super__, null, LatexVerbatimEnvironmentContentsParser, '__init__'), null, self, __kwargtrans__ (kwargs));
+/* 000287 */ 		self.environment_name = environment_name;
+/* 000287 */ 	});},
+/* 000289 */ 	get new_char_check_stop_condition () {return __get__ (this, function (self, char, verbatim_string, verbatim_info, parsing_state) {
+/* 000289 */ 		if (arguments.length) {
+/* 000289 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000289 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000289 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000289 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000289 */ 					switch (__attrib0__) {
+/* 000289 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000289 */ 						case 'char': var char = __allkwargs0__ [__attrib0__]; break;
+/* 000289 */ 						case 'verbatim_string': var verbatim_string = __allkwargs0__ [__attrib0__]; break;
+/* 000289 */ 						case 'verbatim_info': var verbatim_info = __allkwargs0__ [__attrib0__]; break;
+/* 000289 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 000289 */ 					}
+/* 000289 */ 				}
+/* 000289 */ 			}
+/* 000289 */ 		}
+/* 000289 */ 		else {
+/* 000289 */ 		}
+/* 000292 */ 		if (__t__ ((function () {
+/* 000292 */ 			var __accu0__ = verbatim_string;
+/* 000292 */ 			return __call__ (__accu0__.endswith, __accu0__, verbatim_info.end_environment_code);
+/* 000292 */ 		}) ())) {
+/* 000293 */ 			return dict ({'put_back_char': true});
+/* 000293 */ 		}
+/* 000294 */ 		return false;
+/* 000294 */ 	});},
+/* 000296 */ 	get finalize_verbatim_string () {return __get__ (this, function (self, verbatim_string, verbatim_info) {
+/* 000296 */ 		if (arguments.length) {
+/* 000296 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000296 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000296 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000296 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000296 */ 					switch (__attrib0__) {
+/* 000296 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000296 */ 						case 'verbatim_string': var verbatim_string = __allkwargs0__ [__attrib0__]; break;
+/* 000296 */ 						case 'verbatim_info': var verbatim_info = __allkwargs0__ [__attrib0__]; break;
+/* 000296 */ 					}
+/* 000296 */ 				}
+/* 000296 */ 			}
+/* 000296 */ 		}
+/* 000296 */ 		else {
+/* 000296 */ 		}
+/* 000298 */ 		var end_environment_code = verbatim_info.end_environment_code;
+/* 000299 */ 		assert ((function () {
+/* 000299 */ 			var __accu0__ = verbatim_string;
+/* 000299 */ 			return __call__ (__accu0__.endswith, __accu0__, end_environment_code);
+/* 000299 */ 		}) ());
+/* 000301 */ 		var verbatim_string = __getslice__ (verbatim_string, 0, __neg__ (__call__ (len, null, end_environment_code)), 1);
+/* 000303 */ 		var pos_start = verbatim_info.original_pos;
+/* 000305 */ 		if (__t__ ((function () {
+/* 000305 */ 			var __accu0__ = verbatim_string;
+/* 000305 */ 			return __call__ (__accu0__.startswith, __accu0__, '\n');
+/* 000305 */ 		}) ())) {
+/* 000308 */ 			var verbatim_string = __getslice__ (verbatim_string, 1, null, 1);
+/* 000309 */ 			var pos_start = __call__ (__iadd__, null, pos_start, 1);
+/* 000309 */ 		}
+/* 000311 */ 		verbatim_info.pos_start = pos_start;
+/* 000312 */ 		verbatim_info.pos_end = __add__ (pos_start, __call__ (len, null, verbatim_string));
+/* 000313 */ 		return verbatim_string;
+/* 000313 */ 	});},
+/* 000315 */ 	get parse () {return __get__ (this, function (self, latex_walker, token_reader, parsing_state) {
+/* 000315 */ 		var kwargs = dict ();
+/* 000315 */ 		if (arguments.length) {
+/* 000315 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000315 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000315 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000315 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000315 */ 					switch (__attrib0__) {
+/* 000315 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000315 */ 						case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
+/* 000315 */ 						case 'token_reader': var token_reader = __allkwargs0__ [__attrib0__]; break;
+/* 000315 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 000315 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000315 */ 					}
+/* 000315 */ 				}
+/* 000315 */ 				delete kwargs.__kwargtrans__;
+/* 000315 */ 			}
+/* 000315 */ 		}
+/* 000315 */ 		else {
+/* 000315 */ 		}
+/* 000317 */ 		var verbatim_info = (function () {
+/* 000317 */ 			var __accu0__ = LatexVerbatimBaseParser;
+/* 000317 */ 			return __call__ (__accu0__.VerbatimInfo, __accu0__);
+/* 000317 */ 		}) ();
+/* 000318 */ 		verbatim_info.original_pos = (function () {
+/* 000318 */ 			var __accu0__ = token_reader;
+/* 000318 */ 			return __call__ (__accu0__.cur_pos, __accu0__);
 /* 000318 */ 		}) ();
-/* 000326 */ 		return tuple ([nodes, null]);
-/* 000326 */ 	});}
-/* 000326 */ });
+/* 000320 */ 		verbatim_info.end_environment_code = __add__ (__add__ (__add__ (parsing_state.macro_escape_char, 'end{'), self.environment_name), '}');
+/* 000325 */ 		var __left0__ = (function () {
+/* 000325 */ 			var __accu0__ = self;
+/* 000325 */ 			return __call__ (__accu0__.read_verbatim_content, __accu0__, latex_walker, token_reader, parsing_state, verbatim_info, __kwargtrans__ (kwargs));
+/* 000325 */ 		}) ();
+/* 000325 */ 		var verbatim_chars_node = __left0__ [0];
+/* 000325 */ 		var _ = __left0__ [1];
+/* 000328 */ 		var nodes = (function () {
+/* 000328 */ 			var __accu0__ = latex_walker;
+/* 000328 */ 			return __call__ (__accu0__.make_nodelist, __accu0__, [verbatim_chars_node], __kwargtrans__ ({parsing_state: parsing_state}));
+/* 000328 */ 		}) ();
+/* 000336 */ 		return tuple ([nodes, null]);
+/* 000336 */ 	});}
+/* 000336 */ });
 /* 000037 */ 
 //# sourceMappingURL=pylatexenc.latexnodes.parsers._verbatim.map

@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2024-07-16 00:01:36
+/* 000001 */ // Transcrypt'ed from Python, 2024-09-25 21:08:32
 /* 000006 */ var logging = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000006 */ import * as __module_logging__ from './logging.js';
@@ -251,265 +251,286 @@
 /* 000076 */ 			}) (), ...__getslice__ (self.maps, 1, null, 1));
 /* 000076 */ 		}) ();
 /* 000076 */ 	});},
-/* 000078 */ 	__copy__: copy,
-/* 000080 */ 	get new_child () {return __get__ (this, function (self, m) {
-/* 000080 */ 		if (typeof m == 'undefined' || (m != null && m.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000080 */ 			var m = null;
-/* 000080 */ 		};
-/* 000080 */ 		if (arguments.length) {
-/* 000080 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000080 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000080 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000080 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000080 */ 					switch (__attrib0__) {
-/* 000080 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000080 */ 						case 'm': var m = __allkwargs0__ [__attrib0__]; break;
-/* 000080 */ 					}
-/* 000080 */ 				}
-/* 000080 */ 			}
-/* 000080 */ 		}
-/* 000080 */ 		else {
-/* 000080 */ 		}
-/* 000084 */ 		if (__t__ (m === null)) {
-/* 000085 */ 			var m = dict ({});
-/* 000085 */ 		}
-/* 000086 */ 		return (function () {
-/* 000086 */ 			var __accu0__ = self;
-/* 000086 */ 			return __call__ (__accu0__.__class__, __accu0__, m, ...self.maps);
-/* 000086 */ 		}) ();
-/* 000086 */ 	});},
-/* 000089 */ 	get _get_parents () {return __get__ (this, function (self) {
-/* 000089 */ 		if (arguments.length) {
-/* 000089 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000089 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000089 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000089 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000089 */ 					switch (__attrib0__) {
-/* 000089 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000089 */ 					}
-/* 000089 */ 				}
-/* 000089 */ 			}
-/* 000089 */ 		}
-/* 000089 */ 		else {
-/* 000089 */ 		}
-/* 000091 */ 		return (function () {
-/* 000091 */ 			var __accu0__ = self;
-/* 000091 */ 			return __call__ (__accu0__.__class__, __accu0__, ...__getslice__ (self.maps, 1, null, 1));
-/* 000091 */ 		}) ();
-/* 000091 */ 	});},
-/* 000093 */ 	get __setitem__ () {return __get__ (this, function (self, key, value) {
-/* 000093 */ 		if (arguments.length) {
-/* 000093 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000093 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000093 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000093 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000093 */ 					switch (__attrib0__) {
-/* 000093 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000093 */ 						case 'key': var key = __allkwargs0__ [__attrib0__]; break;
-/* 000093 */ 						case 'value': var value = __allkwargs0__ [__attrib0__]; break;
-/* 000093 */ 					}
-/* 000093 */ 				}
-/* 000093 */ 			}
-/* 000093 */ 		}
-/* 000093 */ 		else {
-/* 000093 */ 		}
-/* 000094 */ 		__setitem__ (__getitem__ (self.maps, 0), key, value);
-/* 000094 */ 	});},
-/* 000096 */ 	get __delitem__ () {return __get__ (this, function (self, key) {
-/* 000096 */ 		if (arguments.length) {
-/* 000096 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000096 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000096 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000096 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000096 */ 					switch (__attrib0__) {
-/* 000096 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000096 */ 						case 'key': var key = __allkwargs0__ [__attrib0__]; break;
-/* 000096 */ 					}
-/* 000096 */ 				}
-/* 000096 */ 			}
-/* 000096 */ 		}
-/* 000096 */ 		else {
-/* 000096 */ 		}
-/* 000097 */ 		try {
-/* 000097 */ 			delete __getitem__ (__getitem__ (self.maps, 0), key);
-/* 000097 */ 		}
-/* 000097 */ 		catch (__except0__) {
-/* 000097 */ 			if (isinstance (__except0__, KeyError)) {
-/* 000100 */ 				var __except1__ = __call__ (KeyError, null, 'Key not found in the first mapping: {}'.format (key));
-/* 000100 */ 				__except1__.__cause__ = null;
-/* 000100 */ 				throw __except1__;
-/* 000100 */ 			}
-/* 000100 */ 			else {
-/* 000100 */ 				throw __except0__;
-/* 000100 */ 			}
-/* 000100 */ 		}
-/* 000100 */ 	});},
-/* 000102 */ 	get py_popitem () {return __get__ (this, function (self) {
-/* 000102 */ 		if (arguments.length) {
-/* 000102 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000102 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000102 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000102 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000102 */ 					switch (__attrib0__) {
-/* 000102 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000102 */ 					}
-/* 000102 */ 				}
+/* 000078 */ 	get __copy__ () {return __get__ (this, function (self) {
+/* 000078 */ 		if (arguments.length) {
+/* 000078 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000078 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000078 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000078 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000078 */ 					switch (__attrib0__) {
+/* 000078 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000078 */ 					}
+/* 000078 */ 				}
+/* 000078 */ 			}
+/* 000078 */ 		}
+/* 000078 */ 		else {
+/* 000078 */ 		}
+/* 000080 */ 		return (function () {
+/* 000080 */ 			var __accu0__ = self;
+/* 000080 */ 			return __call__ (__accu0__.__class__, __accu0__, (function () {
+/* 000080 */ 				var __accu1__ = __getitem__ (self.maps, 0);
+/* 000080 */ 				return __call__ (__accu1__.copy, __accu1__);
+/* 000080 */ 			}) (), ...__getslice__ (self.maps, 1, null, 1));
+/* 000080 */ 		}) ();
+/* 000080 */ 	});},
+/* 000082 */ 	get new_child () {return __get__ (this, function (self, m) {
+/* 000082 */ 		if (typeof m == 'undefined' || (m != null && m.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000082 */ 			var m = null;
+/* 000082 */ 		};
+/* 000082 */ 		if (arguments.length) {
+/* 000082 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000082 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000082 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000082 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000082 */ 					switch (__attrib0__) {
+/* 000082 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000082 */ 						case 'm': var m = __allkwargs0__ [__attrib0__]; break;
+/* 000082 */ 					}
+/* 000082 */ 				}
+/* 000082 */ 			}
+/* 000082 */ 		}
+/* 000082 */ 		else {
+/* 000082 */ 		}
+/* 000086 */ 		if (__t__ (m === null)) {
+/* 000087 */ 			var m = dict ({});
+/* 000087 */ 		}
+/* 000088 */ 		return (function () {
+/* 000088 */ 			var __accu0__ = self;
+/* 000088 */ 			return __call__ (__accu0__.__class__, __accu0__, m, ...self.maps);
+/* 000088 */ 		}) ();
+/* 000088 */ 	});},
+/* 000091 */ 	get _get_parents () {return __get__ (this, function (self) {
+/* 000091 */ 		if (arguments.length) {
+/* 000091 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000091 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000091 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000091 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000091 */ 					switch (__attrib0__) {
+/* 000091 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000091 */ 					}
+/* 000091 */ 				}
+/* 000091 */ 			}
+/* 000091 */ 		}
+/* 000091 */ 		else {
+/* 000091 */ 		}
+/* 000093 */ 		return (function () {
+/* 000093 */ 			var __accu0__ = self;
+/* 000093 */ 			return __call__ (__accu0__.__class__, __accu0__, ...__getslice__ (self.maps, 1, null, 1));
+/* 000093 */ 		}) ();
+/* 000093 */ 	});},
+/* 000095 */ 	get __setitem__ () {return __get__ (this, function (self, key, value) {
+/* 000095 */ 		if (arguments.length) {
+/* 000095 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000095 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000095 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000095 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000095 */ 					switch (__attrib0__) {
+/* 000095 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000095 */ 						case 'key': var key = __allkwargs0__ [__attrib0__]; break;
+/* 000095 */ 						case 'value': var value = __allkwargs0__ [__attrib0__]; break;
+/* 000095 */ 					}
+/* 000095 */ 				}
+/* 000095 */ 			}
+/* 000095 */ 		}
+/* 000095 */ 		else {
+/* 000095 */ 		}
+/* 000096 */ 		__setitem__ (__getitem__ (self.maps, 0), key, value);
+/* 000096 */ 	});},
+/* 000098 */ 	get __delitem__ () {return __get__ (this, function (self, key) {
+/* 000098 */ 		if (arguments.length) {
+/* 000098 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000098 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000098 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000098 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000098 */ 					switch (__attrib0__) {
+/* 000098 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000098 */ 						case 'key': var key = __allkwargs0__ [__attrib0__]; break;
+/* 000098 */ 					}
+/* 000098 */ 				}
+/* 000098 */ 			}
+/* 000098 */ 		}
+/* 000098 */ 		else {
+/* 000098 */ 		}
+/* 000099 */ 		try {
+/* 000099 */ 			delete __getitem__ (__getitem__ (self.maps, 0), key);
+/* 000099 */ 		}
+/* 000099 */ 		catch (__except0__) {
+/* 000099 */ 			if (isinstance (__except0__, KeyError)) {
+/* 000102 */ 				var __except1__ = __call__ (KeyError, null, 'Key not found in the first mapping: {}'.format (key));
+/* 000102 */ 				__except1__.__cause__ = null;
+/* 000102 */ 				throw __except1__;
+/* 000102 */ 			}
+/* 000102 */ 			else {
+/* 000102 */ 				throw __except0__;
 /* 000102 */ 			}
 /* 000102 */ 		}
-/* 000102 */ 		else {
-/* 000102 */ 		}
-/* 000104 */ 		try {
-/* 000105 */ 			return (function () {
-/* 000105 */ 				var __accu0__ = __getitem__ (self.maps, 0);
-/* 000105 */ 				return __call__ (__accu0__.py_popitem, __accu0__);
-/* 000105 */ 			}) ();
-/* 000105 */ 		}
-/* 000105 */ 		catch (__except0__) {
-/* 000105 */ 			if (isinstance (__except0__, KeyError)) {
-/* 000107 */ 				var __except1__ = __call__ (KeyError, null, 'No keys found in the first mapping.');
-/* 000107 */ 				__except1__.__cause__ = null;
-/* 000107 */ 				throw __except1__;
-/* 000107 */ 			}
-/* 000107 */ 			else {
-/* 000107 */ 				throw __except0__;
-/* 000107 */ 			}
+/* 000102 */ 	});},
+/* 000104 */ 	get py_popitem () {return __get__ (this, function (self) {
+/* 000104 */ 		if (arguments.length) {
+/* 000104 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000104 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000104 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000104 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000104 */ 					switch (__attrib0__) {
+/* 000104 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000104 */ 					}
+/* 000104 */ 				}
+/* 000104 */ 			}
+/* 000104 */ 		}
+/* 000104 */ 		else {
+/* 000104 */ 		}
+/* 000106 */ 		try {
+/* 000107 */ 			return (function () {
+/* 000107 */ 				var __accu0__ = __getitem__ (self.maps, 0);
+/* 000107 */ 				return __call__ (__accu0__.py_popitem, __accu0__);
+/* 000107 */ 			}) ();
 /* 000107 */ 		}
-/* 000107 */ 	});},
-/* 000109 */ 	get py_pop () {return __get__ (this, function (self, key) {
-/* 000109 */ 		if (arguments.length) {
-/* 000109 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000109 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000109 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000109 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000109 */ 					switch (__attrib0__) {
-/* 000109 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000109 */ 						case 'key': var key = __allkwargs0__ [__attrib0__]; break;
-/* 000109 */ 					}
-/* 000109 */ 				}
+/* 000107 */ 		catch (__except0__) {
+/* 000107 */ 			if (isinstance (__except0__, KeyError)) {
+/* 000109 */ 				var __except1__ = __call__ (KeyError, null, 'No keys found in the first mapping.');
+/* 000109 */ 				__except1__.__cause__ = null;
+/* 000109 */ 				throw __except1__;
 /* 000109 */ 			}
-/* 000109 */ 			var args = tuple ([].slice.apply (arguments).slice (2, __ilastarg0__ + 1));
+/* 000109 */ 			else {
+/* 000109 */ 				throw __except0__;
+/* 000109 */ 			}
 /* 000109 */ 		}
-/* 000109 */ 		else {
-/* 000109 */ 			var args = tuple ();
-/* 000109 */ 		}
-/* 000111 */ 		try {
-/* 000112 */ 			return (function () {
-/* 000112 */ 				var __accu0__ = __getitem__ (self.maps, 0);
-/* 000112 */ 				return __call__ (__accu0__.py_pop, __accu0__, key, ...args);
-/* 000112 */ 			}) ();
-/* 000112 */ 		}
-/* 000112 */ 		catch (__except0__) {
-/* 000112 */ 			if (isinstance (__except0__, KeyError)) {
-/* 000114 */ 				var __except1__ = __call__ (KeyError, null, 'Key not found in the first mapping: {}'.format (key));
-/* 000114 */ 				__except1__.__cause__ = null;
-/* 000114 */ 				throw __except1__;
-/* 000114 */ 			}
-/* 000114 */ 			else {
-/* 000114 */ 				throw __except0__;
-/* 000114 */ 			}
+/* 000109 */ 	});},
+/* 000111 */ 	get py_pop () {return __get__ (this, function (self, key) {
+/* 000111 */ 		if (arguments.length) {
+/* 000111 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000111 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000111 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000111 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000111 */ 					switch (__attrib0__) {
+/* 000111 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000111 */ 						case 'key': var key = __allkwargs0__ [__attrib0__]; break;
+/* 000111 */ 					}
+/* 000111 */ 				}
+/* 000111 */ 			}
+/* 000111 */ 			var args = tuple ([].slice.apply (arguments).slice (2, __ilastarg0__ + 1));
+/* 000111 */ 		}
+/* 000111 */ 		else {
+/* 000111 */ 			var args = tuple ();
+/* 000111 */ 		}
+/* 000113 */ 		try {
+/* 000114 */ 			return (function () {
+/* 000114 */ 				var __accu0__ = __getitem__ (self.maps, 0);
+/* 000114 */ 				return __call__ (__accu0__.py_pop, __accu0__, key, ...args);
+/* 000114 */ 			}) ();
 /* 000114 */ 		}
-/* 000114 */ 	});},
-/* 000116 */ 	get py_clear () {return __get__ (this, function (self) {
-/* 000116 */ 		if (arguments.length) {
-/* 000116 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000116 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000116 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000116 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000116 */ 					switch (__attrib0__) {
-/* 000116 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000116 */ 					}
-/* 000116 */ 				}
+/* 000114 */ 		catch (__except0__) {
+/* 000114 */ 			if (isinstance (__except0__, KeyError)) {
+/* 000116 */ 				var __except1__ = __call__ (KeyError, null, 'Key not found in the first mapping: {}'.format (key));
+/* 000116 */ 				__except1__.__cause__ = null;
+/* 000116 */ 				throw __except1__;
+/* 000116 */ 			}
+/* 000116 */ 			else {
+/* 000116 */ 				throw __except0__;
 /* 000116 */ 			}
 /* 000116 */ 		}
-/* 000116 */ 		else {
-/* 000116 */ 		}
-/* 000118 */ 		(function () {
-/* 000118 */ 			var __accu0__ = __getitem__ (self.maps, 0);
-/* 000118 */ 			return __call__ (__accu0__.py_clear, __accu0__);
-/* 000118 */ 		}) ();
-/* 000118 */ 	});},
-/* 000120 */ 	get __ior__ () {return __get__ (this, function (self, other) {
-/* 000120 */ 		if (arguments.length) {
-/* 000120 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000120 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000120 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000120 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000120 */ 					switch (__attrib0__) {
-/* 000120 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000120 */ 						case 'other': var other = __allkwargs0__ [__attrib0__]; break;
-/* 000120 */ 					}
-/* 000120 */ 				}
-/* 000120 */ 			}
-/* 000120 */ 		}
-/* 000120 */ 		else {
-/* 000120 */ 		}
-/* 000121 */ 		(function () {
-/* 000121 */ 			var __accu0__ = __getitem__ (self.maps, 0);
-/* 000121 */ 			return __call__ (__accu0__.py_update, __accu0__, other);
-/* 000121 */ 		}) ();
-/* 000122 */ 		return self;
-/* 000122 */ 	});},
-/* 000124 */ 	get __or__ () {return __get__ (this, function (self, other) {
-/* 000124 */ 		if (arguments.length) {
-/* 000124 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000124 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000124 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000124 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000124 */ 					switch (__attrib0__) {
-/* 000124 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000124 */ 						case 'other': var other = __allkwargs0__ [__attrib0__]; break;
-/* 000124 */ 					}
-/* 000124 */ 				}
-/* 000124 */ 			}
-/* 000124 */ 		}
-/* 000124 */ 		else {
-/* 000124 */ 		}
-/* 000125 */ 		if (__t__ (!__t__ ((__call__ (isinstance, null, other, _collections_abc.Mapping))))) {
-/* 000126 */ 			return NotImplemented;
+/* 000116 */ 	});},
+/* 000118 */ 	get py_clear () {return __get__ (this, function (self) {
+/* 000118 */ 		if (arguments.length) {
+/* 000118 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000118 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000118 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000118 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000118 */ 					switch (__attrib0__) {
+/* 000118 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000118 */ 					}
+/* 000118 */ 				}
+/* 000118 */ 			}
+/* 000118 */ 		}
+/* 000118 */ 		else {
+/* 000118 */ 		}
+/* 000120 */ 		(function () {
+/* 000120 */ 			var __accu0__ = __getitem__ (self.maps, 0);
+/* 000120 */ 			return __call__ (__accu0__.py_clear, __accu0__);
+/* 000120 */ 		}) ();
+/* 000120 */ 	});},
+/* 000122 */ 	get __ior__ () {return __get__ (this, function (self, other) {
+/* 000122 */ 		if (arguments.length) {
+/* 000122 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000122 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000122 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000122 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000122 */ 					switch (__attrib0__) {
+/* 000122 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000122 */ 						case 'other': var other = __allkwargs0__ [__attrib0__]; break;
+/* 000122 */ 					}
+/* 000122 */ 				}
+/* 000122 */ 			}
+/* 000122 */ 		}
+/* 000122 */ 		else {
+/* 000122 */ 		}
+/* 000123 */ 		(function () {
+/* 000123 */ 			var __accu0__ = __getitem__ (self.maps, 0);
+/* 000123 */ 			return __call__ (__accu0__.py_update, __accu0__, other);
+/* 000123 */ 		}) ();
+/* 000124 */ 		return self;
+/* 000124 */ 	});},
+/* 000126 */ 	get __or__ () {return __get__ (this, function (self, other) {
+/* 000126 */ 		if (arguments.length) {
+/* 000126 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000126 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000126 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000126 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000126 */ 					switch (__attrib0__) {
+/* 000126 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000126 */ 						case 'other': var other = __allkwargs0__ [__attrib0__]; break;
+/* 000126 */ 					}
+/* 000126 */ 				}
+/* 000126 */ 			}
 /* 000126 */ 		}
-/* 000127 */ 		var m = (function () {
-/* 000127 */ 			var __accu0__ = self;
-/* 000127 */ 			return __call__ (__accu0__.copy, __accu0__);
-/* 000127 */ 		}) ();
-/* 000128 */ 		(function () {
-/* 000128 */ 			var __accu0__ = __getitem__ (m.maps, 0);
-/* 000128 */ 			return __call__ (__accu0__.py_update, __accu0__, other);
-/* 000128 */ 		}) ();
-/* 000129 */ 		return m;
-/* 000129 */ 	});},
-/* 000131 */ 	get __ror__ () {return __get__ (this, function (self, other) {
-/* 000131 */ 		if (arguments.length) {
-/* 000131 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000131 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000131 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000131 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000131 */ 					switch (__attrib0__) {
-/* 000131 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000131 */ 						case 'other': var other = __allkwargs0__ [__attrib0__]; break;
-/* 000131 */ 					}
-/* 000131 */ 				}
-/* 000131 */ 			}
-/* 000131 */ 		}
-/* 000131 */ 		else {
-/* 000131 */ 		}
-/* 000132 */ 		if (__t__ (!__t__ ((__call__ (isinstance, null, other, _collections_abc.Mapping))))) {
-/* 000133 */ 			return NotImplemented;
+/* 000126 */ 		else {
+/* 000126 */ 		}
+/* 000127 */ 		if (__t__ (!__t__ ((__call__ (isinstance, null, other, _collections_abc.Mapping))))) {
+/* 000128 */ 			return NotImplemented;
+/* 000128 */ 		}
+/* 000129 */ 		var m = (function () {
+/* 000129 */ 			var __accu0__ = self;
+/* 000129 */ 			return __call__ (__accu0__.copy, __accu0__);
+/* 000129 */ 		}) ();
+/* 000130 */ 		(function () {
+/* 000130 */ 			var __accu0__ = __getitem__ (m.maps, 0);
+/* 000130 */ 			return __call__ (__accu0__.py_update, __accu0__, other);
+/* 000130 */ 		}) ();
+/* 000131 */ 		return m;
+/* 000131 */ 	});},
+/* 000133 */ 	get __ror__ () {return __get__ (this, function (self, other) {
+/* 000133 */ 		if (arguments.length) {
+/* 000133 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000133 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000133 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000133 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000133 */ 					switch (__attrib0__) {
+/* 000133 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000133 */ 						case 'other': var other = __allkwargs0__ [__attrib0__]; break;
+/* 000133 */ 					}
+/* 000133 */ 				}
+/* 000133 */ 			}
 /* 000133 */ 		}
-/* 000134 */ 		var m = __call__ (dict, null, other);
-/* 000135 */ 		var __iterable0__ = __call__ (py_reversed, null, self.maps);
-/* 000135 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000135 */ 			var child = __getitem__ (__iterable0__, __index0__);
-/* 000136 */ 			(function () {
-/* 000136 */ 				var __accu0__ = m;
-/* 000136 */ 				return __call__ (__accu0__.py_update, __accu0__, child);
-/* 000136 */ 			}) ();
-/* 000136 */ 		}
-/* 000137 */ 		return (function () {
-/* 000137 */ 			var __accu0__ = self;
-/* 000137 */ 			return __call__ (__accu0__.__class__, __accu0__, m);
-/* 000137 */ 		}) ();
-/* 000137 */ 	});}
-/* 000137 */ });
-/* 000137 */ Object.defineProperty (ChainMap, 'parents', property.call (ChainMap, ChainMap._get_parents));;
+/* 000133 */ 		else {
+/* 000133 */ 		}
+/* 000134 */ 		if (__t__ (!__t__ ((__call__ (isinstance, null, other, _collections_abc.Mapping))))) {
+/* 000135 */ 			return NotImplemented;
+/* 000135 */ 		}
+/* 000136 */ 		var m = __call__ (dict, null, other);
+/* 000137 */ 		var __iterable0__ = __call__ (py_reversed, null, self.maps);
+/* 000137 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000137 */ 			var child = __getitem__ (__iterable0__, __index0__);
+/* 000138 */ 			(function () {
+/* 000138 */ 				var __accu0__ = m;
+/* 000138 */ 				return __call__ (__accu0__.py_update, __accu0__, child);
+/* 000138 */ 			}) ();
+/* 000138 */ 		}
+/* 000139 */ 		return (function () {
+/* 000139 */ 			var __accu0__ = self;
+/* 000139 */ 			return __call__ (__accu0__.__class__, __accu0__, m);
+/* 000139 */ 		}) ();
+/* 000139 */ 	});}
+/* 000139 */ });
+/* 000139 */ Object.defineProperty (ChainMap, 'parents', property.call (ChainMap, ChainMap._get_parents));;
 /* 000006 */ 
 //# sourceMappingURL=collections.map

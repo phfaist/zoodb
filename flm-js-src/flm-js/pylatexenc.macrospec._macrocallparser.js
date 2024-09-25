@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2024-07-16 00:01:38
+/* 000001 */ // Transcrypt'ed from Python, 2024-09-25 21:08:33
 /* 000036 */ var logging = {};
 /* 000036 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000043 */ import {get_updated_parsing_state_from_delta} from './pylatexenc.latexnodes.js';
@@ -6,7 +6,7 @@
 /* 000040 */ import {LatexEnvironmentNode, LatexMacroNode, LatexSpecialsNode} from './pylatexenc.latexnodes.nodes.js';
 /* 000036 */ import * as __module_logging__ from './logging.js';
 /* 000036 */ __nest__ (logging, '', __module_logging__);
-/* 000036 */ export {LatexMacroNode, LatexParserBase, get_updated_parsing_state_from_delta, LatexEnvironmentNode, LatexSpecialsNode};
+/* 000036 */ export {LatexEnvironmentNode, LatexParserBase, LatexSpecialsNode, LatexMacroNode, get_updated_parsing_state_from_delta};
 /* 000001 */ var __name__ = 'pylatexenc.macrospec._macrocallparser';
 /* 000038 */ export var logger = (function () {
 /* 000038 */ 	var __accu0__ = logging;
@@ -187,7 +187,7 @@
 /* 000154 */ 			if (__t__ (arg_parsing_state_delta !== null)) {
 /* 000155 */ 				(function () {
 /* 000155 */ 					var __accu0__ = logger;
-/* 000155 */ 					return __call__ (__accu0__.warning, __accu0__, 'Parsing carry-over information (%r) ignored after arguments to %s!', arg_parsing_state_delta, self.what);
+/* 000155 */ 					return __call__ (__accu0__.warning, __accu0__, 'Parsing state delta (%r) ignored after arguments to %s!', arg_parsing_state_delta, self.what);
 /* 000155 */ 				}) ();
 /* 000155 */ 			}
 /* 000161 */ 			var body_nodelist = null;
@@ -196,7 +196,7 @@
 /* 000164 */ 		if (__t__ (body_parsing_state_delta !== null)) {
 /* 000165 */ 			(function () {
 /* 000165 */ 				var __accu0__ = logger;
-/* 000165 */ 				return __call__ (__accu0__.warning, __accu0__, 'Parsing carry-over information (%r) ignored after body!', body_parsing_state_delta);
+/* 000165 */ 				return __call__ (__accu0__.warning, __accu0__, 'Parsing state delta (%r) ignored after body!', body_parsing_state_delta);
 /* 000165 */ 			}) ();
 /* 000165 */ 		}
 /* 000171 */ 		var pos_end = (function () {

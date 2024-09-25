@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2024-07-16 00:01:39
+/* 000001 */ // Transcrypt'ed from Python, 2024-09-25 21:08:35
 /* 000006 */ var logging = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000022 */ import {EndnoteCategory} from './flm.feature.endnotes.js';
@@ -13,7 +13,7 @@
 /* 000009 */ import * as latexnodes_nodes from './pylatexenc.latexnodes.nodes.js';
 /* 000006 */ import * as __module_logging__ from './logging.js';
 /* 000006 */ __nest__ (logging, '', __module_logging__);
-/* 000006 */ export {EndnoteCategory, FLMArgumentSpec, ParsedArgumentsInfo, latexnodes_nodes, macrospec, FLMFragment, Feature, FLMMacroSpecBase, latexnodes_parsers, build_counter_formatter};
+/* 000006 */ export {EndnoteCategory, FLMArgumentSpec, FLMFragment, Feature, latexnodes_parsers, macrospec, ParsedArgumentsInfo, latexnodes_nodes, build_counter_formatter, FLMMacroSpecBase};
 /* 000001 */ var __name__ = 'flm.feature.cite';
 /* 000007 */ export var logger = (function () {
 /* 000007 */ 	var __accu0__ = logging;
@@ -644,144 +644,144 @@
 /* 000453 */ 				return __call__ (__accu0__.get_content_nodelist, __accu0__);
 /* 000453 */ 			}) ();
 /* 000453 */ 		}
-/* 000455 */ 		var citekeylist_nodelist = (function () {
-/* 000455 */ 			var __accu0__ = __getitem__ (node_args, 'citekey');
-/* 000455 */ 			return __call__ (__accu0__.get_content_nodelist, __accu0__);
-/* 000455 */ 		}) ();
-/* 000468 */ 		var _get_cite_items_from_key_nodelist = function (citekeylist_nodelist, optional_cite_extra_nodelist) {
-/* 000468 */ 			if (arguments.length) {
-/* 000468 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000468 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000468 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000468 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000468 */ 						switch (__attrib0__) {
-/* 000468 */ 							case 'citekeylist_nodelist': var citekeylist_nodelist = __allkwargs0__ [__attrib0__]; break;
-/* 000468 */ 							case 'optional_cite_extra_nodelist': var optional_cite_extra_nodelist = __allkwargs0__ [__attrib0__]; break;
-/* 000468 */ 						}
-/* 000468 */ 					}
-/* 000468 */ 				}
-/* 000468 */ 			}
-/* 000468 */ 			else {
-/* 000468 */ 			}
-/* 000472 */ 			var cite_items = [];
-/* 000473 */ 			var __iterable0__ = citekeylist_nodelist;
-/* 000473 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000473 */ 				var citekeygroupnode = __getitem__ (__iterable0__, __index0__);
-/* 000475 */ 				if (__t__ (!__t__ ((citekeygroupnode)))) {
-/* 000475 */ 					continue;
-/* 000475 */ 				}
-/* 000478 */ 				var citekey_verbatim = (function () {
-/* 000478 */ 					var __accu0__ = citekeygroupnode;
-/* 000478 */ 					return __call__ (__accu0__.latex_verbatim, __accu0__);
-/* 000478 */ 				}) ();
-/* 000479 */ 				if (__t__ (__getitem__ (citekeygroupnode.delimiters, 0))) {
-/* 000481 */ 					var citekey_verbatim = __getslice__ (citekey_verbatim, __call__ (len, null, __getitem__ (citekeygroupnode.delimiters, 0)), null, 1);
-/* 000481 */ 				}
-/* 000483 */ 				if (__t__ (__getitem__ (citekeygroupnode.delimiters, 1))) {
-/* 000485 */ 					var citekey_verbatim = __getslice__ (citekey_verbatim, 0, __neg__ (__call__ (len, null, __getitem__ (citekeygroupnode.delimiters, 1))), 1);
-/* 000485 */ 				}
-/* 000490 */ 				if (__t__ (__in__ (':', citekey_verbatim))) {
-/* 000491 */ 					var __left0__ = (function () {
-/* 000491 */ 						var __accu0__ = citekey_verbatim;
-/* 000491 */ 						return __call__ (__accu0__.py_split, __accu0__, ':', 1);
+/* 000459 */ 		var citekeylist_nodelist = (function () {
+/* 000459 */ 			var __accu0__ = __getitem__ (node_args, 'citekey');
+/* 000459 */ 			return __call__ (__accu0__.get_content_nodelist, __accu0__, __kwargtrans__ ({unwrap_double_group: false}));
+/* 000459 */ 		}) ();
+/* 000465 */ 		var _get_cite_items_from_key_nodelist = function (citekeylist_nodelist, optional_cite_extra_nodelist) {
+/* 000465 */ 			if (arguments.length) {
+/* 000465 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000465 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000465 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000465 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000465 */ 						switch (__attrib0__) {
+/* 000465 */ 							case 'citekeylist_nodelist': var citekeylist_nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 000465 */ 							case 'optional_cite_extra_nodelist': var optional_cite_extra_nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 000465 */ 						}
+/* 000465 */ 					}
+/* 000465 */ 				}
+/* 000465 */ 			}
+/* 000465 */ 			else {
+/* 000465 */ 			}
+/* 000469 */ 			var cite_items = [];
+/* 000470 */ 			var __iterable0__ = citekeylist_nodelist;
+/* 000470 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000470 */ 				var citekeygroupnode = __getitem__ (__iterable0__, __index0__);
+/* 000472 */ 				if (__t__ (!__t__ ((citekeygroupnode)))) {
+/* 000472 */ 					continue;
+/* 000472 */ 				}
+/* 000475 */ 				var citekey_verbatim = (function () {
+/* 000475 */ 					var __accu0__ = citekeygroupnode;
+/* 000475 */ 					return __call__ (__accu0__.latex_verbatim, __accu0__);
+/* 000475 */ 				}) ();
+/* 000476 */ 				if (__t__ (__getitem__ (citekeygroupnode.delimiters, 0))) {
+/* 000478 */ 					var citekey_verbatim = __getslice__ (citekey_verbatim, __call__ (len, null, __getitem__ (citekeygroupnode.delimiters, 0)), null, 1);
+/* 000478 */ 				}
+/* 000480 */ 				if (__t__ (__getitem__ (citekeygroupnode.delimiters, 1))) {
+/* 000482 */ 					var citekey_verbatim = __getslice__ (citekey_verbatim, 0, __neg__ (__call__ (len, null, __getitem__ (citekeygroupnode.delimiters, 1))), 1);
+/* 000482 */ 				}
+/* 000487 */ 				if (__t__ (__in__ (':', citekey_verbatim))) {
+/* 000488 */ 					var __left0__ = (function () {
+/* 000488 */ 						var __accu0__ = citekey_verbatim;
+/* 000488 */ 						return __call__ (__accu0__.py_split, __accu0__, ':', 1);
+/* 000488 */ 					}) ();
+/* 000488 */ 					var citation_key_prefix = __left0__ [0];
+/* 000488 */ 					var citation_key = __left0__ [1];
+/* 000491 */ 					var citation_key_prefix = (function () {
+/* 000491 */ 						var __accu0__ = (function () {
+/* 000491 */ 							var __accu1__ = citation_key_prefix;
+/* 000491 */ 							return __call__ (__accu1__.strip, __accu1__);
+/* 000491 */ 						}) ();
+/* 000491 */ 						return __call__ (__accu0__.lower, __accu0__);
 /* 000491 */ 					}) ();
-/* 000491 */ 					var citation_key_prefix = __left0__ [0];
-/* 000491 */ 					var citation_key = __left0__ [1];
-/* 000494 */ 					var citation_key_prefix = (function () {
-/* 000494 */ 						var __accu0__ = (function () {
-/* 000494 */ 							var __accu1__ = citation_key_prefix;
-/* 000494 */ 							return __call__ (__accu1__.strip, __accu1__);
-/* 000494 */ 						}) ();
-/* 000494 */ 						return __call__ (__accu0__.lower, __accu0__);
-/* 000494 */ 					}) ();
-/* 000494 */ 				}
-/* 000495 */ 				else {
-/* 000496 */ 					var __left0__ = tuple ([null, citekey_verbatim]);
-/* 000496 */ 					var citation_key_prefix = __left0__ [0];
-/* 000496 */ 					var citation_key = __left0__ [1];
-/* 000496 */ 				}
-/* 000498 */ 				(function () {
-/* 000498 */ 					var __accu0__ = cite_items;
-/* 000498 */ 					return __call__ (__accu0__.append, __accu0__, dict ({'prefix': citation_key_prefix, 'key': citation_key, 'extra': optional_cite_extra_nodelist}));
-/* 000498 */ 				}) ();
-/* 000498 */ 			}
-/* 000507 */ 			if (__t__ (__t__ (optional_cite_extra_nodelist !== null) && __gt__ (__call__ (len, null, cite_items), 1))) {
-/* 000508 */ 				var __except0__ = __call__ (ValueError, null, 'When using the syntax \\cite[extra]{citekey}, you can only specify a single citation key.');
-/* 000508 */ 				__except0__.__cause__ = null;
-/* 000508 */ 				throw __except0__;
-/* 000508 */ 			}
-/* 000513 */ 			return cite_items;
-/* 000513 */ 		};
-/* 000516 */ 		var cite_items = __call__ (_get_cite_items_from_key_nodelist, null, citekeylist_nodelist, optional_cite_extra_nodelist);
-/* 000521 */ 		var cite_more_macros_nodelist = (function () {
-/* 000521 */ 			var __accu0__ = __getitem__ (node_args, 'cite_more');
-/* 000521 */ 			return __call__ (__accu0__.get_content_nodelist, __accu0__);
-/* 000521 */ 		}) ();
-/* 000522 */ 		if (__t__ (cite_more_macros_nodelist !== null)) {
-/* 000523 */ 			var __iterable0__ = cite_more_macros_nodelist;
-/* 000523 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000523 */ 				var gn = __getitem__ (__iterable0__, __index0__);
-/* 000524 */ 				assert ((function () {
-/* 000524 */ 					var __accu0__ = gn;
-/* 000524 */ 					return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexGroupNode);
-/* 000524 */ 				}) ());
-/* 000524 */ 				assert (__eq__ (__getitem__ (gn.delimiters, 0), __add__ ('\\', self.macroname)));
-/* 000526 */ 				var gna = __getitem__ (gn.nodelist, 0);
-/* 000527 */ 				var parsed_args = gna.cite_more_parsed_arguments;
-/* 000527 */ 				assert (parsed_args !== null);
-/* 000530 */ 				var more_node_args = (function () {
-/* 000530 */ 					var __accu0__ = __call__ (ParsedArgumentsInfo, null, __kwargtrans__ ({parsed_arguments: parsed_args}));
-/* 000530 */ 					return __call__ (__accu0__.get_all_arguments_info, __accu0__, tuple (['cite_pre_text', 'citekey']));
-/* 000530 */ 				}) ();
-/* 000533 */ 				var more_extra_nl = null;
-/* 000534 */ 				if (__t__ ((function () {
-/* 000534 */ 					var __accu0__ = __getitem__ (more_node_args, 'cite_pre_text');
-/* 000534 */ 					return __call__ (__accu0__.was_provided, __accu0__);
-/* 000534 */ 				}) ())) {
-/* 000535 */ 					var more_extra_nl = (function () {
-/* 000535 */ 						var __accu0__ = __getitem__ (more_node_args, 'cite_pre_text');
-/* 000535 */ 						return __call__ (__accu0__.get_content_nodelist, __accu0__);
-/* 000535 */ 					}) ();
-/* 000535 */ 				}
-/* 000536 */ 				var more_citekeylist_nl = (function () {
-/* 000536 */ 					var __accu0__ = __getitem__ (more_node_args, 'citekey');
-/* 000536 */ 					return __call__ (__accu0__.get_content_nodelist, __accu0__);
-/* 000536 */ 				}) ();
-/* 000538 */ 				var more_cite_items = __call__ (_get_cite_items_from_key_nodelist, null, more_citekeylist_nl, more_extra_nl);
-/* 000541 */ 				(function () {
-/* 000541 */ 					var __accu0__ = cite_items;
-/* 000541 */ 					return __call__ (__accu0__.extend, __accu0__, more_cite_items);
-/* 000541 */ 				}) ();
-/* 000541 */ 			}
-/* 000541 */ 		}
-/* 000544 */ 		node.flmarg_cite_items = cite_items;
-/* 000546 */ 		return node;
-/* 000546 */ 	});},
-/* 000549 */ 	get render () {return __get__ (this, function (self, node, render_context) {
-/* 000549 */ 		if (arguments.length) {
-/* 000549 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000549 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000549 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000549 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000549 */ 					switch (__attrib0__) {
-/* 000549 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000549 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000549 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000549 */ 					}
-/* 000549 */ 				}
-/* 000549 */ 			}
-/* 000549 */ 		}
-/* 000549 */ 		else {
-/* 000549 */ 		}
-/* 000551 */ 		var cite_mgr = (function () {
-/* 000551 */ 			var __accu0__ = render_context;
-/* 000551 */ 			return __call__ (__accu0__.feature_render_manager, __accu0__, 'citations');
-/* 000551 */ 		}) ();
-/* 000553 */ 		return (function () {
-/* 000553 */ 			var __accu0__ = cite_mgr;
-/* 000553 */ 			return __call__ (__accu0__.render_citation_marks, __accu0__, node.flmarg_cite_items, node);
-/* 000553 */ 		}) ();
-/* 000553 */ 	});}
-/* 000553 */ });
+/* 000491 */ 				}
+/* 000492 */ 				else {
+/* 000493 */ 					var __left0__ = tuple ([null, citekey_verbatim]);
+/* 000493 */ 					var citation_key_prefix = __left0__ [0];
+/* 000493 */ 					var citation_key = __left0__ [1];
+/* 000493 */ 				}
+/* 000495 */ 				(function () {
+/* 000495 */ 					var __accu0__ = cite_items;
+/* 000495 */ 					return __call__ (__accu0__.append, __accu0__, dict ({'prefix': citation_key_prefix, 'key': citation_key, 'extra': optional_cite_extra_nodelist}));
+/* 000495 */ 				}) ();
+/* 000495 */ 			}
+/* 000504 */ 			if (__t__ (__t__ (optional_cite_extra_nodelist !== null) && __gt__ (__call__ (len, null, cite_items), 1))) {
+/* 000505 */ 				var __except0__ = __call__ (ValueError, null, 'When using the syntax \\cite[extra]{citekey}, you can only specify a single citation key.');
+/* 000505 */ 				__except0__.__cause__ = null;
+/* 000505 */ 				throw __except0__;
+/* 000505 */ 			}
+/* 000510 */ 			return cite_items;
+/* 000510 */ 		};
+/* 000513 */ 		var cite_items = __call__ (_get_cite_items_from_key_nodelist, null, citekeylist_nodelist, optional_cite_extra_nodelist);
+/* 000518 */ 		var cite_more_macros_nodelist = (function () {
+/* 000518 */ 			var __accu0__ = __getitem__ (node_args, 'cite_more');
+/* 000518 */ 			return __call__ (__accu0__.get_content_nodelist, __accu0__, __kwargtrans__ ({unwrap_double_group: false}));
+/* 000518 */ 		}) ();
+/* 000521 */ 		if (__t__ (cite_more_macros_nodelist !== null)) {
+/* 000522 */ 			var __iterable0__ = cite_more_macros_nodelist;
+/* 000522 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000522 */ 				var gn = __getitem__ (__iterable0__, __index0__);
+/* 000523 */ 				assert ((function () {
+/* 000523 */ 					var __accu0__ = gn;
+/* 000523 */ 					return __call__ (__accu0__.isNodeType, __accu0__, latexnodes_nodes.LatexGroupNode);
+/* 000523 */ 				}) ());
+/* 000523 */ 				assert (__eq__ (__getitem__ (gn.delimiters, 0), __add__ ('\\', self.macroname)));
+/* 000525 */ 				var gna = __getitem__ (gn.nodelist, 0);
+/* 000526 */ 				var parsed_args = gna.cite_more_parsed_arguments;
+/* 000526 */ 				assert (parsed_args !== null);
+/* 000529 */ 				var more_node_args = (function () {
+/* 000529 */ 					var __accu0__ = __call__ (ParsedArgumentsInfo, null, __kwargtrans__ ({parsed_arguments: parsed_args}));
+/* 000529 */ 					return __call__ (__accu0__.get_all_arguments_info, __accu0__, tuple (['cite_pre_text', 'citekey']));
+/* 000529 */ 				}) ();
+/* 000532 */ 				var more_extra_nl = null;
+/* 000533 */ 				if (__t__ ((function () {
+/* 000533 */ 					var __accu0__ = __getitem__ (more_node_args, 'cite_pre_text');
+/* 000533 */ 					return __call__ (__accu0__.was_provided, __accu0__);
+/* 000533 */ 				}) ())) {
+/* 000534 */ 					var more_extra_nl = (function () {
+/* 000534 */ 						var __accu0__ = __getitem__ (more_node_args, 'cite_pre_text');
+/* 000534 */ 						return __call__ (__accu0__.get_content_nodelist, __accu0__);
+/* 000534 */ 					}) ();
+/* 000534 */ 				}
+/* 000535 */ 				var more_citekeylist_nl = (function () {
+/* 000535 */ 					var __accu0__ = __getitem__ (more_node_args, 'citekey');
+/* 000535 */ 					return __call__ (__accu0__.get_content_nodelist, __accu0__, __kwargtrans__ ({unwrap_double_group: false}));
+/* 000535 */ 				}) ();
+/* 000539 */ 				var more_cite_items = __call__ (_get_cite_items_from_key_nodelist, null, more_citekeylist_nl, more_extra_nl);
+/* 000542 */ 				(function () {
+/* 000542 */ 					var __accu0__ = cite_items;
+/* 000542 */ 					return __call__ (__accu0__.extend, __accu0__, more_cite_items);
+/* 000542 */ 				}) ();
+/* 000542 */ 			}
+/* 000542 */ 		}
+/* 000545 */ 		node.flmarg_cite_items = cite_items;
+/* 000547 */ 		return node;
+/* 000547 */ 	});},
+/* 000550 */ 	get render () {return __get__ (this, function (self, node, render_context) {
+/* 000550 */ 		if (arguments.length) {
+/* 000550 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000550 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000550 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000550 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000550 */ 					switch (__attrib0__) {
+/* 000550 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000550 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000550 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000550 */ 					}
+/* 000550 */ 				}
+/* 000550 */ 			}
+/* 000550 */ 		}
+/* 000550 */ 		else {
+/* 000550 */ 		}
+/* 000552 */ 		var cite_mgr = (function () {
+/* 000552 */ 			var __accu0__ = render_context;
+/* 000552 */ 			return __call__ (__accu0__.feature_render_manager, __accu0__, 'citations');
+/* 000552 */ 		}) ();
+/* 000554 */ 		return (function () {
+/* 000554 */ 			var __accu0__ = cite_mgr;
+/* 000554 */ 			return __call__ (__accu0__.render_citation_marks, __accu0__, node.flmarg_cite_items, node);
+/* 000554 */ 		}) ();
+/* 000554 */ 	});}
+/* 000554 */ });
 /* 000006 */ 
 //# sourceMappingURL=flm.feature.cite.map

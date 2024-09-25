@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2024-07-16 00:01:39
+/* 000001 */ // Transcrypt'ed from Python, 2024-09-25 21:08:34
 /* 000006 */ var logging = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000014 */ import {Feature} from './flm.feature._base.js';
@@ -8,7 +8,7 @@
 /* 000009 */ import {LatexWalkerLocatedError, ParsedArgumentsInfo} from './pylatexenc.latexnodes.js';
 /* 000006 */ import * as __module_logging__ from './logging.js';
 /* 000006 */ __nest__ (logging, '', __module_logging__);
-/* 000006 */ export {FLMArgumentSpec, ParsedArgumentsInfo, Feature, FLMMacroSpecBase, latexnodes_parsers, LatexWalkerLocatedError};
+/* 000006 */ export {FLMArgumentSpec, Feature, latexnodes_parsers, ParsedArgumentsInfo, LatexWalkerLocatedError, FLMMacroSpecBase};
 /* 000001 */ var __name__ = 'flm.feature.graphics';
 /* 000007 */ export var logger = (function () {
 /* 000007 */ 	var __accu0__ = logging;
@@ -188,82 +188,193 @@
 /* 000175 */ 			var __accu0__ = __getitem__ (node_args, 'graphics_path');
 /* 000175 */ 			return __call__ (__accu0__.get_content_as_chars, __accu0__);
 /* 000175 */ 		}) ();
-/* 000177 */ 		node.flm_resources = [dict ({'resource_type': 'graphics_path', 'resource_source_type': 'file', 'resource_source': node.flmarg_graphics_path})];
-/* 000183 */ 		return node;
-/* 000183 */ 	});},
-/* 000185 */ 	get render () {return __get__ (this, function (self, node, render_context) {
-/* 000185 */ 		if (arguments.length) {
-/* 000185 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000185 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000185 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000185 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000185 */ 					switch (__attrib0__) {
-/* 000185 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000185 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000185 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000185 */ 					}
-/* 000185 */ 				}
-/* 000185 */ 			}
-/* 000185 */ 		}
-/* 000185 */ 		else {
-/* 000185 */ 		}
-/* 000187 */ 		var fragment_renderer = render_context.fragment_renderer;
-/* 000189 */ 		var graphics_options_value = node.flmarg_graphics_options_value;
-/* 000190 */ 		var graphics_path = node.flmarg_graphics_path;
-/* 000192 */ 		if (__t__ (graphics_options_value)) {
-/* 000193 */ 			var __except0__ = __call__ (LatexWalkerLocatedError, null, 'Graphics options are not supported here: ‘{}’'.format (graphics_options_value), __kwargtrans__ ({pos: __getitem__ (node_args, 'graphics_options').nodelist.pos}));
-/* 000193 */ 			__except0__.__cause__ = null;
-/* 000193 */ 			throw __except0__;
-/* 000193 */ 		}
-/* 000198 */ 		if (__t__ (!__t__ (((function () {
-/* 000198 */ 			var __accu0__ = render_context;
-/* 000198 */ 			return __call__ (__accu0__.supports_feature, __accu0__, 'graphics_resource_provider');
-/* 000198 */ 		}) ())))) {
-/* 000199 */ 			var __except0__ = __call__ (RuntimeError, null, "FLM's ‘SimpleIncludeGraphicsSpecInfo’ (‘\\includegraphics’) requires a ‘graphics_resource_provider’ feature to be installed in the render context");
-/* 000199 */ 			__except0__.__cause__ = null;
-/* 000199 */ 			throw __except0__;
-/* 000199 */ 		}
-/* 000204 */ 		var resource_info = node.latex_walker.resource_info;
-/* 000207 */ 		var graphics_resource_provider_mgr = (function () {
-/* 000207 */ 			var __accu0__ = render_context;
-/* 000207 */ 			return __call__ (__accu0__.feature_render_manager, __accu0__, 'graphics_resource_provider');
-/* 000207 */ 		}) ();
-/* 000209 */ 		var graphics_resource = (function () {
-/* 000209 */ 			var __accu0__ = graphics_resource_provider_mgr;
-/* 000209 */ 			return __call__ (__accu0__.get_graphics_resource, __accu0__, graphics_path, resource_info);
-/* 000209 */ 		}) ();
-/* 000211 */ 		return (function () {
-/* 000211 */ 			var __accu0__ = fragment_renderer;
-/* 000211 */ 			return __call__ (__accu0__.render_graphics_block, __accu0__, graphics_resource, render_context);
-/* 000211 */ 		}) ();
-/* 000211 */ 	});}
-/* 000211 */ });
-/* 000223 */ export var FeatureSimplePathGraphicsResourceProvider =  __class__ ('FeatureSimplePathGraphicsResourceProvider', [Feature], {
-/* 000223 */ 	__module__: __name__,
-/* 000225 */ 	feature_name: 'graphics_resource_provider',
-/* 000228 */ 	feature_title: 'Include external graphics',
-/* 000228 */ 	RenderManager: __class__ ('RenderManager', [Feature.RenderManager], {
-/* 000228 */ 		__module__: __name__,
-/* 000230 */ 		get get_graphics_resource () {return __get__ (this, function (self, graphics_path, resource_info) {
-/* 000230 */ 			if (arguments.length) {
-/* 000230 */ 				var __ilastarg0__ = arguments.length - 1;
-/* 000230 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000230 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000230 */ 					for (var __attrib0__ in __allkwargs0__) {
-/* 000230 */ 						switch (__attrib0__) {
-/* 000230 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000230 */ 							case 'graphics_path': var graphics_path = __allkwargs0__ [__attrib0__]; break;
-/* 000230 */ 							case 'resource_info': var resource_info = __allkwargs0__ [__attrib0__]; break;
-/* 000230 */ 						}
-/* 000230 */ 					}
-/* 000230 */ 				}
-/* 000230 */ 			}
-/* 000230 */ 			else {
-/* 000230 */ 			}
-/* 000232 */ 			return __call__ (GraphicsResource, null, __kwargtrans__ ({src_url: graphics_path}));
-/* 000232 */ 		});}
-/* 000232 */ 	})
-/* 000232 */ });
-/* 000237 */ export var FeatureClass = FeatureSimplePathGraphicsResourceProvider;
+/* 000177 */ 		if (__t__ (node.flmarg_graphics_options_value)) {
+/* 000178 */ 			var __except0__ = __call__ (LatexWalkerLocatedError, null, __add__ ('Graphics options are not supported for now: '.format (), '‘{}’'.format (node.flmarg_graphics_options_value)), __kwargtrans__ ({pos: __getitem__ (node_args, 'graphics_options').nodelist.pos}));
+/* 000178 */ 			__except0__.__cause__ = null;
+/* 000178 */ 			throw __except0__;
+/* 000178 */ 		}
+/* 000184 */ 		node.flm_resources = [dict ({'resource_type': 'graphics_path', 'resource_source_type': 'file', 'resource_source': node.flmarg_graphics_path})];
+/* 000190 */ 		return node;
+/* 000190 */ 	});},
+/* 000192 */ 	get render () {return __get__ (this, function (self, node, render_context) {
+/* 000192 */ 		if (arguments.length) {
+/* 000192 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000192 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000192 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000192 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000192 */ 					switch (__attrib0__) {
+/* 000192 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000192 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000192 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000192 */ 					}
+/* 000192 */ 				}
+/* 000192 */ 			}
+/* 000192 */ 		}
+/* 000192 */ 		else {
+/* 000192 */ 		}
+/* 000194 */ 		var fragment_renderer = render_context.fragment_renderer;
+/* 000196 */ 		var graphics_options_value = node.flmarg_graphics_options_value;
+/* 000197 */ 		var graphics_path = node.flmarg_graphics_path;
+/* 000199 */ 		if (__t__ (!__t__ (((function () {
+/* 000199 */ 			var __accu0__ = render_context;
+/* 000199 */ 			return __call__ (__accu0__.supports_feature, __accu0__, 'graphics_resource_provider');
+/* 000199 */ 		}) ())))) {
+/* 000200 */ 			var __except0__ = __call__ (RuntimeError, null, "FLM's ‘SimpleIncludeGraphicsSpecInfo’ (‘\\includegraphics’) requires a ‘graphics_resource_provider’ feature to be installed in the render context");
+/* 000200 */ 			__except0__.__cause__ = null;
+/* 000200 */ 			throw __except0__;
+/* 000200 */ 		}
+/* 000205 */ 		var resource_info = node.latex_walker.resource_info;
+/* 000208 */ 		var graphics_resource_provider_mgr = (function () {
+/* 000208 */ 			var __accu0__ = render_context;
+/* 000208 */ 			return __call__ (__accu0__.feature_render_manager, __accu0__, 'graphics_resource_provider');
+/* 000208 */ 		}) ();
+/* 000210 */ 		var graphics_resource = (function () {
+/* 000210 */ 			var __accu0__ = graphics_resource_provider_mgr;
+/* 000210 */ 			return __call__ (__accu0__.get_graphics_resource, __accu0__, graphics_path, resource_info);
+/* 000210 */ 		}) ();
+/* 000212 */ 		return (function () {
+/* 000212 */ 			var __accu0__ = fragment_renderer;
+/* 000212 */ 			return __call__ (__accu0__.render_graphics_block, __accu0__, graphics_resource, render_context);
+/* 000212 */ 		}) ();
+/* 000212 */ 	});},
+/* 000218 */ 	get recompose_pure_latex () {return __get__ (this, function (self, node, recomposer) {
+/* 000218 */ 		var kwargs = dict ();
+/* 000218 */ 		if (arguments.length) {
+/* 000218 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000218 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000218 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000218 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000218 */ 					switch (__attrib0__) {
+/* 000218 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000218 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000218 */ 						case 'recomposer': var recomposer = __allkwargs0__ [__attrib0__]; break;
+/* 000218 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000218 */ 					}
+/* 000218 */ 				}
+/* 000218 */ 				delete kwargs.__kwargtrans__;
+/* 000218 */ 			}
+/* 000218 */ 		}
+/* 000218 */ 		else {
+/* 000218 */ 		}
+/* 000220 */ 		var magnification = null;
+/* 000222 */ 		if (__t__ (recomposer.render_context !== null)) {
+/* 000224 */ 			var graphics_resource_provider_mgr = (function () {
+/* 000224 */ 				var __accu0__ = recomposer.render_context;
+/* 000224 */ 				return __call__ (__accu0__.feature_render_manager, __accu0__, 'graphics_resource_provider');
+/* 000224 */ 			}) ();
+/* 000226 */ 			var graphics_resource = (function () {
+/* 000226 */ 				var __accu0__ = graphics_resource_provider_mgr;
+/* 000226 */ 				return __call__ (__accu0__.get_graphics_resource, __accu0__, node.flmarg_graphics_path, __kwargtrans__ ({resource_info: node.latex_walker.resource_info}));
+/* 000226 */ 			}) ();
+/* 000230 */ 			var fragment_renderer = recomposer.render_context.fragment_renderer;
+/* 000231 */ 			if (__t__ (fragment_renderer !== null)) {
+/* 000233 */ 				if (__t__ (__t__ (__eq__ (graphics_resource.graphics_type, 'raster')) && __call__ (hasattr, null, fragment_renderer, 'graphics_raster_magnification'))) {
+/* 000234 */ 					var magnification = fragment_renderer.graphics_raster_magnification;
+/* 000234 */ 				}
+/* 000235 */ 				else if (__t__ (__call__ (hasattr, null, fragment_renderer, 'graphics_vector_magnification'))) {
+/* 000238 */ 					var magnification = fragment_renderer.graphics_vector_magnification;
+/* 000238 */ 				}
+/* 000238 */ 			}
+/* 000238 */ 		}
+/* 000239 */ 		else {
+/* 000241 */ 			(function () {
+/* 000241 */ 				var __accu0__ = logger;
+/* 000241 */ 				return __call__ (__accu0__.warning, __accu0__, 'Recomposing pure latex: we have no access to a graphics resource provider (need a render_context in the pure latex recomposer for that). Graphics resource information will not be available.'.format ());
+/* 000241 */ 			}) ();
+/* 000246 */ 			var graphics_resource = __call__ (GraphicsResource, null, __kwargtrans__ ({src_url: node.flmarg_graphics_path}));
+/* 000246 */ 		}
+/* 000250 */ 		var recopt_graphics = (function () {
+/* 000250 */ 			var __accu0__ = recomposer;
+/* 000250 */ 			return __call__ (__accu0__.get_options, __accu0__, 'graphics');
+/* 000250 */ 		}) ();
+/* 000251 */ 		// pass;
+/* 000254 */ 		var width_scale = (function () {
+/* 000254 */ 			var __accu0__ = recopt_graphics;
+/* 000254 */ 			return __call__ (__accu0__.py_get, __accu0__, 'width_scale', null);
+/* 000254 */ 		}) ();
+/* 000255 */ 		var set_max_width = (function () {
+/* 000255 */ 			var __accu0__ = recopt_graphics;
+/* 000255 */ 			return __call__ (__accu0__.py_get, __accu0__, 'set_max_width', '\\linewidth');
+/* 000255 */ 		}) ();
+/* 000257 */ 		if (__t__ (__t__ (magnification !== null) && width_scale !== null)) {
+/* 000258 */ 			(function () {
+/* 000258 */ 				var __accu0__ = logger;
+/* 000258 */ 				return __call__ (__accu0__.warning, __accu0__, 'Applying graphics magnification both from magnification=%f from fragment_renderer option as well as from width_scale recomposer option.');
+/* 000258 */ 			}) ();
+/* 000262 */ 			var magification = __mul__ (magnification, width_scale);
+/* 000262 */ 		}
+/* 000263 */ 		else if (__t__ (width_scale !== null)) {
+/* 000265 */ 			var magnification = width_scale;
+/* 000265 */ 		}
+/* 000266 */ 		else if (__t__ (magnification === null)) {
+/* 000268 */ 			var magnification = 1;
+/* 000268 */ 		}
+/* 000272 */ 		var graphics_options_list = [];
+/* 000273 */ 		if (__t__ (graphics_resource.physical_dimensions !== null)) {
+/* 000274 */ 			var __left0__ = graphics_resource.physical_dimensions;
+/* 000274 */ 			var width_pt = __left0__ [0];
+/* 000274 */ 			var _ = __left0__ [1];
+/* 000275 */ 			if (__t__ (width_pt !== null)) {
+/* 000276 */ 				var width_pt = __mul__ (__call__ (float, null, width_pt), magnification);
+/* 000277 */ 				(function () {
+/* 000277 */ 					var __accu0__ = graphics_options_list;
+/* 000277 */ 					return __call__ (__accu0__.append, __accu0__, 'width={}bp'.format (width_pt));
+/* 000277 */ 				}) ();
+/* 000277 */ 			}
+/* 000277 */ 		}
+/* 000278 */ 		if (__t__ (__t__ (set_max_width !== null) && set_max_width !== false)) {
+/* 000279 */ 			(function () {
+/* 000279 */ 				var __accu0__ = recomposer;
+/* 000279 */ 				return __call__ (__accu0__.ensure_latex_package, __accu0__, 'adjustbox', __kwargtrans__ ({options: 'export'}));
+/* 000279 */ 			}) ();
+/* 000280 */ 			(function () {
+/* 000280 */ 				var __accu0__ = graphics_options_list;
+/* 000280 */ 				return __call__ (__accu0__.append, __accu0__, 'max width={}'.format (set_max_width));
+/* 000280 */ 			}) ();
+/* 000280 */ 		}
+/* 000284 */ 		return __add__ (__add__ (__add__ (__add__ ('\\includegraphics', (__t__ (graphics_options_list) ? __add__ (__add__ ('[', (function () {
+/* 000284 */ 			var __accu0__ = ',';
+/* 000284 */ 			return __call__ (__accu0__.join, __accu0__, (function () {
+/* 000284 */ 				var __accu1__ = [];
+/* 000284 */ 				var __iterable0__ = graphics_options_list;
+/* 000284 */ 				for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000284 */ 					var opt = __getitem__ (__iterable0__, __index0__);
+/* 000284 */ 					(function () {
+/* 000284 */ 						var __accu2__ = __accu1__;
+/* 000284 */ 						return __call__ (__accu2__.append, __accu2__, opt);
+/* 000284 */ 					}) ();
+/* 000284 */ 				}
+/* 000284 */ 				return __accu1__;
+/* 000284 */ 			}) ());
+/* 000286 */ 		}) ()), ']') : '')), '{'), __call__ (str, null, graphics_resource.src_url)), '}');
+/* 000286 */ 	});}
+/* 000286 */ });
+/* 000292 */ export var FeatureSimplePathGraphicsResourceProvider =  __class__ ('FeatureSimplePathGraphicsResourceProvider', [Feature], {
+/* 000292 */ 	__module__: __name__,
+/* 000294 */ 	feature_name: 'graphics_resource_provider',
+/* 000297 */ 	feature_title: 'Include external graphics',
+/* 000297 */ 	RenderManager: __class__ ('RenderManager', [Feature.RenderManager], {
+/* 000297 */ 		__module__: __name__,
+/* 000299 */ 		get get_graphics_resource () {return __get__ (this, function (self, graphics_path, resource_info) {
+/* 000299 */ 			if (arguments.length) {
+/* 000299 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000299 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000299 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000299 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000299 */ 						switch (__attrib0__) {
+/* 000299 */ 							case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000299 */ 							case 'graphics_path': var graphics_path = __allkwargs0__ [__attrib0__]; break;
+/* 000299 */ 							case 'resource_info': var resource_info = __allkwargs0__ [__attrib0__]; break;
+/* 000299 */ 						}
+/* 000299 */ 					}
+/* 000299 */ 				}
+/* 000299 */ 			}
+/* 000299 */ 			else {
+/* 000299 */ 			}
+/* 000301 */ 			return __call__ (GraphicsResource, null, __kwargtrans__ ({src_url: graphics_path}));
+/* 000301 */ 		});}
+/* 000301 */ 	})
+/* 000301 */ });
+/* 000306 */ export var FeatureClass = FeatureSimplePathGraphicsResourceProvider;
 /* 000006 */ 
 //# sourceMappingURL=flm.feature.graphics.map

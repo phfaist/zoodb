@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2024-07-16 00:01:38
+/* 000001 */ // Transcrypt'ed from Python, 2024-09-25 21:08:34
 /* 000037 */ var logging = {};
 /* 000037 */ var unique_object_id = {};
 /* 000037 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
@@ -8,7 +8,7 @@
 /* 000043 */ __nest__ (logging, '', __module_logging__);
 /* 000040 */ import {ParsingStateDelta} from './pylatexenc.latexnodes.js';
 /* 000037 */ import * as _util from './pylatexenc._util.js';
-/* 000037 */ export {ParsingStateDelta, _util};
+/* 000037 */ export {_util, ParsingStateDelta};
 /* 000001 */ var __name__ = 'pylatexenc.macrospec._latexcontextdb';
 /* 000044 */ export var logger = (function () {
 /* 000044 */ 	var __accu0__ = logging;
@@ -948,67 +948,67 @@
 /* 000693 */ });
 /* 000699 */ export var ParsingStateDeltaExtendLatexContextDb =  __class__ ('ParsingStateDeltaExtendLatexContextDb', [ParsingStateDelta], {
 /* 000699 */ 	__module__: __name__,
-/* 000712 */ 	get __init__ () {return __get__ (this, function (self, extend_latex_context) {
-/* 000712 */ 		var kwargs = dict ();
-/* 000712 */ 		if (arguments.length) {
-/* 000712 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000712 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000712 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000712 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000712 */ 					switch (__attrib0__) {
-/* 000712 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000712 */ 						case 'extend_latex_context': var extend_latex_context = __allkwargs0__ [__attrib0__]; break;
-/* 000712 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000712 */ 					}
-/* 000712 */ 				}
-/* 000712 */ 				delete kwargs.__kwargtrans__;
-/* 000712 */ 			}
-/* 000712 */ 		}
-/* 000712 */ 		else {
-/* 000712 */ 		}
-/* 000713 */ 		__call__ (__call__ (__super__, null, ParsingStateDeltaExtendLatexContextDb, '__init__'), null, self, __kwargtrans__ (__mergekwargtrans__ ({_fields: tuple (['extend_latex_context', 'set_attributes'])}, kwargs)));
-/* 000717 */ 		self.extend_latex_context = extend_latex_context;
-/* 000717 */ 	});},
-/* 000719 */ 	get get_updated_parsing_state () {return __get__ (this, function (self, parsing_state, latex_walker) {
-/* 000719 */ 		if (arguments.length) {
-/* 000719 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000719 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000719 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000719 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000719 */ 					switch (__attrib0__) {
-/* 000719 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000719 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
-/* 000719 */ 						case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
-/* 000719 */ 					}
-/* 000719 */ 				}
-/* 000719 */ 			}
-/* 000719 */ 		}
-/* 000719 */ 		else {
-/* 000719 */ 		}
-/* 000721 */ 		if (__t__ (self.extend_latex_context)) {
-/* 000723 */ 			if (__t__ (self.set_attributes)) {
-/* 000724 */ 				var set_attributes = self.set_attributes;
-/* 000724 */ 			}
-/* 000725 */ 			else {
-/* 000726 */ 				var set_attributes = dict ({});
-/* 000726 */ 			}
-/* 000728 */ 			var latex_context = (function () {
-/* 000728 */ 				var __accu0__ = parsing_state.latex_context;
-/* 000728 */ 				return __call__ (__accu0__.extended_with, __accu0__, __kwargtrans__ (__mergekwargtrans__ ({category: null}, self.extend_latex_context)));
-/* 000728 */ 			}) ();
-/* 000733 */ 			return (function () {
-/* 000733 */ 				var __accu0__ = parsing_state;
-/* 000733 */ 				return __call__ (__accu0__.sub_context, __accu0__, __kwargtrans__ (__mergekwargtrans__ ({latex_context: latex_context}, set_attributes)));
-/* 000733 */ 			}) ();
-/* 000733 */ 		}
-/* 000737 */ 		else if (__t__ (self.set_attributes)) {
-/* 000738 */ 			return (function () {
-/* 000738 */ 				var __accu0__ = parsing_state;
-/* 000738 */ 				return __call__ (__accu0__.sub_context, __accu0__, __kwargtrans__ (self.set_attributes));
-/* 000738 */ 			}) ();
-/* 000738 */ 		}
-/* 000742 */ 		return parsing_state;
-/* 000742 */ 	});}
-/* 000742 */ });
+/* 000713 */ 	get __init__ () {return __get__ (this, function (self, extend_latex_context) {
+/* 000713 */ 		var kwargs = dict ();
+/* 000713 */ 		if (arguments.length) {
+/* 000713 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000713 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000713 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000713 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000713 */ 					switch (__attrib0__) {
+/* 000713 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000713 */ 						case 'extend_latex_context': var extend_latex_context = __allkwargs0__ [__attrib0__]; break;
+/* 000713 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000713 */ 					}
+/* 000713 */ 				}
+/* 000713 */ 				delete kwargs.__kwargtrans__;
+/* 000713 */ 			}
+/* 000713 */ 		}
+/* 000713 */ 		else {
+/* 000713 */ 		}
+/* 000714 */ 		__call__ (__call__ (__super__, null, ParsingStateDeltaExtendLatexContextDb, '__init__'), null, self, __kwargtrans__ (__mergekwargtrans__ ({_fields: tuple (['extend_latex_context', 'set_attributes'])}, kwargs)));
+/* 000718 */ 		self.extend_latex_context = extend_latex_context;
+/* 000718 */ 	});},
+/* 000720 */ 	get get_updated_parsing_state () {return __get__ (this, function (self, parsing_state, latex_walker) {
+/* 000720 */ 		if (arguments.length) {
+/* 000720 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000720 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000720 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000720 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000720 */ 					switch (__attrib0__) {
+/* 000720 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000720 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 000720 */ 						case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
+/* 000720 */ 					}
+/* 000720 */ 				}
+/* 000720 */ 			}
+/* 000720 */ 		}
+/* 000720 */ 		else {
+/* 000720 */ 		}
+/* 000722 */ 		if (__t__ (self.extend_latex_context)) {
+/* 000724 */ 			if (__t__ (self.set_attributes)) {
+/* 000725 */ 				var set_attributes = self.set_attributes;
+/* 000725 */ 			}
+/* 000726 */ 			else {
+/* 000727 */ 				var set_attributes = dict ({});
+/* 000727 */ 			}
+/* 000729 */ 			var latex_context = (function () {
+/* 000729 */ 				var __accu0__ = parsing_state.latex_context;
+/* 000729 */ 				return __call__ (__accu0__.extended_with, __accu0__, __kwargtrans__ (__mergekwargtrans__ ({category: null}, self.extend_latex_context)));
+/* 000729 */ 			}) ();
+/* 000734 */ 			return (function () {
+/* 000734 */ 				var __accu0__ = parsing_state;
+/* 000734 */ 				return __call__ (__accu0__.sub_context, __accu0__, __kwargtrans__ (__mergekwargtrans__ ({latex_context: latex_context}, set_attributes)));
+/* 000734 */ 			}) ();
+/* 000734 */ 		}
+/* 000738 */ 		else if (__t__ (self.set_attributes)) {
+/* 000739 */ 			return (function () {
+/* 000739 */ 				var __accu0__ = parsing_state;
+/* 000739 */ 				return __call__ (__accu0__.sub_context, __accu0__, __kwargtrans__ (self.set_attributes));
+/* 000739 */ 			}) ();
+/* 000739 */ 		}
+/* 000743 */ 		return parsing_state;
+/* 000743 */ 	});}
+/* 000743 */ });
 /* 000037 */ 
 //# sourceMappingURL=pylatexenc.macrospec._latexcontextdb.map
