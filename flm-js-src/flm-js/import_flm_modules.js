@@ -1,13 +1,17 @@
-/* 000001 */ // Transcrypt'ed from Python, 2024-09-25 21:08:32
+/* 000001 */ // Transcrypt'ed from Python, 2024-09-26 17:30:21
 /* 000005 */ var collections = {};
 /* 000005 */ var flm = {};
 /* 000005 */ var logging = {};
 /* 000005 */ var pylatexenc = {};
 /* 000005 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
-/* 000031 */ import * as __module_collections__ from './collections.js';
-/* 000031 */ __nest__ (collections, '', __module_collections__);
-/* 000030 */ import * as __module_logging__ from './logging.js';
-/* 000030 */ __nest__ (logging, '', __module_logging__);
+/* 000033 */ import * as __module_collections__ from './collections.js';
+/* 000033 */ __nest__ (collections, '', __module_collections__);
+/* 000032 */ import * as __module_logging__ from './logging.js';
+/* 000032 */ __nest__ (logging, '', __module_logging__);
+/* 000027 */ import * as __module_flm_flmrecomposer_purelatex__ from './flm.flmrecomposer.purelatex.js';
+/* 000027 */ __nest__ (flm, 'flmrecomposer.purelatex', __module_flm_flmrecomposer_purelatex__);
+/* 000026 */ import * as __module_flm_flmrecomposer__ from './flm.flmrecomposer.js';
+/* 000026 */ __nest__ (flm, 'flmrecomposer', __module_flm_flmrecomposer__);
 /* 000025 */ import * as __module_flm_flmdump__ from './flm.flmdump.js';
 /* 000025 */ __nest__ (flm, 'flmdump', __module_flm_flmdump__);
 /* 000024 */ import * as __module_flm_fragmentrenderer_markdown__ from './flm.fragmentrenderer.markdown.js';
