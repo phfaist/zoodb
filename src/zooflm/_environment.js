@@ -473,7 +473,10 @@ export const FeatureZooGraphicsCollection = __class__(
                 });},
                     
                 get get_graphics_resource () {return __get__(this, function
-                (self, graphics_path, resource_info) {
+                (self, ...args) {
+                    const [graphics_path, resource_info] = decode_kwargs(
+                        args, ['graphics_path', 'resource_info']
+                    );
                     
                     const feature = self.feature;
 
@@ -518,7 +521,10 @@ export const FeatureZooGraphicsCollection = __class__(
         // methods
 
         get add_graphics () {return __get__(this, function
-        (self, source_path, graphics_resource) {
+        (self, ...args) {
+            const [source_path, graphics_resource] = decode_kwargs(
+                args, ['source_path', 'graphics_resource']
+            );
             if (Object.hasOwn(self.graphics_collection, source_path)) {
                 throw new Error(
                     `Graphics collection already has a graphics resource registered `
@@ -532,7 +538,10 @@ export const FeatureZooGraphicsCollection = __class__(
         });},
 
         get set_collection () {return __get__(this, function
-        (self, collection) {
+        (self, ...args) {
+            const [collection] = decode_kwargs(
+                args, ['collection']
+            );
 
             Object.entries(collection).forEach( (grobjpair) => {
                 const [source_path, graphics_resource] = grobjpair;
@@ -541,12 +550,24 @@ export const FeatureZooGraphicsCollection = __class__(
         }); },
 
         get has_graphics_for () {return __get__(this, function
-        (self, source_path) {
+        (self, ...args) {
+            const [source_path] = decode_kwargs(
+                args, ['source_path']
+            );
             return Object.hasOwn(self.graphics_collection, source_path);
         }); },
 
         get get_graphics_resource_base () {return __get__(this, function
-        (self, graphics_path, resource_info, render_context, override_get_graphics_resource) {
+        (self, ...args) {
+            const [
+                graphics_path, resource_info,
+                render_context, override_get_graphics_resource
+            ] = decode_kwargs(
+                args,
+                [ 'graphics_path', 'resource_info',
+                  'render_context', 'override_get_graphics_resource' ]
+            );
+
             // note, render_context is only required to provide as parameter to the
             // custom callback "src_url_resolver_fn"
 
@@ -623,8 +644,9 @@ export const FeatureZooGraphicsCollection = __class__(
         }); },
 
         get load_database() {return __get__(this, function
-        (self, data)
+        (self, ...args)
         {
+            const [ data ] = decode_kwargs(args, ['data']);
             for (const [source_path, graphics_resource_data] of
                  Object.entries(data.graphics_collection)) {
                 self.add_graphics(source_path,

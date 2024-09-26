@@ -18,6 +18,11 @@ export function decode_kwargs(args, argnames)
     let iLast = args.findLastIndex( (item) => (item !== undefined) );
 
     if (iLast === -1) {
+        if (args.length != argnames.length) {
+            throw new Error(`Error in function call: ${args.length} arguments provided, `
+                + `expected ${argnames.length} `
+                + `(${argnames.map((n) => "‘"+n+"’").join(", ")})`);
+        }
         return args; // no non-undefined arguments -- in particular, no kwargs
     }
 
@@ -28,7 +33,7 @@ export function decode_kwargs(args, argnames)
         return args;
     }
 
-    // these are kwargs, set arguments!
+    // these are kwargs; set arguments!
     let kwargs = Object.assign({}, argLast); // make copy so we can remove elements
     args[iLast] = undefined;
 
@@ -51,9 +56,10 @@ export function decode_kwargs(args, argnames)
     delete kwargs["constructor"]; // why does Transcrypt set this ???
     // delete it only now, in case we actually had a kwarg named 'constructor'
 
-    if (Object.keys(kwargs).length) {
+    const remainingKeys = Object.keys(kwargs);
+    if (remainingKeys.length) {
         throw new Error(
-            `Invalid keyword argument(s): ${Object.keys(kwargs).join(', ')}`
+            `Invalid keyword argument(s): ${remainingKeys.map((n) => "‘"+n+"’").join(', ')}`
         );
     }
 

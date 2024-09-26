@@ -2,6 +2,8 @@
 // ZooDB/ZooFLM code base
 //
 
+
+// in particular, decode_kwargs(...) and get_zooflm_error_string(err)
 export * from './_flmutils.js';
 
 // provide $$kw({...}) and repr() to importers
