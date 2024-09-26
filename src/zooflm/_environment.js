@@ -6,6 +6,8 @@ import path from 'path';
 import {$$kw, /*repr*/} from './_flm-js/py.js';
 import {__class__, __super__, __get__, isinstance} from './_flm-js/org.transcrypt.__runtime__.js';
 
+import { decode_kwargs } from './_flmutils.js';
+
 import {
     ParsingStateDelta,
     LatexWalkerLocatedError, LatexWalkerLocatedErrorFormatter

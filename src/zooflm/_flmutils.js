@@ -1,6 +1,5 @@
 
 import { repr } from './_flm-js/py.js';
-import { decode_kwargs } from './_flmutils.js';
 
 //
 // Use e.g. as:
