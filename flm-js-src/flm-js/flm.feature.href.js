@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2024-09-26 21:06:58
+/* 000001 */ // Transcrypt'ed from Python, 2024-09-26 22:59:52
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
@@ -12,7 +12,7 @@
 /* 000007 */ __nest__ (logging, '', __module_logging__);
 /* 000006 */ import * as __module_re__ from './re.js';
 /* 000006 */ __nest__ (re, '', __module_re__);
-/* 000006 */ export {ParsedArgumentsInfo, SimpleLatexDefinitionsFeature, latexnodes_nodes, FLMArgumentSpec, latexnodes_parsers, FLMMacroSpecBase};
+/* 000006 */ export {FLMArgumentSpec, FLMMacroSpecBase, latexnodes_nodes, latexnodes_parsers, ParsedArgumentsInfo, SimpleLatexDefinitionsFeature};
 /* 000001 */ var __name__ = 'flm.feature.href';
 /* 000008 */ export var logger = (function () {
 /* 000008 */ 	var __accu0__ = logging;
@@ -241,7 +241,7 @@
 /* 000158 */ 		var s_macro_args = [];
 /* 000160 */ 		var rx = (function () {
 /* 000160 */ 			var __accu0__ = re;
-/* 000160 */ 			return __call__ (__accu0__.compile, __accu0__, '([\\\\#%{}])');
+/* 000160 */ 			return __call__ (__accu0__.compile, __accu0__, '[\\\\#%{}]');
 /* 000160 */ 		}) ();
 /* 000163 */ 		var __iterable0__ = __call__ (zip, null, self.command_argnames, visited_results_arguments);
 /* 000163 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
@@ -254,7 +254,25 @@
 /* 000167 */ 					var __accu0__ = s_macro_args;
 /* 000169 */ 					return __call__ (__accu0__.append, __accu0__, __add__ (__add__ (__getitem__ (recomposed_arg_value, 0), (function () {
 /* 000169 */ 						var __accu1__ = rx;
-/* 000169 */ 						return __call__ (__accu1__.sub, __accu1__, '\\\\\\1', __getslice__ (recomposed_arg_value, 1, slenm1, 1));
+/* 000169 */ 						return __call__ (__accu1__.sub, __accu1__, (function __lambda__ (m) {
+/* 000169 */ 							if (arguments.length) {
+/* 000169 */ 								var __ilastarg0__ = arguments.length - 1;
+/* 000169 */ 								if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000169 */ 									var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000169 */ 									for (var __attrib0__ in __allkwargs0__) {
+/* 000169 */ 										switch (__attrib0__) {
+/* 000169 */ 											case 'm': var m = __allkwargs0__ [__attrib0__]; break;
+/* 000169 */ 										}
+/* 000169 */ 									}
+/* 000169 */ 								}
+/* 000169 */ 							}
+/* 000169 */ 							else {
+/* 000169 */ 							}
+/* 000169 */ 							return __add__ ('\\', (function () {
+/* 000169 */ 								var __accu2__ = m;
+/* 000169 */ 								return __call__ (__accu2__.group, __accu2__, 0);
+/* 000169 */ 							}) ());
+/* 000169 */ 						}), __getslice__ (recomposed_arg_value, 1, slenm1, 1));
 /* 000169 */ 					}) ()), __getitem__ (recomposed_arg_value, slenm1)));
 /* 000169 */ 				}) ();
 /* 000169 */ 			}
