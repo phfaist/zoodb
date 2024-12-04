@@ -59,6 +59,7 @@ class LatexNodesVisitorJS
 
 }
 
+
 const make_scanned_types_empty = () => ({
     // citation prefixes & keys for which we'll probably have to fetch
     // info & format full citations
@@ -70,6 +71,9 @@ const make_scanned_types_empty = () => ({
     
     // items that can be referenced from elsewhere in the zoo
     'referenceables': [],
+
+    // references to something that is elsewhere else in the zoo
+    'references': [],
 });
 
 
@@ -84,7 +88,7 @@ const make_scanned_types_empty = () => ({
  */
 export class ZooFLMScanner extends LatexNodesVisitorJS
 {
-    constructor(/*options*/)
+    constructor(options)
     {
         super();
 
@@ -94,10 +98,25 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
         // resource_info), so that we can easily see what items are defined in a
         // specific object
         this.encountered_by_object = {};
+
+        this.options = options ?? {};
+
+        this._enable_by_type = Object.fromEntries(
+            Object.keys(this.encountered).map( (scanned_type) => {
+                const enabled = this.options.enable?.[scanned_type] ?? true;
+                return [ scanned_type, enabled ];
+            })
+        );
     }
 
     get_encountered(scanned_type, {object_type, object_id} = {})
     {
+        if (!this._enable_by_type[scanned_type]) {
+            throw new Error(
+                `get_encountered(): Scanning disabled for scanned_type ‘${scanned_type}’`
+            );
+        }
+
         let encountered;
         if (object_type != null) { // not null or undefined
             encountered = ( this.encountered_by_object[object_type]
@@ -116,31 +135,32 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
         return encountered[scanned_type];
     }
 
-    get_encountered_referenceables_by_reftype(ref_type, {object_type, object_id} = {})
+    get_encountered_referenceables({kind, object_type, object_id} = {})
     {
         const encountered_referenceables =
-              this.get_encountered('referenceables', {object_type, object_id});
+            this.get_encountered('referenceables', {object_type, object_id});
+        let referenceables_by_kind = [];
+        for (const encountered_referenceable of encountered_referenceables) {
+            if (!kind || kind === encountered_referenceable.kind) {
+                referenceables_by_kind.push(encountered_referenceable);
+            }
+        }
+        return referenceables_by_kind;
+    }
 
-        return encountered_referenceables.reduce(
-            (referenceables_by_reftype, encountered_referenceable) => {
-                encountered_referenceable.referenceable_info.labels.forEach( 
-                    (lblpair) => {
-                        const [l_ref_type, l_ref_label] = lblpair;
-                        if (l_ref_type == ref_type) {
-                            referenceables_by_reftype.push(
-                                {
-                                    ref_type: l_ref_type,
-                                    ref_label: l_ref_label,
-                                    ...encountered_referenceable
-                                }
-                            );
-                        }
-                    }
-                );
-                return referenceables_by_reftype;
-            },
-            [] // referenceables_by_reftype initial value for reduce()
-        );
+    get_encountered_references_to_labels(ref_type_list)
+    {
+        const encountered_references = this.get_encountered('references');
+        let filtered_references = [];
+        for (const encountered_reference of encountered_references) {
+            for (const [ref_type, ref_label] of ref_type_list) {
+                if (encountered_reference.ref_type === ref_type
+                    && encountered_reference.ref_label === ref_label) {
+                    filtered_references.push(encountered_reference);
+                }
+            }
+        }
+        return filtered_references;
     }
 
     // ---
@@ -206,7 +226,7 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
     _visit_callable(node)
     {
         //debug(`Visiting callable node ${repr(node)}`);
-        if (Object.hasOwn(node, 'flmarg_cite_items'))
+        if (Object.hasOwn(node, 'flmarg_cite_items') && this._enable_by_type.citations)
         {
             // it's a citation node with citations to track
             node.flmarg_cite_items.forEach( (cite_item) => {
@@ -223,7 +243,7 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
             } );
         }
 
-        if (Object.hasOwn(node, 'flm_resources'))
+        if (Object.hasOwn(node, 'flm_resources') && this._enable_by_type.resources)
         {
             // this node depends on external resources that might need to be
             // collected and packaged along with the output
@@ -239,7 +259,8 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
             }
         }
 
-        if (Object.hasOwn(node, 'flm_referenceable_infos'))
+        if (Object.hasOwn(node, 'flm_referenceable_infos')
+            && this._enable_by_type.referenceables)
         {
             let extra_attributes = {};
             // special treatment for some nodes, to add additional information
@@ -272,6 +293,24 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
                     ... extra_attributes,
                 } );
 
+            }
+        }
+
+        if (Object.hasOwn(node, 'flm_ref_info') && this._enable_by_type.references)
+        {
+            const ref_list = node.flm_ref_info;
+            for (const [ref_type, ref_label] of ref_list) {
+                const resource_info = node.latex_walker.resource_info;
+                this._register_encountered('references', {
+                    resource_info,
+                    ref_type,
+                    ref_label,
+                    encountered_in: {
+                        resource_info,
+                        what: node.latex_walker.what,
+                    },
+                    ... extra_attributes,
+                } );
             }
         }
     }
@@ -351,7 +390,6 @@ export function visitor_scan_zoo(visitor, zoodbdata, options)
     options = options || {};
 
     const object_types = options.object_types || Object.keys(zoodbdata.objects);
-    
 
     for (const object_type of object_types) {
         const schema = zoodbdata.schemas[object_type];
