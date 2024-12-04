@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2024-09-26 23:29:36
+/* 000001 */ // Transcrypt'ed from Python, 2024-12-04 22:08:15
 /* 000007 */ var logging = {};
 /* 000007 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000028 */ import {Counter, build_counter_formatter} from './flm.counter.js';
@@ -11,7 +11,7 @@
 /* 000010 */ import {LatexWalkerLocatedError, ParsedArgumentsInfo, ParsingStateDeltaEnterMathMode} from './pylatexenc.latexnodes.js';
 /* 000007 */ import * as __module_logging__ from './logging.js';
 /* 000007 */ __nest__ (logging, '', __module_logging__);
-/* 000007 */ export {build_counter_formatter, FLMMacroSpecBase, Counter, MacroSpec, ParsingStateDeltaExtendLatexContextDb, ParsedArgumentsInfo, ParsingStateDeltaEnterMathMode, latexnodes_nodes, FLMEnvironmentSpecBase, Feature, LatexEnvironmentBodyContentsParser, LatexWalkerLocatedError, latexnodes_parsers, FLMArgumentSpec};
+/* 000007 */ export {LatexWalkerLocatedError, MacroSpec, build_counter_formatter, ParsingStateDeltaExtendLatexContextDb, Feature, Counter, FLMEnvironmentSpecBase, FLMArgumentSpec, FLMMacroSpecBase, ParsedArgumentsInfo, ParsingStateDeltaEnterMathMode, latexnodes_parsers, LatexEnvironmentBodyContentsParser, latexnodes_nodes};
 /* 000001 */ var __name__ = 'flm.feature.math';
 /* 000008 */ export var logger = (function () {
 /* 000008 */ 	var __accu0__ = logging;
@@ -914,104 +914,105 @@
 /* 000540 */ 			throw __except0__;
 /* 000540 */ 		}
 /* 000546 */ 		node.flmarg_ref = tuple ([ref_type, ref_label]);
-/* 000546 */ 	});},
-/* 000549 */ 	get prepare_delayed_render () {return __get__ (this, function (self, node, render_context) {
-/* 000549 */ 		if (arguments.length) {
-/* 000549 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000549 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000549 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000549 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000549 */ 					switch (__attrib0__) {
-/* 000549 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000549 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000549 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000549 */ 					}
-/* 000549 */ 				}
-/* 000549 */ 			}
-/* 000549 */ 		}
-/* 000549 */ 		else {
-/* 000549 */ 		}
-/* 000550 */ 		// pass;
-/* 000550 */ 	});},
-/* 000552 */ 	get render () {return __get__ (this, function (self, node, render_context) {
-/* 000552 */ 		if (arguments.length) {
-/* 000552 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000552 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000552 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000552 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000552 */ 					switch (__attrib0__) {
-/* 000552 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000552 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000552 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000552 */ 					}
-/* 000552 */ 				}
-/* 000552 */ 			}
-/* 000552 */ 		}
-/* 000552 */ 		else {
-/* 000552 */ 		}
-/* 000554 */ 		var __left0__ = node.flmarg_ref;
-/* 000554 */ 		var ref_type = __left0__ [0];
-/* 000554 */ 		var ref_label = __left0__ [1];
-/* 000556 */ 		var refs_mgr = (function () {
-/* 000556 */ 			var __accu0__ = render_context;
-/* 000556 */ 			return __call__ (__accu0__.feature_render_manager, __accu0__, 'refs');
-/* 000556 */ 		}) ();
-/* 000558 */ 		var resource_info = node.latex_walker.resource_info;
-/* 000560 */ 		try {
-/* 000561 */ 			return (function () {
-/* 000561 */ 				var __accu0__ = refs_mgr;
-/* 000561 */ 				return __call__ (__accu0__.render_ref, __accu0__, ref_type, ref_label, null, resource_info, __kwargtrans__ ({counter_with_prefix: false}));
-/* 000561 */ 			}) ();
-/* 000561 */ 		}
-/* 000561 */ 		catch (__except0__) {
-/* 000561 */ 			if (isinstance (__except0__, Exception)) {
-/* 000561 */ 				var e = __except0__;
-/* 000568 */ 				(function () {
-/* 000568 */ 					var __accu0__ = logger;
-/* 000569 */ 					return __call__ (__accu0__.error, __accu0__, 'Failed to resolve reference to ‘{}:{}’: {} in ‘{}’ @ {}'.format (ref_type, ref_label, e, (function () {
-/* 000569 */ 						var __accu1__ = node;
-/* 000569 */ 						return __call__ (__accu1__.latex_verbatim, __accu1__);
-/* 000569 */ 					}) (), (function () {
-/* 000569 */ 						var __accu1__ = node;
-/* 000569 */ 						return __call__ (__accu1__.format_pos, __accu1__);
-/* 000569 */ 					}) ()));
-/* 000569 */ 				}) ();
-/* 000570 */ 				var __except1__ = __call__ (LatexWalkerLocatedError, null, 'Unable to resolve reference to ‘{}:{}’. {}'.format (ref_type, ref_label, e), __kwargtrans__ ({pos: node.pos}));
-/* 000570 */ 				__except1__.__cause__ = null;
-/* 000570 */ 				throw __except1__;
-/* 000570 */ 			}
-/* 000570 */ 			else {
-/* 000570 */ 				throw __except0__;
-/* 000570 */ 			}
-/* 000570 */ 		}
-/* 000570 */ 	});},
-/* 000575 */ 	get recompose_pure_latex () {return __get__ (this, function (self, node, recomposer, visited_results_arguments) {
-/* 000575 */ 		var kwargs = dict ();
-/* 000575 */ 		if (arguments.length) {
-/* 000575 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000575 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000575 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000575 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000575 */ 					switch (__attrib0__) {
-/* 000575 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000575 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000575 */ 						case 'recomposer': var recomposer = __allkwargs0__ [__attrib0__]; break;
-/* 000575 */ 						case 'visited_results_arguments': var visited_results_arguments = __allkwargs0__ [__attrib0__]; break;
-/* 000575 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000575 */ 					}
-/* 000575 */ 				}
-/* 000575 */ 				delete kwargs.__kwargtrans__;
-/* 000575 */ 			}
-/* 000575 */ 		}
-/* 000575 */ 		else {
-/* 000575 */ 		}
-/* 000579 */ 		var safe_label_info = (function () {
-/* 000579 */ 			var __accu0__ = recomposer;
-/* 000579 */ 			return __call__ (__accu0__.make_safe_label, __accu0__, 'ref', __getitem__ (node.flmarg_ref, 0), __getitem__ (node.flmarg_ref, 1));
-/* 000579 */ 		}) ();
-/* 000583 */ 		return __add__ (__add__ ('\\eqref{', __getitem__ (safe_label_info, 'safe_label')), '}');
-/* 000583 */ 	});}
-/* 000583 */ });
-/* 000588 */ export var FeatureClass = FeatureMath;
+/* 000547 */ 		node.flm_ref_info = dict ({'ref_list': [node.flmarg_ref], 'display_content_nodelist': null});
+/* 000547 */ 	});},
+/* 000553 */ 	get prepare_delayed_render () {return __get__ (this, function (self, node, render_context) {
+/* 000553 */ 		if (arguments.length) {
+/* 000553 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000553 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000553 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000553 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000553 */ 					switch (__attrib0__) {
+/* 000553 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000553 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000553 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000553 */ 					}
+/* 000553 */ 				}
+/* 000553 */ 			}
+/* 000553 */ 		}
+/* 000553 */ 		else {
+/* 000553 */ 		}
+/* 000554 */ 		// pass;
+/* 000554 */ 	});},
+/* 000556 */ 	get render () {return __get__ (this, function (self, node, render_context) {
+/* 000556 */ 		if (arguments.length) {
+/* 000556 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000556 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000556 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000556 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000556 */ 					switch (__attrib0__) {
+/* 000556 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000556 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000556 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000556 */ 					}
+/* 000556 */ 				}
+/* 000556 */ 			}
+/* 000556 */ 		}
+/* 000556 */ 		else {
+/* 000556 */ 		}
+/* 000558 */ 		var __left0__ = node.flmarg_ref;
+/* 000558 */ 		var ref_type = __left0__ [0];
+/* 000558 */ 		var ref_label = __left0__ [1];
+/* 000560 */ 		var refs_mgr = (function () {
+/* 000560 */ 			var __accu0__ = render_context;
+/* 000560 */ 			return __call__ (__accu0__.feature_render_manager, __accu0__, 'refs');
+/* 000560 */ 		}) ();
+/* 000562 */ 		var resource_info = node.latex_walker.resource_info;
+/* 000564 */ 		try {
+/* 000565 */ 			return (function () {
+/* 000565 */ 				var __accu0__ = refs_mgr;
+/* 000565 */ 				return __call__ (__accu0__.render_ref, __accu0__, ref_type, ref_label, null, resource_info, __kwargtrans__ ({counter_with_prefix: false}));
+/* 000565 */ 			}) ();
+/* 000565 */ 		}
+/* 000565 */ 		catch (__except0__) {
+/* 000565 */ 			if (isinstance (__except0__, Exception)) {
+/* 000565 */ 				var e = __except0__;
+/* 000572 */ 				(function () {
+/* 000572 */ 					var __accu0__ = logger;
+/* 000573 */ 					return __call__ (__accu0__.error, __accu0__, 'Failed to resolve reference to ‘{}:{}’: {} in ‘{}’ @ {}'.format (ref_type, ref_label, e, (function () {
+/* 000573 */ 						var __accu1__ = node;
+/* 000573 */ 						return __call__ (__accu1__.latex_verbatim, __accu1__);
+/* 000573 */ 					}) (), (function () {
+/* 000573 */ 						var __accu1__ = node;
+/* 000573 */ 						return __call__ (__accu1__.format_pos, __accu1__);
+/* 000573 */ 					}) ()));
+/* 000573 */ 				}) ();
+/* 000574 */ 				var __except1__ = __call__ (LatexWalkerLocatedError, null, 'Unable to resolve reference to ‘{}:{}’. {}'.format (ref_type, ref_label, e), __kwargtrans__ ({pos: node.pos}));
+/* 000574 */ 				__except1__.__cause__ = null;
+/* 000574 */ 				throw __except1__;
+/* 000574 */ 			}
+/* 000574 */ 			else {
+/* 000574 */ 				throw __except0__;
+/* 000574 */ 			}
+/* 000574 */ 		}
+/* 000574 */ 	});},
+/* 000579 */ 	get recompose_pure_latex () {return __get__ (this, function (self, node, recomposer, visited_results_arguments) {
+/* 000579 */ 		var kwargs = dict ();
+/* 000579 */ 		if (arguments.length) {
+/* 000579 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000579 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000579 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000579 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000579 */ 					switch (__attrib0__) {
+/* 000579 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000579 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000579 */ 						case 'recomposer': var recomposer = __allkwargs0__ [__attrib0__]; break;
+/* 000579 */ 						case 'visited_results_arguments': var visited_results_arguments = __allkwargs0__ [__attrib0__]; break;
+/* 000579 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000579 */ 					}
+/* 000579 */ 				}
+/* 000579 */ 				delete kwargs.__kwargtrans__;
+/* 000579 */ 			}
+/* 000579 */ 		}
+/* 000579 */ 		else {
+/* 000579 */ 		}
+/* 000583 */ 		var safe_label_info = (function () {
+/* 000583 */ 			var __accu0__ = recomposer;
+/* 000583 */ 			return __call__ (__accu0__.make_safe_label, __accu0__, 'ref', __getitem__ (node.flmarg_ref, 0), __getitem__ (node.flmarg_ref, 1));
+/* 000583 */ 		}) ();
+/* 000587 */ 		return __add__ (__add__ ('\\eqref{', __getitem__ (safe_label_info, 'safe_label')), '}');
+/* 000587 */ 	});}
+/* 000587 */ });
+/* 000592 */ export var FeatureClass = FeatureMath;
 /* 000007 */ 
 //# sourceMappingURL=flm.feature.math.map
