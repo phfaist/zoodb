@@ -298,7 +298,7 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
 
         if (Object.hasOwn(node, 'flm_ref_info') && this._enable_by_type.references)
         {
-            const ref_list = node.flm_ref_info;
+            const ref_list = node.flm_ref_info.ref_list;
             for (const [ref_type, ref_label] of ref_list) {
                 const resource_info = node.latex_walker.resource_info;
                 this._register_encountered('references', {
