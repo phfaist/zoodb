@@ -41,6 +41,14 @@ export class ZooFLMResourceInfo
     {
         return `[${this.object_type} ‘${this.object_id}’ in ‘${this.source_path}’]`;
     }
+    toJSON()
+    {
+        return {
+            object_type: this.object_type,
+            object_id: this.object_id,
+            source_path: this.source_path,
+        };
+    }
 }
 
 
