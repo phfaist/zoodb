@@ -309,7 +309,6 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
                         resource_info,
                         what: node.latex_walker.what,
                     },
-                    ... extra_attributes,
                 } );
             }
         }
