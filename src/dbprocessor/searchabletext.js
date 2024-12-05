@@ -281,7 +281,7 @@ export class SearchableTextProcessor extends ZooDbProcessorBase
                 }
                 for (let [/*obj_id*/, obj] of Object.entries(objects)) {
                     let zoodbinfo = obj._zoodb;
-                    delete zoodbinfo.searchable_text_doc;
+                    delete zoodbinfo[this.searchable_text_fieldset_name];
                 }
             }
         }
