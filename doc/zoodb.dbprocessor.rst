@@ -10,6 +10,7 @@ Database processors
 
    zoodb.dbprocessor-relations
    zoodb.dbprocessor-flm
+   zoodb.dbprocessor-computeddata
    zoodb.dbprocessor-gitlastmodified
    zoodb.dbprocessor-searchable
 
