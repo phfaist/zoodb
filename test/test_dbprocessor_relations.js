@@ -46,10 +46,10 @@ describe('zoodb.dbprocessor.relations', function () {
 
             await zoodb.load_data(get_simple_test_data());
 
-            assert.strictEqual(zoodb.objects.dish.pasta.relations.eaten_with[0].ustensil,
-                               zoodb.objects.ustensil.fork);
-            assert.strictEqual(zoodb.objects.dish.soup.relations.eaten_with[0].ustensil,
-                               zoodb.objects.ustensil.spoon);
+            assert.strictEqual(zoodb.objects.dish.pasta.relations.eaten_with[0].utensil,
+                               zoodb.objects.utensil.fork);
+            assert.strictEqual(zoodb.objects.dish.soup.relations.eaten_with[0].utensil,
+                               zoodb.objects.utensil.spoon);
 
         });
 

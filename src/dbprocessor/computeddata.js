@@ -122,11 +122,17 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
     {
         super();
         this.config = Object.assign({
+
             lazy: false, // Note: only non-bulk properties can be computed lazily.
+
             create_zoo_methods: true,
+
             object_types: null,
+
             keep_computed_data_in_data_dumps: false,
+
             computed_data_fieldset_name: 'computed_data',
+
             create_zoodb_special_method:
                 ({zoodb, object_type, computed_property_name, accessor_function}) => {
                 // create method named <object_type>_<property_name> on zoodb ->
@@ -137,10 +143,10 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
         this.computed_data_spec = this.config.computed_data;
 
         if (this.computed_data_spec == null) {
-            debug('Warning: No computed_data set. This DB processor will do nothing.');
+            console.warn('Warning: No computed_data set. This DB processor will do nothing.');
         }
         if (this.config.lazy && !this.config.create_zoo_methods) {
-            debug(`WARNING: ComputedDataProcessor: config.lazy is set to true but `
+            console.warn(`WARNING: ComputedDataProcessor: config.lazy is set to true but `
                 + `create_zoo_methods is set to false.  You'll need to compute the lazy `
                 + `computed properties' values yourself as you won't be able to trigger `
                 + `automatic computation by accessing them through the zoodb special `
@@ -151,6 +157,8 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
     async initialize_zoo()
     {
         this.config.object_types ??= this.zoodb.object_types;
+
+        const { computed_data_fieldset_name } = this.config;
 
         // add accessor methods on the zoodb object for the computed data,
         // e.g. add a zoodb method `user_short_name(user_object)` if objects
@@ -192,7 +200,7 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
             if (obj_db == null) {
                 continue;
             }
-            const computed_object_spec = this.config.computed_data_spec[object_type];
+            const computed_object_spec = this.computed_data_spec[object_type];
             if (computed_object_spec == null) {
                 // no computed data for this object type.
                 continue;
@@ -215,7 +223,7 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
             if (obj_db == null) {
                 continue;
             }
-            const computed_object_spec = this.config.computed_data_spec[object_type];
+            const computed_object_spec = this.computed_data_spec[object_type];
             if (computed_object_spec == null) {
                 // no computed data for this object type.
                 continue;
@@ -270,8 +278,8 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
         }
         // We need to compute the lazy property now.
         const computed_property_spec =
-            this.config.computed_data[object_type][computed_property_name];
-        const value = computed_property_spec.fn.call(zoodb, obj);
+            this.computed_data_spec[object_type][computed_property_name];
+        const value = computed_property_spec.fn.call(this.zoodb, obj);
         obj_computed_data[computed_property_name] = value;
         return value;
     }
@@ -280,15 +288,19 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
         object_type, obj_db, computed_property_name, computed_property_spec
     )
     {
+        debug(`Processing computed property ${object_type}.${computed_property_name}`);
+
         const { computed_data_fieldset_name } = this.config;
         // maybe we can bulk compute all object values? -- use this if the
         // computed data needs to run in an async/await method.
         if (computed_property_spec.fn_bulk != null) {
+            debug(`Processing computed property ... is bulk!`);
             const value_db = await computed_property_spec.fn_bulk.call(this.zoodb, obj_db);
-            for (const [obj_id, obj] of obj_db) {
+            for (const [obj_id, obj] of Object.entries(obj_db)) {
                 const value = value_db[obj_id];
                 obj._zoodb[computed_data_fieldset_name][computed_property_name] = value;
             }
+            return;
         }
 
         if (this.config.lazy) {
@@ -296,7 +308,7 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
             return;
         }
 
-        for (const [obj_id, obj] of obj_db) {
+        for (const [obj_id, obj] of Object.entries(obj_db)) {
             // call the property computer, providing the zoodb as "this"
             const value = computed_property_spec.fn.call(this.zoodb, obj);
             obj._zoodb[computed_data_fieldset_name][computed_property_name] = value;

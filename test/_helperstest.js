@@ -4,12 +4,12 @@ export const schema_validator = new jsonschema.Validator();
 
 export const get_simple_test_data = () => ({
     "schemas": {
-        "ustensil": {
-            "_zoo_primarykey": "ust_id",
+        "utensil": {
+            "_zoo_primarykey": "utl_id",
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "ust_id": {
+                "utl_id": {
                     "type": "string",
                 },
                 "name": {
@@ -31,9 +31,9 @@ export const get_simple_test_data = () => ({
             "_zoo_relations": [
                 {
                     "object_field": "relations.eaten_with",
-                    "to_object_type": "ustensil",
-                    "relation_primary_key_field": "ust_id",
-                    "relation_add_object_field": "ustensil",
+                    "to_object_type": "utensil",
+                    "relation_primary_key_field": "utl_id",
+                    "relation_add_object_field": "utensil",
                     "backreference": {
                         "field": "can_eat_dishes",
                     },
@@ -64,7 +64,7 @@ export const get_simple_test_data = () => ({
                                 "type": "object",
                                 "additionalProperties": false,
                                 "properties": {
-                                    "ust_id": {
+                                    "utl_id": {
                                         "type": "string"
                                     },
                                     "how": {
@@ -80,19 +80,19 @@ export const get_simple_test_data = () => ({
         },
     },
     "objects": {
-        "ustensil": {
+        "utensil": {
             "fork": {
-                "ust_id": "fork",
+                "utl_id": "fork",
                 "name": "Fork",
                 "description": "Has \\emph{pointy} spikes to get food to eat",
             },
             "knife": {
-                "ust_id": "knife",
+                "utl_id": "knife",
                 "name": "Knife",
                 "description": "Enables you to cut your food in small pieces before eating it",
             },
             "spoon": {
-                "ust_id": "spoon",
+                "utl_id": "spoon",
                 "name": "Spoon",
                 "description": "Can be used to eat some good \\href{https://en.wikipedia.org/wiki/Soup}{soup}."
             },
@@ -105,11 +105,11 @@ export const get_simple_test_data = () => ({
                 "relations": {
                     "eaten_with": [
                         {
-                            "ust_id": "fork",
+                            "utl_id": "fork",
                             "how": "Roll spaghetti around the fork by turning the fork on its axis."
                         },
                         {
-                            "ust_id": "knife",
+                            "utl_id": "knife",
                             "how": "To help guide the pasta around the fork.  Not to cut the pasta!"
                         },
                     ],
@@ -122,7 +122,7 @@ export const get_simple_test_data = () => ({
                 "relations": {
                     "eaten_with": [
                         {
-                            "ust_id": "spoon"
+                            "utl_id": "spoon"
                         },
                     ],
                 },

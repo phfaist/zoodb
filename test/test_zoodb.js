@@ -14,7 +14,7 @@ describe('zoodb._zoodb', function () {
             let zoodb = new ZooDb({ schema_validator });
             await zoodb.load_data(get_simple_test_data());
 
-            assert.strictEqual(zoodb.schemas.ustensil._zoo_primarykey, 'ust_id');
+            assert.strictEqual(zoodb.schemas.utensil._zoo_primarykey, 'utl_id');
             assert.strictEqual(zoodb.objects.dish.pasta.name, 'Pasta');
         });
 
@@ -25,7 +25,7 @@ describe('zoodb._zoodb', function () {
             await zoodb.load_data({ schemas: data.schemas });
             await zoodb.load_data({ objects: data.objects });
 
-            assert.strictEqual(zoodb.schemas.ustensil._zoo_primarykey, 'ust_id');
+            assert.strictEqual(zoodb.schemas.utensil._zoo_primarykey, 'utl_id');
             assert.strictEqual(zoodb.objects.dish.pasta.name, 'Pasta');
         });
 
@@ -36,7 +36,7 @@ describe('zoodb._zoodb', function () {
             await zoodb.load_schemas({ schemas: data.schemas });
             await zoodb.load_data({ objects: data.objects });
 
-            assert.strictEqual(zoodb.schemas.ustensil._zoo_primarykey, 'ust_id');
+            assert.strictEqual(zoodb.schemas.utensil._zoo_primarykey, 'utl_id');
             assert.strictEqual(zoodb.objects.dish.pasta.name, 'Pasta');
         });
 
@@ -75,7 +75,7 @@ describe('zoodb._zoodb', function () {
         it('raises schema validation errors', async function () {
 
             let simple_test_data_error = get_simple_test_data();
-            simple_test_data_error.schemas.ustensil.properties.name.type = 'array';
+            simple_test_data_error.schemas.utensil.properties.name.type = 'array';
 
             let zoodb = new ZooDb({ schema_validator, silent: true });
 

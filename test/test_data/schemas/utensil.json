@@ -1,9 +1,9 @@
 {
-    "_zoo_primarykey": "ust_id",
+    "_zoo_primarykey": "utl_id",
     "type": "object",
     "additionalProperties": false,
     "properties": {
-        "ust_id": {
+        "utl_id": {
             "type": "string"
         },
         "name": {

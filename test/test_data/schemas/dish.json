@@ -3,9 +3,9 @@
     "_zoo_relations": [
         {
             "object_field": "relations.eaten_with",
-            "to_object_type": "ustensil",
+            "to_object_type": "utensil",
             "relation_primary_key_field": "ust_id",
-            "relation_add_object_field": "ustensil",
+            "relation_add_object_field": "utensil",
             "backreference": {
                 "field": "can_eat_dishes"
             },

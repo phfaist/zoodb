@@ -106,9 +106,9 @@ async function createMyYamlDbDataLoader(zoodb)
         // specify objects & where to find them
         //
         objects: {
-            ustensil: {
-                schema_name: 'ustensil',
-                data_src_path: 'ustensils.json',
+            utensil: {
+                schema_name: 'utensil',
+                data_src_path: 'utensils.json',
                 load_objects: (d) => d, // file contents is already a list of objects
             },
             dish: {
