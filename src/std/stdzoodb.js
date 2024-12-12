@@ -204,7 +204,7 @@ export async function makeStandardZooDb(config)
                 continue;
             }
             _this.zoodb_named_processors[db_processor_key] = db_processor_instance;
-            _this.zoodb_processors.push( ... db_processor_instance );
+            _this.zoodb_processors.push( db_processor_instance );
         }
     }
 
