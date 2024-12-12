@@ -76,7 +76,21 @@ export async function makeStandardZooDb(config)
 
             use_searchable_text_processor: null,
 
-            extra_db_processors: [],
+            // processor instance infos with custom keys, rather than an array of processors
+            // -- facilitates merge of config with loMerge(), avoids merging arrays (which
+            // can yield unexpected results) -- also sets a corresponding property on
+            // the zoodb instance's 'zoodb_named_processors' property.
+            //
+            // Syntax: extra_db_processors: {
+            //    myproc1: { priority: 30, instance: myDbProcessor },
+            //    ...
+            // }
+            //
+            // A lower 'priority' makes the processor go first in the zoodb's processors list.
+            //
+            extra_db_processors: {},
+
+            // named properties
             custom_zoodb_properties: {},
 
             searchable_text_options: {
@@ -124,10 +138,12 @@ export async function makeStandardZooDb(config)
     }
 
     _this.zoodb_processors = [];
+    _this.zoodb_named_processors = {};
 
 
     if (_this.config.use_relations_populator) {
         _this.zoo_relations_populator = await _this.config.use_relations_populator(_this);
+        _this.zoodb_named_processors.zoo_relations_populator = _this.zoo_relations_populator;
         _this.zoodb_processors.push(_this.zoo_relations_populator);
     } else {
         _this.zoo_relations_populator = null;
@@ -136,6 +152,8 @@ export async function makeStandardZooDb(config)
     if (_this.config.use_gitlastmodified_processor) {
         _this.zoo_gitlastmodified_processor =
             await _this.config.use_gitlastmodified_processor(_this);
+        _this.zoodb_named_processors.zoo_gitlastmodified_processor =
+            _this.zoo_gitlastmodified_processor;
         _this.zoodb_processors.push( _this.zoo_gitlastmodified_processor );
     } else {
         _this.zoo_gitlastmodified_processor = null;
@@ -150,6 +168,7 @@ export async function makeStandardZooDb(config)
     _this.zoo_flm_processor = null;
     if (_this.config.use_flm_processor) {
         _this.zoo_flm_processor = await _this.config.use_flm_processor(_this);
+        _this.zoodb_named_processors.zoo_flm_processor = _this.zoo_flm_processor;
         _this.zoodb_processors.push(_this.zoo_flm_processor);
     }
 
@@ -160,6 +179,8 @@ export async function makeStandardZooDb(config)
     if (_this.config.use_searchable_text_processor) {
         _this.searchable_text_processor =
             await _this.config.use_searchable_text_processor(_this);
+        _this.zoodb_named_processors.searchable_text_processor =
+            _this.searchable_text_processor;
         _this.zoodb_processors.push(_this.searchable_text_processor);
     }
 
@@ -167,8 +188,24 @@ export async function makeStandardZooDb(config)
     // Any user-defined DB processors to include
     //
     if (_this.config.extra_db_processors
-        && _this.config.extra_db_processors.length > 0) {
-        _this.zoodb_processors.push( ... _this.config.extra_db_processors );
+        && Object.keys(_this.config.extra_db_processors).length > 0) {
+        let extra_db_processors_entries =
+            Object.entries(_this.config.extra_db_processors)
+            .filter( ([k,v]) => (v != null) ) ;
+        extra_db_processors_entries.sort(
+            ([ak,av],[bk,bv]) => (av?.priority ?? 50) - (bv?.priority ?? 50)
+        );
+        for (const [db_processor_key, db_processor_spec] of extra_db_processors_entries) {
+            const db_processor_instance = db_processor_spec.instance;
+            if (db_processor_instance == null) {
+                // Skip this entry.  An entry with a null processor is allowed here
+                // so that we can easily remove db processors in a config-merge-chain
+                // by setting { myprocessor: null } or { myprocessor: { instance: null } }
+                continue;
+            }
+            _this.zoodb_named_processors[db_processor_key] = db_processor_instance;
+            _this.zoodb_processors.push( ... db_processor_instance );
+        }
     }
 
     //
