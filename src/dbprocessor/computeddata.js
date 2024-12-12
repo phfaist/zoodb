@@ -241,24 +241,20 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
         keep_computed_data ??= this.config.keep_computed_data_in_data_dumps;
 
         const { computed_data_fieldset_name } = this.config;
-
-        // remove obj._zoodb.searchable_text_doc which takes up too much content
-        // volume
-        if (searchabletext_remove_doc_info) {
-            for (const object_type of this.searchable_text_fieldset.object_types) {
-                const objects = data.db.objects[object_type];
-                if (!objects || Object.keys(objects).length == 0) {
-                    continue;
-                }
-                for (let [/*obj_id*/, obj] of Object.entries(objects)) {
-                    let zoodbinfo = obj._zoodb;
-                    let computed_data = zoodbinfo[computed_data_fieldset_name];
-                    delete zoodbinfo.computed_data;
-                    // if we want to keep the computed data, set the computed fields
-                    // as proper field in the data dump.
-                    if (keep_computed_data) {
-                        Object.assign(obj, computed_data);
-                    }
+        
+        for (const object_type of this.config.object_types) {
+            const objects = data.db.objects[object_type];
+            if (!objects || Object.keys(objects).length == 0) {
+                continue;
+            }
+            for (let [/*obj_id*/, obj] of Object.entries(objects)) {
+                let zoodbinfo = obj._zoodb;
+                let computed_data = zoodbinfo[computed_data_fieldset_name];
+                delete zoodbinfo.computed_data;
+                // if we want to keep the computed data, set the computed fields
+                // as proper field in the data dump.
+                if (keep_computed_data) {
+                    Object.assign(obj, computed_data);
                 }
             }
         }
