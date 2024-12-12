@@ -217,6 +217,9 @@ export async function makeStandardZooDb(config)
 
     let schema_validator = new jsonschema.Validator();
 
+    debug(`Instantiating ZooDb instance object.`,
+          { ZooDbClass, db_processors: _this.zoodb_processors });
+
     //
     // Set up the ZooDb object
     //
