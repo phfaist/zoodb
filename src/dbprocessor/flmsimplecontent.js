@@ -42,6 +42,13 @@ export function parse_schema_flm_options(schema)
         return { enabled: true, standalone: false, is_block_level: true };
     }
 
+    if (typeof schema_flm === 'string') {
+        throw new Error(
+            `Invalid value for FLM field schema specification: ‘${schema_flm}’. `
+            + `Expected 'full', 'standalone', 'block_level', or a dictionary.`
+        );
+    }
+
     // get values from flm schema field
 
     const {enabled, standalone, is_block_level} = schema_flm;
