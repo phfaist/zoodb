@@ -52,7 +52,7 @@ export const get_simple_test_data = () => ({
                 },
                 "description": {
                     "type": "string",
-                    "_flm": "full",
+                    "_flm": "block_level",
                 },
                 "relations": {
                     "type": "object",

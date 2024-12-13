@@ -24,7 +24,7 @@
         },
         "description": {
             "type": "string",
-            "_flm": "full"
+            "_flm": "block_level"
         },
         "relations": {
             "type": "object",

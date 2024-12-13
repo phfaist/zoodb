@@ -32,6 +32,26 @@ describe('zoodb.dbprocessor.flmsimplecontent', function () {
 
             assert.strictEqual(zoodb.objects.dish.pasta.description.flm_text,
                                get_simple_test_data().objects.dish.pasta.description);
+            assert.strictEqual(zoodb.objects.utensil.fork.description.flm_text,
+                               get_simple_test_data().objects.utensil.fork.description);
+
+        });
+
+        it('compiles fragment objects in block level mode as per schema', async function () {
+
+            let zoodb = new ZooDb({
+                processors: [
+                    new FLMSimpleContentCompiler({ flm_environment, }),
+                ],
+                schema_validator,
+            });
+
+            await zoodb.load_data(get_simple_test_data());
+
+            assert.strictEqual(
+                zoodb.objects.dish.pasta.description.nodes.parsing_state.is_block_level,
+                true
+            );
 
         });
 

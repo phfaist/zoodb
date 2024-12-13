@@ -16,9 +16,9 @@ import {
 
 /**
  * Utility to normalize the value of the `_flm:` field in a schema.  Returns an
- * object with the structure ``{ enabled: true|false, standalone: true|false
- * }``.  The `schema` argument is the schema object for this field, which is
- * meant to include the property `_flm`.
+ * object with the structure ``{ enabled: true|false, standalone: true|false,
+ * is_block_level: true|false|null }``.  The `schema` argument is the schema
+ * object for this field, which is meant to include the property `_flm`.
  */
 export function parse_schema_flm_options(schema)
 {
@@ -38,12 +38,19 @@ export function parse_schema_flm_options(schema)
         return { enabled: true, standalone: true };
     }
 
+    if (schema_flm === 'block_level') {
+        return { enabled: true, standalone: false, is_block_level: true };
+    }
+
     // get values from flm schema field
 
-    const {enabled, standalone} = schema_flm;
+    const {enabled, standalone, is_block_level} = schema_flm;
 
-    return { enabled: enabled ?? false,
-             standalone: standalone ?? false };
+    return {
+        enabled: enabled ?? false,
+        standalone: standalone ?? false,
+        is_block_level: is_block_level ?? null,
+    };
 }
 
 
@@ -213,6 +220,7 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
                     standalone_mode: flm_options.standalone ?? false,
                     resource_info: resource_info,
                     what: what,
+                    is_block_level: flm_options.is_block_level ?? null,
                 })
             );
         } catch (err) {
