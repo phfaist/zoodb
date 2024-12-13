@@ -86,7 +86,7 @@ describe('zoodb.dbprocessor.computeddata', function () {
 
         });
 
-        it('uses a custom _zoodb property name', async function () {
+        it('uses a custom zoodb.scratch property name', async function () {
 
             let zoodb = new ZooDb({
                 processors: [
@@ -104,7 +104,7 @@ describe('zoodb.dbprocessor.computeddata', function () {
                 .map( (x) => x.utl_id).join("+");
 
             assert.strictEqual(
-                zoodb.objects.dish.pasta._zoodb.fdsjafhoaidsnjk.utensils_summary,
+                zoodb.scratch.fdsjafhoaidsnjk.dish.pasta.utensils_summary,
                 testValue
             );
 
@@ -130,7 +130,7 @@ describe('zoodb.dbprocessor.computeddata', function () {
             await zoodb.load_data(get_simple_test_data());
 
             assert.strictEqual(
-                zoodb.objects.dish.pasta._zoodb.computed_data.utensils_summary,
+                zoodb.scratch.computed_data_values.dish.pasta.utensils_summary,
                 undefined
             );
 
@@ -144,7 +144,7 @@ describe('zoodb.dbprocessor.computeddata', function () {
 
             // make sure that the value is actually stored in the _zoodb field
             assert.strictEqual(
-                zoodb.objects.dish.pasta._zoodb.computed_data.utensils_summary,
+                zoodb.scratch.computed_data_values.dish.pasta.utensils_summary,
                 testValue
             );
 
@@ -168,7 +168,7 @@ describe('zoodb.dbprocessor.computeddata', function () {
                 .map( (x) => x.utl_id).join("+") ;
 
             assert.strictEqual(
-                zoodb.objects.dish.pasta._zoodb.computed_data.utensils_summary,
+                zoodb.scratch.computed_data_values.dish.pasta.utensils_summary,
                 testValue
             );
 

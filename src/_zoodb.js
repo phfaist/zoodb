@@ -94,6 +94,10 @@ export class ZooDb
         this.zoo_loader_handler = null;
 
         this.db = {};
+
+        // Place to store runtime, non-persistent data.  E.g. computed property
+        // values.
+        this.scratch = {};
     }
 
     /**
@@ -504,6 +508,8 @@ export class ZooDb
                 // ensure that all declared fields, even recursively, are copied
                 // (at least shallowly)
                 let new_object = copy_object_structure(object, schema);
+                // Let's deep clone to make sure we avoid issues with db processor
+                // information being messed up
                 new_object._zoodb = loCloneDeep(object._zoodb);
                 data.db.objects[object_type][object_id] = new_object;
             }

@@ -140,6 +140,9 @@ describe('zoodb.test_std', function() {
     
         await zoodb.load();
 
+        const dataExport = await zoodb.data_dump();
+
         debug(`ZooDb mini test zoo loaded!`);
     });
+
 });

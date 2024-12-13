@@ -21,10 +21,10 @@ import { ZooDbProcessorBase } from './base.js';
  * value.  This special method accesses a cached value, making it efficient to be
  * called repeatedly.
  * 
- * After it is computed, the value of a computed property is stored on an internal
- * property within the object's `_zoodb` special property.  (Try accessing
- * `obj._zoodb.computed_data`, and see the `computed_data_fieldset_name` config
- * option below.)
+ * After it is computed, the value of a computed property is stored within the
+ * `zoodb.scratch` of the zoodb.  (Try accessing
+ * `zoodb.scratch.computed_data_values`, and see the `computed_data_fieldset_name`
+ * config option below to use a scratch property name other than `computed_data_values`.)
  * If the `lazy` config option is set to false, then all computed property values
  * are computed when loading or reloading the zoo.  If the `lazy` option is set to
  * true, then any property that we can compute on-the-fly is only computed at the
@@ -88,17 +88,17 @@ import { ZooDbProcessorBase } from './base.js';
  *    special method on the zoodb object.
  * 
  *    WARNING: If `create_zoo_methods` is set to false, the only way to access the
- *    computed properties' values is through the `_zoodb.computed_data` special object
- *    property (or whatever `computed_data_fieldset_name` config option is set to).
+ *    computed properties' values is by accessing `zoodb.scratch.computed_data_values`
+ *    directly (or whatever `computed_data_fieldset_name` config option is set to)!
  * 
  *    WARNING: If `create_zoo_methods` is set to false, the automatic computation of
  *    lazy properties will never automatically be triggered, and they might never be
  *    computed!
  * 
- *  - `computed_data_fieldset_name`: The name of the property to set on the objects'
- *    internal `_zoodb` property to store the computed data values.  By default, this
- *    is `computed_data`.  You should only change this if you have a good reason to,
- *    e.g., if it is essential to have multiple instances of `ComputedDataProcessor`
+ *  - `computed_data_fieldset_name`: The name of the property to set on the zoodb's
+ *    scratch dictionary to store the computed data values.  By default, this
+ *    is `computed_data_values`.  You should only change this if you have a good reason
+ *    to, e.g., if it is essential to have multiple instances of `ComputedDataProcessor`
  *    on the same zoodb.  But that's probably really asking for trouble!
  * 
  *  - `create_zoodb_special_method`: A function taking named object arguments
@@ -131,7 +131,7 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
 
             keep_computed_data_in_data_dumps: false,
 
-            computed_data_fieldset_name: 'computed_data',
+            computed_data_fieldset_name: 'computed_data_values',
 
             create_zoodb_special_method:
                 ({zoodb, object_type, computed_property_name, accessor_function}) => {
@@ -171,8 +171,13 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
                 for (const computed_property_name of Object.keys(computed_object_spec)) {
                     let accessor_function = null;
                     if (!this.config.lazy) {
-                        accessor_function =
-                            (obj) => obj._zoodb[computed_data_fieldset_name][computed_property_name] ;
+                        accessor_function = (obj) =>
+                                this.zoodb
+                                .scratch[computed_data_fieldset_name]
+                                [object_type]
+                                [obj._zoodb.id]
+                                [computed_property_name]
+                            ;
                     } else {
                         const self = this;
                         accessor_function = (obj) => self._access_lazy_property(
@@ -240,23 +245,31 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
 
         keep_computed_data ??= this.config.keep_computed_data_in_data_dumps;
 
-        const { computed_data_fieldset_name } = this.config;
-        
-        for (const object_type of this.config.object_types) {
-            const objects = data.db.objects[object_type];
-            if (!objects || Object.keys(objects).length == 0) {
-                continue;
-            }
-            for (let [/*obj_id*/, obj] of Object.entries(objects)) {
-                let zoodbinfo = obj._zoodb;
-                let computed_data = zoodbinfo[computed_data_fieldset_name];
-                delete zoodbinfo.computed_data;
-                // if we want to keep the computed data, set the computed fields
-                // as proper field in the data dump.
-                if (keep_computed_data) {
-                    Object.assign(obj, computed_data);
+        if (keep_computed_data) {
+
+            const { computed_data_fieldset_name } = this.config;
+
+            for (const object_type of this.config.object_types) {
+                const computed_object_spec = this.computed_data_spec[object_type];
+                const objects = data.db.objects[object_type];
+                if (!objects || Object.keys(objects).length == 0) {
+                    continue;
+                }
+                for (let [obj_id, obj] of Object.entries(objects)) {
+                    let computed_data_values = this.zoodb
+                        .scratch[computed_data_fieldset_name]
+                        [object_type]
+                        [obj_id] ;
+                    // if we want to keep the computed data, set the computed fields
+                    // as proper field in the data dump.
+                    for (const computed_property_name of Object.keys(computed_object_spec)) {
+                        obj[computed_property_name] =
+                            computed_data_values[computed_property_name];
+                    }
+                    Object.assign(obj, computed_data_values);
                 }
             }
+
         }
         
         return data;
@@ -268,14 +281,20 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
         object_type, obj, computed_property_name
     )
     {
-        let obj_computed_data = obj._zoodb[this.config.computed_data_fieldset_name];
+        let obj_computed_data =
+            this.zoodb.scratch[this.config.computed_data_fieldset_name]
+            [object_type][obj._zoodb.id]
+            ;
+        
         if (Object.hasOwn(obj_computed_data, computed_property_name)) {
             return obj_computed_data[computed_property_name];
         }
         // We need to compute the lazy property now.
         const computed_property_spec =
             this.computed_data_spec[object_type][computed_property_name];
+        
         const value = computed_property_spec.fn.call(this.zoodb, obj);
+
         obj_computed_data[computed_property_name] = value;
         return value;
     }
@@ -287,6 +306,10 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
         debug(`Processing computed property ${object_type}.${computed_property_name}`);
 
         const { computed_data_fieldset_name } = this.config;
+
+        let obj_computed_data =
+            this.zoodb.scratch[computed_data_fieldset_name][object_type];
+
         // maybe we can bulk compute all object values? -- use this if the
         // computed data needs to run in an async/await method.
         if (computed_property_spec.fn_bulk != null) {
@@ -294,7 +317,7 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
             const value_db = await computed_property_spec.fn_bulk.call(this.zoodb, obj_db);
             for (const [obj_id, obj] of Object.entries(obj_db)) {
                 const value = value_db[obj_id];
-                obj._zoodb[computed_data_fieldset_name][computed_property_name] = value;
+                obj_computed_data[obj_id][computed_property_name] = value;
             }
             return;
         }
@@ -307,7 +330,7 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
         for (const [obj_id, obj] of Object.entries(obj_db)) {
             // call the property computer, providing the zoodb as "this"
             const value = computed_property_spec.fn.call(this.zoodb, obj);
-            obj._zoodb[computed_data_fieldset_name][computed_property_name] = value;
+            obj_computed_data[obj_id][computed_property_name] = value;
         }
     }
 
@@ -315,11 +338,18 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
     {
         const { computed_data_fieldset_name } = this.config;
 
-        // ensure that all objects have a _zoodb.computed_data field.
-        for (const [obj_id, obj] of Object.entries(obj_db)) {
-            if (obj._zoodb[computed_data_fieldset_name] == null) {
-                obj._zoodb[computed_data_fieldset_name] = Object.create(null);
-            }
+        if (this.zoodb.scratch[computed_data_fieldset_name] == null) {
+            this.zoodb.scratch[computed_data_fieldset_name] = {};
+        }
+        let obj_type_computed_data_values =
+            this.zoodb.scratch[computed_data_fieldset_name][object_type];
+        if (obj_type_computed_data_values == null) {
+            obj_type_computed_data_values = {};
+            this.zoodb.scratch[computed_data_fieldset_name][object_type]
+                = obj_type_computed_data_values;
+        }
+        for (const [obj_id, obj_] of Object.entries(obj_db)) {
+            obj_type_computed_data_values[obj_id] = Object.create(null);
         }
 
         for (
