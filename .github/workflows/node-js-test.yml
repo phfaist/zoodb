@@ -21,7 +21,8 @@ jobs:
         node-version:
           - '18'
           - '20'
-          #- 'latest' # bug with parcel (10/2023) ! re-activate when bugs are fixed.
+          - '22'
+          - 'latest' # bug with parcel (10/2023) ! re-activate when bugs are fixed.
         
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
