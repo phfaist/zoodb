@@ -331,9 +331,9 @@ export class CitationCompiler
             ?? promisifyMethods(this.cache_fs, ['readFile', 'writeFile'])
         ;
         this.cache_file =
-            this.options.cache_file || '_zoodb_cache_citations_compiled.json';
+            this.options.cache_file ?? '_zoodb_cache_citations_compiled.json';
         this.cache_entry_default_duration_ms =
-            this.options.cache_entry_default_duration_ms || 30*one_day;
+            this.options.cache_entry_default_duration_ms ?? 30*one_day;
 
         this.cache = new Cache();
     }
