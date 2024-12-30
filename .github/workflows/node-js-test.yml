@@ -71,10 +71,10 @@ jobs:
 
       - name: 'Build example ZooDB (Only for Node ≥ 20.10)'
         run: |
-          if $(echo "v20.10\n$(node --version)" | sort -V -C); then
-              echo "Detected node >= 20.10, building test website"
+          if $(echo "v20.10\n$(yarn node --version)" | sort -V -C); then
+              echo "Detected node >= 20.10, building test website [Node $(yarn node --version)]"
               yarn build
           else
-              echo "Detected node < 20.10, skipping test build website"
+              echo "Detected node < 20.10, skipping test build website [Node $(yarn node --version)]"
           fi
         working-directory: ./zoodb-example/website
