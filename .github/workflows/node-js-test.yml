@@ -22,7 +22,7 @@ jobs:
           - '18'
           - '20'
           - '22'
-          - 'latest' # bug with parcel (10/2023) ! re-activate when bugs are fixed.
+          - 'latest'
         
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
@@ -69,7 +69,12 @@ jobs:
         run: 'yarn up @phfaist/zoodb@https://github.com/${{ github.repository }}.git#${{ github.sha }}'
         working-directory: ./zoodb-example/
 
-      - name: 'Build example ZooDB'
-        run: 'yarn build'
+      - name: 'Build example ZooDB (Only for Node ≥ 20.10)'
+        run: |
+          if $(echo "v20.10\n$(node --version)" | sort -V -C); then
+              echo "Detected node >= 20.10, building test website"
+              yarn build
+          else
+              echo "Detected node < 20.10, skipping test build website"
+          fi
         working-directory: ./zoodb-example/website
-        

@@ -4,31 +4,31 @@
     "version": "0.1.1",
     "author": "Philippe Faist",
     "license": "MIT",
-    "packageManager": "yarn@3.3.0",
+    "packageManager": "yarn@4.6.0",
     "dependencies": {
         "@apidevtools/json-schema-ref-parser": "^10.1.0",
         "base32-encode": "^2.0.0",
         "browser-process-hrtime": "^1.0.0",
         "citeproc": "^2.4.62",
-        "debug": "^4.3.4",
+        "debug": "^4.4.0",
         "escape-html": "^1.0.3",
         "exif-parser": "^0.1.12",
         "feedparser": "^2.2.10",
-        "glob": "^8.0.3",
+        "glob": "^11.0.0",
         "hash.js": "^1.1.7",
         "js-yaml": "^4.1.0",
         "jsonschema": "^1.4.1",
         "lodash": "^4.17.21",
-        "node-fetch": "^3.2.10",
+        "node-fetch": "^3.3.2",
         "parse-full-name": "^1.2.6",
-        "sax": "^1.2.4",
+        "sax": "^1.4.1",
         "stream-parser": "^0.3.1",
-        "url": "^0.11.0"
+        "url": "^0.11.4"
     },
     "main": "./src/index.js",
     "devDependencies": {
-        "eslint": "^8.46.0",
-        "mocha": "^10.2.0"
+        "eslint": "^9.17.0",
+        "mocha": "11.0.1"
     },
     "scripts": {
         "test": "mocha",
