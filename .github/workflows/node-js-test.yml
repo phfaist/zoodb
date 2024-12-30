@@ -69,12 +69,12 @@ jobs:
         run: 'yarn up @phfaist/zoodb@https://github.com/${{ github.repository }}.git#${{ github.sha }}'
         working-directory: ./zoodb-example/
 
-      - name: 'Build example ZooDB (Only for Node ≥ 20.10)'
+      - name: 'Build example ZooDB (Only for Node ≥ 20)'
         run: |
-          if $(echo "v20.10\n$(yarn node --version)" | sort -V -C); then
-              echo "Detected node >= 20.10, building test website [Node $(yarn node --version)]"
+          if [[ ${{ matrix.node-version }} == "latest" || ${{ matrix.node-version }} -ge 20 ]]; then
+              echo "Building test website [Node $(yarn node --version)]"
               yarn build
           else
-              echo "Detected node < 20.10, skipping test build website [Node $(yarn node --version)]"
+              echo "Skipping test build website [Node $(yarn node --version)]"
           fi
         working-directory: ./zoodb-example/website
