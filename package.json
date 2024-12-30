@@ -6,7 +6,7 @@
     "license": "MIT",
     "packageManager": "yarn@4.6.0",
     "dependencies": {
-        "@apidevtools/json-schema-ref-parser": "^10.1.0",
+        "@apidevtools/json-schema-ref-parser": "^11.7.3",
         "base32-encode": "^2.0.0",
         "browser-process-hrtime": "^1.0.0",
         "citeproc": "^2.4.62",
@@ -28,7 +28,7 @@
     "main": "./src/index.js",
     "devDependencies": {
         "eslint": "^9.17.0",
-        "mocha": "11.0.1"
+        "mocha": "11.0.2"
     },
     "scripts": {
         "test": "mocha",

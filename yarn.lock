@@ -12,16 +12,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@apidevtools/json-schema-ref-parser@npm:^10.1.0":
-  version: 10.1.0
-  resolution: "@apidevtools/json-schema-ref-parser@npm:10.1.0"
+"@apidevtools/json-schema-ref-parser@npm:^11.7.3":
+  version: 11.7.3
+  resolution: "@apidevtools/json-schema-ref-parser@npm:11.7.3"
   dependencies:
     "@jsdevtools/ono": "npm:^7.1.3"
-    "@types/json-schema": "npm:^7.0.11"
-    "@types/lodash.clonedeep": "npm:^4.5.7"
+    "@types/json-schema": "npm:^7.0.15"
     js-yaml: "npm:^4.1.0"
-    lodash.clonedeep: "npm:^4.5.0"
-  checksum: 10c0/2d54b04e8d73a29be20100c29e2c9b6e6e6c30c476f536daee868889a09ddc6809afd96a798ee37c66be6242b7cff19f1ce2ff91d3e54de134c63b46d888a583
+  checksum: 10c0/326dcb3d4dfaf3f75ecab1ffae99d71123cc0a062a5996ac3d0ae66a1c6a852975bbdf606d2ef559766119e84aa6ca72b155f90529458d9ce22ab9d6c513404c
   languageName: node
   linkType: hard
 
@@ -193,7 +191,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@phfaist/zoodb@workspace:."
   dependencies:
-    "@apidevtools/json-schema-ref-parser": "npm:^10.1.0"
+    "@apidevtools/json-schema-ref-parser": "npm:^11.7.3"
     base32-encode: "npm:^2.0.0"
     browser-process-hrtime: "npm:^1.0.0"
     citeproc: "npm:^2.4.62"
@@ -207,7 +205,7 @@ __metadata:
     js-yaml: "npm:^4.1.0"
     jsonschema: "npm:^1.4.1"
     lodash: "npm:^4.17.21"
-    mocha: "npm:11.0.1"
+    mocha: "npm:11.0.2"
     node-fetch: "npm:^3.3.2"
     parse-full-name: "npm:^1.2.6"
     sax: "npm:^1.4.1"
@@ -237,33 +235,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/json-schema@npm:^7.0.11":
-  version: 7.0.12
-  resolution: "@types/json-schema@npm:7.0.12"
-  checksum: 10c0/2c39946ae321fe42d085c61a85872a81bbee70f9b2054ad344e8811dfc478fdbaf1ebf5f2989bb87c895ba2dfc3b1dcba85db11e467bbcdc023708814207791c
-  languageName: node
-  linkType: hard
-
 "@types/json-schema@npm:^7.0.15":
   version: 7.0.15
   resolution: "@types/json-schema@npm:7.0.15"
   checksum: 10c0/a996a745e6c5d60292f36731dd41341339d4eeed8180bb09226e5c8d23759067692b1d88e5d91d72ee83dfc00d3aca8e7bd43ea120516c17922cbcb7c3e252db
-  languageName: node
-  linkType: hard
-
-"@types/lodash.clonedeep@npm:^4.5.7":
-  version: 4.5.7
-  resolution: "@types/lodash.clonedeep@npm:4.5.7"
-  dependencies:
-    "@types/lodash": "npm:*"
-  checksum: 10c0/214c0fe6a89a5d0c75f148a8c7134e212453caace259fcf0be79e67ceff72015a2fa6335758a8cc3231222f34b3968f8c6adf6f49626594f80ccbc276dd1744d
-  languageName: node
-  linkType: hard
-
-"@types/lodash@npm:*":
-  version: 4.14.196
-  resolution: "@types/lodash@npm:4.14.196"
-  checksum: 10c0/a482cc4070f45f278b3fcedfb66b109b2a32fcae5854c6d500333cef73f25fbd7f1d48cd4a709dae2ed31ff2cf0df70080d0f7185b0faebcb738eb1ef997ebd1
   languageName: node
   linkType: hard
 
@@ -1590,13 +1565,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash.clonedeep@npm:^4.5.0":
-  version: 4.5.0
-  resolution: "lodash.clonedeep@npm:4.5.0"
-  checksum: 10c0/2caf0e4808f319d761d2939ee0642fa6867a4bbf2cfce43276698828380756b99d4c4fa226d881655e6ac298dd453fe12a5ec8ba49861777759494c534936985
-  languageName: node
-  linkType: hard
-
 "lodash.get@npm:^4.4.2":
   version: 4.4.2
   resolution: "lodash.get@npm:4.4.2"
@@ -1850,9 +1818,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mocha@npm:11.0.1":
-  version: 11.0.1
-  resolution: "mocha@npm:11.0.1"
+"mocha@npm:11.0.2":
+  version: 11.0.2
+  resolution: "mocha@npm:11.0.2"
   dependencies:
     ansi-colors: "npm:^4.1.3"
     browser-stdout: "npm:^1.3.1"
@@ -1877,7 +1845,7 @@ __metadata:
   bin:
     _mocha: bin/_mocha
     mocha: bin/mocha.js
-  checksum: 10c0/b290a308c318efca84304e907b5d5f4cb047ee8e27eac401c56a00251f944cac9f9af9a379e5952b82e05446a08654ed06c6fea9c55447c5fe2330673f616ff3
+  checksum: 10c0/3d4b775eb02080fc9e32872c3958cf60fa690ee9fe59af78a365788d0c7ae44d8f42101b75dcf062a08cbf0b4902d73293f1a81b96949f8aaed82df71380100d
   languageName: node
   linkType: hard
 
