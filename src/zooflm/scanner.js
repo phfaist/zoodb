@@ -148,15 +148,16 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
         return referenceables_by_kind;
     }
 
-    get_encountered_references_to_labels(ref_type_list)
+    get_encountered_references_to_labels(ref_type_label_list)
     {
         const encountered_references = this.get_encountered('references');
         let filtered_references = [];
         for (const encountered_reference of encountered_references) {
-            for (const [ref_type, ref_label] of ref_type_list) {
+            for (const [ref_type, ref_label] of ref_type_label_list) {
                 if (encountered_reference.ref_type === ref_type
                     && encountered_reference.ref_label === ref_label) {
                     filtered_references.push(encountered_reference);
+                    break;
                 }
             }
         }

@@ -120,7 +120,12 @@ export function make_render_shorthands({render_context, render_value_options})
         return ref_instance.target_href;
     };
 
-    return { ne, rdr, rdrblock, ref, refhref };
+    return {
+        ne, rdr, rdrblock, ref, refhref,
+        // keep access to render_context, too.
+        render_context,
+        render_value_options
+    };
 }
 
 
