@@ -273,7 +273,7 @@ export class ZooFLMScanner extends LatexNodesVisitorJS
                         $$kw({
                             is_block_level: true,
                             resource_info: node.latex_walker.resource_info,
-                            what: `defterm body`,
+                            what: `extracted defterm body (${node.flmarg_term_flm_ref_label_verbatim}) in ${node.latex_walker.what}`,
                         })
                     )
                 ;

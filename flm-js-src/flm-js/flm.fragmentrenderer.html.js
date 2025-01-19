@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2024-12-04 22:08:16
+/* 000001 */ // Transcrypt'ed from Python, 2025-01-19 14:47:57
 /* 000006 */ var html = {};
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
@@ -1327,100 +1327,100 @@
 /* 000784 */ 	var __accu0__ = re;
 /* 000784 */ 	return __call__ (__accu0__.compile, __accu0__, '<FLM:DLYD:(?P<key>\\d+)\\s*/>');
 /* 000784 */ }) ();
-/* 000791 */ export var _html_css_global = '\np, ul, ol {\n  margin: 1em 0px;\n}\np:first-child, ul:first-child, ol:first-child {\n  margin-top: 0px;\n}\np:last-child, ul:last-child, ol:last-child {\n  margin-bottom: 0px;\n}\ndd > p, dd > p:first-child, dd > p:last-child {\n  margin: 0.33em 0px;\n}\n\na, a:link, a:hover, a:active, a:visited {\n  color: #3232c8;\n  text-decoration: none;\n}\na:hover {\n  color: #22228a;\n}\n';
-/* 000814 */ export var _html_css_content = "\n.emph, .textit {\n  font-style: italic;\n}\n.textbf {\n  font-weight: bold;\n}\n\nh1 {\n  font-size: 1.6rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh2 {\n  font-size: 1.3rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh3 {\n  font-size: 1rem;\n  font-weight: bold;\n  margin: 1em 0px;\n}\n\n.heading-level-4 {\n  font-style: italic;\n  display: inline;\n}\n.heading-level-4::after {\n  display: inline-block;\n  margin: 0px .12em;\n  content: '—';\n}\n\n.heading-level-5 {\n  font-style: italic;\n  font-size: .9em;\n  display: inline;\n}\n.heading-level-5::after {\n  display: inline-block;\n  margin-right: .12em;\n  content: '';\n}\n\n.heading-level-6 {\n  font-style: italic;\n  font-size: .8em;\n  display: inline;\n}\n.heading-level-6::after {\n  display: inline-block;\n  margin-right: .06em;\n  content: '';\n}\n\n\n.heading-level-theorem {\n  font-weight: bold;\n}\n.heading-level-theorem::after {\n  font-weight: bold;\n  display: inline-block;\n  margin: 0px .12em 0px 0px;\n  content: '.';\n}\n\ndiv.theoremlike, div.definitionlike, div.prooflike {\n  margin: 1em 0px;\n}\n\ndiv.prooflike > p > .heading-level-theorem,\ndiv.prooflike > p > .heading-level-theorem::after {\n  font-weight: normal;\n  font-style: italic;\n}\n\n\ndl.enumeration {\n  display: block;\n  margin-left: 2.5em;\n}\ndl.enumeration > dt {\n  float: left;\n  clear: left;\n  display: inline-block;\n  /*margin: 0px; */\n  margin-left: -2.5em;\n  width: 2.0em;\n  min-width: 2.0em;\n  max-width: 2.0em;\n  margin-right: 0.5em;\n  text-align: right;\n}\ndl.enumeration > dd {\n  /*display: inline-block;\n  width: 100%;*/\n  border: 0px;\n  padding: 0px;\n  margin: 0px;\n}\n\nfigure.float {\n  width: 100%;\n  border-width: 1px 0px 1px 0px;\n  border-style: solid none solid none;\n  border-color: rgba(120, 120, 140, 0.15);\n  margin: 0.5rem 0px;\n  padding: 0.5rem 0px;\n}\n\nfigure.float .float-contents {\n  width: 100%;\n  max-width: 100%;\n  overflow-x: auto;\n}\n\nfigure.float .float-contents img {\n  display: block;\n  margin: 0pt auto;\n  padding: 0pt;\n  border: 0pt;\n  margin: 0px auto;\n}\n\nfigure.float figcaption {\n  display: block;\n  margin-top: 0.5em;\n  margin: 0.75em 2em 0px;\n  text-align: center;\n}\n\nfigure.float figcaption > span {\n  display: inline-block;\n  font-style: italic;\n  text-align: left;\n}\n\ntable {\n  margin: 1em 0px 1em 0px;\n  border-collapse: separate;\n  border-spacing: 0px;\n  /*border-top: solid 1pt;\n  border-bottom: solid 1pt;*/\n}\nfigure.float .float-contents table {\n  margin: 0px auto;\n}\ntd {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\nth {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\n.cellstyle-H {\n  border-bottom: solid .5pt;\n}\n.cellstyle-rH {\n}\n.cellstyle-l {\n  text-align: left;\n}\n.cellstyle-c {\n  text-align: center;\n}\n.cellstyle-r {\n  text-align: right;\n}\n.cellstyle-green {\n  background-color: rgba(69, 255, 69, 0.31); /*rgb(200,255,200);*/\n}\n.cellstyle-blue {\n  background-color: rgba(79, 142, 255, 0.27); /*rgb(200,220,255);*/\n}\n.cellstyle-yellow {\n  background-color: rgba(255, 255, 49, 0.33); /*rgb(255,255,200);*/\n}\n.cellstyle-red {\n  background-color: rgba(255,120,120,0.30);  /*rgb(255,200,200);*/\n}\n.cellstyle-lvert {\n  border-left: solid .5pt;\n}\n.cellstyle-rvert {\n  border-right: solid .5pt;\n}\n\n.celltbledge-top {\n  border-top: solid 1pt;\n}\n.celltbledge-bottom {\n  border-bottom: solid 1pt;\n}\n\n.verbatimcode {\n  font-family: monospace;\n  font-size: 0.9em;\n  background-color: rgba(127,127,127,0.25);\n  border-radius: 2px;\n  padding: 1px 2px;\n  display: inline-block;\n  white-space: pre-wrap;\n}\n.verbatima {\n  font-style: italic;\n}\n.verbatimcode-environment {\n  display: block;\n  margin: 0.75em 0px 1em;\n  white-space: pre;\n}\n\n.defterm {\n  font-style: italic;\n  margin: 1em 0px;\n}\n.defterm:first-child {\n  margin-top: 0px;\n}\n.defterm:last-child {\n  margin-bottom: 0px;\n}\n\n.defterm .defterm-term, .defterm .term-in-defining-defterm {\n  font-style: italic;\n  font-weight: bold;\n}\n\n.display-math {\n  width: 100%;\n  max-width: 100%;\n  display: block;\n  overflow-x: auto;\n}\n\n.endnote {\n}\n.citation {\n}\n.footnote {\n}\n.endnote-marks, .citation-marks {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\ndl.citation-list > dt, dl.footnote-list > dt {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\n";
-/* 001074 */ export var _html_js_mathjax = '\nMathJax = {\n    tex: {\n        inlineMath: [[\'\\\\(\', \'\\\\)\']],\n        displayMath: [[\'\\\\[\', \'\\\\]\']],\n        processEnvironments: true,\n        processRefs: true,\n\n        // equation numbering on\n        tags: \'ams\'\n    },\n    options: {\n        // all MathJax content is marked with CSS classes\n        // skipHtmlTags: \'body\',\n        // processHtmlClass: \'display-math|inline-math\',\n    },\n    startup: {\n        pageReady: function() {\n            // override the default "typeset everything on the page" behavior to\n            // only typeset whatever we have explicitly marked as math\n            return typesetPageMathPromise();\n        }\n    }\n};\nfunction typesetPageMathPromise()\n{\n    var elements = document.querySelectorAll(\'.display-math, .inline-math\');\n    return MathJax.typesetPromise(elements);\n}\n';
-/* 001105 */ export var _html_body_end_js_scripts_mathjax = '\n<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>\n<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>\n';
-/* 001113 */ export var get_html_css_global = function (html_fragment_renderer) {
-/* 001113 */ 	if (arguments.length) {
-/* 001113 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001113 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001113 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001113 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001113 */ 				switch (__attrib0__) {
-/* 001113 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001113 */ 				}
-/* 001113 */ 			}
-/* 001113 */ 		}
-/* 001113 */ 	}
-/* 001113 */ 	else {
-/* 001113 */ 	}
-/* 001114 */ 	return _html_css_global;
-/* 001114 */ };
-/* 001116 */ export var get_html_css_content = function (html_fragment_renderer) {
-/* 001116 */ 	if (arguments.length) {
-/* 001116 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001116 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001116 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001116 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001116 */ 				switch (__attrib0__) {
-/* 001116 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001116 */ 				}
-/* 001116 */ 			}
-/* 001116 */ 		}
-/* 001116 */ 	}
-/* 001116 */ 	else {
-/* 001116 */ 	}
-/* 001117 */ 	return _html_css_content;
-/* 001117 */ };
-/* 001119 */ export var get_html_js = function (html_fragment_renderer) {
-/* 001119 */ 	if (arguments.length) {
-/* 001119 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001119 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001119 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001119 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001119 */ 				switch (__attrib0__) {
-/* 001119 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001119 */ 				}
-/* 001119 */ 			}
-/* 001119 */ 		}
-/* 001119 */ 	}
-/* 001119 */ 	else {
-/* 001119 */ 	}
-/* 001120 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
-/* 001121 */ 		return _html_js_mathjax;
-/* 001121 */ 	}
-/* 001122 */ 	return '';
-/* 001122 */ };
-/* 001124 */ export var get_html_body_end_js_scripts = function (html_fragment_renderer) {
-/* 001124 */ 	if (arguments.length) {
-/* 001124 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001124 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001124 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001124 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001124 */ 				switch (__attrib0__) {
-/* 001124 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001124 */ 				}
-/* 001124 */ 			}
-/* 001124 */ 		}
-/* 001124 */ 	}
-/* 001124 */ 	else {
-/* 001124 */ 	}
-/* 001125 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
-/* 001126 */ 		return _html_body_end_js_scripts_mathjax;
-/* 001126 */ 	}
-/* 001127 */ 	return '';
-/* 001127 */ };
-/* 001133 */ export var FragmentRendererInformation =  __class__ ('FragmentRendererInformation', [object], {
-/* 001133 */ 	__module__: __name__,
-/* 001139 */ 	FragmentRendererClass: HtmlFragmentRenderer,
-/* 001142 */ 	get get_style_information () {return function (fragment_renderer) {
-/* 001142 */ 		if (arguments.length) {
-/* 001142 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001142 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001142 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001142 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001142 */ 					switch (__attrib0__) {
-/* 001142 */ 						case 'fragment_renderer': var fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001142 */ 					}
-/* 001142 */ 				}
-/* 001142 */ 			}
-/* 001142 */ 		}
-/* 001142 */ 		else {
-/* 001142 */ 		}
-/* 001147 */ 		return dict ({'css_global': __call__ (get_html_css_global, null, fragment_renderer), 'css_content': __call__ (get_html_css_content, null, fragment_renderer), 'js': __call__ (get_html_js, null, fragment_renderer), 'body_end_js_scripts': __call__ (get_html_body_end_js_scripts, null, fragment_renderer)});
-/* 001147 */ 	};},
-/* 001150 */ 	format_name: 'html'
-/* 001150 */ });
+/* 000791 */ export var _html_css_global = '\np, ul, ol, .p-block {\n  margin: 1em 0px;\n}\np:first-child, ul:first-child, ol:first-child, .p-block:first-child {\n  margin-top: 0px;\n}\np:last-child, ul:last-child, ol:last-child, .p-block:last-child {\n  margin-bottom: 0px;\n}\ndd > p, dd > p:first-child, dd > p:last-child {\n  margin: 0.33em 0px;\n}\n\na, a:link, a:hover, a:active, a:visited {\n  color: #3232c8;\n  text-decoration: none;\n}\na:hover {\n  color: #22228a;\n}\n';
+/* 000814 */ export var _html_css_content = "\n.emph, .textit {\n  font-style: italic;\n}\n.textbf {\n  font-weight: bold;\n}\n\nh1 {\n  font-size: 1.6rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh2 {\n  font-size: 1.3rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh3 {\n  font-size: 1rem;\n  font-weight: bold;\n  margin: 1em 0px;\n}\n\n.heading-level-4 {\n  font-style: italic;\n  display: inline;\n}\n.heading-level-4::after {\n  display: inline-block;\n  margin: 0px .12em;\n  content: '—';\n}\n\n.heading-level-5 {\n  font-style: italic;\n  font-size: .9em;\n  display: inline;\n}\n.heading-level-5::after {\n  display: inline-block;\n  margin-right: .12em;\n  content: '';\n}\n\n.heading-level-6 {\n  font-style: italic;\n  font-size: .8em;\n  display: inline;\n}\n.heading-level-6::after {\n  display: inline-block;\n  margin-right: .06em;\n  content: '';\n}\n\n\n.heading-level-theorem {\n  font-weight: bold;\n}\n.heading-level-theorem::after {\n  font-weight: bold;\n  display: inline-block;\n  margin: 0px .12em 0px 0px;\n  content: '.';\n}\n\ndiv.prooflike > p > .heading-level-theorem,\ndiv.prooflike > p > .heading-level-theorem::after {\n  font-weight: normal;\n  font-style: italic;\n}\n\n\ndl.enumeration {\n  display: block;\n  margin-left: 2.5em;\n}\ndl.enumeration > dt {\n  float: left;\n  clear: left;\n  display: inline-block;\n  /*margin: 0px; */\n  margin-left: -2.5em;\n  width: 2.0em;\n  min-width: 2.0em;\n  max-width: 2.0em;\n  margin-right: 0.5em;\n  text-align: right;\n}\ndl.enumeration > dd {\n  /*display: inline-block;\n  width: 100%;*/\n  border: 0px;\n  padding: 0px;\n  margin: 0px;\n}\n\nfigure.float {\n  width: 100%;\n  border-width: 1px 0px 1px 0px;\n  border-style: solid none solid none;\n  border-color: rgba(120, 120, 140, 0.15);\n  margin: 0.5rem 0px;\n  padding: 0.5rem 0px;\n}\n\nfigure.float .float-contents {\n  width: 100%;\n  max-width: 100%;\n  overflow-x: auto;\n}\n\nfigure.float .float-contents img {\n  display: block;\n  margin: 0pt auto;\n  padding: 0pt;\n  border: 0pt;\n  margin: 0px auto;\n}\n\nfigure.float figcaption {\n  display: block;\n  margin-top: 0.5em;\n  margin: 0.75em 2em 0px;\n  text-align: center;\n}\n\nfigure.float figcaption > span {\n  display: inline-block;\n  font-style: italic;\n  text-align: left;\n}\n\ntable {\n  margin: 1em 0px 1em 0px;\n  border-collapse: separate;\n  border-spacing: 0px;\n  /*border-top: solid 1pt;\n  border-bottom: solid 1pt;*/\n}\nfigure.float .float-contents table {\n  margin: 0px auto;\n}\ntd {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\nth {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\n.cellstyle-H {\n  border-bottom: solid .5pt;\n}\n.cellstyle-rH {\n}\n.cellstyle-l {\n  text-align: left;\n}\n.cellstyle-c {\n  text-align: center;\n}\n.cellstyle-r {\n  text-align: right;\n}\n.cellstyle-green {\n  background-color: rgba(69, 255, 69, 0.31); /*rgb(200,255,200);*/\n}\n.cellstyle-blue {\n  background-color: rgba(79, 142, 255, 0.27); /*rgb(200,220,255);*/\n}\n.cellstyle-yellow {\n  background-color: rgba(255, 255, 49, 0.33); /*rgb(255,255,200);*/\n}\n.cellstyle-red {\n  background-color: rgba(255,120,120,0.30);  /*rgb(255,200,200);*/\n}\n.cellstyle-lvert {\n  border-left: solid .5pt;\n}\n.cellstyle-rvert {\n  border-right: solid .5pt;\n}\n\n.celltbledge-top {\n  border-top: solid 1pt;\n}\n.celltbledge-bottom {\n  border-bottom: solid 1pt;\n}\n\n.verbatimcode {\n  font-family: monospace;\n  font-size: 0.9em;\n  background-color: rgba(127,127,127,0.25);\n  border-radius: 2px;\n  padding: 1px 2px;\n  display: inline-block;\n  white-space: pre-wrap;\n}\n.verbatima {\n  font-style: italic;\n}\n.verbatimcode-environment {\n  display: block;\n  margin: 0.75em 0px 1em;\n  white-space: pre;\n}\n\n.defterm {\n  font-style: italic;\n  margin: 1em 0px;\n}\n.defterm:first-child {\n  margin-top: 0px;\n}\n.defterm:last-child {\n  margin-bottom: 0px;\n}\n\n.defterm .defterm-term, .defterm .term-in-defining-defterm {\n  font-style: italic;\n  font-weight: bold;\n}\n\n.display-math {\n  width: 100%;\n  max-width: 100%;\n  display: block;\n  overflow-x: auto;\n}\n\n.endnote {\n}\n.citation {\n}\n.footnote {\n}\n.endnote-marks, .citation-marks {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\ndl.citation-list > dt, dl.footnote-list > dt {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\n";
+/* 001070 */ export var _html_js_mathjax = '\nMathJax = {\n    tex: {\n        inlineMath: [[\'\\\\(\', \'\\\\)\']],\n        displayMath: [[\'\\\\[\', \'\\\\]\']],\n        processEnvironments: true,\n        processRefs: true,\n\n        // equation numbering on\n        tags: \'ams\'\n    },\n    options: {\n        // all MathJax content is marked with CSS classes\n        // skipHtmlTags: \'body\',\n        // processHtmlClass: \'display-math|inline-math\',\n    },\n    startup: {\n        pageReady: function() {\n            // override the default "typeset everything on the page" behavior to\n            // only typeset whatever we have explicitly marked as math\n            return typesetPageMathPromise();\n        }\n    }\n};\nfunction typesetPageMathPromise()\n{\n    var elements = document.querySelectorAll(\'.display-math, .inline-math\');\n    return MathJax.typesetPromise(elements);\n}\n';
+/* 001101 */ export var _html_body_end_js_scripts_mathjax = '\n<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>\n<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>\n';
+/* 001109 */ export var get_html_css_global = function (html_fragment_renderer) {
+/* 001109 */ 	if (arguments.length) {
+/* 001109 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001109 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001109 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001109 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001109 */ 				switch (__attrib0__) {
+/* 001109 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001109 */ 				}
+/* 001109 */ 			}
+/* 001109 */ 		}
+/* 001109 */ 	}
+/* 001109 */ 	else {
+/* 001109 */ 	}
+/* 001110 */ 	return _html_css_global;
+/* 001110 */ };
+/* 001112 */ export var get_html_css_content = function (html_fragment_renderer) {
+/* 001112 */ 	if (arguments.length) {
+/* 001112 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001112 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001112 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001112 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001112 */ 				switch (__attrib0__) {
+/* 001112 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001112 */ 				}
+/* 001112 */ 			}
+/* 001112 */ 		}
+/* 001112 */ 	}
+/* 001112 */ 	else {
+/* 001112 */ 	}
+/* 001113 */ 	return _html_css_content;
+/* 001113 */ };
+/* 001115 */ export var get_html_js = function (html_fragment_renderer) {
+/* 001115 */ 	if (arguments.length) {
+/* 001115 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001115 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001115 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001115 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001115 */ 				switch (__attrib0__) {
+/* 001115 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001115 */ 				}
+/* 001115 */ 			}
+/* 001115 */ 		}
+/* 001115 */ 	}
+/* 001115 */ 	else {
+/* 001115 */ 	}
+/* 001116 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
+/* 001117 */ 		return _html_js_mathjax;
+/* 001117 */ 	}
+/* 001118 */ 	return '';
+/* 001118 */ };
+/* 001120 */ export var get_html_body_end_js_scripts = function (html_fragment_renderer) {
+/* 001120 */ 	if (arguments.length) {
+/* 001120 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001120 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001120 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001120 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001120 */ 				switch (__attrib0__) {
+/* 001120 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001120 */ 				}
+/* 001120 */ 			}
+/* 001120 */ 		}
+/* 001120 */ 	}
+/* 001120 */ 	else {
+/* 001120 */ 	}
+/* 001121 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
+/* 001122 */ 		return _html_body_end_js_scripts_mathjax;
+/* 001122 */ 	}
+/* 001123 */ 	return '';
+/* 001123 */ };
+/* 001129 */ export var FragmentRendererInformation =  __class__ ('FragmentRendererInformation', [object], {
+/* 001129 */ 	__module__: __name__,
+/* 001135 */ 	FragmentRendererClass: HtmlFragmentRenderer,
+/* 001138 */ 	get get_style_information () {return function (fragment_renderer) {
+/* 001138 */ 		if (arguments.length) {
+/* 001138 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001138 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001138 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001138 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001138 */ 					switch (__attrib0__) {
+/* 001138 */ 						case 'fragment_renderer': var fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001138 */ 					}
+/* 001138 */ 				}
+/* 001138 */ 			}
+/* 001138 */ 		}
+/* 001138 */ 		else {
+/* 001138 */ 		}
+/* 001143 */ 		return dict ({'css_global': __call__ (get_html_css_global, null, fragment_renderer), 'css_content': __call__ (get_html_css_content, null, fragment_renderer), 'js': __call__ (get_html_js, null, fragment_renderer), 'body_end_js_scripts': __call__ (get_html_body_end_js_scripts, null, fragment_renderer)});
+/* 001143 */ 	};},
+/* 001146 */ 	format_name: 'html'
+/* 001146 */ });
 /* 000006 */ 
 //# sourceMappingURL=flm.fragmentrenderer.html.map

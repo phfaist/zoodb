@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2024-12-04 22:08:16
+/* 000001 */ // Transcrypt'ed from Python, 2025-01-19 14:47:57
 /* 000006 */ var logging = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000022 */ import {EndnoteCategory} from './flm.feature.endnotes.js';
@@ -13,7 +13,7 @@
 /* 000009 */ import * as latexnodes_nodes from './pylatexenc.latexnodes.nodes.js';
 /* 000006 */ import * as __module_logging__ from './logging.js';
 /* 000006 */ __nest__ (logging, '', __module_logging__);
-/* 000006 */ export {FLMFragment, build_counter_formatter, Feature, FLMArgumentSpec, FLMMacroSpecBase, ParsedArgumentsInfo, macrospec, latexnodes_parsers, EndnoteCategory, latexnodes_nodes};
+/* 000006 */ export {Feature, FLMFragment, macrospec, build_counter_formatter, FLMArgumentSpec, latexnodes_nodes, FLMMacroSpecBase, ParsedArgumentsInfo, EndnoteCategory, latexnodes_parsers};
 /* 000001 */ var __name__ = 'flm.feature.cite';
 /* 000007 */ export var logger = (function () {
 /* 000007 */ 	var __accu0__ = logging;
@@ -805,55 +805,67 @@
 /* 000564 */ 		if (__t__ (!__t__ ((__call__ (len, null, cite_items))))) {
 /* 000565 */ 			return '';
 /* 000565 */ 		}
-/* 000568 */ 		var cite_bare = [];
-/* 000569 */ 		var cite_extras = [];
-/* 000570 */ 		var __iterable0__ = cite_items;
-/* 000570 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000570 */ 			var cite_item = __getitem__ (__iterable0__, __index0__);
-/* 000571 */ 			var extra = __getitem__ (cite_item, 'extra');
-/* 000573 */ 			var cite_prefix = __getitem__ (cite_item, 'prefix');
-/* 000574 */ 			var cite_key = __getitem__ (cite_item, 'key');
-/* 000575 */ 			var safe_info = (function () {
-/* 000575 */ 				var __accu0__ = recomposer;
-/* 000575 */ 				return __call__ (__accu0__.make_safe_label, __accu0__, 'cite', '{}:{}'.format (cite_prefix, cite_key));
-/* 000575 */ 			}) ();
-/* 000576 */ 			var safe_label = __getitem__ (safe_info, 'safe_label');
-/* 000579 */ 			if (__t__ (__t__ (extra !== null) && __t__ (extra) && __t__ (extra.nodelist !== null) && __call__ (len, null, extra.nodelist))) {
-/* 000580 */ 				(function () {
-/* 000580 */ 					var __accu0__ = cite_extras;
-/* 000580 */ 					return __call__ (__accu0__.append, __accu0__, tuple ([safe_label, extra]));
-/* 000580 */ 				}) ();
-/* 000580 */ 			}
-/* 000581 */ 			else {
-/* 000582 */ 				(function () {
-/* 000582 */ 					var __accu0__ = cite_bare;
-/* 000582 */ 					return __call__ (__accu0__.append, __accu0__, safe_label);
-/* 000582 */ 				}) ();
-/* 000582 */ 			}
-/* 000582 */ 		}
-/* 000584 */ 		var s = '\\NoCaseChange{';
-/* 000586 */ 		if (__t__ (__call__ (len, null, cite_bare))) {
-/* 000587 */ 			var s = __call__ (__iadd__, null, s, __add__ (__add__ ('\\protect\\cite{', (function () {
-/* 000587 */ 				var __accu0__ = ',';
-/* 000587 */ 				return __call__ (__accu0__.join, __accu0__, cite_bare);
-/* 000587 */ 			}) ()), '}'));
-/* 000587 */ 		}
-/* 000589 */ 		if (__t__ (__call__ (len, null, cite_extras))) {
-/* 000590 */ 			var __iterable0__ = cite_extras;
-/* 000590 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000590 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000590 */ 				var safe_label = __left0__ [0];
-/* 000590 */ 				var extra = __left0__ [1];
-/* 000591 */ 				var extra_latex_info = (function () {
-/* 000591 */ 					var __accu0__ = recomposer;
-/* 000591 */ 					return __call__ (__accu0__.recompose_pure_latex, __accu0__, extra);
-/* 000591 */ 				}) ();
-/* 000592 */ 				var s = __call__ (__iadd__, null, s, __add__ (__add__ (__add__ (__add__ ('\\protect\\cite[{', __getitem__ (extra_latex_info, 'latex')), '}]{'), safe_label), '}'));
-/* 000592 */ 			}
-/* 000592 */ 		}
-/* 000597 */ 		var s = __call__ (__iadd__, null, s, '}');
-/* 000598 */ 		return s;
-/* 000598 */ 	});}
-/* 000598 */ });
+/* 000567 */ 		var recopt_cite = (function () {
+/* 000567 */ 			var __accu0__ = recomposer;
+/* 000567 */ 			return __call__ (__accu0__.get_options, __accu0__, 'cite');
+/* 000567 */ 		}) ();
+/* 000568 */ 		// pass;
+/* 000575 */ 		var use_safe_labels = (function () {
+/* 000575 */ 			var __accu0__ = recopt_cite;
+/* 000575 */ 			return __call__ (__accu0__.py_get, __accu0__, 'safe_labels', false);
+/* 000575 */ 		}) ();
+/* 000578 */ 		var cite_bare = [];
+/* 000579 */ 		var cite_extras = [];
+/* 000580 */ 		var __iterable0__ = cite_items;
+/* 000580 */ 		for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000580 */ 			var cite_item = __getitem__ (__iterable0__, __index0__);
+/* 000581 */ 			var extra = __getitem__ (cite_item, 'extra');
+/* 000583 */ 			var cite_prefix = __getitem__ (cite_item, 'prefix');
+/* 000584 */ 			var cite_key = __getitem__ (cite_item, 'key');
+/* 000585 */ 			var cite_label = '{}:{}'.format (cite_prefix, cite_key);
+/* 000587 */ 			if (__t__ (use_safe_labels)) {
+/* 000588 */ 				var safe_info = (function () {
+/* 000588 */ 					var __accu0__ = recomposer;
+/* 000588 */ 					return __call__ (__accu0__.make_safe_label, __accu0__, 'cite', cite_prefix, cite_key);
+/* 000588 */ 				}) ();
+/* 000590 */ 				var cite_label = __getitem__ (safe_info, 'safe_label');
+/* 000590 */ 			}
+/* 000593 */ 			if (__t__ (__t__ (extra !== null) && __t__ (extra) && __t__ (extra.nodelist !== null) && __call__ (len, null, extra.nodelist))) {
+/* 000594 */ 				(function () {
+/* 000594 */ 					var __accu0__ = cite_extras;
+/* 000594 */ 					return __call__ (__accu0__.append, __accu0__, tuple ([cite_label, extra]));
+/* 000594 */ 				}) ();
+/* 000594 */ 			}
+/* 000595 */ 			else {
+/* 000596 */ 				(function () {
+/* 000596 */ 					var __accu0__ = cite_bare;
+/* 000596 */ 					return __call__ (__accu0__.append, __accu0__, cite_label);
+/* 000596 */ 				}) ();
+/* 000596 */ 			}
+/* 000596 */ 		}
+/* 000598 */ 		var s = '\\NoCaseChange{';
+/* 000600 */ 		if (__t__ (__call__ (len, null, cite_bare))) {
+/* 000601 */ 			var s = __call__ (__iadd__, null, s, __add__ (__add__ ('\\protect\\cite{', (function () {
+/* 000601 */ 				var __accu0__ = ',';
+/* 000601 */ 				return __call__ (__accu0__.join, __accu0__, cite_bare);
+/* 000601 */ 			}) ()), '}'));
+/* 000601 */ 		}
+/* 000603 */ 		if (__t__ (__call__ (len, null, cite_extras))) {
+/* 000604 */ 			var __iterable0__ = cite_extras;
+/* 000604 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000604 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000604 */ 				var safe_label = __left0__ [0];
+/* 000604 */ 				var extra = __left0__ [1];
+/* 000605 */ 				var extra_latex_info = (function () {
+/* 000605 */ 					var __accu0__ = recomposer;
+/* 000605 */ 					return __call__ (__accu0__.recompose_pure_latex, __accu0__, extra);
+/* 000605 */ 				}) ();
+/* 000606 */ 				var s = __call__ (__iadd__, null, s, __add__ (__add__ (__add__ (__add__ ('\\protect\\cite[{', __getitem__ (extra_latex_info, 'latex')), '}]{'), safe_label), '}'));
+/* 000606 */ 			}
+/* 000606 */ 		}
+/* 000611 */ 		var s = __call__ (__iadd__, null, s, '}');
+/* 000612 */ 		return s;
+/* 000612 */ 	});}
+/* 000612 */ });
 /* 000006 */ 
 //# sourceMappingURL=flm.feature.cite.map

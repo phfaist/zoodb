@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2024-12-04 22:08:14
+/* 000001 */ // Transcrypt'ed from Python, 2025-01-19 14:47:55
 /* 000038 */ var logging = {};
 /* 000038 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000056 */ import {LatexDelimitedVerbatimParser} from './pylatexenc.latexnodes.parsers._verbatim.js';
@@ -11,7 +11,7 @@
 /* 000041 */ import {} from './pylatexenc.latexnodes._exctypes.js';
 /* 000038 */ import * as __module_logging__ from './logging.js';
 /* 000038 */ __nest__ (logging, '', __module_logging__);
-/* 000038 */ export {_get_content_as_chars, LatexDelimitedExpressionParserInfo, _update_posposend_from_nodelist, LatexGroupNode, LatexCharsNode, LatexDelimitedGroupParser, LatexOptionalEmbellishmentArgsParser, LatexDelimitedVerbatimParser, LatexDelimitedMultiDelimGroupParser, LatexGeneralNodesParser, LatexOptionalCharsMarkerParser, _display_abbrev_str, LatexEnvironmentNode, LatexParserBase, LatexNodesVisitor, LatexDelimitedGroupParserInfo, LatexNodeList, _display_str_delimiters, ParsedArguments, _unicode_from_str, LatexNode, __all__, latex_node_types, LatexMacroNode, LatexSpecialsNode, LatexExpressionParser, LatexMathNode, LatexWalkerParseError, LatexCommentNode};
+/* 000038 */ export {LatexMathNode, LatexNode, LatexWalkerParseError, LatexMacroNode, _update_posposend_from_nodelist, LatexCharsNode, LatexCommentNode, LatexGeneralNodesParser, LatexDelimitedVerbatimParser, LatexDelimitedGroupParserInfo, LatexNodeList, ParsedArguments, LatexOptionalCharsMarkerParser, LatexEnvironmentNode, __all__, LatexDelimitedMultiDelimGroupParser, _display_str_delimiters, LatexDelimitedExpressionParserInfo, _unicode_from_str, LatexExpressionParser, LatexOptionalEmbellishmentArgsParser, _get_content_as_chars, LatexParserBase, LatexDelimitedGroupParser, LatexSpecialsNode, _display_abbrev_str, LatexNodesVisitor, latex_node_types, LatexGroupNode};
 /* 000001 */ var __name__ = 'pylatexenc.latexnodes.parsers._stdarg';
 /* 000039 */ export var logger = (function () {
 /* 000039 */ 	var __accu0__ = logging;
@@ -698,178 +698,208 @@
 /* 000557 */ });
 /* 000568 */ export var LatexTackOnInformationFieldMacrosParser =  __class__ ('LatexTackOnInformationFieldMacrosParser', [LatexParserBase], {
 /* 000568 */ 	__module__: __name__,
-/* 000580 */ 	get __init__ () {return __get__ (this, function (self, macronames, allow_multiple) {
-/* 000580 */ 		if (typeof allow_multiple == 'undefined' || (allow_multiple != null && allow_multiple.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000580 */ 			var allow_multiple = false;
-/* 000580 */ 		};
-/* 000580 */ 		var kwargs = dict ();
-/* 000580 */ 		if (arguments.length) {
-/* 000580 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000580 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000580 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000580 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000580 */ 					switch (__attrib0__) {
-/* 000580 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000580 */ 						case 'macronames': var macronames = __allkwargs0__ [__attrib0__]; break;
-/* 000580 */ 						case 'allow_multiple': var allow_multiple = __allkwargs0__ [__attrib0__]; break;
-/* 000580 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000580 */ 					}
-/* 000580 */ 				}
-/* 000580 */ 				delete kwargs.__kwargtrans__;
-/* 000580 */ 			}
-/* 000580 */ 		}
-/* 000580 */ 		else {
-/* 000580 */ 		}
-/* 000581 */ 		__call__ (__call__ (__super__, null, LatexTackOnInformationFieldMacrosParser, '__init__'), null, self, __kwargtrans__ (kwargs));
-/* 000583 */ 		self.macronames = __call__ (set, null, macronames);
-/* 000584 */ 		if (__t__ (allow_multiple === false)) {
-/* 000585 */ 			self.allow_multiple = __call__ (set, null);
-/* 000585 */ 		}
-/* 000586 */ 		else if (__t__ (allow_multiple === true)) {
-/* 000587 */ 			self.allow_multiple = self.macronames;
-/* 000587 */ 		}
-/* 000588 */ 		else {
-/* 000589 */ 			self.allow_multiple = __call__ (set, null, allow_multiple);
-/* 000589 */ 		}
-/* 000591 */ 		self.expression_parser = __call__ (LatexExpressionParser, null);
-/* 000591 */ 	});},
-/* 000593 */ 	get contents_can_be_empty () {return __get__ (this, function (self) {
-/* 000593 */ 		if (arguments.length) {
-/* 000593 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000593 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000593 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000593 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000593 */ 					switch (__attrib0__) {
-/* 000593 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000593 */ 					}
-/* 000593 */ 				}
-/* 000593 */ 			}
-/* 000593 */ 		}
-/* 000593 */ 		else {
-/* 000593 */ 		}
-/* 000594 */ 		return true;
-/* 000594 */ 	});},
-/* 000596 */ 	get get_macro_arg_parser () {return __get__ (this, function (self, macroname) {
-/* 000596 */ 		if (arguments.length) {
-/* 000596 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000596 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000596 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000596 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000596 */ 					switch (__attrib0__) {
-/* 000596 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000596 */ 						case 'macroname': var macroname = __allkwargs0__ [__attrib0__]; break;
-/* 000596 */ 					}
-/* 000596 */ 				}
-/* 000596 */ 			}
-/* 000596 */ 		}
-/* 000596 */ 		else {
-/* 000596 */ 		}
-/* 000601 */ 		return self.expression_parser;
-/* 000601 */ 	});},
-/* 000603 */ 	get parse () {return __get__ (this, function (self, latex_walker, token_reader, parsing_state) {
-/* 000603 */ 		if (arguments.length) {
-/* 000603 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000603 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000603 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000603 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000603 */ 					switch (__attrib0__) {
-/* 000603 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000603 */ 						case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
-/* 000603 */ 						case 'token_reader': var token_reader = __allkwargs0__ [__attrib0__]; break;
-/* 000603 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
-/* 000603 */ 					}
-/* 000603 */ 				}
-/* 000603 */ 			}
-/* 000603 */ 		}
-/* 000603 */ 		else {
-/* 000603 */ 		}
-/* 000605 */ 		var arg_nodes = [];
-/* 000607 */ 		var seen_macronames = __call__ (set, null);
-/* 000609 */ 		while (__t__ (true)) {
-/* 000610 */ 			var tok = (function () {
-/* 000610 */ 				var __accu0__ = token_reader;
-/* 000610 */ 				return __call__ (__accu0__.peek_token_or_none, __accu0__, parsing_state);
-/* 000610 */ 			}) ();
-/* 000612 */ 			if (__t__ (__t__ (tok === null) || __t__ (__ne__ (tok.tok, 'macro')) || !__in__ (tok.arg, self.macronames))) {
-/* 000613 */ 				// pass;
-/* 000613 */ 				break;
-/* 000613 */ 			}
-/* 000618 */ 			var macroname = tok.arg;
-/* 000619 */ 			var tolerant_parsing_skip_add_this_node = false;
-/* 000623 */ 			(function () {
-/* 000623 */ 				var __accu0__ = token_reader;
-/* 000623 */ 				return __call__ (__accu0__.move_past_token, __accu0__, tok);
-/* 000623 */ 			}) ();
-/* 000625 */ 			if (__t__ (__t__ (__in__ (macroname, seen_macronames)) && !__t__ ((__in__ (macroname, self.allow_multiple))))) {
-/* 000627 */ 				var message = (function () {
-/* 000627 */ 					var __accu0__ = 'You cannot specify information field macro \\{} multiple times';
-/* 000627 */ 					return __call__ (__accu0__.format, __accu0__, macroname);
-/* 000627 */ 				}) ();
-/* 000630 */ 				var exc = __call__ (LatexWalkerParseError, null, __kwargtrans__ ({msg: message, pos: tok.pos, error_type_info: dict ({'what': 'nodes_stdarg_illegal_multiple_information_field_macro', 'macroname': macroname})}));
-/* 000638 */ 				var exc = (function () {
-/* 000638 */ 					var __accu0__ = latex_walker;
-/* 000638 */ 					return __call__ (__accu0__.check_tolerant_parsing_ignore_error, __accu0__, exc);
-/* 000638 */ 				}) ();
-/* 000639 */ 				if (__t__ (exc !== null)) {
-/* 000640 */ 					var __except0__ = exc;
-/* 000640 */ 					__except0__.__cause__ = null;
-/* 000640 */ 					throw __except0__;
-/* 000640 */ 				}
-/* 000641 */ 				(function () {
-/* 000641 */ 					var __accu0__ = logger;
-/* 000641 */ 					return __call__ (__accu0__.warning, __accu0__, '%s; ignoring the additional information field macros', message);
-/* 000641 */ 				}) ();
-/* 000642 */ 				var tolerant_parsing_skip_add_this_node = true;
-/* 000642 */ 			}
-/* 000644 */ 			var macro_arg_parser = (function () {
-/* 000644 */ 				var __accu0__ = self;
-/* 000644 */ 				return __call__ (__accu0__.get_macro_arg_parser, __accu0__, macroname);
-/* 000644 */ 			}) ();
-/* 000646 */ 			var __left0__ = (function () {
-/* 000646 */ 				var __accu0__ = latex_walker;
-/* 000651 */ 				return __call__ (__accu0__.parse_content, __accu0__, macro_arg_parser, __kwargtrans__ ({token_reader: token_reader, parsing_state: parsing_state, open_context: tuple ([(function () {
-/* 000651 */ 					var __accu1__ = 'Argument of information field macro \\{}';
-/* 000651 */ 					return __call__ (__accu1__.format, __accu1__, macroname);
-/* 000651 */ 				}) (), tok])}));
-/* 000651 */ 			}) ();
-/* 000651 */ 			var arg_content_node = __left0__ [0];
-/* 000651 */ 			var arg_parsing_state_delta = __left0__ [1];
-/* 000656 */ 			if (__t__ (arg_parsing_state_delta !== null)) {
-/* 000657 */ 				(function () {
-/* 000657 */ 					var __accu0__ = logger;
-/* 000658 */ 					return __call__ (__accu0__.warning, __accu0__, (function () {
-/* 000658 */ 						var __accu1__ = 'Parsing state delta is ignored when parsing tack-on information field macro \\{}: {}';
-/* 000658 */ 						return __call__ (__accu1__.format, __accu1__, macroname, arg_parsing_state_delta);
-/* 000658 */ 					}) ());
-/* 000658 */ 				}) ();
-/* 000658 */ 			}
-/* 000663 */ 			if (__t__ (tolerant_parsing_skip_add_this_node)) {
-/* 000663 */ 				continue;
-/* 000663 */ 			}
-/* 000666 */ 			if (__t__ (__call__ (isinstance, null, arg_content_node, LatexNodeList))) {
-/* 000667 */ 				var arg_content_nodelist = arg_content_node;
-/* 000667 */ 			}
-/* 000668 */ 			else {
-/* 000669 */ 				var arg_content_nodelist = (function () {
-/* 000669 */ 					var __accu0__ = latex_walker;
-/* 000669 */ 					return __call__ (__accu0__.make_nodelist, __accu0__, [arg_content_node], __kwargtrans__ ({parsing_state: parsing_state}));
-/* 000669 */ 				}) ();
-/* 000669 */ 			}
-/* 000674 */ 			var arg_node = (function () {
-/* 000674 */ 				var __accu0__ = latex_walker;
-/* 000674 */ 				return __call__ (__accu0__.make_node, __accu0__, LatexGroupNode, __kwargtrans__ ({parsing_state: parsing_state, delimiters: tuple ([__add__ ('\\', macroname), '']), nodelist: arg_content_nodelist, pos: tok.pos, pos_end: arg_content_node.pos_end}));
-/* 000674 */ 			}) ();
-/* 000683 */ 			(function () {
-/* 000683 */ 				var __accu0__ = arg_nodes;
-/* 000683 */ 				return __call__ (__accu0__.append, __accu0__, arg_node);
-/* 000683 */ 			}) ();
-/* 000683 */ 		}
-/* 000685 */ 		var arg_nodelist = (function () {
-/* 000685 */ 			var __accu0__ = latex_walker;
-/* 000685 */ 			return __call__ (__accu0__.make_nodelist, __accu0__, arg_nodes, __kwargtrans__ ({parsing_state: parsing_state}));
-/* 000685 */ 		}) ();
-/* 000690 */ 		return tuple ([arg_nodelist, null]);
-/* 000690 */ 	});}
-/* 000690 */ });
+/* 000595 */ 	get __init__ () {return __get__ (this, function (self, macronames, allow_multiple, macro_arg_parsers, default_macro_arg_parser) {
+/* 000595 */ 		if (typeof allow_multiple == 'undefined' || (allow_multiple != null && allow_multiple.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000595 */ 			var allow_multiple = false;
+/* 000595 */ 		};
+/* 000595 */ 		if (typeof macro_arg_parsers == 'undefined' || (macro_arg_parsers != null && macro_arg_parsers.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000595 */ 			var macro_arg_parsers = null;
+/* 000595 */ 		};
+/* 000595 */ 		if (typeof default_macro_arg_parser == 'undefined' || (default_macro_arg_parser != null && default_macro_arg_parser.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000595 */ 			var default_macro_arg_parser = true;
+/* 000595 */ 		};
+/* 000595 */ 		var kwargs = dict ();
+/* 000595 */ 		if (arguments.length) {
+/* 000595 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000595 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000595 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000595 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000595 */ 					switch (__attrib0__) {
+/* 000595 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000595 */ 						case 'macronames': var macronames = __allkwargs0__ [__attrib0__]; break;
+/* 000595 */ 						case 'allow_multiple': var allow_multiple = __allkwargs0__ [__attrib0__]; break;
+/* 000595 */ 						case 'macro_arg_parsers': var macro_arg_parsers = __allkwargs0__ [__attrib0__]; break;
+/* 000595 */ 						case 'default_macro_arg_parser': var default_macro_arg_parser = __allkwargs0__ [__attrib0__]; break;
+/* 000595 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000595 */ 					}
+/* 000595 */ 				}
+/* 000595 */ 				delete kwargs.__kwargtrans__;
+/* 000595 */ 			}
+/* 000595 */ 		}
+/* 000595 */ 		else {
+/* 000595 */ 		}
+/* 000598 */ 		__call__ (__call__ (__super__, null, LatexTackOnInformationFieldMacrosParser, '__init__'), null, self, __kwargtrans__ (kwargs));
+/* 000600 */ 		self.macronames = __call__ (set, null, macronames);
+/* 000601 */ 		if (__t__ (allow_multiple === false)) {
+/* 000602 */ 			self.allow_multiple = __call__ (set, null);
+/* 000602 */ 		}
+/* 000603 */ 		else if (__t__ (allow_multiple === true)) {
+/* 000604 */ 			self.allow_multiple = self.macronames;
+/* 000604 */ 		}
+/* 000605 */ 		else {
+/* 000606 */ 			self.allow_multiple = __call__ (set, null, allow_multiple);
+/* 000606 */ 		}
+/* 000608 */ 		if (__t__ (default_macro_arg_parser === true)) {
+/* 000609 */ 			self.default_macro_arg_parser = __call__ (LatexExpressionParser, null);
+/* 000609 */ 		}
+/* 000610 */ 		else {
+/* 000612 */ 			self.default_macro_arg_parser = default_macro_arg_parser;
+/* 000612 */ 		}
+/* 000614 */ 		self.macro_arg_parsers = macro_arg_parsers;
+/* 000614 */ 	});},
+/* 000616 */ 	get contents_can_be_empty () {return __get__ (this, function (self) {
+/* 000616 */ 		if (arguments.length) {
+/* 000616 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000616 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000616 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000616 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000616 */ 					switch (__attrib0__) {
+/* 000616 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000616 */ 					}
+/* 000616 */ 				}
+/* 000616 */ 			}
+/* 000616 */ 		}
+/* 000616 */ 		else {
+/* 000616 */ 		}
+/* 000617 */ 		return true;
+/* 000617 */ 	});},
+/* 000619 */ 	get get_macro_arg_parser () {return __get__ (this, function (self, macroname) {
+/* 000619 */ 		if (arguments.length) {
+/* 000619 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000619 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000619 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000619 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000619 */ 					switch (__attrib0__) {
+/* 000619 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000619 */ 						case 'macroname': var macroname = __allkwargs0__ [__attrib0__]; break;
+/* 000619 */ 					}
+/* 000619 */ 				}
+/* 000619 */ 			}
+/* 000619 */ 		}
+/* 000619 */ 		else {
+/* 000619 */ 		}
+/* 000627 */ 		if (__t__ (self.macro_arg_parsers === null)) {
+/* 000630 */ 			return self.default_macro_arg_parser;
+/* 000630 */ 		}
+/* 000631 */ 		if (__t__ (!__in__ (macroname, self.macro_arg_parsers))) {
+/* 000632 */ 			return self.default_macro_arg_parser;
+/* 000632 */ 		}
+/* 000633 */ 		var parser = __getitem__ (self.macro_arg_parsers, macroname);
+/* 000634 */ 		if (__t__ (parser === true)) {
+/* 000635 */ 			return self.default_macro_arg_parser;
+/* 000635 */ 		}
+/* 000636 */ 		return parser;
+/* 000636 */ 	});},
+/* 000639 */ 	get parse () {return __get__ (this, function (self, latex_walker, token_reader, parsing_state) {
+/* 000639 */ 		if (arguments.length) {
+/* 000639 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000639 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000639 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000639 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000639 */ 					switch (__attrib0__) {
+/* 000639 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000639 */ 						case 'latex_walker': var latex_walker = __allkwargs0__ [__attrib0__]; break;
+/* 000639 */ 						case 'token_reader': var token_reader = __allkwargs0__ [__attrib0__]; break;
+/* 000639 */ 						case 'parsing_state': var parsing_state = __allkwargs0__ [__attrib0__]; break;
+/* 000639 */ 					}
+/* 000639 */ 				}
+/* 000639 */ 			}
+/* 000639 */ 		}
+/* 000639 */ 		else {
+/* 000639 */ 		}
+/* 000641 */ 		var arg_nodes = [];
+/* 000643 */ 		var seen_macronames = __call__ (set, null);
+/* 000645 */ 		while (__t__ (true)) {
+/* 000646 */ 			var tok = (function () {
+/* 000646 */ 				var __accu0__ = token_reader;
+/* 000646 */ 				return __call__ (__accu0__.peek_token_or_none, __accu0__, parsing_state);
+/* 000646 */ 			}) ();
+/* 000648 */ 			if (__t__ (__t__ (tok === null) || __t__ (__ne__ (tok.tok, 'macro')) || !__in__ (tok.arg, self.macronames))) {
+/* 000649 */ 				// pass;
+/* 000649 */ 				break;
+/* 000649 */ 			}
+/* 000654 */ 			var macroname = tok.arg;
+/* 000655 */ 			var tolerant_parsing_skip_add_this_node = false;
+/* 000659 */ 			(function () {
+/* 000659 */ 				var __accu0__ = token_reader;
+/* 000659 */ 				return __call__ (__accu0__.move_past_token, __accu0__, tok);
+/* 000659 */ 			}) ();
+/* 000661 */ 			if (__t__ (__t__ (__in__ (macroname, seen_macronames)) && !__t__ ((__in__ (macroname, self.allow_multiple))))) {
+/* 000663 */ 				var message = (function () {
+/* 000663 */ 					var __accu0__ = 'You cannot specify information field macro \\{} multiple times';
+/* 000663 */ 					return __call__ (__accu0__.format, __accu0__, macroname);
+/* 000663 */ 				}) ();
+/* 000666 */ 				var exc = __call__ (LatexWalkerParseError, null, __kwargtrans__ ({msg: message, pos: tok.pos, error_type_info: dict ({'what': 'nodes_stdarg_illegal_multiple_information_field_macro', 'macroname': macroname})}));
+/* 000674 */ 				var exc = (function () {
+/* 000674 */ 					var __accu0__ = latex_walker;
+/* 000674 */ 					return __call__ (__accu0__.check_tolerant_parsing_ignore_error, __accu0__, exc);
+/* 000674 */ 				}) ();
+/* 000675 */ 				if (__t__ (exc !== null)) {
+/* 000676 */ 					var __except0__ = exc;
+/* 000676 */ 					__except0__.__cause__ = null;
+/* 000676 */ 					throw __except0__;
+/* 000676 */ 				}
+/* 000677 */ 				(function () {
+/* 000677 */ 					var __accu0__ = logger;
+/* 000677 */ 					return __call__ (__accu0__.warning, __accu0__, '%s; ignoring the additional information field macros', message);
+/* 000677 */ 				}) ();
+/* 000678 */ 				var tolerant_parsing_skip_add_this_node = true;
+/* 000678 */ 			}
+/* 000680 */ 			var macro_arg_parser = (function () {
+/* 000680 */ 				var __accu0__ = self;
+/* 000680 */ 				return __call__ (__accu0__.get_macro_arg_parser, __accu0__, macroname);
+/* 000680 */ 			}) ();
+/* 000682 */ 			if (__t__ (macro_arg_parser === null)) {
+/* 000684 */ 				var arg_content_node = null;
+/* 000685 */ 				var arg_parsing_state_delta = null;
+/* 000685 */ 			}
+/* 000686 */ 			else {
+/* 000689 */ 				var __left0__ = (function () {
+/* 000689 */ 					var __accu0__ = latex_walker;
+/* 000694 */ 					return __call__ (__accu0__.parse_content, __accu0__, macro_arg_parser, __kwargtrans__ ({token_reader: token_reader, parsing_state: parsing_state, open_context: tuple ([(function () {
+/* 000694 */ 						var __accu1__ = 'Argument of information field macro \\{}';
+/* 000694 */ 						return __call__ (__accu1__.format, __accu1__, macroname);
+/* 000694 */ 					}) (), tok])}));
+/* 000694 */ 				}) ();
+/* 000694 */ 				var arg_content_node = __left0__ [0];
+/* 000694 */ 				var arg_parsing_state_delta = __left0__ [1];
+/* 000699 */ 				if (__t__ (arg_parsing_state_delta !== null)) {
+/* 000700 */ 					(function () {
+/* 000700 */ 						var __accu0__ = logger;
+/* 000701 */ 						return __call__ (__accu0__.warning, __accu0__, (function () {
+/* 000701 */ 							var __accu1__ = 'Parsing state delta is ignored when parsing tack-on information field macro \\{}: {}';
+/* 000701 */ 							return __call__ (__accu1__.format, __accu1__, macroname, arg_parsing_state_delta);
+/* 000701 */ 						}) ());
+/* 000701 */ 					}) ();
+/* 000701 */ 				}
+/* 000701 */ 			}
+/* 000706 */ 			if (__t__ (tolerant_parsing_skip_add_this_node)) {
+/* 000706 */ 				continue;
+/* 000706 */ 			}
+/* 000709 */ 			if (__t__ (__call__ (isinstance, null, arg_content_node, LatexNodeList))) {
+/* 000710 */ 				var arg_content_nodelist = arg_content_node;
+/* 000710 */ 			}
+/* 000711 */ 			else {
+/* 000712 */ 				var arg_content_nodelist = (function () {
+/* 000712 */ 					var __accu0__ = latex_walker;
+/* 000712 */ 					return __call__ (__accu0__.make_nodelist, __accu0__, [arg_content_node], __kwargtrans__ ({parsing_state: parsing_state}));
+/* 000712 */ 				}) ();
+/* 000712 */ 			}
+/* 000717 */ 			var arg_node = (function () {
+/* 000717 */ 				var __accu0__ = latex_walker;
+/* 000717 */ 				return __call__ (__accu0__.make_node, __accu0__, LatexGroupNode, __kwargtrans__ ({parsing_state: parsing_state, delimiters: tuple ([__add__ ('\\', macroname), '']), nodelist: arg_content_nodelist, pos: tok.pos, pos_end: (__t__ (arg_content_node !== null) ? arg_content_node.pos_end : tok.pos_end)}));
+/* 000717 */ 			}) ();
+/* 000730 */ 			(function () {
+/* 000730 */ 				var __accu0__ = arg_nodes;
+/* 000730 */ 				return __call__ (__accu0__.append, __accu0__, arg_node);
+/* 000730 */ 			}) ();
+/* 000730 */ 		}
+/* 000732 */ 		var arg_nodelist = (function () {
+/* 000732 */ 			var __accu0__ = latex_walker;
+/* 000732 */ 			return __call__ (__accu0__.make_nodelist, __accu0__, arg_nodes, __kwargtrans__ ({parsing_state: parsing_state}));
+/* 000732 */ 		}) ();
+/* 000737 */ 		return tuple ([arg_nodelist, null]);
+/* 000737 */ 	});}
+/* 000737 */ });
 /* 000038 */ 
 //# sourceMappingURL=pylatexenc.latexnodes.parsers._stdarg.map
