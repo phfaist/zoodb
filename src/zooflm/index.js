@@ -7,10 +7,12 @@
 export * from './_flmutils.js';
 
 // provide $$kw({...}) and repr() to importers
-export {$$kw, repr} from './_flm-js/py.js';
+export { $$kw, repr } from './_flm-js/py.js';
 
 // provide ability to create derived classes of transcrypt/py classes, if necessary ...
-export {__class__, __super__, __get__, isinstance} from './_flm-js/org.transcrypt.__runtime__.js';
+export {
+    __class__, __super__, __get__, isinstance
+} from './_flm-js/org.transcrypt.__runtime__.js';
 
 // ZooFLMResourceInfo
 export * from './_resourceinfo.js';
