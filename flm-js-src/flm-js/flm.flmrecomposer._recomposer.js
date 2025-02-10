@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2025-01-19 14:47:54
+/* 000001 */ // Transcrypt'ed from Python, 2025-02-10 09:59:04
 /* 000007 */ var logging = {};
 /* 000007 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000010 */ import {LatexNodesLatexRecomposer} from './pylatexenc.latexnodes.js';
@@ -83,30 +83,28 @@
 /* 000046 */ 			}), chars);
 /* 000046 */ 		}) ();
 /* 000046 */ 	});},
-/* 000051 */ 	get _attempt_node_specinfo_recompose () {return __get__ (this, function (self, node) {
-/* 000051 */ 		var kwargs = dict ();
-/* 000051 */ 		if (arguments.length) {
-/* 000051 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000051 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000051 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000051 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000051 */ 					switch (__attrib0__) {
-/* 000051 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000051 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000051 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000051 */ 					}
-/* 000051 */ 				}
-/* 000051 */ 				delete kwargs.__kwargtrans__;
-/* 000051 */ 			}
-/* 000051 */ 		}
-/* 000051 */ 		else {
-/* 000051 */ 		}
-/* 000053 */ 		if (__t__ (__t__ (__call__ (hasattr, null, node, 'flm_specinfo')) && __call__ (hasattr, null, node.flm_specinfo, self.recompose_specinfo_method))) {
-/* 000054 */ 			return __call__ (__call__ (getattr, null, node.flm_specinfo, self.recompose_specinfo_method), null, __kwargtrans__ (__mergekwargtrans__ ({node: node, recomposer: self}, kwargs)));
-/* 000054 */ 		}
-/* 000059 */ 		return false;
-/* 000059 */ 	});},
-/* 000062 */ 	get recompose_chars () {return __get__ (this, function (self, chars, n) {
+/* 000049 */ 	get subrecompose () {return __get__ (this, function (self, node) {
+/* 000049 */ 		if (arguments.length) {
+/* 000049 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000049 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000049 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000049 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000049 */ 					switch (__attrib0__) {
+/* 000049 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000049 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000049 */ 					}
+/* 000049 */ 				}
+/* 000049 */ 			}
+/* 000049 */ 		}
+/* 000049 */ 		else {
+/* 000049 */ 		}
+/* 000057 */ 		return (function () {
+/* 000057 */ 			var __accu0__ = node;
+/* 000057 */ 			return __call__ (__accu0__.accept_node_visitor, __accu0__, self);
+/* 000057 */ 		}) ();
+/* 000057 */ 	});},
+/* 000062 */ 	get _attempt_node_specinfo_recompose () {return __get__ (this, function (self, node) {
+/* 000062 */ 		var kwargs = dict ();
 /* 000062 */ 		if (arguments.length) {
 /* 000062 */ 			var __ilastarg0__ = arguments.length - 1;
 /* 000062 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -114,131 +112,144 @@
 /* 000062 */ 				for (var __attrib0__ in __allkwargs0__) {
 /* 000062 */ 					switch (__attrib0__) {
 /* 000062 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000062 */ 						case 'chars': var chars = __allkwargs0__ [__attrib0__]; break;
-/* 000062 */ 						case 'n': var n = __allkwargs0__ [__attrib0__]; break;
+/* 000062 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000062 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
 /* 000062 */ 					}
 /* 000062 */ 				}
+/* 000062 */ 				delete kwargs.__kwargtrans__;
 /* 000062 */ 			}
 /* 000062 */ 		}
 /* 000062 */ 		else {
 /* 000062 */ 		}
-/* 000063 */ 		if (__t__ (!__t__ ((chars)))) {
-/* 000064 */ 			var chars = '';
-/* 000064 */ 		}
-/* 000065 */ 		var chars = __call__ (str, null, chars);
-/* 000066 */ 		return (function () {
-/* 000066 */ 			var __accu0__ = self;
-/* 000066 */ 			return __call__ (__accu0__.escape_chars, __accu0__, chars, n.parsing_state);
-/* 000066 */ 		}) ();
-/* 000066 */ 	});},
-/* 000069 */ 	get visit_macro_node () {return __get__ (this, function (self, node) {
-/* 000069 */ 		var kwargs = dict ();
-/* 000069 */ 		if (arguments.length) {
-/* 000069 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000069 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000069 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000069 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000069 */ 					switch (__attrib0__) {
-/* 000069 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000069 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000069 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000069 */ 					}
-/* 000069 */ 				}
-/* 000069 */ 				delete kwargs.__kwargtrans__;
-/* 000069 */ 			}
-/* 000069 */ 		}
-/* 000069 */ 		else {
-/* 000069 */ 		}
-/* 000070 */ 		var recomposed = (function () {
-/* 000070 */ 			var __accu0__ = self;
-/* 000070 */ 			return __call__ (__accu0__._attempt_node_specinfo_recompose, __accu0__, node, __kwargtrans__ (kwargs));
-/* 000070 */ 		}) ();
-/* 000071 */ 		if (__t__ (recomposed !== false)) {
-/* 000072 */ 			return recomposed;
-/* 000072 */ 		}
-/* 000073 */ 		return __call__ (__call__ (__super__, null, FLMNodesFlmRecomposer, 'visit_macro_node'), null, self, node, __kwargtrans__ (kwargs));
-/* 000073 */ 	});},
-/* 000075 */ 	get visit_environment_node () {return __get__ (this, function (self, node) {
-/* 000075 */ 		var kwargs = dict ();
-/* 000075 */ 		if (arguments.length) {
-/* 000075 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000075 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000075 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000075 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000075 */ 					switch (__attrib0__) {
-/* 000075 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000075 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000075 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000075 */ 					}
-/* 000075 */ 				}
-/* 000075 */ 				delete kwargs.__kwargtrans__;
-/* 000075 */ 			}
+/* 000064 */ 		if (__t__ (__t__ (__call__ (hasattr, null, node, 'flm_specinfo')) && __call__ (hasattr, null, node.flm_specinfo, self.recompose_specinfo_method))) {
+/* 000065 */ 			return __call__ (__call__ (getattr, null, node.flm_specinfo, self.recompose_specinfo_method), null, __kwargtrans__ (__mergekwargtrans__ ({node: node, recomposer: self}, kwargs)));
+/* 000065 */ 		}
+/* 000070 */ 		return false;
+/* 000070 */ 	});},
+/* 000073 */ 	get recompose_chars () {return __get__ (this, function (self, chars, n) {
+/* 000073 */ 		if (arguments.length) {
+/* 000073 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000073 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000073 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000073 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000073 */ 					switch (__attrib0__) {
+/* 000073 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000073 */ 						case 'chars': var chars = __allkwargs0__ [__attrib0__]; break;
+/* 000073 */ 						case 'n': var n = __allkwargs0__ [__attrib0__]; break;
+/* 000073 */ 					}
+/* 000073 */ 				}
+/* 000073 */ 			}
+/* 000073 */ 		}
+/* 000073 */ 		else {
+/* 000073 */ 		}
+/* 000074 */ 		if (__t__ (!__t__ ((chars)))) {
+/* 000075 */ 			var chars = '';
 /* 000075 */ 		}
-/* 000075 */ 		else {
-/* 000075 */ 		}
-/* 000076 */ 		var recomposed = (function () {
-/* 000076 */ 			var __accu0__ = self;
-/* 000076 */ 			return __call__ (__accu0__._attempt_node_specinfo_recompose, __accu0__, node, __kwargtrans__ (kwargs));
-/* 000076 */ 		}) ();
-/* 000077 */ 		if (__t__ (recomposed !== false)) {
-/* 000078 */ 			return recomposed;
-/* 000078 */ 		}
-/* 000079 */ 		return __call__ (__call__ (__super__, null, FLMNodesFlmRecomposer, 'visit_environment_node'), null, self, node, __kwargtrans__ (kwargs));
-/* 000079 */ 	});},
-/* 000081 */ 	get visit_specials_node () {return __get__ (this, function (self, node) {
-/* 000081 */ 		var kwargs = dict ();
-/* 000081 */ 		if (arguments.length) {
-/* 000081 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000081 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000081 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000081 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000081 */ 					switch (__attrib0__) {
-/* 000081 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000081 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000081 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000081 */ 					}
-/* 000081 */ 				}
-/* 000081 */ 				delete kwargs.__kwargtrans__;
-/* 000081 */ 			}
-/* 000081 */ 		}
-/* 000081 */ 		else {
-/* 000081 */ 		}
-/* 000082 */ 		var recomposed = (function () {
-/* 000082 */ 			var __accu0__ = self;
-/* 000082 */ 			return __call__ (__accu0__._attempt_node_specinfo_recompose, __accu0__, node, __kwargtrans__ (kwargs));
-/* 000082 */ 		}) ();
-/* 000083 */ 		if (__t__ (recomposed !== false)) {
-/* 000084 */ 			return recomposed;
-/* 000084 */ 		}
-/* 000085 */ 		return __call__ (__call__ (__super__, null, FLMNodesFlmRecomposer, 'visit_specials_node'), null, self, node, __kwargtrans__ (kwargs));
-/* 000085 */ 	});},
-/* 000087 */ 	get visit_unknown_node () {return __get__ (this, function (self, node) {
-/* 000087 */ 		var kwargs = dict ();
-/* 000087 */ 		if (arguments.length) {
-/* 000087 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000087 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000087 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000087 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000087 */ 					switch (__attrib0__) {
-/* 000087 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000087 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
-/* 000087 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
-/* 000087 */ 					}
-/* 000087 */ 				}
-/* 000087 */ 				delete kwargs.__kwargtrans__;
-/* 000087 */ 			}
-/* 000087 */ 		}
-/* 000087 */ 		else {
-/* 000087 */ 		}
-/* 000088 */ 		var recomposed = (function () {
-/* 000088 */ 			var __accu0__ = self;
-/* 000088 */ 			return __call__ (__accu0__._attempt_node_specinfo_recompose, __accu0__, node, __kwargtrans__ (kwargs));
-/* 000088 */ 		}) ();
-/* 000089 */ 		if (__t__ (recomposed !== false)) {
-/* 000090 */ 			return recomposed;
-/* 000090 */ 		}
-/* 000091 */ 		return __call__ (__call__ (__super__, null, FLMNodesFlmRecomposer, 'visit_unknown_node'), null, self, node, __kwargtrans__ (kwargs));
-/* 000091 */ 	});}
-/* 000091 */ });
+/* 000076 */ 		var chars = __call__ (str, null, chars);
+/* 000077 */ 		return (function () {
+/* 000077 */ 			var __accu0__ = self;
+/* 000077 */ 			return __call__ (__accu0__.escape_chars, __accu0__, chars, n.parsing_state);
+/* 000077 */ 		}) ();
+/* 000077 */ 	});},
+/* 000080 */ 	get node_standard_process_macro () {return __get__ (this, function (self, node) {
+/* 000080 */ 		if (arguments.length) {
+/* 000080 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000080 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000080 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000080 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000080 */ 					switch (__attrib0__) {
+/* 000080 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000080 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000080 */ 					}
+/* 000080 */ 				}
+/* 000080 */ 			}
+/* 000080 */ 		}
+/* 000080 */ 		else {
+/* 000080 */ 		}
+/* 000081 */ 		var recomposed = (function () {
+/* 000081 */ 			var __accu0__ = self;
+/* 000081 */ 			return __call__ (__accu0__._attempt_node_specinfo_recompose, __accu0__, node);
+/* 000081 */ 		}) ();
+/* 000082 */ 		if (__t__ (recomposed !== false)) {
+/* 000083 */ 			return recomposed;
+/* 000083 */ 		}
+/* 000084 */ 		return __call__ (__call__ (__super__, null, FLMNodesFlmRecomposer, 'node_standard_process_macro'), null, self, node);
+/* 000084 */ 	});},
+/* 000086 */ 	get node_standard_process_environment () {return __get__ (this, function (self, node) {
+/* 000086 */ 		if (arguments.length) {
+/* 000086 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000086 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000086 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000086 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000086 */ 					switch (__attrib0__) {
+/* 000086 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000086 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000086 */ 					}
+/* 000086 */ 				}
+/* 000086 */ 			}
+/* 000086 */ 		}
+/* 000086 */ 		else {
+/* 000086 */ 		}
+/* 000087 */ 		var recomposed = (function () {
+/* 000087 */ 			var __accu0__ = self;
+/* 000087 */ 			return __call__ (__accu0__._attempt_node_specinfo_recompose, __accu0__, node);
+/* 000087 */ 		}) ();
+/* 000088 */ 		if (__t__ (recomposed !== false)) {
+/* 000089 */ 			return recomposed;
+/* 000089 */ 		}
+/* 000090 */ 		return __call__ (__call__ (__super__, null, FLMNodesFlmRecomposer, 'node_standard_process_environment'), null, self, node);
+/* 000090 */ 	});},
+/* 000092 */ 	get node_standard_process_specials () {return __get__ (this, function (self, node) {
+/* 000092 */ 		if (arguments.length) {
+/* 000092 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000092 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000092 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000092 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000092 */ 					switch (__attrib0__) {
+/* 000092 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000092 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000092 */ 					}
+/* 000092 */ 				}
+/* 000092 */ 			}
+/* 000092 */ 		}
+/* 000092 */ 		else {
+/* 000092 */ 		}
+/* 000093 */ 		var recomposed = (function () {
+/* 000093 */ 			var __accu0__ = self;
+/* 000093 */ 			return __call__ (__accu0__._attempt_node_specinfo_recompose, __accu0__, node);
+/* 000093 */ 		}) ();
+/* 000094 */ 		if (__t__ (recomposed !== false)) {
+/* 000095 */ 			return recomposed;
+/* 000095 */ 		}
+/* 000096 */ 		return __call__ (__call__ (__super__, null, FLMNodesFlmRecomposer, 'node_standard_process_specials'), null, self, node);
+/* 000096 */ 	});},
+/* 000098 */ 	get visit_unknown_node () {return __get__ (this, function (self, node) {
+/* 000098 */ 		var kwargs = dict ();
+/* 000098 */ 		if (arguments.length) {
+/* 000098 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000098 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000098 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000098 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000098 */ 					switch (__attrib0__) {
+/* 000098 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000098 */ 						case 'node': var node = __allkwargs0__ [__attrib0__]; break;
+/* 000098 */ 						default: kwargs [__attrib0__] = __allkwargs0__ [__attrib0__];
+/* 000098 */ 					}
+/* 000098 */ 				}
+/* 000098 */ 				delete kwargs.__kwargtrans__;
+/* 000098 */ 			}
+/* 000098 */ 		}
+/* 000098 */ 		else {
+/* 000098 */ 		}
+/* 000099 */ 		var recomposed = (function () {
+/* 000099 */ 			var __accu0__ = self;
+/* 000099 */ 			return __call__ (__accu0__._attempt_node_specinfo_recompose, __accu0__, node, __kwargtrans__ (kwargs));
+/* 000099 */ 		}) ();
+/* 000100 */ 		if (__t__ (recomposed !== false)) {
+/* 000101 */ 			return recomposed;
+/* 000101 */ 		}
+/* 000102 */ 		return __call__ (__call__ (__super__, null, FLMNodesFlmRecomposer, 'visit_unknown_node'), null, self, node, __kwargtrans__ (kwargs));
+/* 000102 */ 	});}
+/* 000102 */ });
 /* 000007 */ 
 //# sourceMappingURL=flm.flmrecomposer._recomposer.map

@@ -495,7 +495,7 @@ export const FeatureZooGraphicsCollection = __class__(
         ), // RenderManager
 
 
-        // constructor.  I'm not sure why we need the getters etc.
+        // constructor.
         get __init__ () {return __get__ (this, function
         (self) {
 
