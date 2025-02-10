@@ -2224,7 +2224,6 @@
 /* 001446 */ 		}
 /* 001452 */ 		return (function () {
 /* 001452 */ 			var __accu0__ = self;
-console.log(__accu0__);
 /* 001452 */ 			return __call__ (__accu0__.visit, __accu0__, node, __kwargtrans__ (kwargs));
 /* 001452 */ 		}) ();
 /* 001452 */ 	});},
