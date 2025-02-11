@@ -89,7 +89,7 @@ export class CitationDatabaseManager
         try {
             json_data = await fsp.readFile(this.cache_file);
         } catch (err) {
-            debug(`Cache file does not exist or error loading cache file`, err);
+            debug(`Failed to read citations cache file ‘${this.cache_file}’ - maybe it does not exist`, err);
         }
         if (json_data == null) {
             return;
@@ -99,7 +99,7 @@ export class CitationDatabaseManager
             debug(`Loaded citations cache from ‘${this.cache_file}’ `
                   + `(${this.cache.size()} items)`);
         } catch (err) {
-            debug(`Error importing cache!`, err);
+            debug(`Failed to import citations cache from ‘${this.cache_file}’:`, err);
         }
     }
 
