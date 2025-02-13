@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2025-02-10 21:22:00
+/* 000001 */ // Transcrypt'ed from Python, 2025-02-13 12:53:48
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
@@ -8,7 +8,7 @@
 /* 000008 */ __nest__ (logging, '', __module_logging__);
 /* 000006 */ import * as __module_re__ from './re.js';
 /* 000006 */ __nest__ (re, '', __module_re__);
-/* 000006 */ export {LatexGroupNode, LatexCharsNode, FLMNodesFlmRecomposer};
+/* 000006 */ export {LatexCharsNode, LatexGroupNode, FLMNodesFlmRecomposer};
 /* 000001 */ var __name__ = 'flm.flmrecomposer.purelatex';
 /* 000009 */ export var logger = (function () {
 /* 000009 */ 	var __accu0__ = logging;
@@ -209,7 +209,7 @@
 /* 000105 */ 		__except0__.__cause__ = null;
 /* 000105 */ 		throw __except0__;
 /* 000105 */ 	});},
-/* 000110 */ 	get make_safe_label () {return __get__ (this, function (self, ref_domain, ref_type, ref_label) {
+/* 000110 */ 	get make_safe_label () {return __get__ (this, function (self, ref_domain, ref_type, ref_label, resource_info) {
 /* 000110 */ 		if (arguments.length) {
 /* 000110 */ 			var __ilastarg0__ = arguments.length - 1;
 /* 000110 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -220,86 +220,124 @@
 /* 000110 */ 						case 'ref_domain': var ref_domain = __allkwargs0__ [__attrib0__]; break;
 /* 000110 */ 						case 'ref_type': var ref_type = __allkwargs0__ [__attrib0__]; break;
 /* 000110 */ 						case 'ref_label': var ref_label = __allkwargs0__ [__attrib0__]; break;
+/* 000110 */ 						case 'resource_info': var resource_info = __allkwargs0__ [__attrib0__]; break;
 /* 000110 */ 					}
 /* 000110 */ 				}
 /* 000110 */ 			}
 /* 000110 */ 		}
 /* 000110 */ 		else {
 /* 000110 */ 		}
-/* 000113 */ 		var ref_full_label = '{}:{}'.format (ref_type, ref_label);
-/* 000115 */ 		if (__t__ (__t__ (__in__ (ref_domain, self.safe_ref_types)) && (function () {
-/* 000115 */ 			var __accu0__ = __getitem__ (self.safe_ref_types, ref_domain);
-/* 000115 */ 			return __call__ (__accu0__.py_get, __accu0__, ref_type);
-/* 000115 */ 		}) ())) {
-/* 000117 */ 			return dict ({'safe_label': ref_full_label});
-/* 000117 */ 		}
-/* 000119 */ 		if (__t__ (!__in__ (ref_domain, self.label_to_safe))) {
-/* 000120 */ 			__setitem__ (self.label_to_safe, ref_domain, __call__ (_Dict, null));
-/* 000121 */ 			__setitem__ (self.safe_to_label, ref_domain, __call__ (_Dict, null));
-/* 000121 */ 		}
-/* 000123 */ 		var label_to_safe_map = __getitem__ (self.label_to_safe, ref_domain);
-/* 000124 */ 		var value = (function () {
-/* 000124 */ 			var __accu0__ = label_to_safe_map;
-/* 000124 */ 			return __call__ (__accu0__.py_get, __accu0__, ref_full_label, null);
-/* 000124 */ 		}) ();
-/* 000125 */ 		if (__t__ (value !== null)) {
-/* 000127 */ 			return value;
-/* 000127 */ 		}
-/* 000129 */ 		var safe = '{}{}'.format (ref_domain, __call__ (str, null, self.safe_label_counter));
-/* 000130 */ 		self.safe_label_counter = __call__ (__iadd__, null, self.safe_label_counter, 1);
-/* 000132 */ 		var sinfo = dict ({'safe_label': safe});
-/* 000134 */ 		__setitem__ (__getitem__ (self.label_to_safe, ref_domain), ref_full_label, sinfo);
-/* 000135 */ 		__setitem__ (__getitem__ (self.safe_to_label, ref_domain), safe, ref_full_label);
-/* 000137 */ 		return sinfo;
-/* 000137 */ 	});},
-/* 000143 */ 	get recompose_delimited_nodelist () {return __get__ (this, function (self, delimiters, nodelist, n) {
-/* 000143 */ 		if (arguments.length) {
-/* 000143 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000143 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000143 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000143 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000143 */ 					switch (__attrib0__) {
-/* 000143 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000143 */ 						case 'delimiters': var delimiters = __allkwargs0__ [__attrib0__]; break;
-/* 000143 */ 						case 'nodelist': var nodelist = __allkwargs0__ [__attrib0__]; break;
-/* 000143 */ 						case 'n': var n = __allkwargs0__ [__attrib0__]; break;
-/* 000143 */ 					}
-/* 000143 */ 				}
-/* 000143 */ 			}
-/* 000143 */ 		}
-/* 000143 */ 		else {
-/* 000143 */ 		}
-/* 000144 */ 		var need_protective_braces = false;
-/* 000145 */ 		if (__t__ (__t__ (__eq__ (__getitem__ (delimiters, 0), '[')) && __eq__ (__getitem__ (delimiters, 1), ']'))) {
-/* 000146 */ 			if (__t__ (__t__ (__eq__ (__call__ (len, null, n.nodelist), 1)) && __t__ ((function () {
-/* 000146 */ 				var __accu0__ = __getitem__ (n.nodelist, 0);
-/* 000146 */ 				return __call__ (__accu0__.isNodeType, __accu0__, LatexGroupNode);
-/* 000146 */ 			}) ()) && __eq__ (__getitem__ (__getitem__ (n.nodelist, 0).delimiters, 0), '{'))) {
-/* 000149 */ 				var need_protective_braces = false;
-/* 000149 */ 			}
-/* 000150 */ 			else if (__t__ (__t__ (__eq__ (__call__ (len, null, n.nodelist), 1)) && __t__ ((function () {
-/* 000150 */ 				var __accu0__ = __getitem__ (n.nodelist, 0);
-/* 000150 */ 				return __call__ (__accu0__.isNodeType, __accu0__, LatexCharsNode);
-/* 000151 */ 			}) ()) && (function () {
-/* 000151 */ 				var __accu0__ = _rx_safe_chars_optarg;
-/* 000151 */ 				return __call__ (__accu0__.match, __accu0__, __getitem__ (n.nodelist, 0).chars);
-/* 000151 */ 			}) () !== null)) {
-/* 000153 */ 				var need_protective_braces = false;
-/* 000153 */ 			}
-/* 000154 */ 			else {
-/* 000155 */ 				var need_protective_braces = true;
-/* 000155 */ 			}
-/* 000155 */ 		}
-/* 000157 */ 		if (__t__ (need_protective_braces)) {
-/* 000158 */ 			var delimiters = tuple (['[{', '}]']);
-/* 000158 */ 		}
-/* 000160 */ 		return __call__ (__call__ (__super__, null, FLMPureLatexRecomposer, 'recompose_delimited_nodelist'), null, self, delimiters, nodelist, n);
-/* 000160 */ 	});},
-/* 000165 */ 	recompose_specinfo_method: 'recompose_pure_latex'
-/* 000165 */ });
-/* 000170 */ export var _rx_safe_chars_optarg = (function () {
-/* 000170 */ 	var __accu0__ = re;
-/* 000170 */ 	return __call__ (__accu0__.compile, __accu0__, '[-a-zA-Z0-9_+ !@#$&*()<>,./:;"\'|]*');
-/* 000170 */ }) ();
+/* 000113 */ 		var use_raw = false;
+/* 000114 */ 		var ref_to_global_key = (function __lambda__ (ref_domain, ref_type, ref_label, resource_info) {
+/* 000114 */ 			if (arguments.length) {
+/* 000114 */ 				var __ilastarg0__ = arguments.length - 1;
+/* 000114 */ 				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000114 */ 					var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000114 */ 					for (var __attrib0__ in __allkwargs0__) {
+/* 000114 */ 						switch (__attrib0__) {
+/* 000114 */ 							case 'ref_domain': var ref_domain = __allkwargs0__ [__attrib0__]; break;
+/* 000114 */ 							case 'ref_type': var ref_type = __allkwargs0__ [__attrib0__]; break;
+/* 000114 */ 							case 'ref_label': var ref_label = __allkwargs0__ [__attrib0__]; break;
+/* 000114 */ 							case 'resource_info': var resource_info = __allkwargs0__ [__attrib0__]; break;
+/* 000114 */ 						}
+/* 000114 */ 					}
+/* 000114 */ 				}
+/* 000114 */ 			}
+/* 000114 */ 			else {
+/* 000114 */ 			}
+/* 000114 */ 			return '{}:{}'.format (ref_type, ref_label);
+/* 000114 */ 		});
+/* 000117 */ 		if (__t__ (__in__ (ref_domain, self.safe_ref_types))) {
+/* 000118 */ 			var d = (function () {
+/* 000118 */ 				var __accu0__ = __getitem__ (self.safe_ref_types, ref_domain);
+/* 000118 */ 				return __call__ (__accu0__.py_get, __accu0__, ref_type);
+/* 000118 */ 			}) ();
+/* 000119 */ 			if (__t__ (!__t__ ((d)))) {
+/* 000120 */ 				// pass;
+/* 000120 */ 			}
+/* 000121 */ 			else if (__t__ (__t__ (d === true) || d === false)) {
+/* 000122 */ 				var use_raw = d;
+/* 000122 */ 			}
+/* 000123 */ 			else {
+/* 000125 */ 				if (__t__ (__in__ ('use_raw', d))) {
+/* 000126 */ 					var use_raw = __getitem__ (d, 'use_raw');
+/* 000126 */ 				}
+/* 000127 */ 				if (__t__ (__t__ (__in__ ('ref_to_global_key', d)) && __getitem__ (d, 'ref_to_global_key'))) {
+/* 000128 */ 					var ref_to_global_key = __getitem__ (d, 'ref_to_global_key');
+/* 000128 */ 				}
+/* 000128 */ 			}
+/* 000128 */ 		}
+/* 000130 */ 		if (__t__ (use_raw)) {
+/* 000132 */ 			return dict ({'safe_label': '{}:{}'.format (ref_type, ref_label)});
+/* 000132 */ 		}
+/* 000134 */ 		var ref_global_key = __call__ (ref_to_global_key, null, ref_domain, ref_type, ref_label, resource_info);
+/* 000138 */ 		if (__t__ (!__in__ (ref_domain, self.label_to_safe))) {
+/* 000139 */ 			__setitem__ (self.label_to_safe, ref_domain, __call__ (_Dict, null));
+/* 000140 */ 			__setitem__ (self.safe_to_label, ref_domain, __call__ (_Dict, null));
+/* 000140 */ 		}
+/* 000142 */ 		var label_to_safe_map = __getitem__ (self.label_to_safe, ref_domain);
+/* 000143 */ 		var value = (function () {
+/* 000143 */ 			var __accu0__ = label_to_safe_map;
+/* 000143 */ 			return __call__ (__accu0__.py_get, __accu0__, ref_global_key, null);
+/* 000143 */ 		}) ();
+/* 000144 */ 		if (__t__ (value !== null)) {
+/* 000146 */ 			return value;
+/* 000146 */ 		}
+/* 000148 */ 		var safe = '{}{}'.format (ref_domain, __call__ (str, null, self.safe_label_counter));
+/* 000149 */ 		self.safe_label_counter = __call__ (__iadd__, null, self.safe_label_counter, 1);
+/* 000151 */ 		var sinfo = dict ({'safe_label': safe});
+/* 000153 */ 		__setitem__ (__getitem__ (self.label_to_safe, ref_domain), ref_global_key, sinfo);
+/* 000154 */ 		__setitem__ (__getitem__ (self.safe_to_label, ref_domain), safe, dict ({'ref_global_key': ref_global_key, 'ref_type': ref_type, 'ref_label': ref_label, 'resource_info': resource_info}));
+/* 000161 */ 		return sinfo;
+/* 000161 */ 	});},
+/* 000167 */ 	get recompose_delimited_nodelist () {return __get__ (this, function (self, delimiters, nodelist, n) {
+/* 000167 */ 		if (arguments.length) {
+/* 000167 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000167 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000167 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000167 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000167 */ 					switch (__attrib0__) {
+/* 000167 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000167 */ 						case 'delimiters': var delimiters = __allkwargs0__ [__attrib0__]; break;
+/* 000167 */ 						case 'nodelist': var nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 000167 */ 						case 'n': var n = __allkwargs0__ [__attrib0__]; break;
+/* 000167 */ 					}
+/* 000167 */ 				}
+/* 000167 */ 			}
+/* 000167 */ 		}
+/* 000167 */ 		else {
+/* 000167 */ 		}
+/* 000168 */ 		var need_protective_braces = false;
+/* 000169 */ 		if (__t__ (__t__ (__eq__ (__getitem__ (delimiters, 0), '[')) && __eq__ (__getitem__ (delimiters, 1), ']'))) {
+/* 000170 */ 			if (__t__ (__t__ (__eq__ (__call__ (len, null, n.nodelist), 1)) && __t__ ((function () {
+/* 000170 */ 				var __accu0__ = __getitem__ (n.nodelist, 0);
+/* 000170 */ 				return __call__ (__accu0__.isNodeType, __accu0__, LatexGroupNode);
+/* 000170 */ 			}) ()) && __eq__ (__getitem__ (__getitem__ (n.nodelist, 0).delimiters, 0), '{'))) {
+/* 000173 */ 				var need_protective_braces = false;
+/* 000173 */ 			}
+/* 000174 */ 			else if (__t__ (__t__ (__eq__ (__call__ (len, null, n.nodelist), 1)) && __t__ ((function () {
+/* 000174 */ 				var __accu0__ = __getitem__ (n.nodelist, 0);
+/* 000174 */ 				return __call__ (__accu0__.isNodeType, __accu0__, LatexCharsNode);
+/* 000175 */ 			}) ()) && (function () {
+/* 000175 */ 				var __accu0__ = _rx_safe_chars_optarg;
+/* 000175 */ 				return __call__ (__accu0__.match, __accu0__, __getitem__ (n.nodelist, 0).chars);
+/* 000175 */ 			}) () !== null)) {
+/* 000177 */ 				var need_protective_braces = false;
+/* 000177 */ 			}
+/* 000178 */ 			else {
+/* 000179 */ 				var need_protective_braces = true;
+/* 000179 */ 			}
+/* 000179 */ 		}
+/* 000181 */ 		if (__t__ (need_protective_braces)) {
+/* 000182 */ 			var delimiters = tuple (['[{', '}]']);
+/* 000182 */ 		}
+/* 000184 */ 		return __call__ (__call__ (__super__, null, FLMPureLatexRecomposer, 'recompose_delimited_nodelist'), null, self, delimiters, nodelist, n);
+/* 000184 */ 	});},
+/* 000189 */ 	recompose_specinfo_method: 'recompose_pure_latex'
+/* 000189 */ });
+/* 000194 */ export var _rx_safe_chars_optarg = (function () {
+/* 000194 */ 	var __accu0__ = re;
+/* 000194 */ 	return __call__ (__accu0__.compile, __accu0__, '[-a-zA-Z0-9_+ !@#$&*()<>,./:;"\'|]*');
+/* 000194 */ }) ();
 /* 000006 */ 
 //# sourceMappingURL=flm.flmrecomposer.purelatex.map
