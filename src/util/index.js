@@ -10,3 +10,5 @@ export * from './prefixlabel.js';
 export * from './prify.js';
 
 export * from './rx.js';
+
+export * from './lexicographic.js';
