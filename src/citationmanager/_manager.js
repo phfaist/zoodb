@@ -6,6 +6,7 @@ const debug = debug_module('zoodb.citationmanager');
 import sha256 from 'hash.js/lib/hash/sha/256.js';
 
 import { promisifyMethods } from '../util/prify.js';
+import { writeFileAtomic } from '../util/atomicfilewrite.js';
 
 import { Cache, one_day } from './_cache.js';
 
@@ -111,7 +112,12 @@ export class CitationDatabaseManager
         const fsp = this.cache_fsp;
         // debug(`Saving database to cache file ‘${this.cache_file}’`);
         // to this.cache_file
-        await fsp.writeFile(this.cache_file, this.cache.exportJson());
+        await writeFileAtomic({
+            fsp,
+            fileName: this.cache_file,
+            data: this.cache.exportJson(),
+            processPid: (process != null) ? process.pid : 'XX',
+        });
     }
 
     /**

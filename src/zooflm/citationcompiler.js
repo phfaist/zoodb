@@ -8,6 +8,7 @@ const {
 
 import { split_prefix_label } from '../util/index.js';
 import { promisifyMethods } from '../util/prify.js';
+import { writeFileAtomic } from '../util/atomicfilewrite.js';
 
 import { Cache, one_day } from '../citationmanager/_cache.js';
 
@@ -399,7 +400,12 @@ export class CitationCompiler
     {
         const fsp = this.cache_fsp;
         debug(`Saving compiled citations to cache file ‘${this.cache_file}’`);
-        await fsp.writeFile(this.cache_file, this.cache.exportJson());
+        await writeFileAtomic({
+            fsp,
+            fileName: this.cache_file,
+            data: this.cache.exportJson(),
+            processPid: (process != null) ? process.pid : 'XX',
+        });
     }
 
 
