@@ -1,3 +1,26 @@
+
+export const nCmp = (a, b) => ( (a<b) ? -1 : ( (a === b) ? 0 : 1 ) );
+
+export const cmp = {
+    auto: (a, b) => {
+        if (typeof a !== typeof b) {
+            console.warn(`Type mismatch in comparison`, a, b);
+        }
+        if (typeof a === 'number') {
+            return nCmp(a, parseInt(b));
+        }
+        if (typeof a === 'string') {
+            return a.localeCompare(b);
+        }
+        // stringify to JSON, hope for the best
+        return JSON.stringify(a).localeCompare(JSON.stringify(b));
+    },
+    string: (a, b) => (''+a).localeCompare(b),
+    int: (a, b) => nCmp(parseInt(a), parseInt(b)),
+    number: (a, b) => nCmp(parseFloat(a), parseFloat(b)),
+};
+
+
 /**
  * Return a function that compares two arrays lexicographically according to
  * the given settings.
@@ -25,24 +48,8 @@
  */
 export function makeLexicographicCompareFn(cmpArray, { cmpOps, cmpOpDefault }={})
 {
-    const nCmp = (a, b) => ( (a<b) ? -1 : ( (a === b) ? 0 : 1 ) );
     const cmpOpsFull = {
-        auto: (a, b) => {
-            if (typeof a !== typeof b) {
-                console.warn(`Type mismatch in comparison`, a, b);
-            }
-            if (typeof a === 'number') {
-                return nCmp(a, parseInt(b));
-            }
-            if (typeof a === 'string') {
-                return a.localeCompare(b);
-            }
-            // stringify to JSON, hope for the best
-            return JSON.stringify(a).localeCompare(JSON.stringify(b));
-        },
-        string: (a, b) => (''+a).localeCompare(b),
-        int: (a, b) => nCmp(parseInt(a), parseInt(b)),
-        number: (a, b) => nCmp(parseFloat(a), parseFloat(b)),
+        ...cmp,
         ...(cmpOps ?? {}),
     };
     const cmpFns = (cmpArray??[]).map( (x) => (typeof x === 'string' ? cmpOpsFull[x] : x) );
