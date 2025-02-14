@@ -46,6 +46,8 @@ const default_make_resource_processors_graphics_path =
               new FLMGraphicsResourceProcessor({
                   zoo_flm_environment: _this.zoo_flm_environment,
                   fs,
+                  global_vector_scale: flm_options_resources?.global_vector_scale,
+                  global_raster_scale: flm_options_resources?.global_raster_scale,
               }),
           ];
       }
