@@ -22,7 +22,7 @@ import CSL from 'citeproc';
 const _recharclassescape = (c) => (['^','-',']','\\'].includes(c) ? '\\'+c : c);
 
 const flm_escape_chars = {
-    '\\': '\\textbackslash',
+    '\\': '\\textbackslash ',
     '%': '\\%',
     '#': '\\#',
     '&': '\\&',
