@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2025-02-16 00:46:20
+/* 000001 */ // Transcrypt'ed from Python, 2025-02-16 13:23:55
 /* 000006 */ var flm_all_serializable_classes = {};
 /* 000006 */ var logging = {};
 /* 000006 */ var unique_object_id = {};
@@ -16,7 +16,7 @@
 /* 000009 */ import {LatexArgumentSpec, ParsedArguments, ParsingStateDelta} from './pylatexenc.latexnodes.js';
 /* 000006 */ import * as __module_logging__ from './logging.js';
 /* 000006 */ __nest__ (logging, '', __module_logging__);
-/* 000006 */ export {latex_node_types, FLMParsingState, ParsedArguments, FLMFragment, LatexArgumentSpec, LatexParserBase, SpecialsSpec, FLMSpecInfo, LatexContextDb, FLMLatexWalker, FLMParsingStateDeltaSetBlockLevel, MacroSpec, LatexNodeList, ParsingStateDelta, EnvironmentSpec};
+/* 000006 */ export {FLMSpecInfo, LatexNodeList, LatexParserBase, ParsingStateDelta, latex_node_types, FLMLatexWalker, ParsedArguments, FLMParsingState, LatexContextDb, LatexArgumentSpec, FLMParsingStateDeltaSetBlockLevel, FLMFragment, MacroSpec, SpecialsSpec, EnvironmentSpec};
 /* 000001 */ var __name__ = 'flm.flmdump';
 /* 000007 */ export var logger = (function () {
 /* 000007 */ 	var __accu0__ = logging;
