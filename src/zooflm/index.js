@@ -19,7 +19,8 @@ export * from './_resourceinfo.js';
 
 
 // includes: make_zoo_flm_environment, prep_flm_environ_features,
-// zooflm_default_options, SectionCommandSpec, EndnoteCategory, RefInstance,
+// zooflm_default_environment_options,
+// SectionCommandSpec, EndnoteCategory, RefInstance,
 // FloatType, GraphicsResource
 export * from './_environment.js';
 
