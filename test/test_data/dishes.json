@@ -19,7 +19,7 @@
     {
         "dish_id": "soup",
         "name": "Soup",
-        "description": "A very liquid food dish.  Can have vegetables, etc.  Test some citation \\cite{arxiv:1211.3141}",
+        "description": "A very liquid food dish.  Can have vegetables, etc.  Test some citation \\cite{arxiv:1211.3141}. Test some $x$ dollar-delimited math $y=z$.",
         "relations": {
             "eaten_with": [
                 {

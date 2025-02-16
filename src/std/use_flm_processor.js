@@ -75,15 +75,15 @@ export async function use_flm_processor(_this)
     const citations_cache_dir =
           flm_options.citations?.cache_dir ?? '_zoodb_citations_cache';
 
-    if (flm_options.citations.cache_dir_create ?? true) {
+    if (flm_options.citations?.cache_dir_create ?? true) {
         await fsp.mkdir(citations_cache_dir, { recursive: true });
     }
 
     const make_resource_retriever_graphics_path =
-          flm_options.resources.make_resource_retriever_graphics_path
+          flm_options.resources?.make_resource_retriever_graphics_path
           ?? default_make_resource_retriever_graphics_path;
     const make_resource_processors_graphics_path =
-          flm_options.resources.make_resource_processors_graphics_path
+          flm_options.resources?.make_resource_processors_graphics_path
           ?? default_make_resource_processors_graphics_path;
 
     let citation_sources = {

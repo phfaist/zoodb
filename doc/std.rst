@@ -74,7 +74,7 @@ boilerplate code:
     
   }
 
-  export async function createMyFancyZooDb(config={}, { schema_root })
+  export async function createMyFancyZooDb(config={}, { schema_root }={})
   {
       schema_root ??= schemas_root_path;
 
@@ -140,6 +140,12 @@ boilerplate code:
                   figure_filename_extensions: null,
                   graphics_resources_fs_data_dir: null,
               },
+
+              environment_options: {
+                  // These options will be passed on to the ZooFLMEnvironment
+                  // constructor.  Here you can specify enabled FLM features,
+                  // FLM parsing options, and feature configuration.
+              }
     
           },
     

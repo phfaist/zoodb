@@ -46,9 +46,14 @@ The relevant functions can be imported as follows:
 - explain how to create subclasses..........
 
 
+Overview of FLM-related definitions
+-----------------------------------
 
-FLM environment
----------------
+ZooDb exposes a variety of classes, functions, and objects that enable you to
+interact with FLM-related features.  We'll try to go over most of them in
+the following sections.
+
+Here are the main symbols you can expect to import from `@phfaist/zoodb/zooflm`:
 
 .. code::
 
@@ -75,15 +80,105 @@ FLM environment
        FloatType, // flm.feature.floats.FloatType
        GraphicsResource, // flm.feature.graphics.GraphicsResource
 
-   } from '@phfaist/zoodb';
+   } from '@phfaist/zoodb/zooflm';
 
 
-.. js:class:: ZooFLMEnvironment(options)
+
+FLM environment
+---------------
+
+The `FLMEnvironment` is one of the central classes in the FLM package—it provides
+access to features, creates FLM fragments, defines parsing options, etc.
+
+In `ZooDb`, we have our own class :js:class:`ZooFLMEnvironment`, a
+`FLMEnvironment` subclass, that is capable of defining a standard environment with
+most features that you'd expect working out-of-the-box.
+
+
+.. js:class:: ZooFLMEnvironment(environment_options)
 
    The `ZooFLMEnvironment` class is the main FLM environment class in the
-   context of the ZooDb library.  Consider using the “standard” zoodb interface
+   context of the ZooDb library.
+   
+   Rather than directly instantiating this object, consider using the
+   “standard” zoodb interface
    to create an environment instance, as this is likely to be simpler and more
    features will be handled under the hood (see :ref:`zoodb-std`).
+
+   The options are pretty rich!  The following can appear as properties
+   of the `environment_options` object, with corresponding values to
+   adjust various configuration items:
+
+   - `parsing: { (...object...) }` — options to provide to FLM's
+     `standard_parsing_state()`, and which define options related to parsing
+     of FLM code.  Possible properties include `force_block_level`,
+     `enable_comments`, `comment_start`, `extra_forbidden_characters`, and
+     `dollar_inline_math_mode`.
+
+   - `flm_environment_options: { (...object...) }` — additional
+     keyword options to specify
+     to `FLMEnvironment`'s constructor, including `tolerant_parsing`
+     and `parsing_mode_deltas`.  (It is strongly discouraged to set
+     `tolerant_parsing` to true!)  Do not use this option to set
+     `features`, `parsing_state`, and `latex_context`; we already
+     provide these arguments and you can customize these objects
+     with other options above and below.
+
+   - `enable_features: { (...object...) }` — By default, `ZooFLMEnvironment`
+     provides a set of FLM features with default settings without you
+     explicitly asking for them.  This enables features like basic
+     formatting (``\textbf{}``, ``\emph{}``, etc.), hyperlinks (``\url{...}``,
+     …), math, etc. to work without too much effort on your end.  The
+     configuration option `enable_features` gives you fine-grained control
+     over which features to enable: Properties correspond to feature names
+     and the corresponding value is a boolean indicating whether to enable
+     that feature.  By default, all features are enabled.  The possible
+     feature names are: ``baseformatting``, ``href``, ``verbatim``, ``math``,
+     ``enumeration``, ``headings``, ``refs``, ``endnotes``, ``citations``,
+     ``floats``, ``defterm``, and ``graphics_collection``.  In addition,
+     you may specify the additional property ``default: true | false``,
+     fixing the default value for any feature name not explicitly given.
+     By default, ``default`` is set to ``true``, enabling all features
+     by default.  If you prefer to selectively enable features and ensure
+     that no other feature than the one(s) you selected are enabled, then
+     you can set ``default: false`` and can be reassured that if new features
+     are included in the future, they will not be enabled until you explicitly
+     request them.
+
+   In addition, a number of possible options directly influence settings
+   for individual features:
+
+   - `enumeration_environments` — will be passed on to
+     `flm.feature.enumeration.FeatureEnumeration`;
+
+   - `heading_section_commands_by_level` — will be passed on to
+     `flm.feature.headings.FeatureHeadings`;
+
+   - `ref_resolver` — will be used as an external reference resolver and
+     passed on to `flm.feature.refs.FeatureRefs`.  If you don't specify such an
+     object, a good default object will be automatically instantiated and
+     provided to the refs feature;
+
+   - `endnote_categories` — will be passed on to
+     `flm.feature.endnotes.FeatureEndnotes`;
+
+   - `citations_provider` — will be used as a provider for citations for the
+     `flm.feature.cite.FeatureExternalPrefixedCitations` feature.
+     If you don't specify such an object,
+     a good default object will be automatically instantiated and provided to
+     the cite feature.
+
+   - `citations_options` — an object whose keyword arguments will be passed on
+     directly to `flm.feature.cite.FeatureExternalPrefixedCitations`.  You can
+     specify citations format with `counter_formatter`, delimiters with
+     `citation_delimiters`, etc.;
+
+   - `float_types` — will be passed on to
+     `flm.feature.floats.FeatureFloats`.  Use this to define custom floats
+     beyond figures and tables;
+
+   - `defterm_options` — keyword arguments to pass on to
+     `flm.feature.defterm.FeatureDefTerm`.
 
 
 .. js:class:: FeatureZooGraphicsCollection()
@@ -101,6 +196,11 @@ FLM environment
    signature `callback(graphics_resource, render_context)` and returning a URL
    specifying where the graphics resource should be linked to in the rendered
    output.  (This property is set e.g. in :func:`use_flm_environment()`.)
+
+   You typically do not have to instantiate this object directly, as one is
+   instantiated for you automatically if you construct a `ZooFLMEnvironment`
+   (unless you've passed on options that disable this feature) or if one
+   is constructed using the `zoodb.std` helpers.
 
    .. js:function:: add_graphics(source_path, graphics_resource)
 
@@ -215,3 +315,5 @@ Compiling citations
 
 .. js:autofunction:: src/zooflm/citationcompiler.install_csl_flm_output_format
    :short-name:
+
+

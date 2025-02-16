@@ -50,29 +50,29 @@ export function default_target_href_resolver(ref_instance, render_context,
  */
 export function use_flm_environment(_this)
 {
-    const zoo_flm_environment_options = _this.config.zoo_flm_environment_options ?? {};
-
     const flm_options = _this.config.flm_options ?? {};
+    const environment_options = flm_options.environment_options ?? {};
 
-
-    const zoo_flm_environment = new ZooFLMEnvironment(zoo_flm_environment_options);
+    const zoo_flm_environment = new ZooFLMEnvironment(environment_options);
 
     //
     // target_href resolver for refs within FLM.  We depend on an external
     // callable in config that tells us how to build URLs corresponding to
     // object targets
     //
-    zoo_flm_environment.ref_resolver.target_href_resolver =
-        (ref_instance, render_context) => {
-            return default_target_href_resolver(ref_instance, render_context, {
-                zoo_object_permalink: _this.zoo_object_permalink,
-            });
-        }
-    ;
+    if (zoo_flm_environment.ref_resolver != null) {
+        zoo_flm_environment.ref_resolver.target_href_resolver =
+            (ref_instance, render_context) => {
+                return default_target_href_resolver(ref_instance, render_context, {
+                    zoo_object_permalink: _this.zoo_object_permalink,
+                });
+            }
+        ;
+    }
     //
     // Maybe allow unresolved references, for an incomplete zoo?
     //
-    if (flm_options.allow_unresolved_references) {
+    if (flm_options.allow_unresolved_references && zoo_flm_environment.feature_refs != null) {
         zoo_flm_environment.feature_refs.add_external_ref_resolver(
             {
                 get_ref(ref_type, ref_label, /*resource_info, render_context*/) {
@@ -90,7 +90,7 @@ export function use_flm_environment(_this)
     //
     // Maybe allow unresolved citations?
     //
-    if (flm_options.allow_unresolved_citations) {
+    if (flm_options.allow_unresolved_citations && zoo_flm_environment.feature_citations != null) {
         zoo_flm_environment.feature_citations.add_external_citations_provider(
             {
                 get_citation_full_text_flm(cite_prefix, cite_key, /*resource_info*/)
@@ -106,8 +106,10 @@ export function use_flm_environment(_this)
     // callable in config that tells us how to build URLs corresponding to a
     // given graphics resource.
     //
-    zoo_flm_environment.graphics_collection.src_url_resolver_fn =
-        ({graphics_resource, /*render_context, source_path*/}) => {
+    if (zoo_flm_environment.graphics_collection != null) {
+        zoo_flm_environment.graphics_collection.src_url_resolver_fn = ({
+            graphics_resource, // render_context, source_path
+        }) => {
 
             const src_url =
                   _this.config.zoo_permalinks.graphics_resource(graphics_resource);
@@ -170,8 +172,8 @@ export function use_flm_environment(_this)
             }
 
             return {src_url, srcset};
-        }
-    ;
+        };
+    }
 
     // provide helper $$kw({}) for superclass, if necessary
     _this.$$kw = $$kw;

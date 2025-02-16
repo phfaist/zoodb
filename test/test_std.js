@@ -71,6 +71,21 @@ async function createMyZooDb()
                 cache_dir: '_zoodb_TEST_citation_info_cache',
                 skip_save_cache: true,
             },
+
+            environment_options: {
+                enable_features: {
+                    default: false,
+
+                    defterm: false,
+                    baseformatting: true,
+                    href: true,
+                    math: true,
+                    citations: true,
+                },
+                parsing: {
+                    dollar_inline_math_mode: true,
+                }
+            }
             
         },
 
@@ -143,6 +158,11 @@ describe('zoodb.test_std', function() {
         const dataExport = await zoodb.data_dump();
 
         debug(`ZooDb mini test zoo loaded!`);
+
+        assert.notStrictEqual(zoodb.zoo_flm_environment.feature_baseformatting, null);
+        assert.strictEqual(zoodb.zoo_flm_environment.feature_defterm, null);
+        assert.strictEqual(zoodb.zoo_flm_environment.feature_floats, null);
+
     });
 
 });

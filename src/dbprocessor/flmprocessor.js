@@ -86,38 +86,42 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         //
         // Set up some citations related stuff
         //
-        this.citation_manager = new CitationDatabaseManager(
-            this.options.citations.sources,
-            {
-                default_user_agent: this.options.citations.default_user_agent,
+        if (!this.zoo_flm_environment.citations_provider) {
+            this.citation_manager = null;
+        } else {
+            this.citation_manager = new CitationDatabaseManager(
+                this.options.citations.sources,
+                {
+                    default_user_agent: this.options.citations.default_user_agent,
+                    cache_fs: this.options.citations.cache_fs,
+                    cache_file: path.join(this.options.citations.cache_dir,
+                                        'cache_downloaded_info.json'),
+                    cache_entry_default_duration_ms:
+                        this.options.citations.cache_entry_default_duration_ms,
+                    skip_save_cache: this.options.citations.skip_save_cache,
+                    ...(this.options.citations.citation_manager_options??{})
+                },
+            );
+
+            //
+            // So that we can compile citations
+            //
+
+            install_csl_flm_output_format(this.zoo_flm_environment);
+
+            const csl_style = this.options.citations.csl_style;
+
+            this.citation_compiler = new CitationCompiler({
+                citation_manager: this.citation_manager,
+                csl_style: csl_style,
+                flm_compile_fragments: true,
+                flm_environment: this.zoo_flm_environment,
                 cache_fs: this.options.citations.cache_fs,
                 cache_file: path.join(this.options.citations.cache_dir,
-                                      'cache_downloaded_info.json'),
-                cache_entry_default_duration_ms:
-                    this.options.citations.cache_entry_default_duration_ms,
+                                    'cache_compiled_citations.json'),
                 skip_save_cache: this.options.citations.skip_save_cache,
-                ...(this.options.citations.citation_manager_options??{})
-            },
-        );
-
-        //
-        // So that we can compile citations
-        //
-
-        install_csl_flm_output_format(this.zoo_flm_environment);
-
-        const csl_style = this.options.citations.csl_style;
-
-        this.citation_compiler = new CitationCompiler({
-            citation_manager: this.citation_manager,
-            csl_style: csl_style,
-            flm_compile_fragments: true,
-            flm_environment: this.zoo_flm_environment,
-            cache_fs: this.options.citations.cache_fs,
-            cache_file: path.join(this.options.citations.cache_dir,
-                                  'cache_compiled_citations.json'),
-            skip_save_cache: this.options.citations.skip_save_cache,
-        });
+            });
+        }
 
         //
         // Resource collector, e.g. for graphics
@@ -135,8 +139,8 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
     async initialize_zoo(zoodb)
     {
         // the citation manager & compiler need to load their cache files
-        await this.citation_manager.initialize();
-        await this.citation_compiler.initialize();
+        await this.citation_manager?.initialize();
+        await this.citation_compiler?.initialize();
 
         await this.flm_simple_content_compiler.initialize_zoo(zoodb);
     }
@@ -152,7 +156,7 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         await this.flm_simple_content_compiler.process_zoo(); // process simple FLM fields
         //debug("Zoo FLM content populated!");
 
-        this.zoo_flm_environment.ref_resolver.clear_all_refs();
+        this.zoo_flm_environment.ref_resolver?.clear_all_refs();
 
         await this.process_ref_targets_objects();
         await this.process_ref_targets_referenceables();
@@ -190,6 +194,10 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
     
     async process_ref_targets_objects()
     {
+        if (!this.zoo_flm_environment.ref_resolver) {
+            return;
+        }
+
         debug('setting up ref targets for objects ...');
         for (const [object_type, objectsdb] of Object.entries(this.zoodb.objects)) {
 
@@ -200,8 +208,8 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
             );
 
             const formatted_ref_flm_text_fn =
-                  optionsrefs.formatted_ref_flm_text_fn
-                  || ( (objid, obj) => obj?.name?.flm_text || objid )
+                optionsrefs.formatted_ref_flm_text_fn
+                || ( (objid, obj) => obj?.name?.flm_text || objid )
             ;
 
             for (const [objid,obj] of Object.entries(objectsdb)) {
@@ -219,12 +227,15 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
                     }))
                 );
             }
-
         }
     }
 
     async process_ref_targets_referenceables()
     {
+        if (!this.zoo_flm_environment.ref_resolver) {
+            return;
+        }
+
         debug('setting up ref targets for referenceables ...');
 
         const referenceables = this.scanner.get_encountered('referenceables');
@@ -235,8 +246,7 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
             if (encountered_in && encountered_in.resource_info
                 && encountered_in.resource_info.object_type) {
                 const { object_type, object_id } = encountered_in.resource_info;
-                target_href =
-                    this.get_object_target_href(object_type, object_id);
+                target_href = this.get_object_target_href(object_type, object_id);
                 const referenceable_info_target_id = referenceable_info.get_target_id();
                 if (referenceable_info_target_id != null) {
                     target_href += '#' + referenceable_info_target_id;
@@ -261,6 +271,10 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
 
     async process_citations()
     {
+        if (!this.citation_manager || !this.zoo_flm_environment.citations_provider) {
+            return;
+        }
+
         debug("Fetching citations ...");
 
         const encountered_citations = this.scanner.get_encountered('citations');
@@ -325,6 +339,10 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
 
     async process_collect_resources()
     {
+        if (!this.resource_collector) {
+            return;
+        }
+
         debug('Collecting external resources ...');
 
         const encountered_resources = this.scanner.get_encountered('resources');
@@ -358,7 +376,7 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
                 if (this.options.skip_check_update_existing_resources) {
                     if (resource.resource_type == 'graphics_path'
                         && (this.zoo_flm_environment.graphics_collection
-                            .has_graphics_for(source))) {
+                            ?.has_graphics_for(source) ?? false)) {
                         debug(`Resource information for ${resource.resource_type} `
                               + `‘${source}’ is already available and `
                               + `options.skip_check_update_existing_resources is set; `
@@ -402,15 +420,15 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         //
         if (flm_include_refs_data) {
             let refs_data = {};
-            if (this.zoo_flm_environment.ref_resolver) {
+            if (this.zoo_flm_environment.ref_resolver != null) {
                 refs_data.refs =
                     this.zoo_flm_environment.ref_resolver.dump_database();
             }
-            if (this.zoo_flm_environment.citations_provider) {
+            if (this.zoo_flm_environment.citations_provider != null) {
                 refs_data.citations =
                     this.zoo_flm_environment.citations_provider.dump_database();
             }
-            if (this.zoo_flm_environment.graphics_collection) {
+            if (this.zoo_flm_environment.graphics_collection != null) {
                 refs_data.graphics_collection =
                     this.zoo_flm_environment.graphics_collection.dump_database();
             }

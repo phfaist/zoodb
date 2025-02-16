@@ -39,10 +39,11 @@ export async function makeStandardZooDb(config)
             use_gitlastmodified_processor: null,
 
             use_flm_environment: null,
-            zoo_flm_environment_options: null,
 
             use_flm_processor: null,
             flm_options: {
+
+                environment_options: null,
 
                 refs: {},
 

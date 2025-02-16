@@ -3,6 +3,8 @@ const debug = debug_module('zoodb.zooflm._environment');
 
 import path from 'path';
 
+import loMerge from 'lodash/merge.js';
+
 import {$$kw, /*repr*/} from './_flm-js/py.js';
 import {__class__, __super__, __get__, isinstance} from './_flm-js/org.transcrypt.__runtime__.js';
 
@@ -36,7 +38,7 @@ import * as flm_feature_cite from './_flm-js/flm.feature.cite.js';
 import * as flm_feature_floats from './_flm-js/flm.feature.floats.js';
 import * as flm_feature_defterm from './_flm-js/flm.feature.defterm.js';
 import * as flm_feature_graphics from './_flm-js/flm.feature.graphics.js';
-//import * as flm_feature_cells from './_flm-js/flm.feature.cells.js';
+import * as flm_feature_cells from './_flm-js/flm.feature.cells.js';
 
 import * as flm_flmspecinfo from './_flm-js/flm.flmspecinfo.js';
 import * as flm_flmdocument from './_flm-js/flm.flmdocument.js';
@@ -59,7 +61,7 @@ export {
     flm_feature_math, flm_feature_enumeration,
     flm_feature_headings, flm_feature_endnotes,
     flm_feature_refs, flm_feature_cite,
-    flm_feature_floats, flm_feature_defterm, flm_feature_graphics,
+    flm_feature_floats, flm_feature_defterm, flm_feature_graphics, flm_feature_cells,
     flm_flmspecinfo, flm_flmenvironment, flm_flmdocument, flm_flmrendercontext,
     pylatexenc_latexnodes, pylatexenc_latexnodes_nodes, pylatexenc_latexnodes_parsers,
     pylatexenc_macrospec,
@@ -717,65 +719,124 @@ export function zooflm_default_options(footnote_counter_formatter='alph')
 
 
 
-export function install_standard_features(self, zooflm_options)
+
+//
+// Helper function for ZooFLMEnvironment's constructor.
+// 
+// Useful properties, named `feature_***` along with some others, will be set
+// on the object `self`.
+//
+export function install_standard_features(self, environment_options)
 {
-    self.citations_provider =
-        zooflm_options.citations_provider ?? new CitationsProvider();
-
-    self.ref_resolver =
-        zooflm_options.ref_resolver
-        ?? new RefResolver(zooflm_options.ref_resolver_options);
-
-    self.graphics_collection =
-        zooflm_options.graphics_collection ?? new FeatureZooGraphicsCollection();
-
+    const enable_features = environment_options.enable_features ?? {};
+    const enable_default = enable_features.default ?? true;
 
     debug("install_standard_features: creating feature class instances ...");
 
+    if (enable_features.baseformatting ?? enable_default) {
+        self.feature_baseformatting =
+            new flm_feature_baseformatting.FeatureBaseFormatting();
+    } else {
+        self.feature_baseformatting = null;
+    }
 
-    self.feature_baseformatting =
-        new flm_feature_baseformatting.FeatureBaseFormatting();
+    if (enable_features.href ?? enable_default) {
+        self.feature_href = new flm_feature_href.FeatureHref();
+    } else {
+        self.feature_href = null;
+    }
 
-    self.feature_href = new flm_feature_href.FeatureHref();
+    if (enable_features.verbatim ?? enable_default) {
+        self.feature_verbatim = new flm_feature_verbatim.FeatureVerbatim();
+    } else {
+        self.feature_verbatim = null;
+    }
 
-    self.feature_verbatim = new flm_feature_verbatim.FeatureVerbatim();
+    if (enable_features.math ?? enable_default) {
+        self.feature_math = new flm_feature_math.FeatureMath();
+    } else {
+        self.feature_math = null;
+    }
 
-    self.feature_math = new flm_feature_math.FeatureMath();
+    if (enable_features.enumeration ?? enable_default) {
+        self.feature_enumeration = new flm_feature_enumeration.FeatureEnumeration(
+            $$kw({enumeration_environments:
+                environment_options.enumeration_environments}),
+        );
+    } else {
+        self.feature_enumeration = null;
+    }
 
-    self.feature_enumeration = new flm_feature_enumeration.FeatureEnumeration(
-        $$kw({enumeration_environments:
-              zooflm_options.enumeration_environments}),
-    );
+    if (enable_features.headings ?? enable_default) {
+        self.feature_headings = new flm_feature_headings.FeatureHeadings(
+            $$kw({section_commands_by_level:
+                environment_options.heading_section_commands_by_level}),
+        );
+    } else {
+        self.feature_headings = null;
+    }
 
-    self.feature_headings = new flm_feature_headings.FeatureHeadings(
-        $$kw({section_commands_by_level:
-              zooflm_options.heading_section_commands_by_level}),
-    );
-    self.feature_refs = new flm_feature_refs.FeatureRefs(
-        [ self.ref_resolver ],
-    );
+    if (enable_features.refs ?? enable_default) {
+        self.ref_resolver = environment_options.ref_resolver
+            ?? new RefResolver(environment_options.ref_resolver_options);
 
-    self.feature_endnotes = new flm_feature_endnotes.FeatureEndnotes(
-        $$kw({categories: zooflm_options.endnote_categories})
-    );
+        self.feature_refs = new flm_feature_refs.FeatureRefs(
+            [ self.ref_resolver ],
+        );
+    } else {
+        // Keep custom ref_resolver in case one was provided for a different purpose??
+        self.ref_resolver = environment_options.ref_resolver ?? null;
+        self.feature_refs = null;
+    }
+
+    if (enable_features.endnotes ?? enable_default) {
+        self.feature_endnotes = new flm_feature_endnotes.FeatureEndnotes(
+            $$kw({categories: environment_options.endnote_categories})
+        );
+    } else {
+        self.feature_endnotes = null;
+    }
     
-    self.feature_citations = new flm_feature_cite.FeatureExternalPrefixedCitations(
-        $$kw({ external_citations_providers: [ self.citations_provider ],
-               counter_formatter: zooflm_options.citation_counter_formatter,
-               citation_delimiters: zooflm_options.citation_delimiters, })
-    );
+    if (enable_features.citations ?? enable_default) {
+        self.citations_provider =
+            environment_options.citations_provider ?? new CitationsProvider();
 
-    self.feature_floats = new flm_feature_floats.FeatureFloats(
-        $$kw({float_types: zooflm_options.float_types})
-    );
+        self.feature_citations = new flm_feature_cite.FeatureExternalPrefixedCitations(
+            $$kw({
+                external_citations_providers: [ self.citations_provider ],
+                ... (environment_options.citations_options ?? {})
+            })
+        );
+    } else {
+        // Keep custom citations_provider in case one was provided for a different purpose??
+        self.citations_provider = environment_options.citations_provider ?? null;
+        self.feature_citations = null;
+    }
 
-    self.feature_defterm = new flm_feature_defterm.FeatureDefTerm();
-    self.feature_defterm.render_defterm_with_term =
-        zooflm_options.defterm_render_defterm_with_term;
-    self.feature_defterm.render_defterm_with_term_suffix =
-        zooflm_options.defterm_render_defterm_with_term_suffix;
+    if (enable_features.floats ?? enable_default) {
+        self.feature_floats = new flm_feature_floats.FeatureFloats(
+            $$kw({float_types: environment_options.float_types})
+        );
+    } else {
+        self.feature_floats = null;
+    }
 
-    const features =  [
+    if (enable_features.defterm ?? enable_default) {
+        self.feature_defterm = new flm_feature_defterm.FeatureDefTerm(
+            $$kw({ ... (environment_options.defterm_options ?? {}) })
+        );
+    } else {
+        self.feature_defterm = null;
+    }
+
+    if (enable_features.graphics_collection ?? enable_default) {
+        self.graphics_collection =
+            environment_options.graphics_collection ?? new FeatureZooGraphicsCollection();
+    } else {
+        self.graphics_collection = null;
+    }
+
+    const features = [
         self.feature_baseformatting,
         self.feature_href,
         self.feature_verbatim,
@@ -788,12 +849,15 @@ export function install_standard_features(self, zooflm_options)
         self.feature_floats,
         self.feature_defterm,
         self.graphics_collection,
-    ];
+    ].filter( (f) => (f != null) );
 
     return features;
 }
 
 
+//
+// documented in doc/zoodb.zooflm.rst
+//
 export var ZooFLMEnvironment = __class__(
     'ZooFLMEnvironment', // class name
     [ FLMEnvironment ], // base classes
@@ -801,15 +865,15 @@ export var ZooFLMEnvironment = __class__(
         // static members
 
         get __init__ () {return __get__ (this, function
-        (self, zooflm_options) {
+        (self, environment_options) {
 
-            zooflm_options = Object.assign({}, zooflm_default_options(), zooflm_options);
+            environment_options = loMerge({}, zooflm_default_options(), environment_options);
 
             const parsing_state = flm_flmenvironment.standard_parsing_state($$kw(
-                zooflm_options.parsing_state_options ?? {}
+                environment_options.parsing ?? {}
             ));
 
-            const features = install_standard_features(self, zooflm_options);
+            const features = install_standard_features(self, environment_options);
 
             // const parsing_mode_deltas = {
             //     // /// not sure how useful this is ...
@@ -837,7 +901,7 @@ export var ZooFLMEnvironment = __class__(
                 new pylatexenc_macrospec.LatexContextDb(),
                 $$kw({
                     // parsing_mode_deltas: parsing_mode_deltas,
-                    ... (zooflm_options.flm_environment_options ?? {})
+                    ... (environment_options.flm_environment_options ?? {})
                 })
             );
 
