@@ -666,7 +666,7 @@ export const FeatureZooGraphicsCollection = __class__(
 /**
  * Return a default set of options for an FLM environment.
  */
-export function zooflm_default_options(footnote_counter_formatter='alph')
+export function zooflm_default_environment_options(footnote_counter_formatter='alph')
 {
     return {
 
@@ -699,7 +699,8 @@ export function zooflm_default_options(footnote_counter_formatter='alph')
         citation_counter_formatter: 'arabic',
         citation_delimiters: ['[', ']'],
 
-        figure_filename_extensions: [ '', '.svg', '.png', '.jpg', '.jpeg' ],
+        // ### what is this doing here?
+        //figure_filename_extensions: [ '', '.svg', '.png', '.jpg', '.jpeg' ],
 
         float_types: [
             FloatType('figure', 'Figure', $$kw({
@@ -712,8 +713,10 @@ export function zooflm_default_options(footnote_counter_formatter='alph')
             })),
         ],
 
-        defterm_render_defterm_with_term: true,
-        defterm_render_defterm_with_term_suffix: ': ',
+        defterm_options: {
+            render_defterm_with_term: true,
+            render_defterm_with_term_suffix: ': ',
+        },
     };
 }
 
@@ -867,13 +870,21 @@ export var ZooFLMEnvironment = __class__(
         get __init__ () {return __get__ (this, function
         (self, environment_options) {
 
-            environment_options = loMerge({}, zooflm_default_options(), environment_options);
+            environment_options = loMerge(
+                {},
+                zooflm_default_environment_options(),
+                environment_options
+            );
 
             const parsing_state = flm_flmenvironment.standard_parsing_state($$kw(
                 environment_options.parsing ?? {}
             ));
 
-            const features = install_standard_features(self, environment_options);
+            let features = install_standard_features(self, environment_options);
+
+            if (environment_options.custom_features) {
+                features = [ ...features, environment_options.custom_features ];
+            }
 
             // const parsing_mode_deltas = {
             //     // /// not sure how useful this is ...

@@ -3,6 +3,10 @@ import path from 'path';
 import * as flmdump from './_flm-js/flm.flmdump.js';
 
 /**
+ * .. code::
+ * 
+ *    const ri = new ZooFLMResourceInfo(object_type, object_id, source_path)
+ * 
  * Store information about which source file an FLM fragment was encountered in.
  * Useful to find resources (eg. graphics files) with relative paths as well as
  * to track errors.  Objects of this type will be set in the `resource_info`

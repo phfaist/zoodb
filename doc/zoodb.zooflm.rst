@@ -62,7 +62,7 @@ Here are the main symbols you can expect to import from `@phfaist/zoodb/zooflm`:
        FeatureZooGraphicsCollection,
 
        ZooFLMEnvironment,
-       zooflm_default_options,
+       zooflm_default_environment_options,
 
        is_flm_fragment,
 
@@ -159,6 +159,11 @@ most features that you'd expect working out-of-the-box.
      object, a good default object will be automatically instantiated and
      provided to the refs feature;
 
+   - `ref_resolver_options` — if `ref_resolver` is null (which typically is
+     the case), a standard ref resolver object is instantiated (cf.
+     :js:class:`RefResolver`).  Here, you can specify options to this class
+     constructor;
+
    - `endnote_categories` — will be passed on to
      `flm.feature.endnotes.FeatureEndnotes`;
 
@@ -222,7 +227,7 @@ most features that you'd expect working out-of-the-box.
 .. js:autofunction:: src/zooflm/_environment.is_flm_fragment
    :short-name:
 
-.. js:autofunction:: src/zooflm/_environment.zooflm_default_options
+.. js:autofunction:: src/zooflm/_environment.zooflm_default_environment_options
    :short-name:
 
 
@@ -246,9 +251,17 @@ Rendering content
 .. code::
 
    import {
-       ZooHtmlFragmentRenderer, ZooTextFragmentRenderer,
+       // FLM fragment renderers & related tools
+       ZooHtmlFragmentRenderer,
+       ZooTextFragmentRenderer,
        html_fragmentrenderer_get_style_information,
-       render_html_standalone, render_text_standalone
+       render_html_standalone,
+       render_text_standalone,
+       // render utilities
+       make_render_shorthands,
+       render_value,
+       value_not_empty,
+       make_and_render_document,
    } from '@phfaist/zoodb/zooflm';
 
 
@@ -274,6 +287,18 @@ Rendering content
 .. js:autofunction:: src/zooflm/_fragmentrenderers.render_text_standalone
    :short-name:
 
+
+.. js:autofunction:: src/zooflm/_renderutils.make_render_shorthands
+   :short-name:
+
+.. js:autofunction:: src/zooflm/_renderutils.render_value
+   :short-name:
+
+.. js:autofunction:: src/zooflm/_renderutils.value_not_empty
+   :short-name:
+
+.. js:autofunction:: src/zooflm/_renderutils.make_and_render_document
+   :short-name:
 
 
 Scanning fragments
