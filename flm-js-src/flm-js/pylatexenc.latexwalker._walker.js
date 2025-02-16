@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2025-02-16 22:05:56
+/* 000001 */ // Transcrypt'ed from Python, 2025-02-17 00:04:29
 /* 000037 */ var logging = {};
 /* 000037 */ var re = {};
 /* 000037 */ var unique_object_id = {};
@@ -17,7 +17,7 @@
 /* 000039 */ import * as _util from './pylatexenc._util.js';
 /* 000037 */ import * as __module_re__ from './re.js';
 /* 000037 */ __nest__ (re, '', __module_re__);
-/* 000037 */ export {latexnodes, LatexSpecialsNode, _unicode_from_str, parsers, ParsedArguments, macrospec, LatexCommentNode, _display_str_delimiters, LatexWalkerLocatedErrorFormatter, format_pos, LatexWalkerNodesParseError, LatexMacroNode, LatexCharsNode, LatexWalkerParseError, latex_node_types, LatexNodeList, LatexMathNode, LatexWalkerEndOfStream, to_str, _util, _update_posposend_from_nodelist, _basestring, LatexNode, _display_abbrev_str, LatexWalkerError, LatexWalkerTokenParseError, LatexEnvironmentNode, LatexWalkerLocatedError, _get_content_as_chars, _UseList, LatexNodesVisitor, __all__, LatexGroupNode, ParsingState};
+/* 000037 */ export {LatexWalkerLocatedErrorFormatter, parsers, latexnodes, LatexWalkerNodesParseError, LatexGroupNode, LatexMathNode, LatexWalkerError, LatexEnvironmentNode, LatexNodesVisitor, ParsedArguments, LatexMacroNode, _util, ParsingState, LatexNodeList, _unicode_from_str, _get_content_as_chars, LatexWalkerEndOfStream, LatexWalkerParseError, _display_abbrev_str, LatexCharsNode, format_pos, LatexNode, _display_str_delimiters, __all__, _basestring, to_str, LatexSpecialsNode, LatexWalkerLocatedError, latex_node_types, _UseList, LatexCommentNode, LatexWalkerTokenParseError, _update_posposend_from_nodelist, macrospec};
 /* 000001 */ var __name__ = 'pylatexenc.latexwalker._walker';
 /* 000051 */ export var get_default_latex_context_db = macrospec.LatexContextDb;
 /* 000062 */ export var logger = (function () {
