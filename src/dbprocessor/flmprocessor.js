@@ -156,16 +156,42 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         await this.flm_simple_content_compiler.process_zoo(); // process simple FLM fields
         //debug("Zoo FLM content populated!");
 
-        this.zoo_flm_environment.ref_resolver?.clear_all_refs();
+        await this.process_auxiliary_resources();
 
+        debug("Zoo FLM processing done");
+    }
+
+    /** You can call this method to compile additional, ad hoc fragments that do
+     * not appear as object field values.
+     * 
+     * If you compile additional fragments, don't forget to call 
+     */
+    compile_flm_fragment(flm_content, {
+        standalone, is_block_level, resource_info, what,
+        skip_scanner
+    } )
+    {
+        return this.flm_simple_content_compiler.compile_flm_fragment(flm_content, { 
+            flm_options: { standalone, is_block_level },
+            resource_info,
+            what,
+            skip_scanner,
+        });
+    }
+
+    /** You should call this method if you compile more fragments using
+     * `compile_flm_fragment()`.  This method will ensure that any additional
+     * citaitons are collected, any referenceable targets are registered, and
+     * any additional resources are collected.
+     */
+    async process_auxiliary_resources()
+    {
+        this.zoo_flm_environment.ref_resolver?.clear_all_refs();
         await this.process_ref_targets_objects();
         await this.process_ref_targets_referenceables();
-
         await this.process_citations();
 
         await this.process_collect_resources();
-
-        debug("Zoo FLM processing done");
     }
 
     async prepare_zoo_update_objects(db_objects)

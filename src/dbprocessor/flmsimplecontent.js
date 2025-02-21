@@ -169,9 +169,9 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
      * (nullish) then we find the corresponding field schema in `object_schema`
      * using the `fieldname` argument.
      *
-     * Note: the API guarantees that compile_flm() and compile_object() also
-     * work if no zoodb is set, and can be used w/o zoodb if you want to compile
-     * a single ad hoc object.
+     * Note: the API guarantees that compile_flm(), compile_flm_fragment(), and
+     * compile_object() also work if no zoodb is set, and can be used w/o zoodb
+     * if you want to compile a single ad hoc object.
      */
     compile_flm( flm_content, {
         flm_options,
@@ -217,7 +217,51 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
 
         const what = resource_info.toString() + ` .${fieldname}`;
 
+        return this.compile_flm_fragment(flm_content, { flm_options, resource_info, what })
+    }
+
+    /**
+     * Compile the given string `flm_content` into an FLM fragment using
+     * the current environment.  Will also apply any scanner, unless
+     * `skip_scanner` is true.  Errors will be reported as per the
+     * config's error policy.
+     * 
+     * - `flm_options` is an object with keys 'standalone' (defaults to
+     *   false) and `is_block_level` (defaults to null to let FLMFragment's
+     *   parser decide).
+     * 
+     * - `resource_info` is attached to the fragment.  If null, a `ZooFLMResource`
+     *   info instance with null entries is created.
+     * 
+     * - `what` is a description of what is being compiled.  Useful for error
+     *   messages.
+     * 
+     * - `skip_scanner` defaults to false, so that the fragment scanner defined in
+     *   the configuration of this processor is applied to the fragment by default.
+     *   If this argument is set to a truthy value, then the fragment scanner
+     *   is not applied.
+     * 
+     * - `fieldname` can be set to the name of the object's field name that is
+     *   being compiled.  It is used in error information reporting only.
+     * 
+     * Note: the API guarantees that compile_flm(), compile_flm_fragment(), and
+     * compile_object() also work if no zoodb is set, and can be used w/o zoodb
+     * if you want to compile a single ad hoc object.
+     */
+    compile_flm_fragment(flm_content, { 
+        flm_options, resource_info, what, skip_scanner,
+        fieldname, // fieldname is only used for reporting errors
+    })
+    {
+        if (is_flm_fragment(flm_content)) {
+            // it's already compiled!
+            return flm_content;
+        }
         flm_content ??= '';
+
+        if (resource_info == null) {
+            resource_info = new ZooFLMResourceInfo(null, null, null);
+        }
 
         let fragment = null;
         try {
@@ -225,7 +269,7 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
                 flm_content,
                 $$kw({
                     standalone_mode: flm_options.standalone ?? false,
-                    resource_info: resource_info,
+                    resource_info: resource_info ?? null,
                     what: what,
                     is_block_level: flm_options.is_block_level ?? null,
                 })
@@ -233,8 +277,7 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
         } catch (err) {
             const errmsgobj = (err.msg !== undefined) ? (err.msg + '\n' + err.stack) : err;
             console.error(
-                `Error while compiling FLM content for ${resource_info} `
-                + `— field ‘${fieldname}’: `,
+                `Error while compiling FLM content for ${what}: `,
                 errmsgobj
             );
             let errmsgstr = null;
@@ -253,7 +296,7 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
                 debug(`Continuing despite FLM Error (flm_error_policy is 'continue')`);
                 fragment = this.config.flm_environment.make_fragment(
                     `\\textbf{FLM ERROR `
-                    +   `(\\begin{verbatimtext}${what} [field ‘${fieldname}’]\\end{verbatimtext}):} `
+                    +   `(\\begin{verbatimtext}${what}\\end{verbatimtext}):} `
                     + '\n\n'
                     + `\\begin{verbatimtext}${errmsgstr}\\end{verbatimtext}`,
                     $$kw({
@@ -277,7 +320,7 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
             }
         }
 
-        if (this.config.content_scanner != null) {
+        if ( !skip_scanner && this.config.content_scanner != null) {
             this.config.content_scanner.scan_fragment(fragment);
         }
 
