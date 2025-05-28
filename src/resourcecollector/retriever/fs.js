@@ -207,7 +207,7 @@ class FilesystemPropertiesAccessor
         const strbinary = arr.reduce((res, c) => res + String.fromCharCode(c), '')
         let res = btoa(strbinary);
         // replace /+ by other friendlier chars
-        res = res.replace('/', '_').replace('+', '-');
+        res = res.replaceAll('/', '_').replaceAll('+', '-');
         if (len) {
             return res.slice(0, len);
         }

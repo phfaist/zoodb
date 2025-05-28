@@ -30,7 +30,7 @@ export function sqzhtml(strings, ...values)
     const lastIndex = strings.length - 1;
     let collapsed_strings = strings.map(
         (x, index) => {
-            let s = x.replace(/>\n+ */g, '>').replace(/\n+ *</g, '<');
+            let s = x.replaceAll(/>\n+ */g, '>').replaceAll(/\n+ *</g, '<');
             if (index === 0) {
                 return s.trimStart();
             } else if (index === lastIndex) {

@@ -276,7 +276,7 @@ export function make_and_render_document({
     fragment_renderer ??= new ZooHtmlFragmentRenderer();
 
     render_endnotes_integrate_string ??= (rendered_content, rendered_endnotes) => 
-        rendered_content.replace('<RENDER_ENDNOTES/>', rendered_endnotes)
+        rendered_content.replaceAll('<RENDER_ENDNOTES/>', rendered_endnotes)
         ;
 
     let kwargs = {};
