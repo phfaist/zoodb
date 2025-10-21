@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2025-10-21 20:57:05
+/* 000001 */ // Transcrypt'ed from Python, 2025-10-21 23:26:12
 /* 000033 */ var functools = {};
 /* 000033 */ var itertools = {};
 /* 000033 */ var logging = {};
@@ -13,7 +13,7 @@
 /* 000034 */ __nest__ (functools, '', __module_functools__);
 /* 000033 */ import * as __module_logging__ from './logging.js';
 /* 000033 */ __nest__ (logging, '', __module_logging__);
-/* 000033 */ export {RULE_REGEX, UnicodeToLatexConversionRule, RULE_CALLABLE, RULE_DICT};
+/* 000033 */ export {UnicodeToLatexConversionRule, RULE_CALLABLE, RULE_REGEX, RULE_DICT};
 /* 000001 */ var __name__ = 'pylatexenc.latexencode._unicode_to_latex_encoder';
 /* 000041 */ export var unicode_str = function (s) {
 /* 000041 */ 	if (typeof s == 'undefined' || (s != null && s.hasOwnProperty ("__kwargtrans__"))) {;
