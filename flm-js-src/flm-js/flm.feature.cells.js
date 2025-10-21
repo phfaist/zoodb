@@ -1,7 +1,7 @@
-/* 000001 */ // Transcrypt'ed from Python, 2025-02-21 21:50:04
+/* 000001 */ // Transcrypt'ed from Python, 2025-10-21 17:57:22
 /* 000010 */ var logging = {};
 /* 000010 */ var re = {};
-/* 000010 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
+/* 000010 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, _copy, _sort, abs, all, any, assert, bin, bool, bytearray, bytes, callable, chr, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, hex, input, int, isinstance, issubclass, len, list, map, max, min, object, oct, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000033 */ import {Feature} from './flm.feature._base.js';
 /* 000028 */ import {FLMEnvironmentSpecBase, FLMMacroSpecError} from './flm.flmspecinfo.js';
 /* 000025 */ import {FLMArgumentSpec} from './flm.flmenvironment.js';
@@ -13,7 +13,7 @@
 /* 000012 */ __nest__ (logging, '', __module_logging__);
 /* 000010 */ import * as __module_re__ from './re.js';
 /* 000010 */ __nest__ (re, '', __module_re__);
-/* 000010 */ export {FLMEnvironmentSpecBase, latexnodes_nodes, FLMMacroSpecError, Feature, LatexWalkerLocatedError, FLMArgumentSpec, macrospec, LatexArgumentSpec, ParsingStateDelta, ParsedArgumentsInfo, latexnodes_parsers};
+/* 000010 */ export {latexnodes_parsers, ParsedArgumentsInfo, macrospec, LatexWalkerLocatedError, LatexArgumentSpec, FLMArgumentSpec, FLMMacroSpecError, Feature, ParsingStateDelta, latexnodes_nodes, FLMEnvironmentSpecBase};
 /* 000001 */ var __name__ = 'flm.feature.cells';
 /* 000013 */ export var logger = (function () {
 /* 000013 */ 	var __accu0__ = logging;
@@ -1668,7 +1668,7 @@
 /* 000919 */ 		}) ();
 /* 000919 */ 	});}
 /* 000919 */ });
-/* 000930 */ export var FeatureProvideCells =  __class__ ('FeatureProvideCells', [Feature], {
+/* 000930 */ export var FeatureCells =  __class__ ('FeatureCells', [Feature], {
 /* 000930 */ 	__module__: __name__,
 /* 000932 */ 	feature_name: 'cells',
 /* 000933 */ 	feature_title: 'Typesetting data tables',
@@ -1708,6 +1708,6 @@
 /* 000960 */ 		return __call__ (dict, null, __kwargtrans__ ({macros: [__call__ (CellMacro, null), __call__ (CelldataMacroSpec, null), __call__ (MergeMacroSpec, null), __call__ (LatexTabularRowSeparatorSpec, null)], specials: [__call__ (LatexTabularColumnSeparatorSpec, null)]}));
 /* 000960 */ 	});}
 /* 000960 */ });
-/* 000964 */ export var FeatureClass = FeatureProvideCells;
+/* 000964 */ export var FeatureClass = FeatureCells;
 /* 000010 */ 
 //# sourceMappingURL=flm.feature.cells.map

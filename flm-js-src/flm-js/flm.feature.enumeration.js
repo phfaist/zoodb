@@ -1,6 +1,6 @@
-/* 000001 */ // Transcrypt'ed from Python, 2025-02-21 21:50:04
+/* 000001 */ // Transcrypt'ed from Python, 2025-10-21 17:57:22
 /* 000007 */ var logging = {};
-/* 000007 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
+/* 000007 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, _copy, _sort, abs, all, any, assert, bin, bool, bytearray, bytes, callable, chr, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, hex, input, int, isinstance, issubclass, len, list, map, max, min, object, oct, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000035 */ import {get_safe_target_id} from './flm.feature.refs.js';
 /* 000033 */ import {Feature} from './flm.feature._base.js';
 /* 000030 */ import * as counter from './flm.counter.js';
@@ -12,7 +12,7 @@
 /* 000011 */ import {LatexWalkerLocatedError, ParsedArgumentsInfo} from './pylatexenc.latexnodes.js';
 /* 000007 */ import * as __module_logging__ from './logging.js';
 /* 000007 */ __nest__ (logging, '', __module_logging__);
-/* 000007 */ export {FLMEnvironmentSpecBase, ParsingStateDeltaExtendLatexContextDb, label_arg, LatexEnvironmentBodyContentsParser, latexnodes_nodes, get_safe_target_id, MacroSpec, Feature, counter, FLMArgumentSpec, LatexWalkerLocatedError, helper_collect_labels, ParsedArgumentsInfo, latexnodes_parsers};
+/* 000007 */ export {latexnodes_nodes, latexnodes_parsers, ParsedArgumentsInfo, LatexWalkerLocatedError, MacroSpec, counter, FLMArgumentSpec, LatexEnvironmentBodyContentsParser, Feature, label_arg, ParsingStateDeltaExtendLatexContextDb, helper_collect_labels, get_safe_target_id, FLMEnvironmentSpecBase};
 /* 000001 */ var __name__ = 'flm.feature.enumeration';
 /* 000008 */ export var logger = (function () {
 /* 000008 */ 	var __accu0__ = logging;
@@ -214,7 +214,7 @@
 /* 000197 */ 		}
 /* 000199 */ 		var counter_formatter = (function () {
 /* 000199 */ 			var __accu0__ = counter;
-/* 000199 */ 			return __call__ (__accu0__.parse_counter_formatter, __accu0__, counter_formatter_spec, __kwargtrans__ ({str_use_tag_template: true}));
+/* 000199 */ 			return __call__ (__accu0__.parse_counter_format_num, __accu0__, counter_formatter_spec, __kwargtrans__ ({str_use_tag_template: true}));
 /* 000199 */ 		}) ();
 /* 000204 */ 		var items_custom_tags = dict ({});
 /* 000205 */ 		var items_custom_labels = dict ({});
@@ -275,10 +275,6 @@
 /* 000229 */ 			var __accu0__ = render_context;
 /* 000229 */ 			return __call__ (__accu0__.supports_feature, __accu0__, 'refs');
 /* 000229 */ 		}) ())) {
-/* 000231 */ 			var mgr_enum = (function () {
-/* 000231 */ 				var __accu0__ = render_context;
-/* 000231 */ 				return __call__ (__accu0__.feature_render_manager, __accu0__, 'enumeration');
-/* 000231 */ 			}) ();
 /* 000232 */ 			var mgr_refs = (function () {
 /* 000232 */ 				var __accu0__ = render_context;
 /* 000232 */ 				return __call__ (__accu0__.feature_render_manager, __accu0__, 'refs');
@@ -386,112 +382,115 @@
 /* 000288 */ 				var __accu0__ = __call__ (ParsedArgumentsInfo, null, __kwargtrans__ ({node: item_macro}));
 /* 000288 */ 				return __call__ (__accu0__.get_all_arguments_info, __accu0__, tuple (['custom_tag', 'label']));
 /* 000288 */ 			}) ();
-/* 000292 */ 			var s = __call__ (__iadd__, null, s, '\\item ');
+/* 000292 */ 			var s = __call__ (__iadd__, null, s, '\\item');
 /* 000294 */ 			if (__t__ (__t__ (__in__ ('custom_tag', item_node_args)) && (function () {
 /* 000294 */ 				var __accu0__ = __getitem__ (item_node_args, 'custom_tag');
 /* 000294 */ 				return __call__ (__accu0__.was_provided, __accu0__);
 /* 000294 */ 			}) ())) {
-/* 000295 */ 				var s = __call__ (__iadd__, null, s, (function () {
-/* 000295 */ 					var __accu0__ = recomposer;
-/* 000296 */ 					return __call__ (__accu0__.subrecompose, __accu0__, (function () {
-/* 000296 */ 						var __accu1__ = __getitem__ (item_node_args, 'custom_tag');
-/* 000296 */ 						return __call__ (__accu1__.get_content_nodelist, __accu1__);
-/* 000296 */ 					}) ());
-/* 000296 */ 				}) ());
-/* 000296 */ 			}
-/* 000298 */ 			if (__t__ (__t__ (__in__ ('label', item_node_args)) && (function () {
-/* 000298 */ 				var __accu0__ = __getitem__ (item_node_args, 'label');
-/* 000298 */ 				return __call__ (__accu0__.was_provided, __accu0__);
-/* 000298 */ 			}) ())) {
-/* 000299 */ 				var items_custom_labels = __call__ (helper_collect_labels, null, __getitem__ (item_node_args, 'label'), self.allowed_item_label_prefixes);
-/* 000303 */ 				var __iterable1__ = items_custom_labels;
-/* 000303 */ 				for (var __index1__ = 0; __index1__ < len (__iterable1__); __index1__++) {
-/* 000303 */ 					var __left0__ = __getitem__ (__iterable1__, __index1__);
-/* 000303 */ 					var ref_type = __left0__ [0];
-/* 000303 */ 					var ref_label = __left0__ [1];
-/* 000304 */ 					var safe_label_info = (function () {
-/* 000304 */ 						var __accu0__ = recomposer;
-/* 000304 */ 						return __call__ (__accu0__.make_safe_label, __accu0__, 'ref', ref_type, ref_label, node.latex_walker.resource_info);
-/* 000304 */ 					}) ();
-/* 000307 */ 					var s = __call__ (__iadd__, null, s, __add__ (__add__ ('\\label{', __getitem__ (safe_label_info, 'safe_label')), '}'));
-/* 000307 */ 				}
-/* 000307 */ 			}
-/* 000309 */ 			var s = __call__ (__iadd__, null, s, (function () {
-/* 000309 */ 				var __accu0__ = recomposer;
-/* 000309 */ 				return __call__ (__accu0__.subrecompose, __accu0__, item_content_nodelist);
-/* 000309 */ 			}) ());
-/* 000309 */ 		}
-/* 000311 */ 		var s = __call__ (__iadd__, null, s, __add__ (__add__ ('\\end{', node.environmentname), '}'));
-/* 000312 */ 		return s;
-/* 000312 */ 	});}
-/* 000312 */ });
-/* 000316 */ export var FeatureEnumeration =  __class__ ('FeatureEnumeration', [Feature], {
-/* 000316 */ 	__module__: __name__,
-/* 000323 */ 	feature_name: 'enumeration',
-/* 000324 */ 	feature_title: 'Enumeration and itemization lists',
-/* 000326 */ 	feature_default_config: dict ({'enumeration_environments': dict ({'itemize': dict ({'counter_formatter': ['•', '-', '▸']}), 'enumerate': dict ({'counter_formatter': null})})}),
-/* 000336 */ 	DocumentManager: null,
-/* 000337 */ 	RenderManager: null,
-/* 000340 */ 	get __init__ () {return __get__ (this, function (self, enumeration_environments) {
-/* 000340 */ 		if (typeof enumeration_environments == 'undefined' || (enumeration_environments != null && enumeration_environments.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000340 */ 			var enumeration_environments = null;
-/* 000340 */ 		};
-/* 000340 */ 		if (arguments.length) {
-/* 000340 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000340 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000340 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000340 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000340 */ 					switch (__attrib0__) {
-/* 000340 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000340 */ 						case 'enumeration_environments': var enumeration_environments = __allkwargs0__ [__attrib0__]; break;
-/* 000340 */ 					}
-/* 000340 */ 				}
-/* 000340 */ 			}
-/* 000340 */ 		}
-/* 000340 */ 		else {
-/* 000340 */ 		}
-/* 000341 */ 		__call__ (__call__ (__super__, null, FeatureEnumeration, '__init__'), null, self);
-/* 000342 */ 		if (__t__ (enumeration_environments === null)) {
-/* 000347 */ 			var enumeration_environments = (function () {
-/* 000347 */ 				var __accu0__ = self.feature_default_config;
-/* 000347 */ 				return __call__ (__accu0__.py_get, __accu0__, 'enumeration_environments', dict ({}));
-/* 000347 */ 			}) ();
-/* 000347 */ 		}
-/* 000348 */ 		self.enumeration_environments = enumeration_environments;
-/* 000348 */ 	});},
-/* 000350 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
-/* 000350 */ 		if (arguments.length) {
-/* 000350 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000350 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000350 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000350 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000350 */ 					switch (__attrib0__) {
-/* 000350 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000350 */ 					}
-/* 000350 */ 				}
-/* 000350 */ 			}
-/* 000350 */ 		}
-/* 000350 */ 		else {
-/* 000350 */ 		}
-/* 000351 */ 		return __call__ (dict, null, __kwargtrans__ ({environments: (function () {
-/* 000351 */ 			var __accu0__ = [];
-/* 000358 */ 			var __iterable0__ = (function () {
-/* 000358 */ 				var __accu1__ = __call__ (dict, null, self.enumeration_environments);
-/* 000358 */ 				return __call__ (__accu1__.py_items, __accu1__);
-/* 000358 */ 			}) ();
-/* 000358 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000358 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000358 */ 				var envname = __left0__ [0];
-/* 000358 */ 				var envinfo = __left0__ [1];
-/* 000358 */ 				(function () {
-/* 000358 */ 					var __accu1__ = __accu0__;
-/* 000353 */ 					return __call__ (__accu1__.append, __accu1__, __call__ (Enumeration, null, __kwargtrans__ ({environmentname: envname, counter_formatter: __getitem__ (envinfo, 'counter_formatter'), annotations: [envname]})));
-/* 000353 */ 				}) ();
-/* 000353 */ 			}
-/* 000353 */ 			return __accu0__;
-/* 000353 */ 		}) ()}));
-/* 000353 */ 	});}
-/* 000353 */ });
-/* 000365 */ export var FeatureClass = FeatureEnumeration;
+/* 000297 */ 				var s = __call__ (__iadd__, null, s, __add__ (__add__ ('[{', (function () {
+/* 000297 */ 					var __accu0__ = recomposer;
+/* 000298 */ 					return __call__ (__accu0__.subrecompose, __accu0__, (function () {
+/* 000298 */ 						var __accu1__ = __getitem__ (item_node_args, 'custom_tag');
+/* 000298 */ 						return __call__ (__accu1__.get_content_nodelist, __accu1__);
+/* 000298 */ 					}) ());
+/* 000298 */ 				}) ()), '}]'));
+/* 000298 */ 			}
+/* 000301 */ 			else {
+/* 000303 */ 				var s = __call__ (__iadd__, null, s, ' ');
+/* 000303 */ 			}
+/* 000304 */ 			if (__t__ (__t__ (__in__ ('label', item_node_args)) && (function () {
+/* 000304 */ 				var __accu0__ = __getitem__ (item_node_args, 'label');
+/* 000304 */ 				return __call__ (__accu0__.was_provided, __accu0__);
+/* 000304 */ 			}) ())) {
+/* 000305 */ 				var items_custom_labels = __call__ (helper_collect_labels, null, __getitem__ (item_node_args, 'label'), self.allowed_item_label_prefixes);
+/* 000309 */ 				var __iterable1__ = items_custom_labels;
+/* 000309 */ 				for (var __index1__ = 0; __index1__ < len (__iterable1__); __index1__++) {
+/* 000309 */ 					var __left0__ = __getitem__ (__iterable1__, __index1__);
+/* 000309 */ 					var ref_type = __left0__ [0];
+/* 000309 */ 					var ref_label = __left0__ [1];
+/* 000310 */ 					var safe_label_info = (function () {
+/* 000310 */ 						var __accu0__ = recomposer;
+/* 000310 */ 						return __call__ (__accu0__.make_safe_label, __accu0__, 'ref', ref_type, ref_label, node.latex_walker.resource_info);
+/* 000310 */ 					}) ();
+/* 000313 */ 					var s = __call__ (__iadd__, null, s, __add__ (__add__ ('\\label{', __getitem__ (safe_label_info, 'safe_label')), '}'));
+/* 000313 */ 				}
+/* 000313 */ 			}
+/* 000315 */ 			var s = __call__ (__iadd__, null, s, (function () {
+/* 000315 */ 				var __accu0__ = recomposer;
+/* 000315 */ 				return __call__ (__accu0__.subrecompose, __accu0__, item_content_nodelist);
+/* 000315 */ 			}) ());
+/* 000315 */ 		}
+/* 000317 */ 		var s = __call__ (__iadd__, null, s, __add__ (__add__ ('\\end{', node.environmentname), '}'));
+/* 000318 */ 		return s;
+/* 000318 */ 	});}
+/* 000318 */ });
+/* 000322 */ export var FeatureEnumeration =  __class__ ('FeatureEnumeration', [Feature], {
+/* 000322 */ 	__module__: __name__,
+/* 000329 */ 	feature_name: 'enumeration',
+/* 000330 */ 	feature_title: 'Enumeration and itemization lists',
+/* 000332 */ 	feature_default_config: dict ({'enumeration_environments': dict ({'itemize': dict ({'counter_formatter': ['•', '-', '▸']}), 'enumerate': dict ({'counter_formatter': null})})}),
+/* 000342 */ 	DocumentManager: null,
+/* 000343 */ 	RenderManager: null,
+/* 000346 */ 	get __init__ () {return __get__ (this, function (self, enumeration_environments) {
+/* 000346 */ 		if (typeof enumeration_environments == 'undefined' || (enumeration_environments != null && enumeration_environments.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000346 */ 			var enumeration_environments = null;
+/* 000346 */ 		};
+/* 000346 */ 		if (arguments.length) {
+/* 000346 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000346 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000346 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000346 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000346 */ 					switch (__attrib0__) {
+/* 000346 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000346 */ 						case 'enumeration_environments': var enumeration_environments = __allkwargs0__ [__attrib0__]; break;
+/* 000346 */ 					}
+/* 000346 */ 				}
+/* 000346 */ 			}
+/* 000346 */ 		}
+/* 000346 */ 		else {
+/* 000346 */ 		}
+/* 000347 */ 		__call__ (__call__ (__super__, null, FeatureEnumeration, '__init__'), null, self);
+/* 000348 */ 		if (__t__ (enumeration_environments === null)) {
+/* 000353 */ 			var enumeration_environments = (function () {
+/* 000353 */ 				var __accu0__ = self.feature_default_config;
+/* 000353 */ 				return __call__ (__accu0__.py_get, __accu0__, 'enumeration_environments', dict ({}));
+/* 000353 */ 			}) ();
+/* 000353 */ 		}
+/* 000354 */ 		self.enumeration_environments = enumeration_environments;
+/* 000354 */ 	});},
+/* 000356 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
+/* 000356 */ 		if (arguments.length) {
+/* 000356 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000356 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000356 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000356 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000356 */ 					switch (__attrib0__) {
+/* 000356 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000356 */ 					}
+/* 000356 */ 				}
+/* 000356 */ 			}
+/* 000356 */ 		}
+/* 000356 */ 		else {
+/* 000356 */ 		}
+/* 000357 */ 		return __call__ (dict, null, __kwargtrans__ ({environments: (function () {
+/* 000357 */ 			var __accu0__ = [];
+/* 000364 */ 			var __iterable0__ = (function () {
+/* 000364 */ 				var __accu1__ = __call__ (dict, null, self.enumeration_environments);
+/* 000364 */ 				return __call__ (__accu1__.py_items, __accu1__);
+/* 000364 */ 			}) ();
+/* 000364 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000364 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000364 */ 				var envname = __left0__ [0];
+/* 000364 */ 				var envinfo = __left0__ [1];
+/* 000364 */ 				(function () {
+/* 000364 */ 					var __accu1__ = __accu0__;
+/* 000359 */ 					return __call__ (__accu1__.append, __accu1__, __call__ (Enumeration, null, __kwargtrans__ ({environmentname: envname, counter_formatter: __getitem__ (envinfo, 'counter_formatter'), annotations: [envname]})));
+/* 000359 */ 				}) ();
+/* 000359 */ 			}
+/* 000359 */ 			return __accu0__;
+/* 000359 */ 		}) ()}));
+/* 000359 */ 	});}
+/* 000359 */ });
+/* 000371 */ export var FeatureClass = FeatureEnumeration;
 /* 000007 */ 
 //# sourceMappingURL=flm.feature.enumeration.map
