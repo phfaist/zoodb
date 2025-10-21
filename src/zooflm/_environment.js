@@ -883,7 +883,7 @@ export var ZooFLMEnvironment = __class__(
             let features = install_standard_features(self, environment_options);
 
             if (environment_options.custom_features) {
-                features = [ ...features, environment_options.custom_features ];
+                features = [ ...features, ...environment_options.custom_features ];
             }
 
             // const parsing_mode_deltas = {
