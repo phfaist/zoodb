@@ -331,10 +331,16 @@ export class CitationSourceBase
     {
         // debug(`fetch_url(): url=${url}`);
 
+        fetch_options ??= {};
+
         let get_response_object = false;
-        if (fetch_options != null) {
-            get_response_object = fetch_options.get_response_object ?? false;
+        if (fetch_options.get_response_object !== undefined) {
+            get_response_object = fetch_options.get_response_object ? true : false;
             delete fetch_options.get_response_object;
+        }
+
+        if (fetch_options.headers == null) { // null or not undefined, but not empty object
+            fetch_options.headers = Object.assign({}, this._get_default_headers());
         }
 
         const urlobj = path_or_url_to_url(url, { fs_root_path: this._file_root });

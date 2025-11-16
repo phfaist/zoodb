@@ -54,11 +54,16 @@ export class CitationSourceArxiv extends CitationSourceBase
         options ??= {};
         const chain_to_doi = options.chain_to_doi ?? true;
 
+        const api_get_method = options.api_get_method?.toLowerCase() ?? 'get'; // 'get' or 'post'
+
         const override_options = {
             chains_to_sources: chain_to_doi ? ['doi'] : [],
             source_name: 'ArXiv API citation info source',
         };
         const default_options = {
+            // when using 'GET' method, try to keep the URL length below ~2000 chars, so change the default chunk length:
+            chunk_size: (api_get_method !== 'post') ? 100 : 512,
+
             chunk_retrieve_delay_ms: 3100,
             cite_prefix: 'arxiv',
             cache_duration_ms: 10 * 24*3600*1000, // 10 days for arXiv entries by default
@@ -73,6 +78,7 @@ export class CitationSourceArxiv extends CitationSourceBase
         this.chain_to_doi = chain_to_doi;
         this.data_for_versionless_arxivid = {};
 
+        this.api_get_method = api_get_method;
         this.override_arxiv_dois_file = this.options.override_arxiv_dois_file ?? null;
         this.override_arxiv_dois = this.options.override_arxiv_dois ?? {};
     }
@@ -121,13 +127,33 @@ export class CitationSourceArxiv extends CitationSourceBase
     {
         debug(`Running arXiv.org API retrieve for a chunk of ${id_list.length} IDs`);
 
-        let response = await this.fetch_url( 'https://export.arxiv.org/api/query', {
+        const qsParams = new URLSearchParams({
+            max_results: id_list.length,
+            id_list: id_list.join(','),
+        });
+
+        let fetchUrl = `https://export.arxiv.org/api/query`; 
+        let fetchOptions = {};
+
+        if (this.api_get_method === 'get') {
+            fetchUrl = `${fetchUrl}?${qsParams}`;
+        } else if (this.api_get_method === 'post') {
+            fetchOptions = {
+                body: qsParams.toString(),
+                headers: Object.assign({}, this._get_default_headers(), {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }),
+            };
+        } else {
+            throw new Error(`Invalid api_get_method = ‘${this.api_get_method}’`);
+        }
+
+        //debug(`Built request data: `, { fetchUrl, method: this.api_get_method, fetchOptions, chunk_size: this.chunk_size });
+
+        let response = await this.fetch_url( fetchUrl, {
             get_response_object: true,
-            method: 'post',
-            body: `max_results=${id_list.length}&id_list=${id_list.join(',')}`,
-            headers: Object.assign({}, this._get_default_headers(), {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            }),
+            method: this.api_get_method,
+            ...fetchOptions
         } );
         if (response.status !== 200) {
             console.error(response);

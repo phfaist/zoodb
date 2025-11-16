@@ -14,9 +14,11 @@ describe('zoodb.citationmanager.source.arxiv', function () {
         // adjust timeout for these tests
         this.timeout(5000);
 
-        it('fetches bib information from an arXiv source', async function () {
+        it('fetches bib information from an arXiv source alone', async function () {
 
-            let source = new CitationSourceArxiv();
+            let source = new CitationSourceArxiv({
+                //api_get_method: 'post', // POST fails for some reason (2025/11) ... :/
+            });
             let manager = new CitationDatabaseManager(
                 {
                     arxiv: source,
