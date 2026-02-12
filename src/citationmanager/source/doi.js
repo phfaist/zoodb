@@ -43,7 +43,10 @@ export class CitationSourceDoi extends CitationSourceBase
             throw new Error(`doi run_retrieve_chunk(): can only retrieve one DOI at a time, `
                             + `requested ${JSON.stringify(id_list)}`);
         }
-        const doi = id_list[0].trim();
+
+        // no trim, might cause mismatch because we'll look up citeprefix:citekey with the spaces...
+        const doi = id_list[0]; //.trim();
+        
         const doi_encoded = encodeURIComponent(doi);
 
         let response = await this.fetch_url( 'https://doi.org/' + doi_encoded, {

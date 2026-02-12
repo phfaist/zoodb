@@ -151,7 +151,7 @@ export class CitationDatabaseManager
             // debug(`get_citation_by_id() -> cache get ${JSON.stringify(id)}`);
             cite_obj = this.cache.get(new_id);
             if (cite_obj === null) {
-                throw new Error(`Item ${new_id} not found in citations cache`);
+                throw new Error(`Item ‘${new_id}’ not found in citations cache`);
             }
             if ( ! cite_obj.chained ) {
                 if (cite_obj.id != id) {
