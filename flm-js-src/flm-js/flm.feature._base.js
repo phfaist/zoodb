@@ -1,5 +1,5 @@
-/* 000001 */ // Transcrypt'ed from Python, 2025-10-21 23:26:08
-/* 000179 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, _copy, _sort, abs, all, any, assert, bin, bool, bytearray, bytes, callable, chr, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, hex, input, int, isinstance, issubclass, len, list, map, max, min, object, oct, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
+/* 000001 */ // Transcrypt'ed from Python, 2026-02-12 21:38:40
+/* 000181 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, _copy, _sort, abs, all, any, assert, bin, bool, bytearray, bytes, callable, chr, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, hex, input, int, isinstance, issubclass, len, list, map, max, min, object, oct, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000001 */ var __name__ = 'flm.feature._base';
 /* 000008 */ export var Feature =  __class__ ('Feature', [object], {
 /* 000008 */ 	__module__: __name__,
@@ -208,25 +208,25 @@
 /* 000155 */ });
 /* 000161 */ export var SimpleLatexDefinitionsFeature =  __class__ ('SimpleLatexDefinitionsFeature', [Feature], {
 /* 000161 */ 	__module__: __name__,
-/* 000168 */ 	DocumentManager: null,
-/* 000169 */ 	RenderManager: null,
-/* 000171 */ 	latex_definitions: dict ({}),
-/* 000178 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
-/* 000178 */ 		if (arguments.length) {
-/* 000178 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000178 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000178 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000178 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000178 */ 					switch (__attrib0__) {
-/* 000178 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000178 */ 					}
-/* 000178 */ 				}
-/* 000178 */ 			}
-/* 000178 */ 		}
-/* 000178 */ 		else {
-/* 000178 */ 		}
-/* 000179 */ 		return self.latex_definitions;
-/* 000179 */ 	});}
-/* 000179 */ });
-/* 000179 */ 
+/* 000170 */ 	DocumentManager: null,
+/* 000171 */ 	RenderManager: null,
+/* 000173 */ 	latex_definitions: dict ({}),
+/* 000180 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
+/* 000180 */ 		if (arguments.length) {
+/* 000180 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000180 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000180 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000180 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000180 */ 					switch (__attrib0__) {
+/* 000180 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000180 */ 					}
+/* 000180 */ 				}
+/* 000180 */ 			}
+/* 000180 */ 		}
+/* 000180 */ 		else {
+/* 000180 */ 		}
+/* 000181 */ 		return self.latex_definitions;
+/* 000181 */ 	});}
+/* 000181 */ });
+/* 000181 */ 
 //# sourceMappingURL=flm.feature._base.map

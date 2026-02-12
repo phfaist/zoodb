@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2025-10-21 23:26:11
+/* 000001 */ // Transcrypt'ed from Python, 2026-02-12 21:38:43
 /* 000007 */ var logging = {};
 /* 000007 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, _copy, _sort, abs, all, any, assert, bin, bool, bytearray, bytes, callable, chr, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, hex, input, int, isinstance, issubclass, len, list, map, max, min, object, oct, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000016 */ import {FLMNodesFlmRecomposer} from './flm.flmrecomposer.js';
@@ -7,7 +7,7 @@
 /* 000010 */ import {LatexWalkerLocatedError} from './pylatexenc.latexnodes.js';
 /* 000007 */ import * as __module_logging__ from './logging.js';
 /* 000007 */ __nest__ (logging, '', __module_logging__);
-/* 000007 */ export {nodes, FLMRenderContext, LatexWalkerLocatedError, FLMNodesFlmRecomposer};
+/* 000007 */ export {nodes, LatexWalkerLocatedError, FLMRenderContext, FLMNodesFlmRecomposer};
 /* 000001 */ var __name__ = 'flm.fragmentrenderer._base';
 /* 000008 */ export var logger = (function () {
 /* 000008 */ 	var __accu0__ = logging;
@@ -1018,11 +1018,10 @@
 /* 000409 */ 		__except0__.__cause__ = null;
 /* 000409 */ 		throw __except0__;
 /* 000409 */ 	});},
-/* 000411 */ 	get render_heading () {return __get__ (this, function (self, heading_nodelist, render_context) {
-/* 000411 */ 		var heading_level = 1;
-/* 000411 */ 		var inline_heading = false;
-/* 000411 */ 		var target_id = null;
+/* 000411 */ 	get render_lines () {return __get__ (this, function (self, iter_lines_nodelists, render_context) {
+/* 000411 */ 		var role = null;
 /* 000411 */ 		var annotations = null;
+/* 000411 */ 		var target_id = null;
 /* 000411 */ 		if (arguments.length) {
 /* 000411 */ 			var __ilastarg0__ = arguments.length - 1;
 /* 000411 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -1030,52 +1029,53 @@
 /* 000411 */ 				for (var __attrib0__ in __allkwargs0__) {
 /* 000411 */ 					switch (__attrib0__) {
 /* 000411 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000411 */ 						case 'heading_nodelist': var heading_nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 000411 */ 						case 'iter_lines_nodelists': var iter_lines_nodelists = __allkwargs0__ [__attrib0__]; break;
 /* 000411 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000411 */ 						case 'heading_level': var heading_level = __allkwargs0__ [__attrib0__]; break;
-/* 000411 */ 						case 'inline_heading': var inline_heading = __allkwargs0__ [__attrib0__]; break;
-/* 000411 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
+/* 000411 */ 						case 'role': var role = __allkwargs0__ [__attrib0__]; break;
 /* 000411 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
+/* 000411 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
 /* 000411 */ 					}
 /* 000411 */ 				}
 /* 000411 */ 			}
 /* 000411 */ 		}
 /* 000411 */ 		else {
 /* 000411 */ 		}
-/* 000417 */ 		var __except0__ = __call__ (RuntimeError, null, 'Subclasses need to reimplement this method');
-/* 000417 */ 		__except0__.__cause__ = null;
-/* 000417 */ 		throw __except0__;
-/* 000417 */ 	});},
-/* 000419 */ 	get render_verbatim () {return __get__ (this, function (self, value, render_context) {
-/* 000419 */ 		var is_block_level = false;
-/* 000419 */ 		var annotations = null;
-/* 000419 */ 		var target_id = null;
-/* 000419 */ 		if (arguments.length) {
-/* 000419 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000419 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000419 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000419 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000419 */ 					switch (__attrib0__) {
-/* 000419 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 						case 'value': var value = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 						case 'is_block_level': var is_block_level = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
-/* 000419 */ 					}
-/* 000419 */ 				}
-/* 000419 */ 			}
-/* 000419 */ 		}
-/* 000419 */ 		else {
-/* 000419 */ 		}
+/* 000413 */ 		var __except0__ = __call__ (RuntimeError, null, 'Subclasses need to reimplement this method');
+/* 000413 */ 		__except0__.__cause__ = null;
+/* 000413 */ 		throw __except0__;
+/* 000413 */ 	});},
+/* 000415 */ 	get render_heading () {return __get__ (this, function (self, heading_nodelist, render_context) {
+/* 000415 */ 		var heading_level = 1;
+/* 000415 */ 		var inline_heading = false;
+/* 000415 */ 		var target_id = null;
+/* 000415 */ 		var annotations = null;
+/* 000415 */ 		if (arguments.length) {
+/* 000415 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000415 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000415 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000415 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000415 */ 					switch (__attrib0__) {
+/* 000415 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000415 */ 						case 'heading_nodelist': var heading_nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 000415 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000415 */ 						case 'heading_level': var heading_level = __allkwargs0__ [__attrib0__]; break;
+/* 000415 */ 						case 'inline_heading': var inline_heading = __allkwargs0__ [__attrib0__]; break;
+/* 000415 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
+/* 000415 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
+/* 000415 */ 					}
+/* 000415 */ 				}
+/* 000415 */ 			}
+/* 000415 */ 		}
+/* 000415 */ 		else {
+/* 000415 */ 		}
 /* 000421 */ 		var __except0__ = __call__ (RuntimeError, null, 'Subclasses need to reimplement this method');
 /* 000421 */ 		__except0__.__cause__ = null;
 /* 000421 */ 		throw __except0__;
 /* 000421 */ 	});},
-/* 000423 */ 	get render_link () {return __get__ (this, function (self, ref_type, href, display_nodelist, render_context, annotations) {
-/* 000423 */ 		if (typeof annotations == 'undefined' || (annotations != null && annotations.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000423 */ 			var annotations = null;
-/* 000423 */ 		};
+/* 000423 */ 	get render_verbatim () {return __get__ (this, function (self, value, render_context) {
+/* 000423 */ 		var is_block_level = false;
+/* 000423 */ 		var annotations = null;
+/* 000423 */ 		var target_id = null;
 /* 000423 */ 		if (arguments.length) {
 /* 000423 */ 			var __ilastarg0__ = arguments.length - 1;
 /* 000423 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -1083,130 +1083,156 @@
 /* 000423 */ 				for (var __attrib0__ in __allkwargs0__) {
 /* 000423 */ 					switch (__attrib0__) {
 /* 000423 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000423 */ 						case 'ref_type': var ref_type = __allkwargs0__ [__attrib0__]; break;
-/* 000423 */ 						case 'href': var href = __allkwargs0__ [__attrib0__]; break;
-/* 000423 */ 						case 'display_nodelist': var display_nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 000423 */ 						case 'value': var value = __allkwargs0__ [__attrib0__]; break;
 /* 000423 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000423 */ 						case 'is_block_level': var is_block_level = __allkwargs0__ [__attrib0__]; break;
 /* 000423 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
+/* 000423 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
 /* 000423 */ 					}
 /* 000423 */ 				}
 /* 000423 */ 			}
 /* 000423 */ 		}
 /* 000423 */ 		else {
 /* 000423 */ 		}
-/* 000437 */ 		var __except0__ = __call__ (RuntimeError, null, 'Subclasses need to reimplement this method');
-/* 000437 */ 		__except0__.__cause__ = null;
-/* 000437 */ 		throw __except0__;
-/* 000437 */ 	});},
-/* 000439 */ 	get render_annotation_comment () {return __get__ (this, function (self, display_nodelist, render_context, color_index, initials) {
-/* 000439 */ 		if (typeof color_index == 'undefined' || (color_index != null && color_index.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000439 */ 			var color_index = 0;
-/* 000439 */ 		};
-/* 000439 */ 		if (typeof initials == 'undefined' || (initials != null && initials.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000439 */ 			var initials = null;
-/* 000439 */ 		};
-/* 000439 */ 		if (arguments.length) {
-/* 000439 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000439 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000439 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000439 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000439 */ 					switch (__attrib0__) {
-/* 000439 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000439 */ 						case 'display_nodelist': var display_nodelist = __allkwargs0__ [__attrib0__]; break;
-/* 000439 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000439 */ 						case 'color_index': var color_index = __allkwargs0__ [__attrib0__]; break;
-/* 000439 */ 						case 'initials': var initials = __allkwargs0__ [__attrib0__]; break;
-/* 000439 */ 					}
-/* 000439 */ 				}
-/* 000439 */ 			}
-/* 000439 */ 		}
-/* 000439 */ 		else {
-/* 000439 */ 		}
-/* 000443 */ 		var __except0__ = __call__ (RuntimeError, null, 'Subclasses need to reimplement this method');
-/* 000443 */ 		__except0__.__cause__ = null;
-/* 000443 */ 		throw __except0__;
-/* 000443 */ 	});},
-/* 000449 */ 	get render_float () {return __get__ (this, function (self, float_instance, render_context) {
-/* 000449 */ 		if (arguments.length) {
-/* 000449 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000449 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000449 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000449 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000449 */ 					switch (__attrib0__) {
-/* 000449 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000449 */ 						case 'float_instance': var float_instance = __allkwargs0__ [__attrib0__]; break;
-/* 000449 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000449 */ 					}
-/* 000449 */ 				}
-/* 000449 */ 			}
-/* 000449 */ 		}
-/* 000449 */ 		else {
-/* 000449 */ 		}
-/* 000450 */ 		var __except0__ = __call__ (RuntimeError, null, 'Feature is not implemented by subclass');
-/* 000450 */ 		__except0__.__cause__ = null;
-/* 000450 */ 		throw __except0__;
-/* 000450 */ 	});},
-/* 000452 */ 	get render_graphics_block () {return __get__ (this, function (self, graphics_resource, render_context) {
-/* 000452 */ 		if (arguments.length) {
-/* 000452 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000452 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000452 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000452 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000452 */ 					switch (__attrib0__) {
-/* 000452 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000452 */ 						case 'graphics_resource': var graphics_resource = __allkwargs0__ [__attrib0__]; break;
-/* 000452 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000452 */ 					}
-/* 000452 */ 				}
-/* 000452 */ 			}
-/* 000452 */ 		}
-/* 000452 */ 		else {
-/* 000452 */ 		}
-/* 000453 */ 		var __except0__ = __call__ (RuntimeError, null, 'Feature is not implemented by subclass');
-/* 000453 */ 		__except0__.__cause__ = null;
-/* 000453 */ 		throw __except0__;
-/* 000453 */ 	});},
-/* 000455 */ 	get render_cells () {return __get__ (this, function (self, cells_model, render_context, target_id) {
-/* 000455 */ 		if (typeof target_id == 'undefined' || (target_id != null && target_id.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000455 */ 			var target_id = null;
-/* 000455 */ 		};
-/* 000455 */ 		if (arguments.length) {
-/* 000455 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000455 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000455 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000455 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000455 */ 					switch (__attrib0__) {
-/* 000455 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000455 */ 						case 'cells_model': var cells_model = __allkwargs0__ [__attrib0__]; break;
-/* 000455 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000455 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
-/* 000455 */ 					}
-/* 000455 */ 				}
-/* 000455 */ 			}
-/* 000455 */ 		}
-/* 000455 */ 		else {
-/* 000455 */ 		}
-/* 000456 */ 		var __except0__ = __call__ (RuntimeError, null, 'Feature is not implemented by subclass');
-/* 000456 */ 		__except0__.__cause__ = null;
-/* 000456 */ 		throw __except0__;
-/* 000456 */ 	});},
-/* 000463 */ 	get ensure_render_context () {return __get__ (this, function (self, render_context) {
-/* 000463 */ 		if (arguments.length) {
-/* 000463 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000463 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000463 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000463 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000463 */ 					switch (__attrib0__) {
-/* 000463 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000463 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
-/* 000463 */ 					}
-/* 000463 */ 				}
-/* 000463 */ 			}
-/* 000463 */ 		}
-/* 000463 */ 		else {
-/* 000463 */ 		}
-/* 000464 */ 		return __t__ (render_context) || __call__ (FLMRenderContext, null, __kwargtrans__ ({fragment_renderer: self}));
-/* 000464 */ 	});}
-/* 000464 */ });
+/* 000425 */ 		var __except0__ = __call__ (RuntimeError, null, 'Subclasses need to reimplement this method');
+/* 000425 */ 		__except0__.__cause__ = null;
+/* 000425 */ 		throw __except0__;
+/* 000425 */ 	});},
+/* 000427 */ 	get render_link () {return __get__ (this, function (self, ref_type, href, display_nodelist, render_context, annotations) {
+/* 000427 */ 		if (typeof annotations == 'undefined' || (annotations != null && annotations.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000427 */ 			var annotations = null;
+/* 000427 */ 		};
+/* 000427 */ 		if (arguments.length) {
+/* 000427 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000427 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000427 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000427 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000427 */ 					switch (__attrib0__) {
+/* 000427 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000427 */ 						case 'ref_type': var ref_type = __allkwargs0__ [__attrib0__]; break;
+/* 000427 */ 						case 'href': var href = __allkwargs0__ [__attrib0__]; break;
+/* 000427 */ 						case 'display_nodelist': var display_nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 000427 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000427 */ 						case 'annotations': var annotations = __allkwargs0__ [__attrib0__]; break;
+/* 000427 */ 					}
+/* 000427 */ 				}
+/* 000427 */ 			}
+/* 000427 */ 		}
+/* 000427 */ 		else {
+/* 000427 */ 		}
+/* 000441 */ 		var __except0__ = __call__ (RuntimeError, null, 'Subclasses need to reimplement this method');
+/* 000441 */ 		__except0__.__cause__ = null;
+/* 000441 */ 		throw __except0__;
+/* 000441 */ 	});},
+/* 000443 */ 	get render_annotation_comment () {return __get__ (this, function (self, display_nodelist, render_context, color_index, initials) {
+/* 000443 */ 		if (typeof color_index == 'undefined' || (color_index != null && color_index.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000443 */ 			var color_index = 0;
+/* 000443 */ 		};
+/* 000443 */ 		if (typeof initials == 'undefined' || (initials != null && initials.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000443 */ 			var initials = null;
+/* 000443 */ 		};
+/* 000443 */ 		if (arguments.length) {
+/* 000443 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000443 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000443 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000443 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000443 */ 					switch (__attrib0__) {
+/* 000443 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000443 */ 						case 'display_nodelist': var display_nodelist = __allkwargs0__ [__attrib0__]; break;
+/* 000443 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000443 */ 						case 'color_index': var color_index = __allkwargs0__ [__attrib0__]; break;
+/* 000443 */ 						case 'initials': var initials = __allkwargs0__ [__attrib0__]; break;
+/* 000443 */ 					}
+/* 000443 */ 				}
+/* 000443 */ 			}
+/* 000443 */ 		}
+/* 000443 */ 		else {
+/* 000443 */ 		}
+/* 000447 */ 		var __except0__ = __call__ (RuntimeError, null, 'Subclasses need to reimplement this method');
+/* 000447 */ 		__except0__.__cause__ = null;
+/* 000447 */ 		throw __except0__;
+/* 000447 */ 	});},
+/* 000453 */ 	get render_float () {return __get__ (this, function (self, float_instance, render_context) {
+/* 000453 */ 		if (arguments.length) {
+/* 000453 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000453 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000453 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000453 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000453 */ 					switch (__attrib0__) {
+/* 000453 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000453 */ 						case 'float_instance': var float_instance = __allkwargs0__ [__attrib0__]; break;
+/* 000453 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000453 */ 					}
+/* 000453 */ 				}
+/* 000453 */ 			}
+/* 000453 */ 		}
+/* 000453 */ 		else {
+/* 000453 */ 		}
+/* 000454 */ 		var __except0__ = __call__ (RuntimeError, null, 'Feature is not implemented by subclass');
+/* 000454 */ 		__except0__.__cause__ = null;
+/* 000454 */ 		throw __except0__;
+/* 000454 */ 	});},
+/* 000456 */ 	get render_graphics_block () {return __get__ (this, function (self, graphics_resource, render_context) {
+/* 000456 */ 		if (arguments.length) {
+/* 000456 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000456 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000456 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000456 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000456 */ 					switch (__attrib0__) {
+/* 000456 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000456 */ 						case 'graphics_resource': var graphics_resource = __allkwargs0__ [__attrib0__]; break;
+/* 000456 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000456 */ 					}
+/* 000456 */ 				}
+/* 000456 */ 			}
+/* 000456 */ 		}
+/* 000456 */ 		else {
+/* 000456 */ 		}
+/* 000457 */ 		var __except0__ = __call__ (RuntimeError, null, 'Feature is not implemented by subclass');
+/* 000457 */ 		__except0__.__cause__ = null;
+/* 000457 */ 		throw __except0__;
+/* 000457 */ 	});},
+/* 000459 */ 	get render_cells () {return __get__ (this, function (self, cells_model, render_context, target_id) {
+/* 000459 */ 		if (typeof target_id == 'undefined' || (target_id != null && target_id.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000459 */ 			var target_id = null;
+/* 000459 */ 		};
+/* 000459 */ 		if (arguments.length) {
+/* 000459 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000459 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000459 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000459 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000459 */ 					switch (__attrib0__) {
+/* 000459 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000459 */ 						case 'cells_model': var cells_model = __allkwargs0__ [__attrib0__]; break;
+/* 000459 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000459 */ 						case 'target_id': var target_id = __allkwargs0__ [__attrib0__]; break;
+/* 000459 */ 					}
+/* 000459 */ 				}
+/* 000459 */ 			}
+/* 000459 */ 		}
+/* 000459 */ 		else {
+/* 000459 */ 		}
+/* 000460 */ 		var __except0__ = __call__ (RuntimeError, null, 'Feature is not implemented by subclass');
+/* 000460 */ 		__except0__.__cause__ = null;
+/* 000460 */ 		throw __except0__;
+/* 000460 */ 	});},
+/* 000467 */ 	get ensure_render_context () {return __get__ (this, function (self, render_context) {
+/* 000467 */ 		if (arguments.length) {
+/* 000467 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000467 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000467 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000467 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000467 */ 					switch (__attrib0__) {
+/* 000467 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000467 */ 						case 'render_context': var render_context = __allkwargs0__ [__attrib0__]; break;
+/* 000467 */ 					}
+/* 000467 */ 				}
+/* 000467 */ 			}
+/* 000467 */ 		}
+/* 000467 */ 		else {
+/* 000467 */ 		}
+/* 000468 */ 		return __t__ (render_context) || __call__ (FLMRenderContext, null, __kwargtrans__ ({fragment_renderer: self}));
+/* 000468 */ 	});}
+/* 000468 */ });
 /* 000007 */ 
 //# sourceMappingURL=flm.fragmentrenderer._base.map
