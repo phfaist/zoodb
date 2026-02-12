@@ -44,9 +44,14 @@ export class CitationSourceDoi extends CitationSourceBase
                             + `requested ${JSON.stringify(id_list)}`);
         }
 
-        // no trim, might cause mismatch because we'll look up citeprefix:citekey with the spaces...
-        const doi = id_list[0]; //.trim();
-        
+        const doi = id_list[0];
+
+        // DOIs cannot contain spaces.  Check and alert the user with a helpful message before
+        // they pull their hair out trying to find why their DOI citation doesn't work.
+        if (/\s/.test(doi)) {
+            throw new Error(`Malformed DOI ‘${doi}’: DOIs cannot contain spaces`);
+        }
+
         const doi_encoded = encodeURIComponent(doi);
 
         let response = await this.fetch_url( 'https://doi.org/' + doi_encoded, {
