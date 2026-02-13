@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2026-02-12 21:38:38
+/* 000001 */ // Transcrypt'ed from Python, 2026-02-13 22:15:40
 /* 000010 */ import {copy as _copy} from './copy.js';
 /* 000010 */ export {_copy};
 /* 000001 */ var __name__ = 'org.transcrypt.__runtime__';
@@ -2708,6 +2708,22 @@ __pop__ = function (aKey, aDefault) {
         if ( aDefault === undefined ) {
             throw KeyError (aKey, new Error());
         }
+    }
+    return aDefault;
+}
+//
+// Similar bug in __getdefault__() for dictionaries' .get() method
+//
+__getdefault__ = function (aKey, aDefault) {
+    var result = this [aKey];
+    if (result === undefined) {
+        result = this ['py_' + aKey]
+    }
+    if (result !== undefined) {
+        return result;
+    }
+    if (aDefault === undefined) {
+        return null;
     }
     return aDefault;
 }
