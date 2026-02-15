@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2026-02-13 22:15:43
+/* 000001 */ // Transcrypt'ed from Python, 2026-02-15 15:34:34
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
 /* 000006 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, _copy, _sort, abs, all, any, assert, bin, bool, bytearray, bytes, callable, chr, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, hex, input, int, isinstance, issubclass, len, list, map, max, min, object, oct, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
@@ -12,7 +12,7 @@
 /* 000007 */ __nest__ (logging, '', __module_logging__);
 /* 000006 */ import * as __module_re__ from './re.js';
 /* 000006 */ __nest__ (re, '', __module_re__);
-/* 000006 */ export {latexnodes_parsers, FLMMacroSpecBase, latexnodes_nodes, ParsedArgumentsInfo, SimpleLatexDefinitionsFeature, FLMArgumentSpec};
+/* 000006 */ export {ParsedArgumentsInfo, latexnodes_parsers, FLMArgumentSpec, FLMMacroSpecBase, SimpleLatexDefinitionsFeature, latexnodes_nodes};
 /* 000001 */ var __name__ = 'flm.feature.href';
 /* 000008 */ export var logger = (function () {
 /* 000008 */ 	var __accu0__ = logging;
@@ -237,68 +237,81 @@
 /* 000153 */ 		}
 /* 000153 */ 		else {
 /* 000153 */ 		}
-/* 000155 */ 		var s = __add__ ('\\', node.macroname);
-/* 000162 */ 		var s_macro_args = [];
-/* 000164 */ 		if (__t__ (node.nodeargd !== null)) {
-/* 000167 */ 			var __iterable0__ = __call__ (zip, null, self.command_argnames, node.nodeargd.argnlist);
-/* 000167 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000167 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000167 */ 				var argname = __left0__ [0];
-/* 000167 */ 				var nodearg = __left0__ [1];
-/* 000174 */ 				var recomposed_arg_value = (function () {
-/* 000174 */ 					var __accu0__ = recomposer;
-/* 000174 */ 					return __call__ (__accu0__.subrecompose, __accu0__, nodearg);
-/* 000174 */ 				}) ();
-/* 000176 */ 				if (__t__ (__in__ (argname, tuple (['target_href', 'target_email'])))) {
-/* 000177 */ 					var slenm1 = __sub__ (__call__ (len, null, recomposed_arg_value), 1);
-/* 000178 */ 					(function () {
-/* 000178 */ 						var __accu0__ = s_macro_args;
-/* 000180 */ 						return __call__ (__accu0__.append, __accu0__, __add__ (__add__ (__getitem__ (recomposed_arg_value, 0), (function () {
-/* 000180 */ 							var __accu1__ = _rx_url_unsafe;
-/* 000180 */ 							return __call__ (__accu1__.sub, __accu1__, (function __lambda__ (m) {
-/* 000180 */ 								if (arguments.length) {
-/* 000180 */ 									var __ilastarg0__ = arguments.length - 1;
-/* 000180 */ 									if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000180 */ 										var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000180 */ 										for (var __attrib0__ in __allkwargs0__) {
-/* 000180 */ 											switch (__attrib0__) {
-/* 000180 */ 												case 'm': var m = __allkwargs0__ [__attrib0__]; break;
-/* 000180 */ 											}
-/* 000180 */ 										}
-/* 000180 */ 									}
-/* 000180 */ 								}
-/* 000180 */ 								else {
-/* 000180 */ 								}
-/* 000181 */ 								return __add__ ('\\', (function () {
-/* 000181 */ 									var __accu2__ = m;
-/* 000181 */ 									return __call__ (__accu2__.group, __accu2__, 0);
-/* 000181 */ 								}) ());
-/* 000181 */ 							}), __getslice__ (recomposed_arg_value, 1, slenm1, 1));
-/* 000181 */ 						}) ()), __getitem__ (recomposed_arg_value, slenm1)));
-/* 000181 */ 					}) ();
-/* 000181 */ 				}
-/* 000185 */ 				else {
-/* 000187 */ 					(function () {
-/* 000187 */ 						var __accu0__ = s_macro_args;
-/* 000187 */ 						return __call__ (__accu0__.append, __accu0__, recomposed_arg_value);
-/* 000187 */ 					}) ();
-/* 000187 */ 				}
-/* 000187 */ 			}
-/* 000187 */ 		}
-/* 000189 */ 		var recomposed = __add__ (s, (function () {
-/* 000189 */ 			var __accu0__ = '';
-/* 000189 */ 			return __call__ (__accu0__.join, __accu0__, s_macro_args);
-/* 000189 */ 		}) ());
-/* 000190 */ 		return recomposed;
-/* 000190 */ 	});}
-/* 000190 */ });
-/* 000194 */ export var FeatureHref =  __class__ ('FeatureHref', [SimpleLatexDefinitionsFeature], {
-/* 000194 */ 	__module__: __name__,
-/* 000196 */ 	feature_name: 'href',
-/* 000197 */ 	feature_title: 'Hyperlinks',
-/* 000199 */ 	latex_definitions: dict ({'macros': [__call__ (HrefHyperlinkMacro, null, __kwargtrans__ ({macroname: 'href', command_arguments: tuple (['target_href', 'display_text'])})), __call__ (HrefHyperlinkMacro, null, __kwargtrans__ ({macroname: 'url', command_arguments: tuple (['target_href'])})), __call__ (HrefHyperlinkMacro, null, __kwargtrans__ ({macroname: 'email', command_arguments: tuple (['target_email'])}))]}),
-/* 000216 */ 	HrefHyperlinkMacroClass: HrefHyperlinkMacro
-/* 000216 */ });
-/* 000219 */ export var FeatureClass = FeatureHref;
+/* 000155 */ 		var recopt_href = (function () {
+/* 000155 */ 			var __accu0__ = recomposer;
+/* 000155 */ 			return __call__ (__accu0__.get_options, __accu0__, 'href');
+/* 000155 */ 		}) ();
+/* 000157 */ 		var href_macro_mapping = (function () {
+/* 000157 */ 			var __accu0__ = recopt_quote;
+/* 000157 */ 			return __call__ (__accu0__.py_get, __accu0__, 'map_macros', null);
+/* 000157 */ 		}) ();
+/* 000159 */ 		if (__t__ (__t__ (href_macro_mapping) && __in__ (node.macroname, href_macro_mapping))) {
+/* 000160 */ 			var s = __add__ ('\\', __getitem__ (href_macro_mapping, node.macroname));
+/* 000160 */ 		}
+/* 000161 */ 		else {
+/* 000162 */ 			var s = __add__ ('\\', node.macroname);
+/* 000162 */ 		}
+/* 000169 */ 		var s_macro_args = [];
+/* 000171 */ 		if (__t__ (node.nodeargd !== null)) {
+/* 000174 */ 			var __iterable0__ = __call__ (zip, null, self.command_argnames, node.nodeargd.argnlist);
+/* 000174 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000174 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000174 */ 				var argname = __left0__ [0];
+/* 000174 */ 				var nodearg = __left0__ [1];
+/* 000181 */ 				var recomposed_arg_value = (function () {
+/* 000181 */ 					var __accu0__ = recomposer;
+/* 000181 */ 					return __call__ (__accu0__.subrecompose, __accu0__, nodearg);
+/* 000181 */ 				}) ();
+/* 000183 */ 				if (__t__ (__in__ (argname, tuple (['target_href', 'target_email'])))) {
+/* 000184 */ 					var slenm1 = __sub__ (__call__ (len, null, recomposed_arg_value), 1);
+/* 000185 */ 					(function () {
+/* 000185 */ 						var __accu0__ = s_macro_args;
+/* 000187 */ 						return __call__ (__accu0__.append, __accu0__, __add__ (__add__ (__getitem__ (recomposed_arg_value, 0), (function () {
+/* 000187 */ 							var __accu1__ = _rx_url_unsafe;
+/* 000187 */ 							return __call__ (__accu1__.sub, __accu1__, (function __lambda__ (m) {
+/* 000187 */ 								if (arguments.length) {
+/* 000187 */ 									var __ilastarg0__ = arguments.length - 1;
+/* 000187 */ 									if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000187 */ 										var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000187 */ 										for (var __attrib0__ in __allkwargs0__) {
+/* 000187 */ 											switch (__attrib0__) {
+/* 000187 */ 												case 'm': var m = __allkwargs0__ [__attrib0__]; break;
+/* 000187 */ 											}
+/* 000187 */ 										}
+/* 000187 */ 									}
+/* 000187 */ 								}
+/* 000187 */ 								else {
+/* 000187 */ 								}
+/* 000188 */ 								return __add__ ('\\', (function () {
+/* 000188 */ 									var __accu2__ = m;
+/* 000188 */ 									return __call__ (__accu2__.group, __accu2__, 0);
+/* 000188 */ 								}) ());
+/* 000188 */ 							}), __getslice__ (recomposed_arg_value, 1, slenm1, 1));
+/* 000188 */ 						}) ()), __getitem__ (recomposed_arg_value, slenm1)));
+/* 000188 */ 					}) ();
+/* 000188 */ 				}
+/* 000192 */ 				else {
+/* 000194 */ 					(function () {
+/* 000194 */ 						var __accu0__ = s_macro_args;
+/* 000194 */ 						return __call__ (__accu0__.append, __accu0__, recomposed_arg_value);
+/* 000194 */ 					}) ();
+/* 000194 */ 				}
+/* 000194 */ 			}
+/* 000194 */ 		}
+/* 000196 */ 		var recomposed = __add__ (s, (function () {
+/* 000196 */ 			var __accu0__ = '';
+/* 000196 */ 			return __call__ (__accu0__.join, __accu0__, s_macro_args);
+/* 000196 */ 		}) ());
+/* 000197 */ 		return recomposed;
+/* 000197 */ 	});}
+/* 000197 */ });
+/* 000201 */ export var FeatureHref =  __class__ ('FeatureHref', [SimpleLatexDefinitionsFeature], {
+/* 000201 */ 	__module__: __name__,
+/* 000203 */ 	feature_name: 'href',
+/* 000204 */ 	feature_title: 'Hyperlinks',
+/* 000206 */ 	latex_definitions: dict ({'macros': [__call__ (HrefHyperlinkMacro, null, __kwargtrans__ ({macroname: 'href', command_arguments: tuple (['target_href', 'display_text'])})), __call__ (HrefHyperlinkMacro, null, __kwargtrans__ ({macroname: 'url', command_arguments: tuple (['target_href'])})), __call__ (HrefHyperlinkMacro, null, __kwargtrans__ ({macroname: 'email', command_arguments: tuple (['target_email'])}))]}),
+/* 000223 */ 	HrefHyperlinkMacroClass: HrefHyperlinkMacro
+/* 000223 */ });
+/* 000226 */ export var FeatureClass = FeatureHref;
 /* 000006 */ 
 //# sourceMappingURL=flm.feature.href.map
