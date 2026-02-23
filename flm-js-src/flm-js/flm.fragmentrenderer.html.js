@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2026-02-23 11:51:27
+/* 000001 */ // Transcrypt'ed from Python, 2026-02-23 19:58:49
 /* 000006 */ var html = {};
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
@@ -1521,10 +1521,26 @@
 /* 000909 */ 	return __call__ (__accu0__.compile, __accu0__, '<FLM:DLYD:(?P<key>\\d+)\\s*/>');
 /* 000909 */ }) ();
 /* 000916 */ export var _html_css_global = '\np, ul, ol, .p-block {\n  margin: 1em 0px;\n}\np:first-child, ul:first-child, ol:first-child, .p-block:first-child {\n  margin-top: 0px;\n}\np:last-child, ul:last-child, ol:last-child, .p-block:last-child {\n  margin-bottom: 0px;\n}\ndd > p, dd > p:first-child, dd > p:last-child {\n  margin: 0.33em 0px;\n}\n\na, a:link, a:hover, a:active, a:visited {\n  color: #3232c8;\n  text-decoration: none;\n}\na:hover {\n  color: #22228a;\n}\n';
-/* 000939 */ export var _html_css_content = "\n.emph, .textit {\n  font-style: italic;\n}\n.textbf {\n  font-weight: bold;\n}\n\nh1 {\n  font-size: 1.6rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh2 {\n  font-size: 1.3rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh3 {\n  font-size: 1rem;\n  font-weight: bold;\n  margin: 1em 0px;\n}\n\n.heading-level-4 {\n  font-style: italic;\n  display: inline;\n}\n.heading-level-4::after {\n  display: inline-block;\n  margin: 0px .12em;\n  content: '—';\n}\n\n.heading-level-5 {\n  font-style: italic;\n  font-size: .9em;\n  display: inline;\n}\n.heading-level-5::after {\n  display: inline-block;\n  margin-right: .12em;\n  content: '';\n}\n\n.heading-level-6 {\n  font-style: italic;\n  font-size: .8em;\n  display: inline;\n}\n.heading-level-6::after {\n  display: inline-block;\n  margin-right: .06em;\n  content: '';\n}\n\n\n.heading-level-theorem {\n  font-weight: bold;\n}\n.heading-level-theorem::after {\n  font-weight: bold;\n  display: inline-block;\n  margin: 0px .12em 0px 0px;\n  content: '.';\n}\n\ndiv.prooflike > p > .heading-level-theorem,\ndiv.prooflike > p > .heading-level-theorem::after {\n  font-weight: normal;\n  font-style: italic;\n}\n\n\ndl.enumeration {\n  display: block;\n  margin-left: 2.5em;\n}\ndl.enumeration > dt {\n  float: left;\n  clear: left;\n  display: inline-block;\n  /*margin: 0px; */\n  margin-left: -2.5em;\n  width: 2.0em;\n  min-width: 2.0em;\n  /*max-width: 2.0em;*/ /* messes up wide labels, e.g. in {description} items */\n  margin-right: 0.5em;\n  text-align: right;\n}\ndl.enumeration > dd {\n  /*display: inline-block;\n  width: 100%;*/\n  border: 0px;\n  padding: 0px;\n  margin: 0px;\n}\n\nfigure.float {\n  width: 100%;\n  border-width: 1px 0px 1px 0px;\n  border-style: solid none solid none;\n  border-color: rgba(120, 120, 140, 0.15);\n  margin: 0.5rem 0px;\n  padding: 0.5rem 0px;\n}\n\nfigure.float .float-contents {\n  width: 100%;\n  max-width: 100%;\n  overflow-x: auto;\n}\n\nfigure.float .float-contents img {\n  display: block;\n  margin: 0pt auto;\n  padding: 0pt;\n  border: 0pt;\n  margin: 0px auto;\n}\n\nfigure.float figcaption {\n  display: block;\n  margin-top: 0.5em;\n  margin: 0.75em 2em 0px;\n  text-align: center;\n}\n\nfigure.float figcaption > span {\n  display: inline-block;\n  font-style: italic;\n  text-align: left;\n}\n\ntable {\n  margin: 1em 0px 1em 0px;\n  border-collapse: separate;\n  border-spacing: 0px;\n  /*border-top: solid 1pt;\n  border-bottom: solid 1pt;*/\n}\nfigure.float .float-contents table {\n  margin: 0px auto;\n}\ntd {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\nth {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\n.cellstyle-H {\n  border-bottom: solid .5pt;\n}\n.cellstyle-rH {\n}\n.cellstyle-l {\n  text-align: left;\n}\n.cellstyle-c {\n  text-align: center;\n}\n.cellstyle-r {\n  text-align: right;\n}\n.cellstyle-green {\n  background-color: rgba(69, 255, 69, 0.31); /*rgb(200,255,200);*/\n}\n.cellstyle-blue {\n  background-color: rgba(79, 142, 255, 0.27); /*rgb(200,220,255);*/\n}\n.cellstyle-yellow {\n  background-color: rgba(255, 255, 49, 0.33); /*rgb(255,255,200);*/\n}\n.cellstyle-red {\n  background-color: rgba(255,120,120,0.30);  /*rgb(255,200,200);*/\n}\n.cellstyle-lvert {\n  border-left: solid .5pt;\n}\n.cellstyle-rvert {\n  border-right: solid .5pt;\n}\n\n.celltbledge-top {\n  border-top: solid 1pt;\n}\n.celltbledge-bottom {\n  border-bottom: solid 1pt;\n}\n\n.verbatimcode {\n  font-family: monospace;\n  font-size: 0.9em;\n  background-color: rgba(127,127,127,0.25);\n  border-radius: 2px;\n  padding: 1px 2px;\n  display: inline-block;\n  white-space: pre-wrap;\n}\n.verbatima {\n  font-style: italic;\n}\n.verbatimcode-environment {\n  display: block;\n  margin: 0.75em 0px 1em;\n  white-space: pre;\n}\n\n.defterm {\n  font-style: italic;\n  margin: 1em 0px;\n}\n.defterm:first-child {\n  margin-top: 0px;\n}\n.defterm:last-child {\n  margin-bottom: 0px;\n}\n\n.defterm .defterm-term, .defterm .term-in-defining-defterm {\n  font-style: italic;\n  font-weight: bold;\n}\n\n.display-math {\n  width: 100%;\n  max-width: 100%;\n  display: block;\n  overflow-x: auto;\n}\n\n.endnote {\n}\n.citation {\n}\n.footnote {\n}\n.endnote-marks, .citation-marks {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\ndl.citation-list > dt, dl.footnote-list > dt {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\n\n.annotation {\n  color: var(--annotation-color);\n}\n.annotation-comment {\n  padding: 3pt 0px;\n  font-weight: 600;\n  font-family: sans-serif;\n}\n.annotation-comment::before {\n  content: '['\n}\n.annotation-comment::after {\n  content: ']'\n}\n.annotation-initials {\n  display: inline-block;\n  margin-right: 0.3em;\n  font-family: sans-serif;\n  font-size: .8em;\n  font-weight: normal;\n  font-style: normal;\n  line-height: .9;\n  padding: .5pt;\n  border: solid .4pt var(--annotation-color);\n  border-radius: 2pt;\n\n  float: right;\n  margin-right: -4em;\n}\n.annotation-0 {\n  --annotation-color: rgb(148,7,24); /* dark red / burgundy */\n}\n.annotation-1 {\n  --annotation-color: rgb(0,148,240); /* blue-y */\n}\n.annotation-2 {\n  --annotation-color: rgb(242,108,13); /* orange-brown-y */\n}\n.annotation-3 {\n  --annotation-color: rgb(65,149,42); /* green-y */\n}\n.annotation-4 {\n  --annotation-color: rgb(128,55,134); /* purple-y */\n}\n.annotation-5 {\n  --annotation-color: rgb(0,129,129); /* blue-green-y */\n}\n.annotation-6 {\n  --annotation-color: rgb(160,120,0); /* brownish */\n}\n.annotation-7 {\n  --annotation-color: rgb(35,195,155); /* aqua-ish */\n}\n\n\n.quote, .address, .blockquote {\n  margin: 1em 0;\n}\n.quote {\n  background: rgba(120, 140, 150, 0.15);\n  padding: 1em 3em;\n}\n.quote .quote-lines,\n.quote .quote-text {\n  font-style: italic;\n  margin: 0.5em 0;\n}\n\n.quote .quote-lines + .quote-lines {\n  margin-top: 1em;\n}\n\n.quote .quote-lines .quote-lines-indent {\n  display: inline-block;\n  width: 2.5em;\n}\n\n.quote-attributed {\n  margin: 0.5em 0;\n  text-align: right;\n}\n.quote .quote-attributed::before {\n  content: '—';\n}\n.quote-block {\n  padding-left: 1em;\n  border-left: solid 4pt rgba(120, 140, 150, 0.3)  ;\n}\n\n.address .quote-lines {\n  font-size: .933em;\n}\n\n.blockquote {\n  padding: 0 1em;\n}\n\n";
-/* 001293 */ export var _html_js_mathjax = '\nMathJax = {\n    tex: {\n        inlineMath: [[\'\\\\(\', \'\\\\)\']],\n        displayMath: [[\'\\\\[\', \'\\\\]\']],\n        processEnvironments: true,\n        processRefs: true,\n\n        // equation numbering on\n        tags: \'ams\'\n    },\n    options: {\n        // all MathJax content is marked with CSS classes\n        // skipHtmlTags: \'body\',\n        // processHtmlClass: \'display-math|inline-math\',\n    },\n    startup: {\n        pageReady: function() {\n            // override the default "typeset everything on the page" behavior to\n            // only typeset whatever we have explicitly marked as math\n            return typesetPageMathPromise();\n        }\n    }\n};\nfunction typesetPageMathPromise()\n{\n    var elements = document.querySelectorAll(\'.display-math, .inline-math\');\n    return MathJax.typesetPromise(elements);\n}\n';
-/* 001324 */ export var _html_body_end_js_scripts_mathjax = '\n<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>\n<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>\n';
-/* 001332 */ export var get_html_css_global = function (html_fragment_renderer) {
+/* 000939 */ export var _html_css_content = "\n.emph, .textit {\n  font-style: italic;\n}\n.textbf {\n  font-weight: bold;\n}\n\nh1 {\n  font-size: 1.6rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh2 {\n  font-size: 1.3rem;\n  line-height: 1.3em;\n  font-weight: bold;\n  margin: 1em 0px;\n}\nh3 {\n  font-size: 1rem;\n  font-weight: bold;\n  margin: 1em 0px;\n}\n\n.heading-level-4 {\n  font-style: italic;\n  display: inline;\n}\n.heading-level-4::after {\n  display: inline-block;\n  margin: 0px .12em;\n  content: '—';\n}\n\n.heading-level-5 {\n  font-style: italic;\n  font-size: .9em;\n  display: inline;\n}\n.heading-level-5::after {\n  display: inline-block;\n  margin-right: .12em;\n  content: '';\n}\n\n.heading-level-6 {\n  font-style: italic;\n  font-size: .8em;\n  display: inline;\n}\n.heading-level-6::after {\n  display: inline-block;\n  margin-right: .06em;\n  content: '';\n}\n\n\n.heading-level-theorem {\n  font-weight: bold;\n}\n.heading-level-theorem::after {\n  font-weight: bold;\n  display: inline-block;\n  margin: 0px .12em 0px 0px;\n  content: '.';\n}\n\ndiv.prooflike > p > .heading-level-theorem,\ndiv.prooflike > p > .heading-level-theorem::after {\n  font-weight: normal;\n  font-style: italic;\n}\n\n\ndl.enumeration {\n  display: block;\n  margin-left: 2.5em;\n}\ndl.enumeration > dt {\n  float: left;\n  clear: left;\n  display: inline-block;\n  /*margin: 0px; */\n  margin-left: -2.5em;\n  min-width: 2.0em;\n  /* messes up wide labels, e.g. in {description} items: */\n  /* width: 2.0em;  max-width: 2.0em;*/\n  margin-right: 0.5em;\n  text-align: right;\n}\ndl.enumeration > dd {\n  /*display: inline-block;\n  width: 100%;*/\n  border: 0px;\n  padding: 0px;\n  margin: 0px;\n}\n\nfigure.float {\n  width: 100%;\n  border-width: 1px 0px 1px 0px;\n  border-style: solid none solid none;\n  border-color: rgba(120, 120, 140, 0.15);\n  margin: 0.5rem 0px;\n  padding: 0.5rem 0px;\n}\n\nfigure.float .float-contents {\n  width: 100%;\n  max-width: 100%;\n  overflow-x: auto;\n}\n\nfigure.float .float-contents img {\n  display: block;\n  margin: 0pt auto;\n  padding: 0pt;\n  border: 0pt;\n  margin: 0px auto;\n}\n\nfigure.float figcaption {\n  display: block;\n  margin-top: 0.5em;\n  margin: 0.75em 2em 0px;\n  text-align: center;\n}\n\nfigure.float figcaption > span {\n  display: inline-block;\n  font-style: italic;\n  text-align: left;\n}\n\ntable {\n  margin: 1em 0px 1em 0px;\n  border-collapse: separate;\n  border-spacing: 0px;\n  /*border-top: solid 1pt;\n  border-bottom: solid 1pt;*/\n}\nfigure.float .float-contents table {\n  margin: 0px auto;\n}\ntd {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\nth {\n  padding: 0.3em 0.5em;\n  border: none 0px;\n}\n.cellstyle-H {\n  border-bottom: solid .5pt;\n}\n.cellstyle-rH {\n}\n.cellstyle-l {\n  text-align: left;\n}\n.cellstyle-c {\n  text-align: center;\n}\n.cellstyle-r {\n  text-align: right;\n}\n.cellstyle-green {\n  background-color: rgba(69, 255, 69, 0.31); /*rgb(200,255,200);*/\n}\n.cellstyle-blue {\n  background-color: rgba(79, 142, 255, 0.27); /*rgb(200,220,255);*/\n}\n.cellstyle-yellow {\n  background-color: rgba(255, 255, 49, 0.33); /*rgb(255,255,200);*/\n}\n.cellstyle-red {\n  background-color: rgba(255,120,120,0.30);  /*rgb(255,200,200);*/\n}\n.cellstyle-lvert {\n  border-left: solid .5pt;\n}\n.cellstyle-rvert {\n  border-right: solid .5pt;\n}\n\n.celltbledge-top {\n  border-top: solid 1pt;\n}\n.celltbledge-bottom {\n  border-bottom: solid 1pt;\n}\n\n.verbatimcode {\n  font-family: monospace;\n  font-size: 0.9em;\n  background-color: rgba(127,127,127,0.25);\n  border-radius: 2px;\n  padding: 1px 2px;\n  display: inline-block;\n  white-space: pre-wrap;\n}\n.verbatima {\n  font-style: italic;\n}\n.verbatimcode-environment {\n  display: block;\n  margin: 0.75em 0px 1em;\n  white-space: pre;\n}\n\n.defterm {\n  font-style: italic;\n  margin: 1em 0px;\n}\n.defterm:first-child {\n  margin-top: 0px;\n}\n.defterm:last-child {\n  margin-bottom: 0px;\n}\n\n.defterm .defterm-term, .defterm .term-in-defining-defterm {\n  font-style: italic;\n  font-weight: bold;\n}\n\n.display-math {\n  width: 100%;\n  max-width: 100%;\n  display: block;\n  overflow-x: auto;\n}\n\n.endnote {\n}\n.citation {\n}\n.footnote {\n}\n.endnote-marks, .citation-marks {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\ndl.citation-list > dt, dl.footnote-list > dt {\n  font-size: 0.8em;\n  display: inline-block;\n  vertical-align: 0.3em;\n  margin-top: -0.3em;\n}\n\n.annotation {\n  color: var(--annotation-color);\n}\n.annotation-comment {\n  padding: 3pt 0px;\n  font-weight: 600;\n  font-family: sans-serif;\n}\n.annotation-comment::before {\n  content: '['\n}\n.annotation-comment::after {\n  content: ']'\n}\n.annotation-initials {\n  display: inline-block;\n  margin-right: 0.3em;\n  font-family: sans-serif;\n  font-size: .8em;\n  font-weight: normal;\n  font-style: normal;\n  line-height: .9;\n  padding: .5pt;\n  border: solid .4pt var(--annotation-color);\n  border-radius: 2pt;\n\n  float: right;\n  margin-right: -4em;\n}\n.annotation-0 {\n  --annotation-color: rgb(148,7,24); /* dark red / burgundy */\n}\n.annotation-1 {\n  --annotation-color: rgb(0,148,240); /* blue-y */\n}\n.annotation-2 {\n  --annotation-color: rgb(242,108,13); /* orange-brown-y */\n}\n.annotation-3 {\n  --annotation-color: rgb(65,149,42); /* green-y */\n}\n.annotation-4 {\n  --annotation-color: rgb(128,55,134); /* purple-y */\n}\n.annotation-5 {\n  --annotation-color: rgb(0,129,129); /* blue-green-y */\n}\n.annotation-6 {\n  --annotation-color: rgb(160,120,0); /* brownish */\n}\n.annotation-7 {\n  --annotation-color: rgb(35,195,155); /* aqua-ish */\n}\n\n\n.quote, .address, .blockquote {\n  margin: 1em 0;\n}\n.quote {\n  background: rgba(120, 140, 150, 0.15);\n  padding: 1em 3em;\n}\n.quote .quote-lines,\n.quote .quote-text {\n  font-style: italic;\n  margin: 0.5em 0;\n}\n.quote .quote-lines + .quote-lines {\n  margin-top: 1em;\n}\n.quote .quote-lines .quote-lines-indent {\n  display: inline-block;\n  width: 2.5em;\n}\n.quote-attributed {\n  margin: 0.5em 0;\n  text-align: right;\n}\n.quote .quote-attributed::before {\n  content: '—';\n}\n.quote-block {\n  padding-left: 1em;\n  border-left: solid 4pt rgba(120, 140, 150, 0.3)  ;\n}\n\n.address .quote-lines {\n  font-size: .933em;\n}\n\n.blockquote {\n  padding: 0 1em;\n}\n\n";
+/* 001290 */ export var _html_js_mathjax = '\nMathJax = {\n    tex: {\n        inlineMath: [[\'\\\\(\', \'\\\\)\']],\n        displayMath: [[\'\\\\[\', \'\\\\]\']],\n        processEnvironments: true,\n        processRefs: true,\n\n        // equation numbering on\n        tags: \'ams\'\n    },\n    options: {\n        // all MathJax content is marked with CSS classes\n        // skipHtmlTags: \'body\',\n        // processHtmlClass: \'display-math|inline-math\',\n    },\n    startup: {\n        pageReady: function() {\n            // override the default "typeset everything on the page" behavior to\n            // only typeset whatever we have explicitly marked as math\n            return typesetPageMathPromise();\n        }\n    }\n};\nfunction typesetPageMathPromise()\n{\n    var elements = document.querySelectorAll(\'.display-math, .inline-math\');\n    return MathJax.typesetPromise(elements);\n}\n';
+/* 001321 */ export var _html_body_end_js_scripts_mathjax = '\n<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>\n<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>\n';
+/* 001329 */ export var get_html_css_global = function (html_fragment_renderer) {
+/* 001329 */ 	if (arguments.length) {
+/* 001329 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001329 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001329 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001329 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001329 */ 				switch (__attrib0__) {
+/* 001329 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001329 */ 				}
+/* 001329 */ 			}
+/* 001329 */ 		}
+/* 001329 */ 	}
+/* 001329 */ 	else {
+/* 001329 */ 	}
+/* 001330 */ 	return _html_css_global;
+/* 001330 */ };
+/* 001332 */ export var get_html_css_content = function (html_fragment_renderer) {
 /* 001332 */ 	if (arguments.length) {
 /* 001332 */ 		var __ilastarg0__ = arguments.length - 1;
 /* 001332 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -1538,9 +1554,9 @@
 /* 001332 */ 	}
 /* 001332 */ 	else {
 /* 001332 */ 	}
-/* 001333 */ 	return _html_css_global;
+/* 001333 */ 	return _html_css_content;
 /* 001333 */ };
-/* 001335 */ export var get_html_css_content = function (html_fragment_renderer) {
+/* 001335 */ export var get_html_js = function (html_fragment_renderer) {
 /* 001335 */ 	if (arguments.length) {
 /* 001335 */ 		var __ilastarg0__ = arguments.length - 1;
 /* 001335 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -1554,66 +1570,50 @@
 /* 001335 */ 	}
 /* 001335 */ 	else {
 /* 001335 */ 	}
-/* 001336 */ 	return _html_css_content;
-/* 001336 */ };
-/* 001338 */ export var get_html_js = function (html_fragment_renderer) {
-/* 001338 */ 	if (arguments.length) {
-/* 001338 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001338 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001338 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001338 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001338 */ 				switch (__attrib0__) {
-/* 001338 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001338 */ 				}
-/* 001338 */ 			}
-/* 001338 */ 		}
-/* 001338 */ 	}
-/* 001338 */ 	else {
-/* 001338 */ 	}
-/* 001339 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
-/* 001340 */ 		return _html_js_mathjax;
+/* 001336 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
+/* 001337 */ 		return _html_js_mathjax;
+/* 001337 */ 	}
+/* 001338 */ 	return '';
+/* 001338 */ };
+/* 001340 */ export var get_html_body_end_js_scripts = function (html_fragment_renderer) {
+/* 001340 */ 	if (arguments.length) {
+/* 001340 */ 		var __ilastarg0__ = arguments.length - 1;
+/* 001340 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001340 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001340 */ 			for (var __attrib0__ in __allkwargs0__) {
+/* 001340 */ 				switch (__attrib0__) {
+/* 001340 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001340 */ 				}
+/* 001340 */ 			}
+/* 001340 */ 		}
 /* 001340 */ 	}
-/* 001341 */ 	return '';
-/* 001341 */ };
-/* 001343 */ export var get_html_body_end_js_scripts = function (html_fragment_renderer) {
-/* 001343 */ 	if (arguments.length) {
-/* 001343 */ 		var __ilastarg0__ = arguments.length - 1;
-/* 001343 */ 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001343 */ 			var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001343 */ 			for (var __attrib0__ in __allkwargs0__) {
-/* 001343 */ 				switch (__attrib0__) {
-/* 001343 */ 					case 'html_fragment_renderer': var html_fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001343 */ 				}
-/* 001343 */ 			}
-/* 001343 */ 		}
-/* 001343 */ 	}
-/* 001343 */ 	else {
-/* 001343 */ 	}
-/* 001344 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
-/* 001345 */ 		return _html_body_end_js_scripts_mathjax;
-/* 001345 */ 	}
-/* 001346 */ 	return '';
-/* 001346 */ };
-/* 001352 */ export var FragmentRendererInformation =  __class__ ('FragmentRendererInformation', [object], {
-/* 001352 */ 	__module__: __name__,
-/* 001358 */ 	FragmentRendererClass: HtmlFragmentRenderer,
-/* 001361 */ 	get get_style_information () {return function (fragment_renderer) {
-/* 001361 */ 		if (arguments.length) {
-/* 001361 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 001361 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 001361 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 001361 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 001361 */ 					switch (__attrib0__) {
-/* 001361 */ 						case 'fragment_renderer': var fragment_renderer = __allkwargs0__ [__attrib0__]; break;
-/* 001361 */ 					}
-/* 001361 */ 				}
-/* 001361 */ 			}
-/* 001361 */ 		}
-/* 001361 */ 		else {
-/* 001361 */ 		}
-/* 001366 */ 		return dict ({'css_global': __call__ (get_html_css_global, null, fragment_renderer), 'css_content': __call__ (get_html_css_content, null, fragment_renderer), 'js': __call__ (get_html_js, null, fragment_renderer), 'body_end_js_scripts': __call__ (get_html_body_end_js_scripts, null, fragment_renderer)});
-/* 001366 */ 	};},
-/* 001369 */ 	format_name: 'html'
-/* 001369 */ });
+/* 001340 */ 	else {
+/* 001340 */ 	}
+/* 001341 */ 	if (__t__ (html_fragment_renderer.use_mathjax)) {
+/* 001342 */ 		return _html_body_end_js_scripts_mathjax;
+/* 001342 */ 	}
+/* 001343 */ 	return '';
+/* 001343 */ };
+/* 001349 */ export var FragmentRendererInformation =  __class__ ('FragmentRendererInformation', [object], {
+/* 001349 */ 	__module__: __name__,
+/* 001355 */ 	FragmentRendererClass: HtmlFragmentRenderer,
+/* 001358 */ 	get get_style_information () {return function (fragment_renderer) {
+/* 001358 */ 		if (arguments.length) {
+/* 001358 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 001358 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 001358 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 001358 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 001358 */ 					switch (__attrib0__) {
+/* 001358 */ 						case 'fragment_renderer': var fragment_renderer = __allkwargs0__ [__attrib0__]; break;
+/* 001358 */ 					}
+/* 001358 */ 				}
+/* 001358 */ 			}
+/* 001358 */ 		}
+/* 001358 */ 		else {
+/* 001358 */ 		}
+/* 001363 */ 		return dict ({'css_global': __call__ (get_html_css_global, null, fragment_renderer), 'css_content': __call__ (get_html_css_content, null, fragment_renderer), 'js': __call__ (get_html_js, null, fragment_renderer), 'body_end_js_scripts': __call__ (get_html_body_end_js_scripts, null, fragment_renderer)});
+/* 001363 */ 	};},
+/* 001366 */ 	format_name: 'html'
+/* 001366 */ });
 /* 000006 */ 
 //# sourceMappingURL=flm.fragmentrenderer.html.map

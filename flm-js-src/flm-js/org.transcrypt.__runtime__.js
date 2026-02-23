@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2026-02-23 11:51:23
+/* 000001 */ // Transcrypt'ed from Python, 2026-02-23 19:58:44
 /* 000010 */ import {copy as _copy} from './copy.js';
 /* 000010 */ export {_copy};
 /* 000001 */ var __name__ = 'org.transcrypt.__runtime__';

@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2026-02-23 11:51:24
+/* 000001 */ // Transcrypt'ed from Python, 2026-02-23 19:58:46
 /* 000006 */ var logging = {};
 /* 000006 */ var re = {};
 /* 000006 */ var unique_object_id = {};
@@ -17,7 +17,7 @@
 /* 000007 */ __nest__ (logging, '', __module_logging__);
 /* 000006 */ import * as __module_re__ from './re.js';
 /* 000006 */ __nest__ (re, '', __module_re__);
-/* 000006 */ export {FLMFragment, macrospec, FLMDocument, latexnodes, LatexWalkerParseError, latexwalker, _autounichars, latexnodes_nodes, LatexWalkerLocatedErrorFormatter};
+/* 000006 */ export {latexnodes, LatexWalkerLocatedErrorFormatter, LatexWalkerParseError, FLMDocument, macrospec, FLMFragment, latexnodes_nodes, _autounichars, latexwalker};
 /* 000001 */ var __name__ = 'flm.flmenvironment';
 /* 000008 */ export var logger = (function () {
 /* 000008 */ 	var __accu0__ = logging;
