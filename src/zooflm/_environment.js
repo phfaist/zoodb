@@ -684,6 +684,11 @@ export function zooflm_default_environment_options(footnote_counter_formatter='a
             itemize: {
                 counter_formatter: ['•', '-', '▸'],
             },
+            description: {
+                // {description} expects an explicit label to be attached to each item.
+                // Use the \item[<LABEL>] syntax.
+                counter_formatter: ['<??>', '<??>', '<??>'],
+            },
             enumerate: {
                 // uses default formatters 1., 2., ... incl. nested (i), etc.
                 counter_formatter: null,
