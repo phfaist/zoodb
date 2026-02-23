@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2026-02-15 18:37:42
+/* 000001 */ // Transcrypt'ed from Python, 2026-02-23 11:51:27
 /* 000007 */ var logging = {};
 /* 000007 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, _copy, _sort, abs, all, any, assert, bin, bool, bytearray, bytes, callable, chr, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, hex, input, int, isinstance, issubclass, len, list, map, max, min, object, oct, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000035 */ import {get_safe_target_id} from './flm.feature.refs.js';
@@ -12,7 +12,7 @@
 /* 000011 */ import {LatexWalkerLocatedError, ParsedArgumentsInfo} from './pylatexenc.latexnodes.js';
 /* 000007 */ import * as __module_logging__ from './logging.js';
 /* 000007 */ __nest__ (logging, '', __module_logging__);
-/* 000007 */ export {helper_collect_labels, latexnodes_parsers, counter, FLMArgumentSpec, Feature, FLMEnvironmentSpecBase, ParsingStateDeltaExtendLatexContextDb, LatexEnvironmentBodyContentsParser, MacroSpec, latexnodes_nodes, LatexWalkerLocatedError, ParsedArgumentsInfo, label_arg, get_safe_target_id};
+/* 000007 */ export {get_safe_target_id, ParsingStateDeltaExtendLatexContextDb, LatexWalkerLocatedError, Feature, FLMArgumentSpec, counter, helper_collect_labels, label_arg, ParsedArgumentsInfo, latexnodes_parsers, latexnodes_nodes, MacroSpec, LatexEnvironmentBodyContentsParser, FLMEnvironmentSpecBase};
 /* 000001 */ var __name__ = 'flm.feature.enumeration';
 /* 000008 */ export var logger = (function () {
 /* 000008 */ 	var __accu0__ = logging;
@@ -428,69 +428,69 @@
 /* 000322 */ 	__module__: __name__,
 /* 000329 */ 	feature_name: 'enumeration',
 /* 000330 */ 	feature_title: 'Enumeration and itemization lists',
-/* 000332 */ 	feature_default_config: dict ({'enumeration_environments': dict ({'itemize': dict ({'counter_formatter': ['•', '-', '▸']}), 'enumerate': dict ({'counter_formatter': null})})}),
-/* 000342 */ 	DocumentManager: null,
-/* 000343 */ 	RenderManager: null,
-/* 000346 */ 	get __init__ () {return __get__ (this, function (self, enumeration_environments) {
-/* 000346 */ 		if (typeof enumeration_environments == 'undefined' || (enumeration_environments != null && enumeration_environments.hasOwnProperty ("__kwargtrans__"))) {;
-/* 000346 */ 			var enumeration_environments = null;
-/* 000346 */ 		};
-/* 000346 */ 		if (arguments.length) {
-/* 000346 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000346 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000346 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000346 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000346 */ 					switch (__attrib0__) {
-/* 000346 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000346 */ 						case 'enumeration_environments': var enumeration_environments = __allkwargs0__ [__attrib0__]; break;
-/* 000346 */ 					}
-/* 000346 */ 				}
-/* 000346 */ 			}
-/* 000346 */ 		}
-/* 000346 */ 		else {
-/* 000346 */ 		}
-/* 000347 */ 		__call__ (__call__ (__super__, null, FeatureEnumeration, '__init__'), null, self);
-/* 000348 */ 		if (__t__ (enumeration_environments === null)) {
-/* 000353 */ 			var enumeration_environments = (function () {
-/* 000353 */ 				var __accu0__ = self.feature_default_config;
-/* 000353 */ 				return __call__ (__accu0__.py_get, __accu0__, 'enumeration_environments', dict ({}));
-/* 000353 */ 			}) ();
-/* 000353 */ 		}
-/* 000354 */ 		self.enumeration_environments = enumeration_environments;
-/* 000354 */ 	});},
-/* 000356 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
-/* 000356 */ 		if (arguments.length) {
-/* 000356 */ 			var __ilastarg0__ = arguments.length - 1;
-/* 000356 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
-/* 000356 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
-/* 000356 */ 				for (var __attrib0__ in __allkwargs0__) {
-/* 000356 */ 					switch (__attrib0__) {
-/* 000356 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
-/* 000356 */ 					}
-/* 000356 */ 				}
-/* 000356 */ 			}
-/* 000356 */ 		}
-/* 000356 */ 		else {
-/* 000356 */ 		}
-/* 000357 */ 		return __call__ (dict, null, __kwargtrans__ ({environments: (function () {
-/* 000357 */ 			var __accu0__ = [];
-/* 000364 */ 			var __iterable0__ = (function () {
-/* 000364 */ 				var __accu1__ = __call__ (dict, null, self.enumeration_environments);
-/* 000364 */ 				return __call__ (__accu1__.py_items, __accu1__);
-/* 000364 */ 			}) ();
-/* 000364 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
-/* 000364 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
-/* 000364 */ 				var envname = __left0__ [0];
-/* 000364 */ 				var envinfo = __left0__ [1];
-/* 000364 */ 				(function () {
-/* 000364 */ 					var __accu1__ = __accu0__;
-/* 000359 */ 					return __call__ (__accu1__.append, __accu1__, __call__ (Enumeration, null, __kwargtrans__ ({environmentname: envname, counter_formatter: __getitem__ (envinfo, 'counter_formatter'), annotations: [envname]})));
-/* 000359 */ 				}) ();
-/* 000359 */ 			}
-/* 000359 */ 			return __accu0__;
-/* 000359 */ 		}) ()}));
-/* 000359 */ 	});}
-/* 000359 */ });
-/* 000371 */ export var FeatureClass = FeatureEnumeration;
+/* 000332 */ 	feature_default_config: dict ({'enumeration_environments': dict ({'itemize': dict ({'counter_formatter': ['•', '-', '▸']}), 'enumerate': dict ({'counter_formatter': null}), 'description': dict ({'counter_formatter': ['<??>', '<??>', '<??>']})})}),
+/* 000346 */ 	DocumentManager: null,
+/* 000347 */ 	RenderManager: null,
+/* 000350 */ 	get __init__ () {return __get__ (this, function (self, enumeration_environments) {
+/* 000350 */ 		if (typeof enumeration_environments == 'undefined' || (enumeration_environments != null && enumeration_environments.hasOwnProperty ("__kwargtrans__"))) {;
+/* 000350 */ 			var enumeration_environments = null;
+/* 000350 */ 		};
+/* 000350 */ 		if (arguments.length) {
+/* 000350 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000350 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000350 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000350 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000350 */ 					switch (__attrib0__) {
+/* 000350 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000350 */ 						case 'enumeration_environments': var enumeration_environments = __allkwargs0__ [__attrib0__]; break;
+/* 000350 */ 					}
+/* 000350 */ 				}
+/* 000350 */ 			}
+/* 000350 */ 		}
+/* 000350 */ 		else {
+/* 000350 */ 		}
+/* 000351 */ 		__call__ (__call__ (__super__, null, FeatureEnumeration, '__init__'), null, self);
+/* 000352 */ 		if (__t__ (enumeration_environments === null)) {
+/* 000357 */ 			var enumeration_environments = (function () {
+/* 000357 */ 				var __accu0__ = self.feature_default_config;
+/* 000357 */ 				return __call__ (__accu0__.py_get, __accu0__, 'enumeration_environments', dict ({}));
+/* 000357 */ 			}) ();
+/* 000357 */ 		}
+/* 000358 */ 		self.enumeration_environments = enumeration_environments;
+/* 000358 */ 	});},
+/* 000360 */ 	get add_latex_context_definitions () {return __get__ (this, function (self) {
+/* 000360 */ 		if (arguments.length) {
+/* 000360 */ 			var __ilastarg0__ = arguments.length - 1;
+/* 000360 */ 			if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+/* 000360 */ 				var __allkwargs0__ = arguments [__ilastarg0__--];
+/* 000360 */ 				for (var __attrib0__ in __allkwargs0__) {
+/* 000360 */ 					switch (__attrib0__) {
+/* 000360 */ 						case 'self': var self = __allkwargs0__ [__attrib0__]; break;
+/* 000360 */ 					}
+/* 000360 */ 				}
+/* 000360 */ 			}
+/* 000360 */ 		}
+/* 000360 */ 		else {
+/* 000360 */ 		}
+/* 000361 */ 		return __call__ (dict, null, __kwargtrans__ ({environments: (function () {
+/* 000361 */ 			var __accu0__ = [];
+/* 000368 */ 			var __iterable0__ = (function () {
+/* 000368 */ 				var __accu1__ = __call__ (dict, null, self.enumeration_environments);
+/* 000368 */ 				return __call__ (__accu1__.py_items, __accu1__);
+/* 000368 */ 			}) ();
+/* 000368 */ 			for (var __index0__ = 0; __index0__ < len (__iterable0__); __index0__++) {
+/* 000368 */ 				var __left0__ = __getitem__ (__iterable0__, __index0__);
+/* 000368 */ 				var envname = __left0__ [0];
+/* 000368 */ 				var envinfo = __left0__ [1];
+/* 000368 */ 				(function () {
+/* 000368 */ 					var __accu1__ = __accu0__;
+/* 000363 */ 					return __call__ (__accu1__.append, __accu1__, __call__ (Enumeration, null, __kwargtrans__ ({environmentname: envname, counter_formatter: __getitem__ (envinfo, 'counter_formatter'), annotations: [envname]})));
+/* 000363 */ 				}) ();
+/* 000363 */ 			}
+/* 000363 */ 			return __accu0__;
+/* 000363 */ 		}) ()}));
+/* 000363 */ 	});}
+/* 000363 */ });
+/* 000375 */ export var FeatureClass = FeatureEnumeration;
 /* 000007 */ 
 //# sourceMappingURL=flm.feature.enumeration.map
