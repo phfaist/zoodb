@@ -1,4 +1,4 @@
-/* 000001 */ // Transcrypt'ed from Python, 2026-02-23 19:58:49
+/* 000001 */ // Transcrypt'ed from Python, 2026-03-17 13:44:57
 /* 000012 */ import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, _copy, _sort, abs, all, any, assert, bin, bool, bytearray, bytes, callable, chr, delattr, dict, dir, divmod, enumerate, filter, float, format, getattr, hasattr, hex, input, int, isinstance, issubclass, len, list, map, max, min, object, oct, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 /* 000027 */ import {FeatureTheorems} from './flm.feature.theorems.js';
 /* 000025 */ import {FeatureQuote} from './flm.feature.quote.js';
@@ -15,7 +15,7 @@
 /* 000014 */ import {FeatureVerbatim} from './flm.feature.verbatim.js';
 /* 000013 */ import {FeatureHref} from './flm.feature.href.js';
 /* 000012 */ import {FeatureBaseFormatting} from './flm.feature.baseformatting.js';
-/* 000012 */ export {FeatureExternalPrefixedCitations, FeatureHref, FeatureFloats, FeatureTheorems, FeatureHeadings, FeatureEndnotes, FeatureBaseFormatting, EndnoteCategory, FeatureEnumeration, FeatureVerbatim, FeatureSimplePathGraphicsResourceProvider, FeatureSubstMacros, FeatureMath, FeatureRefs, FeatureDefTerm, FeatureQuote};
+/* 000012 */ export {FeatureSimplePathGraphicsResourceProvider, FeatureMath, FeatureSubstMacros, FeatureDefTerm, FeatureHref, FeatureQuote, FeatureFloats, FeatureEndnotes, FeatureVerbatim, FeatureEnumeration, EndnoteCategory, FeatureTheorems, FeatureHeadings, FeatureRefs, FeatureBaseFormatting, FeatureExternalPrefixedCitations};
 /* 000001 */ var __name__ = 'flm.stdfeatures';
 /* 000030 */ export var standard_features = function () {
 /* 000030 */ 	var baseformatting = true;
@@ -186,7 +186,7 @@
 /* 000172 */ 		}
 /* 000173 */ 		(function () {
 /* 000173 */ 			var __accu0__ = features;
-/* 000174 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureQuotes, null, __kwargtrans__ (dargs)));
+/* 000174 */ 			return __call__ (__accu0__.append, __accu0__, __call__ (FeatureQuote, null, __kwargtrans__ (dargs)));
 /* 000174 */ 		}) ();
 /* 000174 */ 	}
 /* 000177 */ 	return features;
