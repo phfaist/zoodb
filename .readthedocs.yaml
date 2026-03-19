@@ -23,10 +23,10 @@ build:
       # https://python-poetry.org/docs/#installing-manually
       - 'pip install "poetry>=1.4"'
       # Tell poetry to not use a virtual environment
-      - 'poetry config virtualenvs.create false'
+      #- 'poetry config virtualenvs.create false'
 
     post_install:
-      - 'poetry install --directory=doc/ --no-root'
+      - 'VIRTUAL_ENV="$READTHEDOCS_VIRTUALENV_PATH" poetry install --directory=doc/ --no-root'
       - 'npm install -g jsdoc'
 
 
