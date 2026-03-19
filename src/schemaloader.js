@@ -17,9 +17,7 @@ import { path_or_url_to_url } from './util/url.js';
 
 /**
  * Load schema object data from a collection of YAML or JSON source files, and
- * dereference any { '$ref': ... } internal and external references.
- *
- * Doc........
+ * dereference any ``{ "$ref": ... }`` internal and external references.
  *
  * Configuration options:
  *

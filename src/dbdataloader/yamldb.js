@@ -107,11 +107,38 @@ const dbdata = zoodbdataloader.load();
  *
  * Includes validation of the input object data against the provided schemas.
  *
- * Doc........
+ * Configuration options:
  *
- * Configuration options .............
+ * - ``root_data_dir`` *(required)* — the root directory on the filesystem
+ *   where data files are located.
  *
- * See also :class:`makeStandardZooDbYamlDataLoader` for a simplified loading.
+ * - ``objects`` — an object mapping each object type name to a per-type
+ *   configuration object with the following optional properties:
+ *
+ *   - ``schema_name`` — the schema name to use for validation (defaults to the
+ *     object type name).
+ *   - ``data_src_path`` — sub-directory (relative to ``root_data_dir``) where
+ *     source files for this type are stored (defaults to the object type name
+ *     with an ``'s'`` suffix, e.g. ``'codes'`` for type ``'code'``).
+ *   - ``file_name_match`` — a `RegExp` that file names must match to be loaded
+ *     (defaults to ``/\.(ya?ml|json)$/i``).
+ *   - ``ignore_file_name_match`` — a `RegExp` for file names to silently
+ *     ignore (defaults to a pattern covering backup files, editor temp files,
+ *     and resource file extensions).
+ *   - ``load_objects(data)`` — a function that receives the parsed file content
+ *     and returns an array of objects.  Defaults to ``(d) => [d]`` (one object
+ *     per file).
+ *
+ * - ``object_defaults`` — default values for the per-type properties listed
+ *   above, applied when the per-type config does not specify a value.
+ *
+ * - ``fs`` — an `fs`-compatible module providing `readFile`, `readdir`,
+ *   `stat`, and `lstat` (or their `promises` equivalents).
+ *
+ * - ``resource_file_extensions`` — array of file extensions that should be
+ *   ignored when scanning data directories (e.g. `['.svg', '.png']`).
+ *
+ * See also :func:`makeStandardZooDb` for a higher-level setup.
  */
 export class YamlDbDataLoader
 {

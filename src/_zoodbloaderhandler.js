@@ -9,13 +9,13 @@ import loMerge from 'lodash/merge.js';
  * care of performing reloads, etc.
  *
  * You can install a `ZooDbDataLoaderHandler` in a :class:`ZooDb` instance by
- * calling :meth:`ZooDb.install_data_loader_handler()`.
+ * calling :meth:`ZooDb.install_zoo_loader_handler()`.
  *
  * The reason for splitting off the logic of the loader handler is to avoid
  * bloating the `ZooDb` class definition, especially in case a user would like
  * to create a barebones `ZooDb`, e.g. with hard-coded JSON data, without
- * reloading features, in which case neither a loader nor a loader handler are
- * not necessary.
+ * reloading features, in which case neither a loader nor a loader handler
+ * is necessary.
  *
  * This class will do a few more things other than directly calling the
  * `dbdataloader`'s load method and setting the data on the `zoodb` instance:
@@ -78,7 +78,7 @@ export class ZooDbDataLoaderHandler
      *
      * **Normally, you don't need to call this method!** This function is
      * automatically called by the :class:`ZooDb` instance when you call
-     * :meth:`ZooDb.install_data_loader_handler()`.
+     * :meth:`ZooDb.install_zoo_loader_handler()`.
      */
     async initialize(zoodb)
     {
@@ -93,7 +93,7 @@ export class ZooDbDataLoaderHandler
      * documentation for details.
      *
      * After the initial call to load(), any subsequent calls to load() will
-     * automatically reload the zoo in the same was as directly calling
+     * automatically reload the zoo in the same way as directly calling
      * reload().
      */
     async load()
@@ -169,7 +169,7 @@ export class ZooDbDataLoaderHandler
      *
      * Usually you don't need to call reload() directly and simply call load()
      * instead.  After the initial call to load(), any subsequent calls to
-     * load() will automatically reload the zoo in the same was as directly
+     * load() will automatically reload the zoo in the same way as directly
      * calling reload().
      */
     async reload()

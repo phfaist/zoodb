@@ -329,6 +329,11 @@ export class SearchableTextProcessor extends ZooDbProcessorBase
                 }
                 for (let [/*obj_id*/, obj] of Object.entries(objects)) {
                     let zoodbinfo = obj._zoodb;
+                    // REVIEW: `this.searchable_text_fieldset_name` is undefined
+                    // on SearchableTextProcessor — the property lives on
+                    // `this.searchable_text_fieldset.searchable_text_fieldset_name`.
+                    // As written, this delete is a no-op and the search
+                    // documents are never stripped from the dump.
                     delete zoodbinfo[this.searchable_text_fieldset_name];
                 }
             }

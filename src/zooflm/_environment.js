@@ -171,7 +171,10 @@ export function format_pylatexenc_located_error_traceback(obj)
 /**
  * Manager for cross-references.
  *
- * Doc........... & doc members.......!
+ * Stores a database of :class:`RefInstance` objects keyed by ``(ref_type,
+ * ref_label)`` pairs and resolves lookups via `get_ref()`.  Optionally
+ * restricts the set of allowed `ref_type` values when `options.ref_types` is
+ * provided; otherwise, any ref type is accepted dynamically.
  *
  * .. attribute:: target_href_resolver
  *
@@ -320,11 +323,15 @@ export class RefResolver
 
 
 /**
- * Simple citations provider (for flm interface) that looks up a citation in a
- * given citation database.  A convenient way to set up the database is to use a
- * :class:`CitationManager`.
+ * Simple citations provider (for the FLM interface) that looks up a citation
+ * in a given citation database.  A convenient way to set up the database is to
+ * use a :class:`CitationDatabaseManager` together with a
+ * :class:`CitationCompiler`, which produces formatted citation text and
+ * registers it via `update_citations()`.
  *
- * Doc...........
+ * Citations are keyed by ``(cite_prefix, cite_key)`` pairs.  The stored value
+ * for each citation is an FLM text string or a pre-compiled FLM fragment
+ * instance.
  */
 export class CitationsProvider
 {

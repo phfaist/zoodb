@@ -96,9 +96,11 @@ export function render_value(x, render_context, render_value_options = {})
 }
 
 /**
- * Determine whether the `value` contains an empty value.  If `value` is
- * an FLM fragment, we test whether the fragment is empty (see
- * `FLMFragment.is_empty()`).
+ * Return `true` if `value` is non-empty, `false` otherwise.  Nullish
+ * values and empty strings are considered empty.  FLM fragments are
+ * tested via `FLMFragment.is_empty()`.  Arrays (or other objects with a
+ * `length` property) are considered non-empty when their length is
+ * greater than zero.
  */
 export function value_not_empty(value)
 {

@@ -125,7 +125,7 @@ export class ZooDb
     get schemas() { return this.db.schemas; }
     /**
      * Read-only properties to access the dictionary of objects.  Access objects
-     * as ``stored_object = zoodbobject.objects[object_type][object_id]``.
+     * as ``stored_object = zoodb.objects[object_type][object_id]``.
      */
     get objects() { return this.db.objects; }
 
@@ -141,7 +141,7 @@ export class ZooDb
     /**
      * Initialize the database processors and then directly load objects whose
      * data is given in the argument dictionary `db`.  We ensure that the
-     * objects are copies of the probvided data, by serializing them &
+     * objects are copies of the provided data, by serializing them &
      * deserializing them again from JSON.
      *
      * Note that this method is meant to load raw data that needs to be
@@ -216,7 +216,7 @@ export class ZooDb
 
 
     /**
-     * Can be overridden to proceed to validatation of the zoo.  E.g., you can
+     * Can be overridden to proceed to validation of the zoo.  E.g., you can
      * enforce any constraints, sanity checks, etc.
      *
      * The base class applies checks that all IDs are unique modulo the
@@ -298,7 +298,7 @@ export class ZooDb
      * bloating the ZooDb class definition, especially in case a user would like
      * to create a barebones ZooDb, e.g. with hard-coded JSON data, without
      * reloading features, in which case neither a loader nor a loader handler
-     * are not necessary.
+     * is necessary.
      */
     async install_zoo_loader_handler( zoo_loader_handler )
     {
@@ -316,6 +316,10 @@ export class ZooDb
 
     /** Load or reload the zoo, using the loader handler that was installed via
      * `install_zoo_loader_handler()`.
+     *
+     * The `options` parameter is forwarded to the loader handler's `load()`
+     * method.  The default :class:`ZooDbDataLoaderHandler` does not use it,
+     * but a custom loader handler subclass may define its own options.
      */
     async load(options={})
     {

@@ -53,6 +53,9 @@ let _rx_html_escape_chars = new RegExp(
     '[' + Object.keys(html_escape_chars).map((c)=>_recharclassescape(c)).join('') + ']',
     'g'
 );
+// REVIEW: The next line resets `_rx_flm_escape_chars.lastIndex` instead of
+// `_rx_html_escape_chars.lastIndex`.  This is likely a copy-paste bug and
+// should read `_rx_html_escape_chars.lastIndex = 0;`.
 function escape_html(x)
 {
     _rx_flm_escape_chars.lastIndex = 0;
@@ -389,8 +392,8 @@ export class CitationCompiler
 
     /**
      * Load citation information from the cache file.  Does nothing if the cache
-     * file does not exist.  This method is automatically called by the
-     * constructor.
+     * file does not exist.  This method is automatically called by
+     * `initialize()`.
      */
     async load_cache()
     {

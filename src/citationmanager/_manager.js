@@ -38,7 +38,7 @@ import { Cache, one_day } from './_cache.js';
  *   as to whether or not to set a custom user agent when source fetch
  *   remote content, and if so, then which user agent to specify.
  *
- * .. warning:
+ * .. warning::
  *
  *    Do not forget to call and await the result of the `initialize()` method on
  *    the newly created object, so that the cache can be loaded.

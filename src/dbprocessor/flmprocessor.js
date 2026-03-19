@@ -218,8 +218,10 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
 
     /** You can call this method to compile additional, ad hoc fragments that do
      * not appear as object field values.
-     * 
-     * If you compile additional fragments, don't forget to call 
+     *
+     * If you compile additional fragments, don't forget to call
+     * `process_auxiliary_resources()` afterwards to register any new citations,
+     * cross-reference targets, and external resources found in the new fragments.
      */
     compile_flm_fragment(flm_content, {
         standalone, is_block_level, resource_info, what,
@@ -236,7 +238,7 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
 
     /** You should call this method if you compile more fragments using
      * `compile_flm_fragment()`.  This method will ensure that any additional
-     * citaitons are collected, any referenceable targets are registered, and
+     * citations are collected, any referenceable targets are registered, and
      * any additional resources are collected.
      */
     async process_auxiliary_resources()
