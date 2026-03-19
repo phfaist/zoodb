@@ -10,14 +10,101 @@ import loMerge from 'lodash/merge.js';
 
 
 /**
- * Create a :class:`ZooDb` instance (or a custom subclass instance) using 
+ * Create a :class:`ZooDb` instance (or a custom subclass instance) using
  * standard settings with higher-level options.
  *
- * To create an instance of a custom ZooDb subclass, set the config value
- * `config.ZooDbClass` to the subclass of ZooDb you want to use (see
- * :ref:`example`).
+ * To create an instance of a custom ZooDb subclass, set `config.ZooDbClass`
+ * to the desired subclass.
  *
- * TODO: Document the higher-level options !!
+ * Top-level config keys:
+ *
+ * - `ZooDbClass` — class to instantiate (default: :class:`ZooDb`).
+ * - `SchemaLoaderClass` — class used to load JSON Schemas (default:
+ *   :class:`SchemaLoader`).  Set to `false` to skip schema loading.
+ * - `continue_with_errors` — if `true`, FLM compilation errors become
+ *   warnings instead of aborting (sets `flm_error_policy` to `'continue'`).
+ *   Default: `false`.
+ * - `fs` — filesystem access object (Node.js `fs` module or compatible).
+ *   Required by the FLM processor for reading data and citation cache files.
+ * - `fs_data_dir` — root directory for resolving data file paths.
+ * - `zoo_permalinks` *(required)* — object with permalink-building functions
+ *   (see below).
+ * 
+ * The `zoo_permalinks` object should expose the following methods:
+ * - `object(object_type, object_id) → string` — builds a URL for a zoo
+ *   object.
+ * - `graphics_resource(gresource) → string` — builds a URL for a graphics
+ *   resource.
+ *
+ * Processor activation keys (each accepts either `null`/`false` to disable or
+ * a factory function ``(_this) → processorInstance``):
+ *
+ * - `use_relations_populator` — factory for :class:`RelationsPopulator`.
+ *   Consumed by `use_relations_populator.js`.
+ * - `use_gitlastmodified_processor` — factory for
+ *   :class:`GetGitLastModifiedDbProcessor`.
+ *   Consumed by `use_gitlastmodified_processor.js`.
+ * - `use_flm_environment` — factory for :class:`ZooFLMEnvironment`.
+ *   Consumed by `use_flm_environment.js`.
+ * - `use_flm_processor` — factory for :class:`ZooFLMProcessor`.
+ *   Consumed by `use_flm_processor.js`.
+ * - `use_searchable_text_processor` — factory for
+ *   :class:`SearchableTextProcessor`.
+ *   Consumed by `use_searchable_text_processor.js`.
+ *
+ * FLM options (`flm_options` sub-object, used by `use_flm_environment.js` and
+ * `use_flm_processor.js`):
+ *
+ * - `environment_options` — options forwarded to the :class:`ZooFLMEnvironment`
+ *   constructor.  Consumed by `use_flm_environment.js`.
+ * - `refs` — object mapping ref types to configuration; forwarded to
+ *   :class:`ZooFLMProcessor`.  Consumed by `use_flm_processor.js`.
+ * - `allow_unresolved_references` — when `true`, unresolved FLM cross-references
+ *   render as `<??>` instead of throwing.  Consumed by `use_flm_environment.js`.
+ * - `allow_unresolved_citations` — when `true`, unknown citation keys render
+ *   verbatim.  Consumed by `use_flm_environment.js`.
+ * - `citations.csl_style` — CSL style XML string for citation formatting.
+ *   Consumed by `use_flm_processor.js`.
+ * - `citations.override_arxiv_dois_file` — path to a file overriding arXiv DOI
+ *   mappings.  Consumed by `use_flm_processor.js`.
+ * - `citations.preset_bibliography_files` — array of bibliography file paths to
+ *   pre-load.  Consumed by `use_flm_processor.js`.
+ * - `citations.default_user_agent` — HTTP User-Agent string for citation HTTP
+ *   requests.  Consumed by `use_flm_processor.js`.
+ * - `citations.cache_dir` — directory for citation cache files (default:
+ *   `'_zoodb_citations_cache'`).  Consumed by `use_flm_processor.js`.
+ * - `citations.cache_dir_create` — whether to auto-create `cache_dir` (default:
+ *   `true`).  Consumed by `use_flm_processor.js`.
+ * - `citations.cache_entry_default_duration_ms` — cache TTL in milliseconds.
+ *   Consumed by `use_flm_processor.js`.
+ * - `citations.skip_save_cache` — skip writing updated citation cache to disk.
+ *   Consumed by `use_flm_processor.js`.
+ * - `citations.sources` — object mapping source names to source instances or
+ *   `true`/`false`/`null` to enable or disable defaults.
+ *   Consumed by `use_flm_processor.js`.
+ * - `resources.rename_figure_template` — function producing a target filename
+ *   for collected graphics resources.  Consumed by `use_flm_processor.js`.
+ * - `resources.figure_filename_extensions` — array of extensions to try when
+ *   resolving a graphics source name.  Consumed by `use_flm_processor.js`.
+ * - `resources.graphics_resources_fs_data_dir` — base directory for graphics
+ *   files (defaults to `fs_data_dir`).  Consumed by `use_flm_processor.js`.
+ * - `resources.graphics_use_srcset_parceljs` — options for generating
+ *   Parcel-compatible `srcset` attributes for raster images.
+ *   Consumed by `use_flm_environment.js`.
+ *
+ * Other options:
+ *
+ * - `extra_db_processors` — object mapping processor keys to
+ *   ``{ priority, instance }`` objects.  Lower `priority` values run earlier.
+ *   Set `instance` to `null` to disable an entry.
+ * - `custom_zoodb_properties` — object of extra properties to attach directly
+ *   to the returned ZooDb instance.
+ * - `searchable_text_options.object_types` — array of object types to include
+ *   in the searchable text index.  Consumed by `use_searchable_text_processor.js`.
+ * - `schemas` — passed to :class:`SchemaLoader`; must contain `schema_root`,
+ *   `schema_rel_path`, and `schema_add_extension`.
+ * - `schema_names` — array of schema names to load (or `null` to auto-detect
+ *   from the schema directory).  Passed to :class:`SchemaLoader`.
  */
 export async function makeStandardZooDb(config)
 {

@@ -172,6 +172,20 @@ export class SchemaLoader
 
     }
 
+    /**
+     * Load all schemas specified by the `schema_names` config property (or,
+     * when `schema_names` is null, by listing all matching files in the schema
+     * root directory) and return an object ``{ schemas }`` whose `schemas`
+     * property maps each schema name to its resolved JSON Schema object.
+     *
+     * Each referenced `$ref` within a schema is dereferenced automatically.
+     * The returned schemas object may be passed directly to
+     * :meth:`ZooDb.load_data()`.
+     *
+     * @returns {Promise<{schemas: Object}>}
+     * @throws {Error} If `schema_names` is null but `schema_root` is not a
+     *     `file:` URL, or if any schema file cannot be read or parsed.
+     */
     async load_schemas()
     {
         debug(`Loading schemas in ‘${this.config.schemas.schema_root}’ ...`);
@@ -214,6 +228,21 @@ export class SchemaLoader
         };
     }
 
+    /**
+     * Load and return a single schema by name, dereferencing any `$ref`
+     * references.  Repeated calls for the same name return the cached result
+     * without re-reading the file.
+     *
+     * This method allows loading an additional schema that is not listed in
+     * the constructor's `schema_names` config — for example, a supplementary
+     * schema needed at runtime.
+     *
+     * @param {string} schema_name - The bare schema name (without path prefix
+     *     or file extension) corresponding to a file under the configured
+     *     `schema_root` / `schema_rel_path`.
+     * @returns {Promise<Object>} The resolved JSON Schema object.
+     * @throws {Error} If the file cannot be read, parsed, or dereferenced.
+     */
     async load_schema_by_name(schema_name)
     {
         if ( Object.hasOwn(this.schemas_by_name, schema_name) ) {

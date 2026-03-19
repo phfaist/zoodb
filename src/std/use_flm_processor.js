@@ -56,9 +56,54 @@ const default_make_resource_processors_graphics_path =
 
 
 /**
- * Doc................
+ * Factory function that creates and configures a :class:`ZooFLMProcessor` for
+ * use with :func:`makeStandardZooDb`.
  *
- * Lots of options to document!.......
+ * Reads the following properties from `_this.config.flm_options` (the
+ * `flm_options` key of the config passed to `makeStandardZooDb`):
+ *
+ * - `refs` — object forwarded to the :class:`ZooFLMProcessor` constructor's
+ *   `refs` option.
+ * - `citations.csl_style` — CSL style XML string for the citation formatter.
+ * - `citations.override_arxiv_dois_file` — path to a file that overrides
+ *   arXiv-to-DOI mappings, relative to `fs_data_dir`.
+ * - `citations.preset_bibliography_files` — array of bibliography file paths
+ *   to pre-load into the `preset` citation source.
+ * - `citations.default_user_agent` — HTTP User-Agent header value for
+ *   citation fetch requests.
+ * - `citations.cache_dir` — directory for the citations disk cache (default:
+ *   `'_zoodb_citations_cache'`).  Created automatically unless
+ *   `citations.cache_dir_create` is `false`.
+ * - `citations.cache_entry_default_duration_ms` — cache TTL in milliseconds.
+ * - `citations.skip_save_cache` — set to `true` to skip writing the updated
+ *   cache to disk.
+ * - `citations.sources` — object mapping citation source names to source
+ *   instances.  Setting a key to `false` or `null` removes the built-in
+ *   source of that name; setting it to `true` keeps the built-in default.
+ *   The built-in sources are `'arxiv'`, `'doi'`, `'manual'`, and `'preset'`.
+ * - `citations.citation_manager_options` — extra options forwarded to the
+ *   :class:`CitationDatabaseManager` constructor.
+ * - `resources.rename_figure_template` — function ``(accessor) → string``
+ *   used to generate target filenames for graphics resources.
+ * - `resources.figure_filename_extensions` — array of extensions to append
+ *   when resolving a graphics source name (default: `['', '.svg', '.png',
+ *   '.jpeg', '.jpg']`).
+ * - `resources.graphics_resources_fs_data_dir` — source directory for
+ *   graphics files (defaults to `_this.config.fs_data_dir`).
+ * - `resources.rename_use_file_hash` / `resources.read_file_content` — see
+ *   :class:`FilesystemResourceRetriever`.
+ * - `resources.make_resource_retriever_graphics_path` — override the entire
+ *   graphics retriever factory.
+ * - `resources.make_resource_processors_graphics_path` — override the entire
+ *   graphics processor factory.
+ * - `skip_check_update_existing_citations` / `skip_check_update_existing_resources`
+ *   — forwarded to the :class:`ZooFLMProcessor` constructor.
+ *
+ * Requires `_this.zoo_flm_environment` to be already set (i.e.,
+ * `use_flm_environment` must run before `use_flm_processor`).
+ *
+ * @param {Object} _this - The internal state object from `makeStandardZooDb`.
+ * @returns {Promise<ZooFLMProcessor>} The configured FLM processor instance.
  */
 export async function use_flm_processor(_this)
 {

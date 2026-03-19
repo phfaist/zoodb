@@ -4,11 +4,12 @@ version = "0.1.0"
 description = "Documentation for ZooDb JS lib"
 authors = ["Philippe Faist"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 sphinx-js = "^3.2.1"
-sphinx = "<6.0.0"
+sphinx = ">=5.0,<9.0"
 
 [build-system]
 requires = ["poetry-core"]

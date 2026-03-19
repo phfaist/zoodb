@@ -19,13 +19,68 @@ import { ResourceCollector } from '../resourcecollector/index.js';
 import loMerge from 'lodash/merge.js';
 
 /**
- * Database processor that compiles FLM content in object fields all while
- * providing the relevant infrastructure to handle cross-references between
- * objects, collect external resources, and manage citations (fetching,
- * compiling, formatting).
+ * Database processor that compiles FLM content in object fields while
+ * providing the full infrastructure to handle cross-references, external
+ * resources, and citations (fetching, compiling, formatting).
  *
- * TODO: Document & explain options ............. !
+ * The constructor `options` object recognises the following properties:
  *
+ * - ``zoo_flm_environment`` *(required)* — the :class:`ZooFLMEnvironment`
+ *   instance to use.
+ *
+ * - ``refs`` — per-object-type override options for reference registration,
+ *   keyed by object type.  Each value is an object that may contain
+ *   ``formatted_ref_flm_text_fn(objid, obj) => string``, which controls the
+ *   display text for cross-references to objects of that type.
+ *
+ * - ``refs_defaults`` — default override options applied to all object types
+ *   before any per-type override in ``refs``.
+ *
+ * - ``citations.sources`` — an object mapping citation prefixes to
+ *   :class:`CitationSourceBase` instances (e.g. ``{ arxiv:
+ *   new CitationSourceArxiv(...) }``).
+ *
+ * - ``citations.csl_style`` — the CSL style XML string used by
+ *   :class:`CitationCompiler` to format citations.
+ *
+ * - ``citations.default_user_agent`` — HTTP ``User-Agent`` header for
+ *   citation source requests.
+ *
+ * - ``citations.cache_fs`` — a filesystem object for cache file access.
+ *
+ * - ``citations.cache_dir`` — directory path for the two citation cache files
+ *   (`cache_downloaded_info.json` and `cache_compiled_citations.json`).
+ *   Defaults to ``'.'``.
+ *
+ * - ``citations.cache_entry_default_duration_ms`` — how long fetched citation
+ *   information remains valid in the cache (milliseconds).
+ *
+ * - ``citations.skip_save_cache`` — when `true`, the citation caches are not
+ *   written to disk.  Useful in test environments.
+ *
+ * - ``citations.citation_manager_options`` — additional options forwarded
+ *   directly to :class:`CitationDatabaseManager`.
+ *
+ * - ``flm_error_policy`` — ``'abort'`` (default) or ``'continue'``.
+ *   Controls behaviour when an FLM compilation error occurs.
+ *
+ * - ``skip_check_update_existing_citations`` — when `true`, citations already
+ *   present in the environment's citations provider are not re-fetched or
+ *   re-compiled.  Useful for incremental updates.
+ *
+ * - ``skip_check_update_existing_resources`` — when `true`, graphics
+ *   resources already registered in the environment's graphics collection are
+ *   not re-collected.
+ *
+ * - ``resource_collector`` — provide a :class:`ResourceCollector` instance
+ *   directly; when set, ``resource_collector_options`` is ignored.
+ *
+ * - ``resource_collector_options`` — options forwarded to the
+ *   :class:`ResourceCollector` constructor if ``resource_collector`` is not
+ *   provided.
+ *
+ * In normal usage this class is instantiated by :func:`use_flm_processor`
+ * which constructs all the citation sources and resource collector for you.
  */
 export class ZooFLMProcessor extends ZooDbProcessorBase
 {

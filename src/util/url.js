@@ -15,6 +15,13 @@ function percent_encode_path(p)
 }
 
 
+/**
+ * Return `true` if `url` contains an explicit protocol (e.g. `http:`,
+ * `file:`, `https:`), and `false` if it is a bare filesystem path.
+ *
+ * @param {string} url - The URL or path string to test.
+ * @returns {boolean}
+ */
 export function url_has_protocol(url)
 {
     return (new URL(url, 'xyzdummyproto://example.com/')).protocol !== 'xyzdummyproto:';

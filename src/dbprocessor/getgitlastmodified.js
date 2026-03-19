@@ -15,6 +15,19 @@ import { ZooDbProcessorBase } from './base.js';
  * https://github.com/vuejs/vuepress/blob/89440ce552675859189ed4ab254ce19c4bba5447/packages/%40vuepress/plugin-last-updated/index.js
  * MIT licensed: https://github.com/vuejs/vuepress/blob/89440ce552675859189ed4ab254ce19c4bba5447/LICENSE
  */
+/**
+ * Return the date of the most recent git commit that touched `filePath`.
+ *
+ * Runs ``git log -1 --format=%at <filePath>`` in the directory that contains
+ * `filePath` and converts the resulting UNIX timestamp to a `Date` object.
+ * If the command fails (e.g. the file is not tracked) an error is logged to
+ * `console.error` and the current date is returned as a fallback.
+ *
+ * @param {string} filePath - Absolute path to the file whose git history is
+ *     queried.
+ * @returns {Promise<Date>} The last-modified date, or the current date on
+ *     error.
+ */
 export async function getGitLastUpdatedDate(filePath) {
     //debug(`Getting GIT modification time stamp for ${filePath}`);
 
@@ -142,6 +155,20 @@ export class GetGitLastModifiedDbProcessor extends ZooDbProcessorBase
 
     // ----
 
+    /**
+     * Query git for the last modification date of the source file associated
+     * with `obj` and store the result in `obj._zoodb.git_last_modified_date`.
+     * Also updates the internal `_latest_modification_date` tracker if the
+     * new date is later than any previously seen date.
+     *
+     * Does nothing for objects without a `source_file_path` in their `_zoodb`
+     * metadata.
+     *
+     * @param {string} object_type - The type name of the object.
+     * @param {string} objid - The ID of the object.
+     * @param {Object} obj - The database object to annotate.
+     * @returns {Promise<void>}
+     */
     async process_object(object_type, objid, obj)
     {
         const { source_file_path } = obj._zoodb ?? {};

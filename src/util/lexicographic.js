@@ -1,6 +1,23 @@
 
+/**
+ * Numeric three-way comparison.  Returns `-1`, `0`, or `1` as `a` is less
+ * than, equal to, or greater than `b`.
+ */
 export const nCmp = (a, b) => ( (a<b) ? -1 : ( (a === b) ? 0 : 1 ) );
 
+/**
+ * A collection of named comparison functions for use with
+ * `makeLexicographicCompareFn()`.  Each function accepts two values `(a, b)`
+ * and returns a number in `{ -1, 0, +1 }`.
+ *
+ * Available comparators:
+ *
+ * - `auto` — detects numeric vs string type and compares accordingly; logs a
+ *   warning on type mismatch.
+ * - `string` — locale-aware string comparison via `String.localeCompare`.
+ * - `int` — integer comparison after `parseInt`.
+ * - `number` — floating-point comparison after `parseFloat`.
+ */
 export const cmp = {
     auto: (a, b) => {
         if (typeof a !== typeof b) {

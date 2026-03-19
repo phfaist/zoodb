@@ -49,7 +49,7 @@ Primary key field
 -----------------
 
 You can specify which field of the object should be used as the object's unique
-identifier ("primary key").  Set the global schema field `_zoodb_primarykey:` to
+identifier ("primary key").  Set the global schema field `_zoo_primarykey:` to
 the name of the field you'd like to use as unique identifier.
 
 

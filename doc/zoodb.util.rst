@@ -19,7 +19,79 @@ Object fields and schema inspection
    // "import ... from '@phfaist/zoodb/util' "
    
 
-Todo, doc.........
+.. js:autofunction:: src/util/getfield.get_field_schema
+   :short-name:
+
+.. js:autofunction:: src/util/getfield.iterfield
+   :short-name:
+
+.. js:autofunction:: src/util/getfield.getfield
+   :short-name:
+
+.. js:autofunction:: src/util/getfield.setfield
+   :short-name:
+
+.. js:autofunction:: src/util/getfield.concatlistfield
+   :short-name:
+
+.. js:autofunction:: src/util/objectinspector.iter_object_fields_recursive
+   :short-name:
+
+.. js:autofunction:: src/util/objectinspector.iter_schema_fields_recursive
+   :short-name:
+
+.. js:autofunction:: src/util/objectinspector.copy_object_structure
+   :short-name:
+
+
+Miscellaneous utilities
+-----------------------
+
+.. code::
+
+   import {
+     promisify, promisifyMethods, timeout
+   } from '@phfaist/zoodb/util/prify';
+
+   import { escapeRegExp } from '@phfaist/zoodb/util/rx';
+
+   import { url_has_protocol, path_or_url_to_url } from '@phfaist/zoodb/util/url';
+
+   import {
+     nCmp, cmp, makeLexicographicCompareFn
+   } from '@phfaist/zoodb/util/lexicographic';
+
+   // all the above symbols can also be imported as
+   // "import ... from '@phfaist/zoodb/util' "
+
+
+.. js:autofunction:: src/util/prify.promisify
+   :short-name:
+
+.. js:autofunction:: src/util/prify.promisifyMethods
+   :short-name:
+
+.. js:autofunction:: src/util/prify.timeout
+   :short-name:
+
+.. js:autofunction:: src/util/rx.escapeRegExp
+   :short-name:
+
+.. js:autofunction:: src/util/url.url_has_protocol
+   :short-name:
+
+.. js:autofunction:: src/util/url.path_or_url_to_url
+   :short-name:
+
+The module also exports two pre-built comparator values:
+
+- ``nCmp`` — a comparator function for numbers (ascending order).
+- ``cmp`` — an object with four ready-to-use comparators: ``cmp.str``
+  (string, ascending), ``cmp.strReverse`` (string, descending), ``cmp.num``
+  (number, ascending), ``cmp.numReverse`` (number, descending).
+
+.. js:autofunction:: src/util/lexicographic.makeLexicographicCompareFn
+   :short-name:
 
 
 Splitting a ‘prefix:label’ string

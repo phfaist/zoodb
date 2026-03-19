@@ -5,9 +5,29 @@ import { $$kw, render_value, ZooTextFragmentRenderer } from '../zooflm/index.js'
 
 
 /**
- * Doc.......
+ * Assembles search-document values from a list of ``[key, value]`` pairs
+ * where some values may be compiled FLM fragments.  Each fragment is rendered
+ * to plain text inside an FLM document context so that citations and
+ * cross-references resolve correctly.
  *
- * For use in combination with a SearchableTextFieldset() instance...
+ * Pass an instance's `assemble_doc_text_values` method as the
+ * `assemble_doc_text_values` option of :class:`SearchableTextFieldset` when
+ * zoo objects contain FLM-formatted fields.
+ *
+ * Constructor parameters:
+ *
+ * - `zoo_flm_environment` *(required)* — the FLM environment used to create
+ *   the rendering document.
+ *
+ * - `render_value_fn` — function called as ``render_value_fn(v,
+ *   render_context)`` to convert a single field value to a string.  Defaults
+ *   to the `render_value` helper from `zooflm`.
+ *
+ * - `doc_metadata` — metadata object forwarded to
+ *   `zoo_flm_environment.make_document()`.  Defaults to `null`.
+ *
+ * - `text_fragment_renderer` — fragment renderer used to produce plain text.
+ *   Defaults to a new :class:`ZooTextFragmentRenderer` instance.
  */
 export class FLMSearchableDocTextValuesAssembler
 {

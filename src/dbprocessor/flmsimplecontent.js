@@ -345,10 +345,23 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
     }
 
     /**
+     * Compile all FLM-enabled fields of the database object `obj` in place,
+     * replacing each field's string value with the compiled FLM fragment.
      *
-     * Note: the API guarantees that compile_flm() and compile_object() also
-     * work if no zoodb is set, and can be used w/o zoodb if you want to compile
-     * a single ad hoc object.
+     * The list of compiled field names is stored in `obj._zoodb.flm_fields` so
+     * that later stages (e.g. `process_data_dump()`) know which fields to
+     * serialise back to text.
+     *
+     * Note: `compile_flm()`, `compile_flm_fragment()`, and `compile_object()`
+     * also work if no zoodb is attached; they can be used to compile a
+     * stand-alone ad hoc object.
+     *
+     * @param {string} object_type - The type name of the object being compiled.
+     * @param {string} objid - The ID of the object being compiled.
+     * @param {Object} obj - The database object whose FLM fields are compiled
+     *     in place.
+     * @param {Object} schema - The JSON Schema for `object_type`, used to
+     *     discover which fields carry FLM content.
      */
     compile_object(object_type, objid, obj, schema)
     {
@@ -385,6 +398,32 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
 
     // ---
 
+    /**
+     * Prepare a data dump by converting in-memory FLM fragment objects back to
+     * a serialisable form.  Exactly one of the following options must be chosen
+     * (defaulting to `flm_fragments_to_flm_text` when none is provided):
+     *
+     * - `flm_fragments_keep_instances` — keep the live FLM fragment objects
+     *   in the dump as-is (useful for in-process consumers that can operate
+     *   directly on fragments).
+     *
+     * - `flm_fragments_to_flm_text` — replace each compiled fragment with its
+     *   original FLM source string.  This is the default when neither of the
+     *   other options is set.
+     *
+     * - `flm_fragments_to_flm_dump` — replace each compiled fragment with a
+     *   key string of the form ``"flm.<n>"`` and collect all fragment data
+     *   under `data.flm_fragment_data` (produced by `FLMDataDumper`).  Useful
+     *   for transferring pre-parsed fragment state across a network boundary.
+     *
+     * The additional option `flm_keep_zoodb_info_flm_fields` (default `true`)
+     * controls whether `obj._zoodb.flm_fields` is retained in the dump.  Set
+     * it to `false` to strip that internal bookkeeping field.
+     *
+     * @param {Object} data - The data object being assembled for the dump.
+     * @param {Object} options - Dump options; see above.
+     * @returns {Promise<Object>} The (mutated) `data` object.
+     */
     async process_data_dump(data, options)
     {
         let {

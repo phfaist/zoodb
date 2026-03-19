@@ -3,9 +3,28 @@ const debug = debug_module('zoodb.resourcecollector');
 
 
 /**
- * Main manager class for collecting external resources.
+ * Main manager class for collecting external resources (e.g. graphics files)
+ * referenced by zoo objects.
  *
- * Needs doc!!!..................
+ * Resources are keyed by *resource type* (an application-defined string such
+ * as `'graphics'`).  For each type the collector delegates to:
+ *
+ * - A *resource retriever* (e.g. :class:`FilesystemResourceRetriever`) that
+ *   locates the resource, copies it to a target location if needed, and
+ *   returns a `target_info` object.
+ *
+ * - Zero or more *resource processors* that receive ``{ target_info, source,
+ *   processed_info }`` and can add arbitrary properties to `processed_info`.
+ *
+ * Constructor options:
+ *
+ * - `resource_types` *(required)* — array of resource type name strings.
+ *
+ * - `resource_retrievers` — object mapping each resource type name to its
+ *   retriever instance.
+ *
+ * - `resource_processors` — object mapping each resource type name to an
+ *   array of processor instances.
  */
 export class ResourceCollector
 {
@@ -27,11 +46,24 @@ export class ResourceCollector
         this.collect_working = false;
     }
 
-    //
-    // NOTE: collect() calls need to be awaited and shouldn't run
-    // simultaneously!  (e.g. resources corresponding to different source
-    // names/aliases should only be collected once)
-    //
+    /**
+     * Collect the resource identified by `source` of type `resource_type`.
+     *
+     * Resolves the source via the registered retriever, then runs all
+     * registered processors for that type.  If the resource was already
+     * collected (either by its canonical name or as an alias), this call is
+     * a no-op.
+     *
+     * **Important:** `collect()` calls must be awaited and must not run
+     * concurrently — if a second call is made before the first resolves, an
+     * error is thrown.
+     *
+     * @param {string} resource_type - The resource type (must be listed in
+     *     `options.resource_types`).
+     * @param {string} source - The source identifier (e.g. a file path) for
+     *     the resource to collect.
+     * @returns {Promise<void>}
+     */
     async collect(resource_type, source)
     {
         if (this.collect_working) {
@@ -114,6 +146,18 @@ export class ResourceCollector
 
     }
 
+    /**
+     * Return the collected resource data object for the given `resource_type`
+     * and `source`.  Alias sources are resolved to their canonical name
+     * automatically.
+     *
+     * Returns `undefined` if the resource has not yet been collected.
+     *
+     * @param {string} resource_type - The resource type.
+     * @param {string} source - The source identifier (may be an alias).
+     * @returns {{ target_info: Object, processed_info: Object,
+     *             resolved_info: Object, source: string } | undefined}
+     */
     get_resource_data(resource_type, source)
     {
         let alias_info = null;
@@ -126,6 +170,12 @@ export class ResourceCollector
         return this.collected_resources[resource_type][source];
     }
 
+    /**
+     * Signal to all registered resource retrievers that collection is
+     * complete.  Calls `retriever.finish()` on every retriever in parallel.
+     *
+     * @returns {Promise<void>}
+     */
     async finish()
     {
         // call finished on all resource retrievers

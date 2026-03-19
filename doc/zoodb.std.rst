@@ -7,22 +7,22 @@ create your zoo.
 
 .. code::
 
-   import { makeStandardZooDb } from '@phfaist/zoodb/stdzoodb';
+   import { makeStandardZooDb } from '@phfaist/zoodb/std/stdzoodb';
    import {
        makeStandardYamlDbDataLoader
    } from '@phfaist/zoodb/std/stdyamldbdataloader';
 
-   import { use_relations_populator } from '@phfaist/zoodb/use_relations_populator';
+   import { use_relations_populator } from '@phfaist/zoodb/std/use_relations_populator';
    import {
        use_flm_environment, default_target_href_resolver,
-   } from '@phfaist/zoodb/use_flm_environment';
-   import { use_flm_processor } from '@phfaist/zoodb/use_flm_processor';
+   } from '@phfaist/zoodb/std/use_flm_environment';
+   import { use_flm_processor } from '@phfaist/zoodb/std/use_flm_processor';
    import {
        use_gitlastmodified_processor
-   } from '@phfaist/zoodb/use_gitlastmodified_processor';
+   } from '@phfaist/zoodb/std/use_gitlastmodified_processor';
    import {
        use_searchable_text_processor
-   } from '@phfaist/zoodb/use_searchable_text_processor';
+   } from '@phfaist/zoodb/std/use_searchable_text_processor';
 
 
 .. js:autofunction:: src/std/stdzoodb.makeStandardZooDb

@@ -69,7 +69,33 @@ function searchable_field_name(fieldname, fieldschema)
 
 
 /**
- * Doc.........
+ * Describes the set of searchable text fields that will be extracted from zoo
+ * objects and assembled into a flat search document per object.
+ *
+ * Configuration options (`config` argument):
+ *
+ * - `field_name_id` — the key used for the object's ID in the search document
+ *   (default: `'id'`).
+ *
+ * - `field_name_title` — the key used for the object's title/name in the
+ *   search document (default: `'title'`).
+ *
+ * - `assemble_doc_text_values` — a function
+ *   ``(doc_values: Array<[key, value]>) → Object`` that converts the raw list
+ *   of ``[key, value]`` pairs into a flat key→string document.  Defaults to a
+ *   built-in function that concatenates multiple values for the same key with
+ *   newlines.  Replace this with an :class:`FLMSearchableDocTextValuesAssembler`
+ *   instance's `assemble_doc_text_values` method when FLM content is present.
+ *
+ * - `searchable_text_fieldset_name` — the property name set on
+ *   ``obj._zoodb`` to store the assembled search document (default:
+ *   `'searchable_text_doc'`).
+ *
+ * - `object_types` — array of object type names to include; defaults to all
+ *   types registered in the ZooDb instance.
+ *
+ * - `exclude_fields` — an array of field names to exclude from the search
+ *   index even if their schema would normally include them.
  */
 export class SearchableTextFieldset
 {
@@ -187,7 +213,16 @@ export class SearchableTextFieldset
 
 
 /**
- * Doc...........
+ * Database processor that builds a flat searchable-text document for every
+ * object in the zoo and stores it in ``obj._zoodb.<fieldset_name>``.
+ *
+ * The shape of the generated documents is determined by the
+ * :class:`SearchableTextFieldset` passed to the constructor.  Once built, the
+ * documents can be fed into a client-side search library such as Lunr.js.
+ *
+ * @param {SearchableTextFieldset} searchable_text_fieldset - Configured
+ *     fieldset that controls which object fields are included in the search
+ *     document and how they are assembled.
  */
 export class SearchableTextProcessor extends ZooDbProcessorBase
 {
@@ -263,6 +298,19 @@ export class SearchableTextProcessor extends ZooDbProcessorBase
 
     // ---
 
+    /**
+     * Prepare a data dump by optionally stripping the generated search
+     * documents from the objects.
+     *
+     * The single recognised option is `searchabletext_remove_doc_info`
+     * (default `true`): when true, `obj._zoodb.<fieldset_name>` is deleted
+     * from every object before the dump, reducing payload size.  Set it to
+     * `false` to retain the search documents in the exported data.
+     *
+     * @param {Object} data - The data object being assembled for the dump.
+     * @param {Object} options - Dump options; see above.
+     * @returns {Promise<Object>} The (mutated) `data` object.
+     */
     async process_data_dump(data, options)
     {
         let {

@@ -1,4 +1,20 @@
 
+/**
+ * Return the JSON schema object for the field at the given dotted path within
+ * `schema`.  The path may contain `[]` to traverse an array's item schema.
+ * Returns `undefined` if the final segment is not found in the schema's
+ * `properties`.
+ *
+ * @param {Object} schema - A JSON Schema object, typically the full object
+ *     type schema retrieved from `zoodb.schema(object_type)`.
+ * @param {string} field - A dotted field path such as `'relations.parents'` or
+ *     `'items.[].name'`.
+ * @returns {Object|undefined} The sub-schema for the requested field, or
+ *     `undefined` when the final segment is absent.
+ *
+ * @example
+ * const fieldSchema = get_field_schema(zoodb.schema('person'), 'address.city');
+ */
 export function get_field_schema(schema, field)
 {
     if (typeof schema == 'undefined') {
@@ -21,7 +37,25 @@ export function get_field_schema(schema, field)
 }
 
 
-// field can contain xyz.[].zz and [] are arrays that will be iterated over
+/**
+ * Generator that iterates over all concrete field positions within `obj` for
+ * the given dotted field path.  The path may include `[]` to expand every
+ * element of an array at that position.  Each yielded item has the shape
+ * `{ value, fieldnameidx }`, where `fieldnameidx` is the concrete path string
+ * with array indices substituted for `[]`.
+ *
+ * @param {Object} obj - The object to inspect.  Must not be `undefined`.
+ * @param {string} field - A dotted field path, possibly containing `[]` for
+ *     array expansion, e.g. `'relations.[].code_id'`.
+ * @param {string} [fieldnameidx] - A prefix to prepend to the returned
+ *     `fieldnameidx` strings; omit in normal usage.
+ * @returns {Generator<{value: *, fieldnameidx: string}>}
+ *
+ * @example
+ * for (const { value, fieldnameidx } of iterfield(obj, 'tags.[].label')) {
+ *   console.log(fieldnameidx, value);
+ * }
+ */
 export function *  iterfield(obj, field, fieldnameidx=undefined)
 {
     if (typeof obj == 'undefined') {
@@ -54,6 +88,19 @@ export function *  iterfield(obj, field, fieldnameidx=undefined)
 }
 
 
+/**
+ * Return the value of the nested field at the given dotted path within `obj`.
+ * The final segment's value (which may be `undefined`) is returned.
+ *
+ * @param {Object} obj - The object to read from.  Must not be `undefined`.
+ * @param {string} field - A dotted field path such as `'address.city'`.
+ *     Numeric array indices may be written as `[0]` within the path.
+ * @returns {*} The value at the given path, or `undefined` if a segment is
+ *     absent.
+ *
+ * @example
+ * const city = getfield(person, 'address.city');
+ */
 export function getfield(obj, field)
 {
     if (typeof obj == 'undefined') {
@@ -69,11 +116,50 @@ export function getfield(obj, field)
                 part = parseInt(m[1]);
             }
         }
+        // REVIEW: `|| {}` silently replaces any falsy intermediate value
+        // (null, 0, false, "") with an empty object, masking genuine data.
+        // This can cause unexpected behaviour when field values are legitimately
+        // falsy.  Consider replacing with `?? {}` or an explicit null check.
         obj = obj[part] || {};
     }
     return obj[tail_part]; // can be undefined
 }
 
+/**
+ * Write a value into the nested field at the given dotted path within `obj`,
+ * creating intermediate objects or arrays as needed.
+ *
+ * The `setterfn` argument controls what is written.  It accepts two forms:
+ *
+ * - A function `(oldValue) => newValue`: called with the current value of the
+ *   leaf field (or `undefined` if absent) and its return value is stored.
+ *   When the field did not previously exist, the function is called without
+ *   arguments.
+ *
+ * - An options object `{ set_object_attribute_fn }`: the function
+ *   `set_object_attribute_fn(parentObject, tailKey)` is called directly and
+ *   is responsible for writing the value itself (e.g. using `delete`).
+ *
+ * The path may include `[]` to append a new element to an array at that
+ * position, or `[n]` to write to a specific numeric index.
+ *
+ * // REVIEW: The dual signature of `setterfn` (plain function vs. object with
+ * // `set_object_attribute_fn`) is unusual and may surprise callers.  The two
+ * // forms have different semantics and there is no type guard between them.
+ * // Consider splitting into two separate functions for clarity.
+ *
+ * @param {Object} obj - The object to mutate.  Must not be `undefined`.
+ * @param {string} field - A dotted field path, possibly containing `[]` or
+ *     `[n]` segments.
+ * @param {Function|{set_object_attribute_fn: Function}} setterfn - See above.
+ *
+ * @example
+ * // Increment a counter
+ * setfield(obj, 'stats.count', (old) => (old ?? 0) + 1);
+ *
+ * // Delete a field
+ * setfield(obj, 'tags.[].label', { set_object_attribute_fn: (p, k) => delete p[k] });
+ */
 export function setfield(obj, field, setterfn)
 {
     if (typeof obj == 'undefined') {
@@ -145,6 +231,18 @@ export function setfield(obj, field, setterfn)
     return set_object_attribute_fn(obj, tail_part);
 }
 
+/**
+ * Append the elements of `items` to the array stored at the nested field
+ * path `field` within `obj`.  If the field is currently absent or falsy, a
+ * new array containing `items` is stored.
+ *
+ * @param {Object} obj - The object to mutate.
+ * @param {string} field - A dotted field path to an array-valued field.
+ * @param {Array} items - The elements to append.
+ *
+ * @example
+ * concatlistfield(person, 'relations.children', [newChildId]);
+ */
 export function concatlistfield(obj, field, items)
 {
     const setterfn = (value) => (value || []).concat(items);

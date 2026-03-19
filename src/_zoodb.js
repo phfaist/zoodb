@@ -34,29 +34,28 @@ function cloneDeepWithEmptyPrototypeObjects(object)
 /**
  * The main database class.
  *
- * 
+ * The constructor accepts a single destructured options object with the
+ * following properties:
  *
- * The constructor accepts a single object with the following properties:
- *
- * - ``processors`` - list of DB processors to install.  See module
+ * - ``processors`` — list of DB processor instances to install.  Each
+ *   processor must extend :class:`ZooDbProcessorBase`.  See
  *   :ref:`zoodb.dbprocessor`.
  *
- * - ``schema_validator`` - [Optional] You can specify a schema validator, which
- *   should provide the method ``validate(object, schema)`` (such as a
- *   ``Validator`` object instance from the `jsonschema npm package
- *   <https://www.npmjs.com/package/jsonschema>`_).
+ * - ``schema_validator`` — [Optional] An object with a
+ *   ``validate(object, schema)`` method (e.g. a ``Validator`` instance from
+ *   the `jsonschema <https://www.npmjs.com/package/jsonschema>`_ npm package).
+ *   When a validator is provided, every object added to the database is
+ *   validated against its schema.  Pass `false` to suppress the "no validator"
+ *   error and proceed without validation.  When using
+ *   :class:`YamlDbDataLoader`, that loader already performs validation, so you
+ *   may safely pass `null` or omit this option.
  *
- * If you specify a schema validator, objects that are added to the database
- * will automatically be validated against the schema using the provided
- * validator.
+ * - ``normalize_id_for_uniqueness_check`` — [Optional] A function
+ *   ``(id: string) => string`` used to normalise object IDs before comparing
+ *   them for uniqueness.  Defaults to ``(x) => x.toLowerCase()``.
  *
- * Note that if you use a :class:`YamlDbDataLoader` to load your data, then that
- * class already performs schema validation so you don't need to validate your
- * objects here again.  In this case, you may simply leave `schema_validator` be
- * `null` or undefined.
- *
- * @param {} options
- *
+ * - ``silent`` — [Optional] When `true`, schema validation failures are not
+ *   printed to the console (the error is still thrown).  Defaults to `false`.
  */
 export class ZooDb
 {
@@ -405,6 +404,20 @@ export class ZooDb
     // -------------
 
 
+    /**
+     * Update a subset of objects in the database, running the processor
+     * pipeline's update hooks (`prepare_zoo_update_objects()` and
+     * `process_zoo_update_objects()`).
+     *
+     * This method is called by :class:`ZooDbDataLoaderHandler` during a reload
+     * operation.  You can also call it directly to inject updated raw object
+     * data without triggering a full re-load.
+     *
+     * @param {Object} db_objects - An object of the form
+     *     ``{ object_type: { object_id: object, ... }, ... }`` containing only
+     *     the objects that should be updated.  Each object must already carry a
+     *     `_zoodb` metadata field (as set by :class:`YamlDbDataLoader`).
+     */
     async update_objects(db_objects)
     {
         // debug(`Updating zoo with db_objects =`, db_objects);
@@ -444,7 +457,9 @@ export class ZooDb
         // debug(`Finally, this.db.objects=`, this.db.objects);
     }
 
-    // internal.
+    // REVIEW: This method is internal (called only by update_objects()) but its
+    // name is public.  Consider renaming to _update_object() to make the
+    // internal nature explicit.
     update_object({object_db, object_type, object_id, new_object})
     {
         this._sanitize_raw_object({object_id, object_type, object: new_object})
@@ -459,15 +474,40 @@ export class ZooDb
     /**
      * Produce a serializable data dump of the contents of the database.
      *
-     * WARNING: Depending on the options provided here and any installed
-     * database processors, YOU MIGHT BE GETTING ACCESS TO THE RAW OBJECTS IN
-     * THE DATABASE.  For instance, you might have access to the original
-     * `FLMFragment` instances if you're using a FLM content processor and
-     * provide the relevant `options`.  ANY MODIFICATIONS MIGHT AFFECT THE
-     * ORIGINAL DATABASE CONTENT.
+     * .. warning::
      *
-     * This method will call all database processors' `process_data_dump()`
-     * methods to ensure that the database is prepared for serialization.
+     *    Depending on the options provided and any installed database
+     *    processors, **this method may return references to the raw objects
+     *    stored inside the database**.  For example, when
+     *    `flm_fragments_keep_instances` is used with :class:`ZooFLMProcessor`,
+     *    the returned objects contain live `FLMFragment` instances from the
+     *    database.  **Any mutations will affect the original database content.**
+     *
+     * Options accepted in the `options` argument:
+     *
+     * - ``use_raw_db_data`` — when `true`, return the raw (pre-processor)
+     *   data and skip all processor `process_data_dump()` calls.  Defaults to
+     *   `false`.
+     *
+     * - ``skip_db_processors`` — when `true`, skip calling each installed
+     *   processor's `process_data_dump()` method but still return the live
+     *   processed object data (not the raw data).  Defaults to `false`.
+     *
+     * - ``remove_zoodb_id`` — when `true`, delete the `id` field from every
+     *   object's `_zoodb` metadata property in the returned dump.  Defaults to
+     *   `false`.
+     *
+     * - ``remove_zoodb_info`` — when `true`, delete the entire `_zoodb`
+     *   metadata property from every returned object.  Defaults to `false`.
+     *
+     * Additional options recognised by individual database processors (e.g.
+     * `flm_fragments_to_flm_text`, `relations_keep_object_property_pointers`,
+     * etc.) may be passed here and are forwarded to each processor's
+     * `process_data_dump()` method.
+     *
+     * @param {Object} [options] - Dump options, see above.
+     * @returns {Object} An object `{ db: { objects, schemas }, ... }` suitable
+     *     for serialisation.
      */
     async data_dump(options = {})
     {

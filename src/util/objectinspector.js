@@ -13,23 +13,42 @@ function default_arrayitemfieldname(fieldname, i='[]')
 }
 
 /**
- * For each field specified by the schema (recursively), this method yields the
- * value of that field for `obj` along with field information.
+ * Generator that recursively yields every leaf field within `obj` according to
+ * the structure described by `schema`.  Each yielded value has the shape
+ * `{ fieldname, fieldvalue, fieldschema }`.  When `options.provide_parent` is
+ * `true`, the yielded objects additionally include `parent` and `parent_index`
+ * so that the caller can update the field in-place with
+ * `parent[parent_index] = newValue`.
  *
- * E.g.:
- * ```js
- * for (const {fieldname, fieldvalue, fieldschema}
+ * Recognised `options` properties:
+ *
+ * - `provide_parent` — when `true`, include `parent` and `parent_index` in
+ *   each yielded object.
+ * - `only_schema_properties` — when `true` (the default), only iterate over
+ *   properties declared in `schema.properties` instead of `Object.keys(obj)`.
+ * - `visit_predicate({ fieldname, fieldschema, fieldvalue })` — optional
+ *   function; return `false` to skip a field and its children.
+ * - `propfieldname(fieldname, propname)` — optional function to build the
+ *   dotted field name for an object property.
+ * - `arrayitemfieldname(fieldname, i)` — optional function to build the
+ *   field name for an array element.
+ *
+ * @param {Object} obj - The database object to inspect.
+ * @param {Object} schema - The JSON Schema for `obj`.
+ * @param {Object} [options] - See above.
+ * @param {string} [fieldname] - Internal recursion prefix; omit in normal usage.
+ * @returns {Generator<{fieldname: string, fieldvalue: *, fieldschema: Object}>}
+ *
+ * @example
+ * for (const { fieldname, fieldvalue, fieldschema }
  *      of iter_object_fields_recursive(obj, schema)) {
- *   ...
+ *   // process each leaf field
  * }
- * for (const {fieldname, fieldvalue, fieldschema, parent, parent_index}
- *      of iter_object_fields_recursive(obj, schema, {provide_parent: true})) {
- *   ...
- *   // the object's field value can be changed with:
- *   parent[parent_index] = new_value;
+ * for (const { fieldname, fieldvalue, fieldschema, parent, parent_index }
+ *      of iter_object_fields_recursive(obj, schema, { provide_parent: true })) {
+ *   // mutate the field in-place:
+ *   parent[parent_index] = transform(fieldvalue);
  * }
- *
- *
  */
 export function * iter_object_fields_recursive(obj, schema, options, fieldname=undefined)
 {
@@ -103,6 +122,25 @@ export function * iter_object_fields_recursive(obj, schema, options, fieldname=u
 }
 
 
+/**
+ * Generator that recursively yields every leaf field declared in `schema`,
+ * without requiring an actual object.  Each yielded value has the shape
+ * `{ fieldname, fieldschema }`.
+ *
+ * Recognised `options` properties are the same as for
+ * `iter_object_fields_recursive()`: `visit_predicate`, `propfieldname`, and
+ * `arrayitemfieldname`.
+ *
+ * @param {Object} schema - A JSON Schema object to traverse.
+ * @param {Object} [options] - See above.
+ * @param {string} [fieldname] - Internal recursion prefix; omit in normal usage.
+ * @returns {Generator<{fieldname: string, fieldschema: Object}>}
+ *
+ * @example
+ * for (const { fieldname, fieldschema } of iter_schema_fields_recursive(schema)) {
+ *   if (fieldschema._flm) { console.log(fieldname, 'is an FLM field'); }
+ * }
+ */
 export function * iter_schema_fields_recursive(schema, options, fieldname=undefined)
 {
     options ??= {};
@@ -142,6 +180,23 @@ export function * iter_schema_fields_recursive(schema, options, fieldname=undefi
 
 
 
+/**
+ * Return a shallow structural copy of `obj` according to `schema`, recursively
+ * creating new plain objects and arrays for each object/array level while
+ * leaving leaf values as-is (shared references).
+ *
+ * Options:
+ *
+ * - `only_schema_properties` — when `true`, only copy properties declared in
+ *   the schema (default: `false`).
+ * - `create_object` — factory function `() => {}` for new object nodes.
+ * - `create_array` — factory function `() => []` for new array nodes.
+ *
+ * @param {Object|null} obj - The object to copy; returned unchanged if `null`.
+ * @param {Object} schema - The JSON Schema describing `obj`'s structure.
+ * @param {Object} [options] - See above.
+ * @returns {Object|null} A structural shallow copy of `obj`.
+ */
 export function copy_object_structure(obj, schema, options={})
 {
     let {

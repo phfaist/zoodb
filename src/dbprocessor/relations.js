@@ -128,6 +128,17 @@ export class ZooRelation
         return computed_fields;
     }
 
+    /**
+     * Return all relation-data objects for `obj` that are relevant to this
+     * relation.  For a single-valued field this returns a one-element array
+     * (or an empty array if `allow_null` is true and the field is absent).
+     * For an array-typed field it returns all array elements.
+     *
+     * @param {Object} obj - A database object instance whose field described by
+     *     `this.object_field` will be read.
+     * @returns {Array}
+     * @throws {Error} If the field is absent and `allow_null` is false.
+     */
     get_object_relation_objects(obj)
     {
         const stuff = getfield(obj, this.object_field);
@@ -153,6 +164,17 @@ export class ZooRelation
         }
     }
 
+    /**
+     * Process this relation for all relation-data objects of `obj`.  Resolves
+     * target object references, populates the `relation_add_object_field`
+     * property if configured, and adds back-references to the target object if
+     * `backreference` is configured in the relation spec.
+     *
+     * @param {Object} obj - A database object of type `this.object_type`.
+     * @param {Object} options - Must include `process_object_types` (array of
+     *     object types being processed), used to guard back-reference writes.
+     * @throws {Error} If a referenced object ID does not exist in the database.
+     */
     process_object_relation(obj, options)
     {
         for (const relation_object of this.get_object_relation_objects(obj)) {
@@ -343,6 +365,17 @@ export class RelationsPopulator extends ZooDbProcessorBase
 
     // ---
 
+    /**
+     * Delete every auto-populated relation field (object pointers and
+     * back-reference lists) from all objects in the database, leaving only the
+     * original source data.  Called before `process_zoo()` rebuilds relations
+     * from scratch, and also before a data dump to avoid serialising circular
+     * references.
+     *
+     * @param {Object} [options]
+     * @param {Object} [options.dbobjects] - Alternative object dictionary to
+     *     clear; defaults to `this.zoodb.objects`.
+     */
     clear_all_relation_fields({ dbobjects } = {})
     {
         const clear_field =
@@ -356,6 +389,21 @@ export class RelationsPopulator extends ZooDbProcessorBase
         this.check_all_clean_fields({ action: clear_field, dbobjects });
     }
 
+    /**
+     * Iterate over all auto-populated relation fields in the database and
+     * invoke `action` for each field whose value is set.  When `action` is
+     * omitted, the default action throws an error, which is used during
+     * `initialize_zoo()` to detect objects that manually set auto-populated
+     * fields.  Pass a custom `action` to implement a different behaviour (e.g.
+     * deletion, as done by `clear_all_relation_fields()`).
+     *
+     * @param {Object} [options]
+     * @param {Function} [options.action] - Called as
+     *     `action({ object_type, object, computed_relation_fieldinfo, fieldnameidx, value })`.
+     *     Defaults to throwing an error on the first non-empty auto-populated field.
+     * @param {Object} [options.dbobjects] - Object dictionary to inspect;
+     *     defaults to `this.zoodb.objects`.
+     */
     check_all_clean_fields({ action, dbobjects } = {})
     {
         dbobjects ??= this.zoodb.objects;

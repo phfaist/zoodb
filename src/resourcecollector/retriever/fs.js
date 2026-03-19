@@ -15,15 +15,43 @@ import { promisifyMethods } from '../../util/prify.js';
 
 
 /**
- * Doc........
+ * Resource retriever that locates files on the local filesystem and,
+ * optionally, copies them to a target output directory with a renamed
+ * filename derived from the file's content hash.
  *
- * `options.fs` should be an object providing the methods `access()` and
- * `readFile()` (the `readFile()` method is in fact only needed if the file
- * renaming template includes a hash of the file content).  Alternatively (and
- * even better), `options.fs.promises` can contain the promisified versions of
- * those functions.  Additionally, if `copy_to_target_directory` is true, then
- * the methods `mkdir()` and `copyFile(src, dest)` should also be available.
+ * Constructor options:
  *
+ * - `fs` *(required)* — filesystem access object.  Must provide `access()`
+ *   and `readFile()` (needed when the rename template uses a content hash).
+ *   `fs.promises` can hold pre-promisified versions of these methods.  When
+ *   `copy_to_target_directory` is `true`, `mkdir()` and `copyFile(src, dest)`
+ *   are also required.
+ *
+ * - `copy_to_target_directory` — when `true`, each retrieved file is copied
+ *   from `source_directory` to `target_directory` using the name produced by
+ *   `rename_file_template`.  Defaults to `false`.
+ *
+ * - `source_directory` — base directory for resolving source paths
+ *   (default: `'.'`).
+ *
+ * - `target_directory` — directory that files are copied into when
+ *   `copy_to_target_directory` is `true` (default: `'./_output_file_resources/'`).
+ *
+ * - `rename_file_template` — a function ``(accessor) → string`` that
+ *   produces the target filename from a `FilesystemPropertiesAccessor`
+ *   instance (which exposes helpers like `b32hash()`, `lowerext()`, etc.).
+ *   Defaults to `(f) => \`fig-${f.b32hash(24)}${f.lowerext()}\``.
+ *
+ * - `rename_use_file_hash` — when `true` (default) the file content is read
+ *   so that the rename template can use content hashes.  Set to `false` to
+ *   skip reading the file if the rename template does not use hashes.
+ *
+ * - `read_file_content` — set to `true` to read the file content
+ *   unconditionally (independently of `rename_use_file_hash`).
+ *
+ * - `extensions` — array of filename extensions to try when resolving a
+ *   source name that lacks an extension.  Include `''` to try the bare name
+ *   as-is.  Defaults to `['']`.
  */
 export class FilesystemResourceRetriever
 {

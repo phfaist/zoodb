@@ -8,14 +8,33 @@ import { YamlDbDataLoader } from '../dbdataloader/yamldb.js';
 
 
 /**
- * Create a :class:`YamlDbDataLoader` instance using some standard settings with
- * higher-level options, based on some settings that have been set in a standard
- * ZooDb instance.
+ * Create a :class:`YamlDbDataLoader` instance using standard settings derived
+ * from a ZooDb instance that was created with :func:`makeStandardZooDb`.
  *
- * The `zoodb` argument should be a :class:`ZooDb` instance (or subclass
- * instance) that was created with :func:`makeStandardZooDb()`.
+ * The `zoodb` argument must be a :class:`ZooDb` instance (or subclass) whose
+ * `config` property has been populated by `makeStandardZooDb`.
  *
- * TODO: Document the higher-level options !!  (Check our example for now)
+ * Config keys (the `config` argument):
+ *
+ * - `objects` *(required)* — object describing which YAML files to load for
+ *   each object type; passed directly to :class:`YamlDbDataLoader` as its
+ *   `objects` option.
+ *
+ * - `DbDataLoaderClass` — class to instantiate (default:
+ *   :class:`YamlDbDataLoader`).  Use this to supply a custom subclass.
+ *
+ * - `fs_data_dir` — override the root data directory.  Defaults to
+ *   `zoodb.config.fs_data_dir`.
+ *
+ * - `fs` — override the filesystem access object.  Defaults to
+ *   `zoodb.config.fs`.
+ *
+ * The `resource_file_extensions` option forwarded to the data loader is taken
+ * from `zoodb.config.flm_options.resources.resource_file_extensions`.
+ *
+ * @param {ZooDb} zoodb - A ZooDb instance created with `makeStandardZooDb`.
+ * @param {Object} [config={}] - Configuration options; see above.
+ * @returns {Promise<YamlDbDataLoader>} The constructed data loader instance.
  */
 export async function makeStandardYamlDbDataLoader(zoodb, config={})
 {

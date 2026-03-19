@@ -13,7 +13,24 @@ import { split_prefix_label } from '../util/prefixlabel.js';
 // import loMerge from 'lodash/merge.js';
 
 /**
- * Doc........
+ * Resolve a compiled FLM reference instance to a final URL string.
+ *
+ * If the reference's `target_href` uses the internal `zoodbobjectref:` scheme
+ * (set by the FLM processor for zoo object links), the URL is converted to a
+ * zoo object permalink using `zoo_object_permalink(object_type, object_id)`.
+ * Otherwise the `target_href` is returned unchanged.
+ *
+ * Throws an error if `ref_instance` has no `target_href` and cannot be
+ * resolved.
+ *
+ * @param {Object} ref_instance - The FLM `RefInstance` object to resolve.
+ * @param {Object} render_context - The FLM render context (passed through to
+ *     the resolver; not used by this function directly).
+ * @param {Object} options
+ * @param {Function} options.zoo_object_permalink - Called as
+ *     `zoo_object_permalink(object_type, object_id)` and must return a URL
+ *     string for the given object.
+ * @returns {string} The resolved URL.
  */
 export function default_target_href_resolver(ref_instance, render_context,
                                              { zoo_object_permalink })
@@ -43,10 +60,30 @@ export function default_target_href_resolver(ref_instance, render_context,
 
 
 /**
- * Set up the StandardZooDb to set up a :class:`ZooFLMEnvironment` with some
- * standard features and settings.
+ * Factory function that creates and configures a :class:`ZooFLMEnvironment`
+ * for use with :func:`makeStandardZooDb`.
  *
- * Document options............................
+ * Reads the following properties from `_this` (the internal state object
+ * built by `makeStandardZooDb`):
+ *
+ * - `_this.config.flm_options.environment_options` — options forwarded
+ *   directly to the :class:`ZooFLMEnvironment` constructor.
+ * - `_this.config.flm_options.allow_unresolved_references` — if `true`,
+ *   cross-references that cannot be resolved at build time render as `<??>`
+ *   instead of throwing an error.
+ * - `_this.config.flm_options.allow_unresolved_citations` — if `true`,
+ *   unknown citation keys render verbatim as ``prefix:key``.
+ * - `_this.config.flm_options.resources.graphics_use_srcset_parceljs` — when
+ *   `{ enabled: true, ... }`, the graphics URL resolver emits a `srcset`
+ *   array of Parcel-compatible image-resize URLs for raster images.
+ * - `_this.config.zoo_permalinks.graphics_resource(gresource) → string` —
+ *   callback that maps a collected graphics resource to a public URL.
+ * - `_this.zoo_object_permalink(object_type, object_id) → string` — callback
+ *   used by :func:`default_target_href_resolver` to map zoo object references
+ *   to public URLs.
+ *
+ * @param {Object} _this - The internal state object from `makeStandardZooDb`.
+ * @returns {ZooFLMEnvironment} The configured FLM environment instance.
  */
 export function use_flm_environment(_this)
 {

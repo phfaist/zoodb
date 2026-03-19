@@ -245,21 +245,47 @@ const _default_format_link_text = {
 
 
 /**
- * Format citations into FLM code using a citation manager.
+ * Format citations into FLM code (or another output format) using a
+ * citation manager and the citeproc-js CSL processor.
  *
- * Options:
+ * Constructor options:
  *
- * - ``citation_manager``, ``locales``, ``csl_style``, ``add_cite_links``, ``output_format``, ``flm_compile_fragments``, ``flm_environment``, ``format_link_text``,  - ....
+ * - `citation_manager` *(required)* — a `CitationDatabaseManager` (or
+ *   compatible) instance that provides the raw citation metadata.
  *
+ * - `locales` — object mapping BCP-47 language tags to CSL locale XML strings.
+ *   The `'en-US'` locale is provided by default.
  *
- * - ``cache_fs`` - a 'fs'-compatible module object providing filesystem access for the cache.
+ * - `csl_style` — CSL style XML string that controls citation formatting.
  *
- * - ``cache_file`` - the filesystem path where we should store a cache of the compiled
- *   citations.
+ * - `add_cite_links` — controls which link types are appended to formatted
+ *   citations.  Defaults to `{ arxiv: true, doi: true, url: 'only-if-no-other-link' }`.
+ *   Set a key to `false` to suppress that link type.
  *
- * - ``cache_entry_duration_ms`` - Specify for how long (in milliseconds) to
- *   keep entries in the cache.
+ * - `output_format` — citeproc-js output format name.  Must be either
+ *   `'flm'` (default, requires :func:`install_csl_flm_output_format` to have
+ *   been called) or `'html'`.
  *
+ * - `flm_compile_fragments` — when `true`, produced FLM strings are compiled
+ *   into FLM fragment instances immediately.  Requires `flm_environment` to
+ *   be set.  Default: `false`.
+ *
+ * - `flm_environment` — FLM environment instance used when
+ *   `flm_compile_fragments` is `true`.
+ *
+ * - `format_link_text` — object mapping link-type names (e.g. `'arxiv'`,
+ *   `'doi'`, `'url'`) to functions that produce the display text string for
+ *   that link type.
+ *
+ * - `cache_fs` — `fs`-compatible object providing `readFile()` and
+ *   `writeFile()` for persisting the compiled-citation cache.
+ *   `cache_fs.promises` may hold pre-promisified versions.
+ *
+ * - `cache_file` — filesystem path for the JSON cache file (default:
+ *   `'_zoodb_cache_citations_compiled.json'`).
+ *
+ * - `cache_entry_default_duration_ms` — time-to-live for each cache entry in
+ *   milliseconds.  Defaults to 30 days.
  */
 export class CitationCompiler
 {
@@ -441,13 +467,15 @@ export class CitationCompiler
     }
 
     /**
+     * Compile citations using the CSL engine and store the results in
+     * `this.compiled_citations`.
      *
-     * The argument `compile_citations` is a list of citation keys to compile.
-     * If set to non-null, we'll only compile these citations and not all the
-     * citations of the database.  An empty list signifies to compile nothing.
-     * Each list element should be an object that provides the keys
-     * 'cite_prefix' and 'cite_key'.  (E.g., as returned by
-     * :class:`ZooFLMScanner` via `scanner.get_encountered('citations')`)
+     * @param {Array<{cite_prefix: string, cite_key: string}>|null} compile_citations
+     *     The list of citations to compile.  Each element must provide
+     *     `cite_prefix` and `cite_key` string properties (as returned by
+     *     :class:`ZooFLMScanner` via `scanner.get_encountered('citations')`).
+     *     If `null`, all citations in the citation manager are compiled.  An
+     *     empty array compiles nothing.
      */
     compile_citations(compile_citations)
     {
