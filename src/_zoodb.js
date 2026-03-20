@@ -41,20 +41,18 @@ function cloneDeepWithEmptyPrototypeObjects(object)
  *   processor must extend :class:`ZooDbProcessorBase`.  See
  *   :ref:`zoodb.dbprocessor`.
  *
- * - ``schema_validator`` — [Optional] An object with a
- *   ``validate(object, schema)`` method (e.g. a ``Validator`` instance from
+ * - ``schema_validator`` — An object with a ``validate(object, schema)`` method
+ *   (e.g. a ``Validator`` instance from
  *   the `jsonschema <https://www.npmjs.com/package/jsonschema>`_ npm package).
  *   When a validator is provided, every object added to the database is
  *   validated against its schema.  Pass `false` to suppress the "no validator"
- *   error and proceed without validation.  When using
- *   :class:`YamlDbDataLoader`, that loader already performs validation, so you
- *   may safely pass `null` or omit this option.
- *
- * - ``normalize_id_for_uniqueness_check`` — [Optional] A function
+ *   error and proceed without validation.
+ * 
+ * - ``normalize_id_for_uniqueness_check`` — A function
  *   ``(id: string) => string`` used to normalise object IDs before comparing
  *   them for uniqueness.  Defaults to ``(x) => x.toLowerCase()``.
  *
- * - ``silent`` — [Optional] When `true`, schema validation failures are not
+ * - ``silent`` — If set to `true`, schema validation failures are not
  *   printed to the console (the error is still thrown).  Defaults to `false`.
  */
 export class ZooDb

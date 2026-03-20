@@ -10,6 +10,20 @@ import loMerge from 'lodash/merge.js';
  *
  * You can install a `ZooDbDataLoaderHandler` in a :class:`ZooDb` instance by
  * calling :meth:`ZooDb.install_zoo_loader_handler()`.
+ * 
+ * This class will delegate loading the zoo database data
+ * to one or more database loader instances provided
+ * to the `db_data_loaders` argument.  The `db_data_loaders` argument can be
+ * a single loader instance or an array of such instances.  Loader objects
+ * can be, for example, :js:class:`YamlDbDataLoader` or
+ * :js:class:`FlmFilesDbDataLoader` instances.
+ * 
+ * If you specify an array of loaders, data will be loaded from each of the
+ * loader objects in sequence, and all the loaded objects will be included
+ * in the loaded data.  Loaders are invoked in the order they appear in the
+ * array.  You are responsible for making sure loaders later in the array
+ * do not overwrite data loaded by earlier ones, for instance, by ensuring
+ * that each loader loads objects of different types.
  *
  * The reason for splitting off the logic of the loader handler is to avoid
  * bloating the `ZooDb` class definition, especially in case a user would like
@@ -23,7 +37,7 @@ import loMerge from 'lodash/merge.js';
  * - Checks if a loading operation is already currently in progress, and if
  *   so, declines to reload the data with an error message in the console.
  *
- * - Calls the `zoodb` instance's validate() function, to ensure that the loaded
+ * - Calls the `zoodb` instance's `validate()` method, to ensure that the loaded
  *   data conforms to any validation checks.
  *
  * - Provides a `load()` function that can be called repeatedly --- the method
@@ -36,7 +50,7 @@ import loMerge from 'lodash/merge.js';
  *   the database data. You might include, for instance, a
  *   :class:`YamlDbDataLoader` instance.  Specify either an array of loader
  *   instances or a single loader instance.
- *
+ * 
  * - `options` - [optional] an object with the following properties.
  *
  * Options:
@@ -50,8 +64,6 @@ import loMerge from 'lodash/merge.js';
  *   the development server by throwing an exception when reloading a database
  *   after a file modification is detected.
  *
- * @param {} db_data_loader
- * @param {} options
  */
 export class ZooDbDataLoaderHandler
 {

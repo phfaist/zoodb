@@ -58,61 +58,6 @@ const FlmFieldValueEnvironmentSpec = __class__(
     }
 );
 
-
-// ### NO NO NO, we want a VERBATIM parser!! We aren't even sure that the field
-// ### contents is valid FLM (we don't even check the schema currently)!  Plus
-// ### this would be much faster!!
-
-//
-// // we need to define this class the Transcrypt way because we want to inherit a
-// // Python-transcrypted class.
-// const FlmFieldValueEnvironmentSpec = __class__(
-//     'FlmFieldValueEnvironmentSpec', // class name
-//     [ zooflm.flm_flmspecinfo.FLMEnvironmentSpecBase ], // base classes
-//     {
-//         // static members
-//         __module__: 'zoodb.dbdataloader.flmfilesdb',
-
-//         // constructor.
-//         get __init__ () {return __get__ (this, function
-//         (self, ...args) {
-//             const [environmentname, main_body_parsing_state] = zooflm.decode_kwargs(
-//                 args,
-//                 ['environmentname', 'main_body_parsing_state'],
-//             );
-
-//             __super__(FlmFieldValueEnvironmentSpec, '__init__')(self, $$kw({
-//                 environmentname: environmentname,
-//                 arguments_spec_list: [
-//                     zooflm.flm_flmenvironment.FLMArgumentSpec(
-//                         parser=LatexCharsGroupParser($$kw({
-//                             delimiters: ['{', '}'],
-//                             enable_comments: false,
-//                             enable_groups: false,
-//                         })),
-//                         argname='fieldname',
-//                         flm_doc='The fully qualified name of the Zoo DB field whose value '
-//                         + 'is specified in the environment contents',
-//                     )
-//                 ],
-//             }));
-//             self.main_body_parsing_state = main_body_parsing_state;
-//         });},
-//        
-//         get make_body_parsing_state_delta () {return __get__(this, function
-//         (self, /*...args*/) {
-//             // const [token, nodeargd, arg_parsing_state_delta, latex_walker] =
-//             //       zooflm.decode_kwargs(
-//             //           args,
-//             //           ['token', 'nodeargd', 'arg_parsing_state_delta', 'latex_walker']
-//             //       );
-//             return pylatexenc_latexnodes.ParsingStateDeltaReplaceParsingState(
-//                 self.main_body_parsing_state
-//             );
-//         });},
-//     }
-// );
-
  
 
 
