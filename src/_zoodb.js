@@ -445,7 +445,7 @@ export class ZooDb
         for (const [object_type, object_db] of Object.entries(db_objects)) {
             for (const [object_id, object] of Object.entries(object_db)) {
                 // update object
-                this.update_object({
+                this._update_object({
                     object_db: this.db.objects[object_type],
                     object_type,
                     object_id,
@@ -461,10 +461,7 @@ export class ZooDb
         // debug(`Finally, this.db.objects=`, this.db.objects);
     }
 
-    // REVIEW: This method is internal (called only by update_objects()) but its
-    // name is public.  Consider renaming to _update_object() to make the
-    // internal nature explicit.
-    update_object({object_db, object_type, object_id, new_object})
+    _update_object({object_db, object_type, object_id, new_object})
     {
         this._sanitize_raw_object({object_id, object_type, object: new_object})
 

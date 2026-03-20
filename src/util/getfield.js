@@ -90,16 +90,23 @@ export function *  iterfield(obj, field, fieldnameidx=undefined)
 
 /**
  * Return the value of the nested field at the given dotted path within `obj`.
- * The final segment's value (which may be `undefined`) is returned.
+ * The final segment's value is returned.
+ * 
+ * If any property along the property chain is not present, then `undefined`
+ * is returned.
+ * 
+ * If any property along the property chain cannot be indexed with the
+ * subsequent property name, an error is thrown.
  *
  * @param {Object} obj - The object to read from.  Must not be `undefined`.
  * @param {string} field - A dotted field path such as `'address.city'`.
- *     Numeric array indices may be written as `[0]` within the path.
+ *     Numeric array indices may be provided as `[0]` within the path, still
+ *     separated by dots from the other properties.
  * @returns {*} The value at the given path, or `undefined` if a segment is
  *     absent.
  *
  * @example
- * const city = getfield(person, 'address.city');
+ * const first_city = getfield(person, 'address.city.[0]');
  */
 export function getfield(obj, field)
 {
@@ -108,7 +115,6 @@ export function getfield(obj, field)
     }
 
     const parts = field.split('.');
-    const tail_part = parts.pop();
     for (let part of parts) {
         if (Array.isArray(obj)) {
             let m = /^\[(\d+)\]$/.exec(part);
@@ -116,13 +122,19 @@ export function getfield(obj, field)
                 part = parseInt(m[1]);
             }
         }
-        // REVIEW: `|| {}` silently replaces any falsy intermediate value
-        // (null, 0, false, "") with an empty object, masking genuine data.
-        // This can cause unexpected behaviour when field values are legitimately
-        // falsy.  Consider replacing with `?? {}` or an explicit null check.
-        obj = obj[part] || {};
+        try {
+            obj = obj[part];
+        } catch (e) {
+            throw new Error(
+                `Property ‘${part}’ cannot be accessed on ${obj} in call `
+                + `to getfield(‘${field}’)`
+            );
+        }
+        if (obj === undefined) {
+            return undefined;
+        }
     }
-    return obj[tail_part]; // can be undefined
+    return obj;
 }
 
 /**
@@ -143,10 +155,13 @@ export function getfield(obj, field)
  * The path may include `[]` to append a new element to an array at that
  * position, or `[n]` to write to a specific numeric index.
  *
- * // REVIEW: The dual signature of `setterfn` (plain function vs. object with
- * // `set_object_attribute_fn`) is unusual and may surprise callers.  The two
- * // forms have different semantics and there is no type guard between them.
- * // Consider splitting into two separate functions for clarity.
+ * Both `setterfn` forms are intentional and provided for convenience: the
+ * plain-function form covers the common case of transforming a value, while the
+ * `{ set_object_attribute_fn }` object form gives the caller direct access to
+ * the parent object and key — useful for operations like `delete` that cannot
+ * be expressed as a value transformation.  The two forms are distinguished by
+ * `typeof setterfn`: `'function'` selects the first form, `'object'` the
+ * second.
  *
  * @param {Object} obj - The object to mutate.  Must not be `undefined`.
  * @param {string} field - A dotted field path, possibly containing `[]` or
@@ -157,8 +172,8 @@ export function getfield(obj, field)
  * // Increment a counter
  * setfield(obj, 'stats.count', (old) => (old ?? 0) + 1);
  *
- * // Delete a field
- * setfield(obj, 'tags.[].label', { set_object_attribute_fn: (p, k) => delete p[k] });
+ * // Delete the 'label' field in the 'tags' object
+ * setfield(obj, 'tags.label', { set_object_attribute_fn: (p, k) => delete p[k] });
  */
 export function setfield(obj, field, setterfn)
 {

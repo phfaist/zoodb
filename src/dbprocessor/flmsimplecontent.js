@@ -492,6 +492,15 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
                     for (const flm_field of obj._zoodb.flm_fields) {
                         // we need to process obj's field `flm_field`
                         const fragment = getfield(obj, flm_field);
+                        if (fragment == null) {
+                            // do not throw an error, let's try to get
+                            // a usable dump.  Maybe the user is saving
+                            // precious information we don't want to lose?
+                            console.warn(
+                                `No such field on object: ${flm_field}.  (Internal inconsistency?)`
+                            );
+                            continue
+                        }
                         if (flm_fragments_to_flm_text) {
                             setfield(obj, flm_field,
                                      () => fragment.flm_text);

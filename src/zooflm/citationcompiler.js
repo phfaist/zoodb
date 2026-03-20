@@ -53,12 +53,9 @@ let _rx_html_escape_chars = new RegExp(
     '[' + Object.keys(html_escape_chars).map((c)=>_recharclassescape(c)).join('') + ']',
     'g'
 );
-// REVIEW: The next line resets `_rx_flm_escape_chars.lastIndex` instead of
-// `_rx_html_escape_chars.lastIndex`.  This is likely a copy-paste bug and
-// should read `_rx_html_escape_chars.lastIndex = 0;`.
 function escape_html(x)
 {
-    _rx_flm_escape_chars.lastIndex = 0;
+    _rx_html_escape_chars.lastIndex = 0;
     return x.replaceAll(_rx_html_escape_chars, (m) => html_escape_chars[m]);
 }
 

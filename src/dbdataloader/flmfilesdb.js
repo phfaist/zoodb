@@ -297,7 +297,10 @@ export class FlmFilesDbDataLoader extends YamlDbDataLoader
             
             const field_value = this.flm_field_value_trim( node.nodelist.latex_verbatim() );
 
-            // set the value
+            // Set the value.
+            // It might not conform to the schema at this point.  This will be caught at a
+            // later stage in the loading process, as we validate the data object globally
+            // against the relevant schemas.
             setfield(obj_data, field_name, () => field_value);
             //debug(`Set ‘${field_name}’ to “${field_value}”`);
         }

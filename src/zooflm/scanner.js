@@ -376,12 +376,7 @@ export function visitor_scan_zoo(visitor, zoodbdata, options)
 
     for (const object_type of object_types) {
         const schema = zoodbdata.schemas[object_type];
-        // REVIEW: `object_types` (the array) is used as the key here instead of
-        // `object_type` (the loop variable).  `zoodbdata.objects[object_types]`
-        // always evaluates to `undefined`, so this loop body never executes and
-        // `visitor_scan_zoo()` effectively scans no objects at all.  Should be
-        // `zoodbdata.objects[object_type]`.
-        for (const [objid,obj] of Object.entries(zoodbdata.objects[object_types])) {
+        for (const [objid,obj] of Object.entries(zoodbdata.objects[object_type])) {
             visitor_scan_object(visitor, obj, schema, `${object_type}:${objid}`);
         }
     }
