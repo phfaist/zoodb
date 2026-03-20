@@ -75,13 +75,43 @@ const FlmFieldValueEnvironmentSpec = __class__(
  * Load object data from a collection of FLM source files with optional YAML
  * front matter.
  *
+ * Each ``.flm`` file may begin with a YAML front matter block delimited by
+ * ``---`` lines.  Fields defined in the front matter are loaded as regular
+ * object properties.  The body of the file (after the front matter, if any)
+ * is parsed for ``\begin{field}{<fieldname>}...\end{field}`` blocks.  The
+ * verbatim content of each such block is assigned to the corresponding field
+ * on the object (using dot-separated paths for nested fields, e.g.
+ * ``relations.parents``).  A field may not appear in both the front matter
+ * and the body; doing so raises an error.
+ *
+ * Top-level content outside ``\begin{field}...\end{field}`` blocks is not
+ * allowed (except for whitespace and comments introduced with ``%%``).
+ * Encountering other content raises a parse error with line/column
+ * information.
+ *
  * Includes validation of the input object data against the provided schemas.
  *
- * Doc........
+ * This class extends :js:class:`YamlDbDataLoader`.  All configuration options
+ * accepted by :js:class:`YamlDbDataLoader` are also accepted here; the
+ * following defaults are changed:
  *
- * Configuration options .............
+ * - ``object_defaults.file_name_match`` defaults to ``/\.flm$/i`` (instead
+ *   of the YAML/JSON pattern used by the parent class).
  *
- * See also :class:`makeStandardZooDbYamlDataLoader` for a simplified loading.
+ * Additional configuration options:
+ *
+ * - ``flm_field_environmentname`` — the LaTeX environment name used to
+ *   delimit field blocks in the file body (default: ``'field'``).  With
+ *   the default, fields are written as
+ *   ``\begin{field}{name}...\end{field}``.
+ *
+ * - ``flm_field_value_trim`` — controls whitespace trimming of field body
+ *   content.  If ``true`` (the default), leading/trailing blank lines and
+ *   horizontal whitespace are stripped.  If ``false``, no trimming is
+ *   performed.  May also be set to a custom ``(string) → string`` function
+ *   for bespoke trimming behaviour.
+ *
+ * See also :func:`makeStandardZooDb` for a higher-level setup.
  */
 export class FlmFilesDbDataLoader extends YamlDbDataLoader
 {

@@ -82,11 +82,14 @@ export function parse_schema_flm_options(schema)
  * Parsing of DB fields follows the schema's ``_flm`` field.  The value of that
  * field can either be a dictionary, a string, `true`, `false`, or `null`.  If
  * it's a dictionary, then it should be of the form ``{ enabled: true|false,
- * standalone: true|false }`` (both fields default to `false` if omitted).  The
- * schema's ``_flm`` field can also be `true` or ``'full'`` (shorthands for ``{
- * enabled: true, standalone: false }``, ``'standalone'`` (a shorthand for ``{
- * enabled: true, standalone: true }``), or `false` or `null` (interpreted as
- * ``{ enabled: false }``).
+ * standalone: true|false, is_block_level: true|false|null }`` (all fields
+ * default to `false` if omitted, except ``is_block_level`` which defaults to
+ * `null`).  The schema's ``_flm`` field can also be `true` or ``'full'``
+ * (shorthands for ``{ enabled: true, standalone: false }``), ``'standalone'``
+ * (a shorthand for ``{ enabled: true, standalone: true }``),
+ * ``'block_level'`` (a shorthand for ``{ enabled: true, standalone: false,
+ * is_block_level: true }``), or `false` or `null` (interpreted as ``{
+ * enabled: false }``).
  *
  * If ``enabled`` is true, then FLM processing is enabled for that field,
  * otherwise it is disabled.  If ``standalone`` is true, then any FLM processing
@@ -96,6 +99,11 @@ export function parse_schema_flm_options(schema)
  * useful for pieces of text that you'd want to be able to render in multiple
  * different contexts (e.g. an object's name or title, which you might want to
  * reproduce in links to that object or in a list of objects).
+ *
+ * If ``is_block_level`` is true, then the FLM content is compiled in
+ * block-level mode: the content can contain paragraphs, bullet lists, figures,
+ * and other block-level constructs.  When ``is_block_level`` is `null` (the
+ * default), the FLM parser decides based on the content itself.
  *
  */
 export class FLMSimpleContentCompiler extends ZooDbProcessorBase

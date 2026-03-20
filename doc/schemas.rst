@@ -84,14 +84,22 @@ including code that might pin down labels and make use of cross-references.
 If you set `_flm: 'standalone'`, then only standalone-mode FLM code is accepted.
 See FLM's documentation for standalone mode.
 
-You can also specify whether or not to enable FLM parsing and whether or not to
-enable standalone mode parsing by specifying an object:
+If you set `_flm: 'block_level'`, then full FLM parsing is enabled in
+block-level mode: the content can contain paragraphs, bullet lists, figures,
+and other block-level constructs.
+
+You can also specify whether or not to enable FLM parsing, standalone mode, and
+block-level mode by specifying an object:
 
 .. code:: yaml
 
     _flm:
       enabled: true|false
       standalone: true|false
+      is_block_level: true|false|null
+
+All three keys default to `false` when omitted, except `is_block_level` which
+defaults to `null` (letting the FLM parser decide based on the content itself).
 
 
 
