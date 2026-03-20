@@ -6,6 +6,7 @@ const debug = debugm('zoodb.test_citationmanager_manager');
 import { CitationDatabaseManager } from '../src/citationmanager/index.js';
 import { CitationSourceArxiv } from '../src/citationmanager/source/arxiv.js';
 import { CitationSourceDoi } from '../src/citationmanager/source/doi.js';
+import { CitationSourceManual } from '../src/citationmanager/source/manual.js';
 
 
 describe('zoodb.citationmanager._manager', function() {
@@ -122,5 +123,107 @@ describe('zoodb.citationmanager._manager', function() {
             debug(`Yay, got error as expected from server.`);
             
         });
+
+        it('CitationSourceManual stores manual citation entries', async function () {
+            let manualsource = new CitationSourceManual();
+            let manager = new CitationDatabaseManager(
+                { manual: manualsource },
+                {
+                    cache_fs: fs,
+                    cache_file: '_zoodb_test_nocache.junk.json',
+                    skip_save_cache: true,
+                }
+            );
+            await manager.initialize();
+
+            await manager.retrieve_citations([
+                { cite_prefix: 'manual', cite_key: 'J. Smith, "A paper", 2020.' },
+            ]);
+
+            const entry = manager.get_citation('manual', 'J. Smith, "A paper", 2020.');
+            assert.ok(entry);
+            assert.ok(entry._ready_formatted);
+            assert.strictEqual(entry._ready_formatted.flm, 'J. Smith, "A paper", 2020.');
+        });
+
+        it('get_citation_by_id parses prefix:key format', async function () {
+            let manualsource = new CitationSourceManual();
+            let manager = new CitationDatabaseManager(
+                { manual: manualsource },
+                {
+                    cache_fs: fs,
+                    cache_file: '_zoodb_test_nocache.junk.json',
+                    skip_save_cache: true,
+                }
+            );
+            await manager.initialize();
+
+            await manager.retrieve_citations([
+                { cite_prefix: 'manual', cite_key: 'test_entry' },
+            ]);
+
+            const entry = manager.get_citation_by_id('manual:test_entry');
+            assert.ok(entry);
+            assert.strictEqual(entry.id, 'manual:test_entry');
+        });
+
+        it('get_citation_by_id throws for unknown citation', async function () {
+            let manualsource = new CitationSourceManual();
+            let manager = new CitationDatabaseManager(
+                { manual: manualsource },
+                {
+                    cache_fs: fs,
+                    cache_file: '_zoodb_test_nocache.junk.json',
+                    skip_save_cache: true,
+                }
+            );
+            await manager.initialize();
+
+            assert.throws(() => {
+                manager.get_citation_by_id('manual:nonexistent');
+            }, /not found/i);
+        });
+
+        it('keys() returns all stored citation IDs', async function () {
+            let manualsource = new CitationSourceManual();
+            let manager = new CitationDatabaseManager(
+                { manual: manualsource },
+                {
+                    cache_fs: fs,
+                    cache_file: '_zoodb_test_nocache.junk.json',
+                    skip_save_cache: true,
+                }
+            );
+            await manager.initialize();
+
+            await manager.retrieve_citations([
+                { cite_prefix: 'manual', cite_key: 'entry_a' },
+                { cite_prefix: 'manual', cite_key: 'entry_b' },
+            ]);
+
+            const keys = manager.keys();
+            assert.ok(keys.includes('manual:entry_a'));
+            assert.ok(keys.includes('manual:entry_b'));
+        });
+
+        it('throws for unknown cite_prefix during retrieve', async function () {
+            let manualsource = new CitationSourceManual();
+            let manager = new CitationDatabaseManager(
+                { manual: manualsource },
+                {
+                    cache_fs: fs,
+                    cache_file: '_zoodb_test_nocache.junk.json',
+                    skip_save_cache: true,
+                }
+            );
+            await manager.initialize();
+
+            await assert.rejects(async () => {
+                await manager.retrieve_citations([
+                    { cite_prefix: 'unknown_prefix', cite_key: 'some_key' },
+                ]);
+            }, /No source registered/i);
+        });
+
     });
 });

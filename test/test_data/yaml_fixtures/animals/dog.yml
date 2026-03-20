@@ -1,0 +1,6 @@
+animal_id: dog
+name: Domestic Dog
+relations:
+  lives_in:
+    - habitat_id: house
+    - habitat_id: yard

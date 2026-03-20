@@ -1,0 +1,5 @@
+animal_id: cat
+name: Domestic Cat
+relations:
+  lives_in:
+    - habitat_id: house

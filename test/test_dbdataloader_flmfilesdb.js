@@ -108,6 +108,111 @@ invalid content here
 
         });
 
+        it('parses FLM file with no YAML frontmatter', async function () {
+
+            let f = new FlmFilesDbDataLoader();
+            let file_content = `
+\\begin{field}{title}
+My Title
+\\end{field}
+
+\\begin{field}{description}
+A description here.
+\\end{field}
+`;
+            let d = await f.parse_file_data(file_content, {}, '/root', 'dummy/xyz.flm');
+            assert.deepStrictEqual(d, {
+                title: 'My Title',
+                description: 'A description here.',
+            });
+        });
+
+        it('parses multiple field blocks at various nesting levels', async function () {
+
+            let f = new FlmFilesDbDataLoader();
+            let file_content = `
+---
+obj_id: nested_test
+---
+
+\\begin{field}{a.b}
+value_ab
+\\end{field}
+
+\\begin{field}{a.c}
+value_ac
+\\end{field}
+
+\\begin{field}{d}
+value_d
+\\end{field}
+`;
+            let d = await f.parse_file_data(file_content, {}, '/root', 'dummy/xyz.flm');
+            assert.strictEqual(d.obj_id, 'nested_test');
+            assert.strictEqual(d.a.b, 'value_ab');
+            assert.strictEqual(d.a.c, 'value_ac');
+            assert.strictEqual(d.d, 'value_d');
+        });
+
+        it('errors if field is specified in both frontmatter and body', async function () {
+
+            let f = new FlmFilesDbDataLoader();
+            let file_content = `
+---
+obj_id: conflict_test
+title: from frontmatter
+---
+
+\\begin{field}{title}
+from body
+\\end{field}
+`;
+            await assert.rejects(async () => {
+                await f.parse_file_data(file_content, {}, '/root', 'dummy/xyz.flm');
+            }, /specified both/i);
+        });
+
+        it('allows %% comments in root content', async function () {
+
+            let f = new FlmFilesDbDataLoader();
+            let file_content = `
+---
+obj_id: comments_test
+---
+
+%% This is a comment
+
+\\begin{field}{name}
+Test
+\\end{field}
+
+%% Another comment
+`;
+            let d = await f.parse_file_data(file_content, {}, '/root', 'dummy/xyz.flm');
+            assert.strictEqual(d.obj_id, 'comments_test');
+            assert.strictEqual(d.name, 'Test');
+        });
+
+        it('trims leading/trailing newlines from field values by default', async function () {
+
+            let f = new FlmFilesDbDataLoader();
+            let file_content = `
+\\begin{field}{name}
+hello world
+\\end{field}
+`;
+            let d = await f.parse_file_data(file_content, {}, '/root', 'dummy/xyz.flm');
+            // Default trim removes leading \n and trailing \n around the value
+            assert.strictEqual(d.name, 'hello world');
+        });
+
+        it('default file_name_match is .flm', function () {
+            let f = new FlmFilesDbDataLoader({
+                objects: { code: {} },
+            });
+            assert.ok(f.config.objects.code.file_name_match.test('test.flm'));
+            assert.ok(!f.config.objects.code.file_name_match.test('test.yml'));
+        });
 
     });
 });

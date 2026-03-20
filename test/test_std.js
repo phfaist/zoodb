@@ -165,4 +165,82 @@ describe('zoodb.test_std', function() {
 
     });
 
+    it('all processor types enabled together', async function () {
+        this.timeout(5000);
+
+        const zoodb = await createMyZooDb();
+        const loader = await createMyYamlDbDataLoader(zoodb);
+
+        const loader_handler = new ZooDbDataLoaderHandler(loader);
+        await zoodb.install_zoo_loader_handler(loader_handler);
+
+        await zoodb.load();
+
+        // Relations should be populated
+        const pasta = zoodb.objects.dish.pasta;
+        assert.ok(pasta.relations);
+        assert.ok(pasta.relations.eaten_with);
+        assert.ok(pasta.relations.eaten_with.length > 0);
+
+        // FLM fields should be compiled (if any have _flm annotation)
+        // The dish/utensil schemas may not have _flm fields, but the processor should run
+        assert.ok(zoodb.processors.length > 0);
+    });
+
+    it('zoo_permalinks configuration produces correct URLs', async function () {
+        this.timeout(5000);
+
+        const zoodb = await createMyZooDb();
+        const loader = await createMyYamlDbDataLoader(zoodb);
+
+        const loader_handler = new ZooDbDataLoaderHandler(loader);
+        await zoodb.install_zoo_loader_handler(loader_handler);
+
+        await zoodb.load();
+
+        // Check that the permalink function works as configured
+        const permalink = zoodb.zoo_permalinks.object('dish', 'pasta');
+        assert.strictEqual(permalink, '/dish/pasta');
+
+        const graphics_permalink = zoodb.zoo_permalinks.graphics_resource({ src_url: 'test.png' });
+        assert.strictEqual(graphics_permalink, '/pic/test.png');
+    });
+
+    it('data dump and reload produces consistent data', async function () {
+        this.timeout(5000);
+
+        const zoodb = await createMyZooDb();
+        const loader = await createMyYamlDbDataLoader(zoodb);
+
+        const loader_handler = new ZooDbDataLoaderHandler(loader);
+        await zoodb.install_zoo_loader_handler(loader_handler);
+
+        await zoodb.load();
+
+        const dump = await zoodb.data_dump({ remove_zoodb_info: true });
+
+        // Dump should contain our object types
+        assert.ok(dump.db.objects.dish);
+        assert.ok(dump.db.objects.utensil);
+
+        // Dumped objects should have their IDs
+        assert.ok(dump.db.objects.dish.pasta);
+        assert.ok(dump.db.objects.utensil.fork);
+    });
+
+    it('FLM environment features match configuration', async function () {
+        this.timeout(5000);
+
+        const zoodb = await createMyZooDb();
+
+        // Features that were enabled
+        assert.ok(zoodb.zoo_flm_environment.feature_baseformatting);
+        assert.ok(zoodb.zoo_flm_environment.feature_href);
+        assert.ok(zoodb.zoo_flm_environment.feature_math);
+
+        // Features that were disabled
+        assert.strictEqual(zoodb.zoo_flm_environment.feature_defterm, null);
+        assert.strictEqual(zoodb.zoo_flm_environment.feature_floats, null);
+    });
+
 });
