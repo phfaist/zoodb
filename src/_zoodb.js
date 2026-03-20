@@ -79,6 +79,8 @@ export class ZooDb
 
         this.schema_validator = schema_validator ?? null;
         if (this.schema_validator == null) {
+            // schema_validator is null or undefined.  Set schema_validator to `false`
+            // to avoid this error.
             throw new Error(
                 `No schema validator set on this ZooDb to perform schema validation. `
                 + `To suppress this error and proceed without schema validation, `

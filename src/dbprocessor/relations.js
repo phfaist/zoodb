@@ -335,7 +335,7 @@ export class RelationsPopulator extends ZooDbProcessorBase
             debug(`Processing relations for ${object_type} object relations`);
 
             if (!this.relations[object_type]) {
-                return;
+                continue;
             }
 
             //

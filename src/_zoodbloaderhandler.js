@@ -112,45 +112,50 @@ export class ZooDbDataLoaderHandler
 
         this._currently_loading = true;
 
-        //
-        // Load the data files
-        //
-        let dbdata = { schemas: {}, objects: {}, };
-        let newdbdata;
-        for (const db_data_loader of this.db_data_loaders) {
+        try {
 
-            newdbdata = await db_data_loader.load({ schemas: this.zoodb.schemas });
+            //
+            // Load the data files
+            //
+            let dbdata = { schemas: {}, objects: {}, };
+            let newdbdata;
+            for (const db_data_loader of this.db_data_loaders) {
 
-            for (const [k,v] of Object.entries(newdbdata.schemas ?? {})) {
-                if (dbdata.schemas[k] != null) {
-                    throw new Error(
-                        `Conflict: same schema name ‘${k}’ loaded by different db data loaders!`
-                    );
-                }
-                dbdata.schemas[k] = v;
-            }
+                newdbdata = await db_data_loader.load({ schemas: this.zoodb.schemas });
 
-            for (const [object_type, object_db] of Object.entries(newdbdata.objects ?? {})) {
-                dbdata.objects[object_type] ??= {};
-                for (const [k,v] of Object.entries(object_db)) {
-                    if (dbdata.objects[object_type][k] != null) {
+                for (const [k,v] of Object.entries(newdbdata.schemas ?? {})) {
+                    if (dbdata.schemas[k] != null) {
                         throw new Error(
-                            `Conflict: same object ID ‘${k}’ loaded by different `
-                            + `db data loaders!`
+                            `Conflict: same schema name ‘${k}’ loaded by different db data loaders!`
                         );
                     }
-                    dbdata.objects[object_type][k] = v;
+                    dbdata.schemas[k] = v;
                 }
+
+                for (const [object_type, object_db] of Object.entries(newdbdata.objects ?? {})) {
+                    dbdata.objects[object_type] ??= {};
+                    for (const [k,v] of Object.entries(object_db)) {
+                        if (dbdata.objects[object_type][k] != null) {
+                            throw new Error(
+                                `Conflict: same object ID ‘${k}’ loaded by different `
+                                + `db data loaders!`
+                            );
+                        }
+                        dbdata.objects[object_type][k] = v;
+                    }
+                }
+
             }
 
+            //
+            // Load the zoo from the data files
+            //
+            await this.zoodb.load_data( dbdata );
+
+        } finally {
+            this._currently_loading = false;
         }
 
-        //
-        // Load the zoo from the data files
-        //
-        await this.zoodb.load_data( dbdata );
-
-        this._currently_loading = false;
         this._first_load_done = true;
 
         debug("Validating Zoo ...");
@@ -179,8 +184,6 @@ export class ZooDbDataLoaderHandler
                           + "reload again at this time.");
             return;
         }
-        this._currently_loading = true;
-
         if (!this._first_load_done) {
             throw new Error(
                 `Call to ZooDbDataLoaderHandler.reload() before having called load().  You `
@@ -189,6 +192,8 @@ export class ZooDbDataLoaderHandler
                 + `operation if it detects the zoo was already loaded once.`
             );
         }
+
+        this._currently_loading = true;
 
         try {
 

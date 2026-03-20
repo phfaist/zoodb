@@ -93,7 +93,7 @@ export function install_csl_flm_output_format(zooflmenviron)
                 text = "";
             }
 
-            if (!text.strip()) {
+            if (!text.trim()) {
                 // it's only whitespace -- we don't need to process it further
                 return text;
             }
