@@ -101,9 +101,94 @@ describe('zoodb.dbprocessor.flmsimplecontent', function () {
 
         });
 
-    });    
+        it('compiles nested FLM fields (relation objects with FLM)', async function () {
 
-    describe('RelationsPopulator#process_data_dump', function () {
+            let zoodb = new ZooDb({
+                processors: [
+                    new FLMSimpleContentCompiler({ flm_environment, }),
+                ],
+                schema_validator,
+            });
+
+            await zoodb.load_data(get_simple_test_data());
+
+            // The 'how' field inside relations.eaten_with items has _flm: "full"
+            const how_frag = zoodb.objects.dish.pasta.relations.eaten_with[0].how;
+            assert.ok(how_frag);
+            assert.ok(how_frag.flm_text);
+            assert.strictEqual(how_frag.flm_text,
+                get_simple_test_data().objects.dish.pasta.relations.eaten_with[0].how);
+        });
+
+        it('FLM compilation error handling with abort policy throws', async function () {
+
+            const data = get_simple_test_data();
+            // Introduce malformed FLM
+            data.objects.utensil.fork.description = '\\invalidcommand{broken}';
+
+            let zoodb = new ZooDb({
+                processors: [
+                    new FLMSimpleContentCompiler({
+                        flm_environment,
+                        flm_error_policy: 'abort',
+                    }),
+                ],
+                schema_validator: false,
+            });
+
+            await assert.rejects(async () => {
+                await zoodb.load_data(data);
+            }, /FLM Error/);
+        });
+
+        it('FLM compilation error with continue policy produces error fragment', async function () {
+
+            const data = get_simple_test_data();
+            data.objects.utensil.fork.description = '\\invalidcommand{broken}';
+
+            let zoodb = new ZooDb({
+                processors: [
+                    new FLMSimpleContentCompiler({
+                        flm_environment,
+                        flm_error_policy: 'continue',
+                    }),
+                ],
+                schema_validator: false,
+            });
+
+            await zoodb.load_data(data);
+
+            // Should have an error info attached
+            const frag = zoodb.objects.utensil.fork.description;
+            assert.ok(frag._flm_error_info);
+            assert.ok(frag._flm_error_info.message_string);
+        });
+
+        it('_flm: "standalone" vs "full" vs "block_level" differences', async function () {
+
+            let zoodb = new ZooDb({
+                processors: [
+                    new FLMSimpleContentCompiler({ flm_environment, }),
+                ],
+                schema_validator,
+            });
+
+            await zoodb.load_data(get_simple_test_data());
+
+            // name has _flm: "standalone" — standalone_mode should be true
+            const name_frag = zoodb.objects.utensil.fork.name;
+            assert.ok(name_frag.standalone_mode);
+
+            // utensil description has _flm: "full" — standalone_mode should be false
+            const desc_frag = zoodb.objects.utensil.fork.description;
+            assert.strictEqual(desc_frag.standalone_mode, false);
+
+            // dish description has _flm: "block_level" — is_block_level should be true
+            assert.strictEqual(
+                zoodb.objects.dish.pasta.description.nodes.parsing_state.is_block_level,
+                true
+            );
+        });
 
     });
 

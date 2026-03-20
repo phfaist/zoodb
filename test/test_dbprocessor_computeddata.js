@@ -179,6 +179,75 @@ describe('zoodb.dbprocessor.computeddata', function () {
 
         });
 
+        it('error handling: computed data function throws — error propagates', async function () {
+
+            let zoodb = new ZooDb({
+                processors: [
+                    new ComputedDataProcessor({
+                        computed_data: {
+                            dish: {
+                                bad_prop: {
+                                    fn: (dish) => {
+                                        throw new Error('Computation failed!');
+                                    },
+                                },
+                            },
+                        },
+                    }),
+                ],
+                schema_validator,
+            });
+
+            await assert.rejects(async () => {
+                await zoodb.load_data(get_simple_test_data());
+            }, /Computation failed/);
+        });
+
+        it('process_data_dump() does not keep computed data by default', async function () {
+
+            let zoodb = new ZooDb({
+                processors: [
+                    new ComputedDataProcessor({
+                        computed_data: MyZooDbComputedData,
+                    }),
+                ],
+                schema_validator,
+            });
+
+            await zoodb.load_data(get_simple_test_data());
+
+            let dump = await zoodb.data_dump({
+                remove_zoodb_info: true,
+            });
+
+            // Computed data should NOT be in the dump by default
+            assert.strictEqual(dump.db.objects.dish.pasta.utensils_summary, undefined);
+        });
+
+        it('process_data_dump() keeps computed data when keep_computed_data is true', async function () {
+
+            let zoodb = new ZooDb({
+                processors: [
+                    new ComputedDataProcessor({
+                        computed_data: MyZooDbComputedData,
+                        object_types: ['dish'],
+                    }),
+                ],
+                schema_validator,
+            });
+
+            await zoodb.load_data(get_simple_test_data());
+
+            let dump = await zoodb.data_dump({
+                keep_computed_data: true,
+            });
+
+            const expectedValue = get_simple_test_data().objects.dish.pasta.relations.eaten_with
+                .map( (x) => x.utl_id).join("+");
+
+            assert.strictEqual(dump.db.objects.dish.pasta.utensils_summary, expectedValue);
+        });
+
     });
 
 });

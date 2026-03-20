@@ -1,0 +1,16 @@
+{
+    "_zoo_primarykey": "habitat_id",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "habitat_id": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "climate": {
+            "type": "string"
+        }
+    }
+}

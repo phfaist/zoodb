@@ -1,0 +1,25 @@
+{
+    "_zoo_primarykey": "animal_id",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "animal_id": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "relations": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "lives_in": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "habitat_ref"
+                    }
+                }
+            }
+        }
+    }
+}
