@@ -55,7 +55,7 @@ Data loader
 -----------
 
 This function will create a data loader class (:class:`YamlDbDataLoader`) that
-you can then use in a :`ZooDbDataLoaderHandler` class, which will take care of
+you can then use in a :class:`ZooDbDataLoaderHandler`, which will take care of
 loading (and if requested, reloading) the data into the main zoo instance.
 
 .. js:autofunction:: src/std/stdyamldbdataloader.makeStandardYamlDbDataLoader

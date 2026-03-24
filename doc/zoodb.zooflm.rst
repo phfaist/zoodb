@@ -23,7 +23,7 @@ there are some important differences to keep in mind:
   <https://www.transcrypt.org/docs/html/what_why.html#id2>`_.
 
 - To pass keyword arguments, use the syntax ``function(arg1, arg2, $$kw( {
-  keyword_arg1: ..., keyword_arg2: ... } ))``.  The ``$kw(...)`` argument should
+  keyword_arg1: ..., keyword_arg2: ... } ))``.  The ``$$kw(...)`` argument should
   be the last argument in the call.
 
 - You cannot use the JS syntax ``x instanceof y`` with python-transcrypted
@@ -42,8 +42,6 @@ The relevant functions can be imported as follows:
        $$kw, repr, __class__, __super__, __get__, isinstance
    } from '@phfaist/zoodb/zooflm';
 
-
-- explain how to create subclasses..........
 
 
 Overview of FLM-related definitions

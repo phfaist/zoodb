@@ -78,8 +78,8 @@ import { ZooDbProcessorBase } from './base.js';
  * 
  *  - `keep_computed_data_in_data_dumps`: if set to true, then data dumps of the zoodb
  *    will produce objects in which the computed properties are included as regular
- *    properties of the objects.  See also the `keep_computed_data` option of the 
- *    data dumper (... todo, doc. ...)
+ *    properties of the objects.  This can be overridden per-dump by passing
+ *    `keep_computed_data` in the options to `data_dump()`.
  * 
  *  - `create_zoo_methods`: if set to true (the default), then special methods named
  *    `<object_type>_<computed_property_name>(obj)` are installed on the main zoodb
@@ -323,7 +323,7 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
         }
 
         if (this.config.lazy) {
-            debug(`skipping computation of ‘${object_type.computed_property_name}’ (lazy)`);
+            debug(`skipping computation of ‘${object_type}.${computed_property_name}’ (lazy)`);
             return;
         }
 

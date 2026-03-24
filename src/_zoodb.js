@@ -45,8 +45,11 @@ function cloneDeepWithEmptyPrototypeObjects(object)
  *   (e.g. a ``Validator`` instance from
  *   the `jsonschema <https://www.npmjs.com/package/jsonschema>`_ npm package).
  *   When a validator is provided, every object added to the database is
- *   validated against its schema.  Pass `false` to suppress the "no validator"
- *   error and proceed without validation.
+ *   validated against its schema.  Omitting this option (or passing
+ *   ``null``/``undefined``) throws an error at construction time.  Pass
+ *   ``false`` to explicitly disable validation without triggering this error;
+ *   this is appropriate when :class:`YamlDbDataLoader` is used, since that
+ *   loader already validates objects as it loads them.
  * 
  * - ``normalize_id_for_uniqueness_check`` — A function
  *   ``(id: string) => string`` used to normalise object IDs before comparing
@@ -131,6 +134,18 @@ export class ZooDb
 
     // ---
 
+    /**
+     * Load schema definitions into the database.  The provided schemas are
+     * deep-cloned before being stored.
+     *
+     * Normally you do not call this method directly — it is invoked
+     * automatically by `load_data()` when the data includes a `schemas`
+     * property.
+     *
+     * @param {Object} options
+     * @param {Object} options.schemas - An object mapping each schema name
+     *     (which doubles as the object type name) to its JSON Schema object.
+     */
     async load_schemas({ schemas })
     {
         this.raw_data_db.schemas = loCloneDeep(schemas);
@@ -380,6 +395,13 @@ export class ZooDb
                 throw e;
             }
         }
+
+        // TODO: Check that fields marked _auto_populated in the schema are not
+        // set in the raw input data.  Currently, if a user accidentally provides
+        // a value for an auto-populated field, it is silently overwritten by the
+        // processor that owns that field.  Ideally we would warn or error here,
+        // but doing so requires walking the schema to find _auto_populated
+        // annotations — see iter_schema_fields_recursive() in util/objectinspector.
 
         object._zoodb ??= {};
         if (!object._zoodb.id) {

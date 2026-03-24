@@ -205,7 +205,7 @@ boilerplate code:
           
       };
 
-      return await makeStandardYamlDbDataLoader(config);
+      return await makeStandardYamlDbDataLoader(zoodb, config);
   }
 
   // -----------------

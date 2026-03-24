@@ -55,13 +55,13 @@ import loMerge from 'lodash/merge.js';
  *
  * Options:
  *
- * - ``throw_reload_errors`` - if set to `true`, then reload operation failures
- *   will cause an error to be thrown (regardless of whether they are initiated
- *   with a second call to load() or with a call to reload()).  If set to
- *   `false`, only an error message is printed to the console while the function
- *   returns normally.  Setting this option to `false` can be useful in
- *   development mode in eleventy, for instance, where you don't want to stop
- *   the development server by throwing an exception when reloading a database
+ * - ``throw_reload_errors`` (default: ``true``) - when `true`, reload
+ *   operation failures cause an error to be thrown (regardless of whether
+ *   they are initiated with a second call to `load()` or with a call to
+ *   `reload()`).  When `false`, reload errors are logged to the console
+ *   and the function returns normally.  Setting this to `false` is useful
+ *   in development mode with Eleventy, where you do not want to stop the
+ *   development server by throwing an exception when reloading a database
  *   after a file modification is detected.
  *
  */

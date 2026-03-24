@@ -3,8 +3,8 @@
 API Reference
 =============
 
-The API documentation is still incomplete (sorry!), so you might wish to further
-inspect the source code directly.
+Some parts of the API documentation may still be incomplete; you can always
+inspect the source code directly for full details.
 
 .. note::
 

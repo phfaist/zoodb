@@ -85,10 +85,11 @@ Miscellaneous utilities
 
 The module also exports two pre-built comparator values:
 
-- ``nCmp`` — a comparator function for numbers (ascending order).
-- ``cmp`` — an object with four ready-to-use comparators: ``cmp.str``
-  (string, ascending), ``cmp.strReverse`` (string, descending), ``cmp.num``
-  (number, ascending), ``cmp.numReverse`` (number, descending).
+- ``nCmp`` — a three-way numeric comparator: returns ``-1``, ``0``, or ``1``.
+- ``cmp`` — an object with four ready-to-use comparators: ``cmp.auto``
+  (detects type and compares accordingly), ``cmp.string`` (locale-aware string
+  comparison), ``cmp.int`` (integer comparison via ``parseInt``), and
+  ``cmp.number`` (floating-point comparison via ``parseFloat``).
 
 .. js:autofunction:: src/util/lexicographic.makeLexicographicCompareFn
    :short-name:

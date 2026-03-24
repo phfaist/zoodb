@@ -141,7 +141,7 @@ export class SearchableTextFieldset
         }
 
         //
-        // fields the zoodb to extract fields.
+        // Scan the zoodb schemas to discover which fields to extract.
         //
         let fields_set = new Set();
         for (const object_type of this.object_types) {

@@ -12,17 +12,19 @@ import { ZooDbProcessorBase } from './base.js';
 /**
  * An instance of a relation in the database.
  *
- * @param object_type - The type of the object from which the relation is
- *     originating
+ * The constructor accepts a single destructured options object with the
+ * following properties:
  *
- * @param relation_spec - The *relation specification object* containing
- *    information about how this relation works (other object types,
- *    one-to-many, many-to-many, backreferences, etc.).  This is the content of
- *    the items of the `_zoo_relations:` field in the object schema (see
- *    :ref:`object-schemas` and see above).
- *
- * @param zoodb - The ZooDb instance where to look for other objects being
- *    referenced.
+ * @param {Object} options
+ * @param {string} options.object_type - The type of the object from which the
+ *     relation originates.
+ * @param {Object} options.relation_spec - The *relation specification object*
+ *     containing information about how this relation works (target object type,
+ *     primary key field, backreferences, etc.).  This is one of the items from
+ *     the ``_zoo_relations`` array in the object schema (see
+ *     :ref:`object-schemas`).
+ * @param {ZooDb} options.zoodb - The ZooDb instance used to look up
+ *     referenced objects.
  */
 export class ZooRelation
 {

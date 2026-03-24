@@ -60,7 +60,11 @@ Some fields are meant to be populated automatically by some database processor.
 You can mark such fields with `_auto_populated: true`.  In this case, no data is
 expected to be provided when loading the object raw data.
 
-BUG/FIXME: Enforce no values in `_auto_populated` fields at validation time!!
+.. note::
+
+   Auto-populated fields are not currently checked for absence during schema
+   validation.  If data is accidentally provided for such a field, it will
+   be silently overwritten by the processor.
 
 
 .. _zoodb-schemas-flmcontent:
@@ -170,7 +174,7 @@ The `relations.parents` object will be extended to include a field `person` with
 a reference to the corresponding person object.  Furthermore, the field
 `relations.children` on the target object will be a list of backreferences; each
 will be a copy of the relationship object (`relations.parents[]`) but with the
-`parent_id` and `parent` fields set to the referring object.
+`person_id` and `person` fields set to the referring object.
 
 See the documentation for the :class:`RelationsPopulator` database processor
 for how to specify relationships with *relation spec objects*.

@@ -127,11 +127,10 @@ Bibliographic citations
   DOI as ``\cite{doi:10.ZZZZZZ}``.
   
   DOIs are automatically retrieved for ``arXiv`` citations, so please use
-  ``arXiv`` identifiers whenever possible.  If the DOI is not retreived
-  correctly (e.g., it is not listed correctly on the arXiv page), then please
-  add a line in the file ``citation_extras/citation_hints.yml`` (in the data
-  repo), specifically in the ``arxiv_to_doi_override:`` section.  You can also
-  file an issue in this repo so that we take care of this addition.
+  ``arXiv`` identifiers whenever possible.  If the DOI is not retrieved
+  correctly (e.g., it is not listed correctly on the arXiv page), you can
+  provide manual overrides through configuration (see the citation sources
+  documentation).
   
   Citations can be combined as in LaTeX: ``\cite{arxiv:XXX,arxiv:YYY,doi:ZZZ}``.
   If there is neither an arxiv number nor a DOI number available, you can enter
@@ -139,12 +138,12 @@ Bibliographic citations
   Stuff} 12:\textbf{A}, 1003--1592 (1943)}}``.
   
 
-References to other codes and external links
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+References to other objects and external links
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Reference other codes using ``\ref{code:<other-code-id>}``.  To set
-  a custom label to show, you can use
-  ``\hyperref[code:<other-code-id>]{link text}``.
+- Reference other zoo objects using ``\ref{<object_type>:<object_id>}``.  To
+  set a custom label to show, you can use
+  ``\hyperref[<object_type>:<object_id>]{link text}``.
   
 - Insert hyperlinks to other web pages as
   ``\href{https://example.com/example/page}{shown link text}`` or with
@@ -239,12 +238,12 @@ Figures and tables
   environments and will issue errors if you deviate from it.
 
 - *Figure images:* The ``figure_file_name`` must be the name of an
-  image file that is in the code YAML file tree, which is searched
-  relative to the code YAML file's path.  In ``figure_file_name``,
-  the file name extension (e.g., ``.svg``) can be omitted.  The
-  preferred file structure for codes that have image files is to
-  place the code YAML file along with the image files in their own,
-  separate folder that is specific to that code.
+  image file that can be found in the data file tree, searched
+  relative to the source data file's path.  In ``figure_file_name``,
+  the file name extension (e.g., ``.svg``) can be omitted.  A
+  recommended file structure for objects that have image files is to
+  place the data file along with the image files in their own,
+  separate folder that is specific to that object.
   
   You may not specify optional sizing/trimming/cropping arguments to
   the ``\includegraphics`` command.  Please prepare your figure

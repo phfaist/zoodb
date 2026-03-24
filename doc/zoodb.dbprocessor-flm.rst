@@ -30,8 +30,9 @@ Low-level FLM content object field compilation
 
 
 This database processor will only take care of converting FLM content fields of
-objects into compiled FLM fragment objects.  Optionally, the field values are
-scanned as they are being compiled
+objects into compiled FLM fragment objects.  Optionally, if a
+:class:`ZooFLMScanner` is provided, the field values are scanned as they are
+being compiled to collect references, citations, and resources.
 
 
 

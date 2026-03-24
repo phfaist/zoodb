@@ -50,7 +50,7 @@ import { path_or_url_to_url } from './util/url.js';
  *   any requested filesystem paths.  We also need the `readdir()` method if
  *   `schema_names` is null or undefined.
  *
- * See also :class:`makeStandardZooDbYamlDataLoader` for a simplified loading.
+ * See also :func:`makeStandardYamlDbDataLoader` for a simplified loading.
  */
 export class SchemaLoader
 {

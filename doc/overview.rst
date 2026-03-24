@@ -9,7 +9,7 @@ browses this information, etc.
 
 A use case for the `ZooDb` library is the following:
 
-* Collect and read YAML (or JSON) files recursivly inside a given folder, and
+* Collect and read YAML (or JSON) files recursively inside a given folder, and
   build an internal object structure;
 
 * Process relations between objects;
@@ -49,7 +49,7 @@ The `ZooDb` library is geared towards providing the following features:
   to building a full-blown zoo website, as well as provide entire JSON data
   dumps and build client-side applications to display the data interactively.
 
-* Generate other types of output if requried, such as LaTeX code to create a
+* Generate other types of output if required, such as LaTeX code to create a
   print version of the zoo.
 
 * ... and more, read on to learn more :) 

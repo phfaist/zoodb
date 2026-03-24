@@ -13,9 +13,9 @@ export class ZooDbProcessorBase
     }
 
     /**
-     * Will be called very early by the ZooDb object to make itself aware to the
-     * database processor.  You don't need to reimplement this function.  It
-     * simply stores the zoodb instance in `this.zoodb`.
+     * Called by the ZooDb constructor to give the processor a reference to
+     * the database.  You do not normally need to override this method.  It
+     * stores the `zoodb` instance in `this.zoodb`.
      */
     install_zoo(zoodb)
     {
