@@ -201,7 +201,7 @@ export async function makeStandardZooDb(config)
         config,
     );
 
-    debug(`makeStandardZooDb: Using config =`, debugconfig(debug, _this.config, { level: 4 }));
+    debug(`makeStandardZooDb: Using config =`, debugconfig(debug, _this.config, { levels: 4 }));
 
     if (_this.config.zoo_permalinks == null) {
         throw new Error(
@@ -301,7 +301,7 @@ export async function makeStandardZooDb(config)
     let schema_validator = new jsonschema.Validator();
 
     debug(`Instantiating ZooDb instance object.`,
-          { ZooDbClass, db_processors: _this.zoodb_processors });
+          debugconfig(debug, { ZooDbClass, db_processors: _this.zoodb_processors }));
 
     //
     // Set up the ZooDb object
