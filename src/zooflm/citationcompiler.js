@@ -399,7 +399,7 @@ export class CitationCompiler
         try {
             json_data = await fsp.readFile(this.cache_file);
         } catch (err) {
-            debug(`Cache file does not exist or error loading cache file`, err);
+            debug(`Cache file does not exist or error loading cache file.  [${err}]`);
         }
         if (json_data == null) {
             return;

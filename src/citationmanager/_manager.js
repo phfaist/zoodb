@@ -90,7 +90,7 @@ export class CitationDatabaseManager
         try {
             json_data = await fsp.readFile(this.cache_file);
         } catch (err) {
-            debug(`Failed to read citations cache file ‘${this.cache_file}’ - maybe it does not exist`, err);
+            debug(`Failed to read citations cache file ‘${this.cache_file}’ - maybe it does not exist.  [${err}]`);
         }
         if (json_data == null) {
             return;

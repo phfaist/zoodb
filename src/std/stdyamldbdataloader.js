@@ -6,6 +6,8 @@ const debug = debug_mod("zoodb.std.stdyamldbloader");
 
 import { YamlDbDataLoader } from '../dbdataloader/yamldb.js';
 
+import { debugconfig } from '../util/debugconfig.js';
+
 
 /**
  * Create a :class:`YamlDbDataLoader` instance using standard settings derived
@@ -58,7 +60,7 @@ export async function makeStandardYamlDbDataLoader(zoodb, config={})
         fs: config.fs ?? zoo_config.fs,
     };
 
-    debug(`Creating a ${DbDataLoaderClass.name} instance with config`, loader_config);
+    debug(`Creating a ${DbDataLoaderClass.name} instance with config`, debugconfig(debug, loader_config));
 
     let yamldb_loader = new DbDataLoaderClass(loader_config);
 

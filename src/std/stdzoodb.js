@@ -5,6 +5,7 @@ import jsonschema from 'jsonschema';
 
 import { ZooDb } from '../_zoodb.js';
 import { SchemaLoader } from '../schemaloader.js';
+import { debugconfig } from '../util/debugconfig.js';
 
 import loMerge from 'lodash/merge.js';
 
@@ -200,13 +201,7 @@ export async function makeStandardZooDb(config)
         config,
     );
 
-    debug(`makeStandardZooDb: Using config =`,
-          _this.config,
-          // stringify .fs property otherwise dumping Node's module in
-          // console is very long
-          // Object.assign({}, _this.config, {fs: `(((${_this.config.fs})))`}),
-         );
-    debug(`StandardZooDb: config's flm_options are =`, _this.config.flm_options);
+    debug(`makeStandardZooDb: Using config =`, debugconfig(debug, _this.config, { level: 4 }));
 
     if (_this.config.zoo_permalinks == null) {
         throw new Error(
