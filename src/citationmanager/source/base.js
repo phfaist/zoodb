@@ -11,6 +11,16 @@ import { timeout, promisify } from '../../util/prify.js';
 import { path_or_url_to_url } from '../../util/url.js';
 
 
+const RETRYABLE_STATUSES = new Set([
+    429, // Too Many Requests
+    503, // Service Unavailable
+    502, // Bad Gateway
+    504, // Gateway Timeout
+    500, // Internal Server Error (optional — see notes)
+]);
+
+
+
 /**
  * Base class for a *citation source*, i.e., an engine that is able to obtain
  * bibliographic citation information based on a citation key.  (E.g., the
@@ -108,6 +118,7 @@ export class CitationSourceBase
                 } },
                 fsRootFilePath: null,
 
+                fetch_max_retries: 10,
                 cache_store_options: {},
             },
             default_options ?? {},
@@ -358,7 +369,7 @@ export class CitationSourceBase
             let path = decodeURIComponent(urlobj.pathname);
             return await this.fsp_readFile(path);
         }
-        const response = await fetch(urlobj.href, fetch_options);
+        const response = await this._fetch(urlobj.href, fetch_options);
         if (get_response_object) {
             return response;
         }
@@ -369,6 +380,61 @@ export class CitationSourceBase
         return await response.text();
     }
 
+    async _fetch(url, options)
+    {
+        const maxRetries = this.options.fetch_max_retries;
+        const sleep = (ms) => { new Promise(resolve => setTimeout(resolve, ms)) };
+
+        let attempt = 0;
+        while (attempt <= maxRetries) {
+            let response;
+
+            try {
+                response = await fetch(url, options);
+            } catch (networkError) {
+                // fetch() itself threw — no response at all (DNS failure, connection refused,
+                // request timeout via AbortController, etc.)
+                if (attempt === maxRetries) {
+                    throw networkError;
+                }
+                const waitMs = this._jittered_backoff(attempt);
+                console.warn(`Network error on attempt ${attempt + 1}: ${networkError.message}. Retrying in ${Math.round(waitMs)}ms…`);
+                await sleep(waitMs);
+                attempt++;
+                continue;
+            }
+
+            if (!RETRYABLE_STATUSES.has(response.status)) {
+                return response; // 2xx, 3xx, 4xx (non-retryable) — caller handles it
+            }
+
+            if (attempt === maxRetries) {
+                throw new Error(`Request failed with ${response.status} after ${maxRetries} retries`);
+            }
+
+            // Honour Retry-After for 429 and 503 (servers sometimes send it for 503 too)
+            const retryAfter = response.headers.get("Retry-After");
+            let waitMs;
+
+            if (retryAfter) {
+                const seconds = Number(retryAfter);
+                waitMs = !isNaN(seconds)
+                    ? seconds * 1000
+                    : Math.max(0, new Date(retryAfter) - Date.now());
+            }
+            if (!waitMs) {
+                waitMs = this._jittered_backoff(attempt);
+            }
+
+            console.warn(`${response.status} received. Retry ${attempt + 1}/${maxRetries} in ${Math.round(waitMs)}ms…`);
+            await sleep(waitMs);
+            attempt++;
+        }
+    }
+
+    _jittered_backoff(attempt, baseMs = 500, capMs = 30_000) {
+        return Math.random() * Math.min(capMs, baseMs * (2 ** attempt));
+    }
 
     // -------------
 
