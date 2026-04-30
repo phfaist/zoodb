@@ -432,8 +432,8 @@ export class CitationSourceBase
         }
     }
 
-    _jittered_backoff(attempt, baseMs = 500, capMs = 30_000) {
-        return Math.random() * Math.min(capMs, baseMs * (2 ** attempt));
+    _jittered_backoff(attempt, baseMs = 750, capMs = 30_000) {
+        return Math.min(capMs, baseMs * (2 ** attempt)) + 2*baseMs*Math.random();
     }
 
     // -------------
