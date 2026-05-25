@@ -426,14 +426,14 @@ export class CitationSourceBase
                 waitMs = this._jittered_backoff(attempt);
             }
 
-            console.warn(`${response.status} received. Retry ${attempt + 1}/${maxRetries} in ${Math.round(waitMs)}ms…`);
+            console.warn(`${response.status} received. Retry ${attempt + 1}/${maxRetries} after ${Math.round(waitMs)}ms…`);
             await sleep(waitMs);
             attempt++;
         }
     }
 
-    _jittered_backoff(attempt, baseMs = 750, capMs = 30_000) {
-        return Math.min(capMs, baseMs * (2 ** attempt)) + 2*baseMs*Math.random();
+    _jittered_backoff(attempt, baseMs = 750, capMs = 30_000, minMs = 3_000) {
+        return Math.max(minMs, Math.min(capMs, baseMs * (2 ** attempt)) + 2*baseMs*Math.random());
     }
 
     // -------------
