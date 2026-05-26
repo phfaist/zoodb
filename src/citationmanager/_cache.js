@@ -29,8 +29,11 @@ function Cache () {
             console.log('caching: %s = %j (@%s)', key, value, time);
         }
 
+        // use time=0 for ephemeral objects that are kept in cache until "purge_expired()" is called.  These
+        // objects are never saved to disk with exportJson().
+
         if (typeof time !== 'undefined' && (typeof time !== 'number' || isNaN(time) || time < 0)) {
-            throw new Error('Cache timeout must be a positive number');
+            throw new Error('Cache timeout must either be a positive number (use 0 for ephemeral objects)');
         }
         //   else if (typeof timeoutCallback !== 'undefined' && typeof timeoutCallback !== 'function') {
         //   throw new Error('Cache timeout callback must be a function');
@@ -45,7 +48,7 @@ function Cache () {
 
         var record = {
             value: value,
-            expire: time + Date.now()
+            expire: (time == 0 ? -1 : time + Date.now()),
         };
 
         // if (!isNaN(record.expire)) {

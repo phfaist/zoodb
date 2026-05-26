@@ -64,7 +64,7 @@ export class CitationSourceArxiv extends CitationSourceBase
             // when using 'GET' method, try to keep the URL length below ~2000 chars, so change the default chunk length:
             chunk_size: (api_get_method !== 'post') ? 100 : 512,
 
-            chunk_retrieve_delay_ms: 3100,
+            chunk_retrieve_delay_ms: 3100, // respect rate limit of 1 request per 3 seconds from arXiv API
             cite_prefix: 'arxiv',
             cache_duration_ms: 10 * 24*3600*1000, // 10 days for arXiv entries by default
         };
