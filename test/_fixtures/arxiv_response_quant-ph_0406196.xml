@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/4wp/+TT28ypFWVzkqFSU4nfDxd4</id>
+  <title>arXiv Query: search_query=&amp;id_list=quant-ph/0406196&amp;start=0&amp;max_results=1</title>
+  <updated>2026-05-26T09:13:58Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=&amp;start=0&amp;max_results=1&amp;id_list=quant-ph/0406196" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>1</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/quant-ph/0406196v5</id>
+    <title>Improved Simulation of Stabilizer Circuits</title>
+    <updated>2008-06-18T19:36:18Z</updated>
+    <link href="https://arxiv.org/abs/quant-ph/0406196v5" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/quant-ph/0406196v5" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  The Gottesman-Knill theorem says that a stabilizer circuit -- that is, a quantum circuit consisting solely of CNOT, Hadamard, and phase gates -- can be simulated efficiently on a classical computer. This paper improves that theorem in several directions. First, by removing the need for Gaussian elimination, we make the simulation algorithm much faster at the cost of a factor-2 increase in the number of bits needed to represent a state. We have implemented the improved algorithm in a freely-available program called CHP (CNOT-Hadamard-Phase), which can handle thousands of qubits easily. Second, we show that the problem of simulating stabilizer circuits is complete for the classical complexity class ParityL, which means that stabilizer circuits are probably not even universal for classical computation. Third, we give efficient algorithms for computing the inner product between two stabilizer states, putting any n-qubit stabilizer circuit into a "canonical form" that requires at most O(n^2/log n) gates, and other useful tasks. Fourth, we extend our simulation algorithm to circuits acting on mixed states, circuits containing a limited number of non-stabilizer gates, and circuits acting on general tensor-product initial states but containing only a limited number of measurements.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2004-06-25T17:57:42Z</published>
+    <arxiv:comment>15 pages. Final version with some minor updates and corrections. Software at http://www.scottaaronson.com/chp</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <arxiv:journal_ref>Phys. Rev. A 70, 052328 (2004) (14 pages)</arxiv:journal_ref>
+    <author>
+      <name>Scott Aaronson</name>
+    </author>
+    <author>
+      <name>Daniel Gottesman</name>
+    </author>
+    <arxiv:doi>10.1103/PhysRevA.70.052328</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1103/PhysRevA.70.052328" title="doi"/>
+  </entry>
+</feed>

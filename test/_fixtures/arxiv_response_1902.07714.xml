@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/cdAha3elg+0AU2fX+J88XUqpti8</id>
+  <title>arXiv Query: search_query=&amp;id_list=1902.07714&amp;start=0&amp;max_results=1</title>
+  <updated>2026-05-26T09:13:49Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=&amp;start=0&amp;max_results=1&amp;id_list=1902.07714" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>1</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/1902.07714v1</id>
+    <title>Continuous symmetries and approximate quantum error correction</title>
+    <updated>2019-02-20T19:00:00Z</updated>
+    <link href="https://arxiv.org/abs/1902.07714v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1902.07714v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quantum error correction and symmetry arise in many areas of physics, including many-body systems, metrology in the presence of noise, fault-tolerant computation, and holographic quantum gravity. Here we study the compatibility of these two important principles. If a logical quantum system is encoded into $n$ physical subsystems, we say that the code is covariant with respect to a symmetry group $G$ if a $G$ transformation on the logical system can be realized by performing transformations on the individual subsystems. For a $G$-covariant code with $G$ a continuous group, we derive a lower bound on the error correction infidelity following erasure of a subsystem. This bound approaches zero when the number of subsystems $n$ or the dimension $d$ of each subsystem is large. We exhibit codes achieving approximately the same scaling of infidelity with $n$ or $d$ as the lower bound. Leveraging tools from representation theory, we prove an approximate version of the Eastin-Knill theorem: If a code admits a universal set of transversal gates and corrects erasure with fixed accuracy, then, for each logical qubit, we need a number of physical qubits per subsystem that is inversely proportional to the error parameter. We construct codes covariant with respect to the full logical unitary group, achieving good accuracy for large $d$ (using random codes) or $n$ (using codes based on $W$-states). We systematically construct codes covariant with respect to general groups, obtaining natural generalizations of qubit codes to, for instance, oscillators and rotors. In the context of the AdS/CFT correspondence, our approach provides insight into how time evolution in the bulk corresponds to time evolution on the boundary without violating the Eastin-Knill theorem, and our five-rotor code can be stacked to form a covariant holographic code.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2019-02-20T19:00:00Z</published>
+    <arxiv:comment>Main text 25 pages, 6 figures; see related work today by Woods and Alhambra</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <arxiv:journal_ref>Phys. Rev. X 10, 041018 (2020)</arxiv:journal_ref>
+    <author>
+      <name>Philippe Faist</name>
+    </author>
+    <author>
+      <name>Sepehr Nezami</name>
+    </author>
+    <author>
+      <name>Victor V. Albert</name>
+    </author>
+    <author>
+      <name>Grant Salton</name>
+    </author>
+    <author>
+      <name>Fernando Pastawski</name>
+    </author>
+    <author>
+      <name>Patrick Hayden</name>
+    </author>
+    <author>
+      <name>John Preskill</name>
+    </author>
+    <arxiv:doi>10.1103/PhysRevX.10.041018</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1103/PhysRevX.10.041018" title="doi"/>
+  </entry>
+</feed>

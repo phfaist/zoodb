@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/iC61eo46JSYfOzwx8fCqS3FBOhU</id>
+  <title>arXiv Query: search_query=&amp;id_list=1310.2984&amp;start=0&amp;max_results=1</title>
+  <updated>2026-05-26T09:13:39Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=&amp;start=0&amp;max_results=1&amp;id_list=1310.2984" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>1</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/1310.2984v3</id>
+    <title>Fault-Tolerant Quantum Computation with Constant Overhead</title>
+    <updated>2014-07-22T19:44:54Z</updated>
+    <link href="https://arxiv.org/abs/1310.2984v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1310.2984v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>What is the minimum number of extra qubits needed to perform a large fault-tolerant quantum circuit? Working in a common model of fault-tolerance, I show that in the asymptotic limit of large circuits, the ratio of physical qubits to logical qubits can be a constant. The construction makes use of quantum low-density parity check codes, and the asymptotic overhead of the protocol is equal to that of the family of quantum error-correcting codes underlying the fault-tolerant protocol.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2013-10-10T23:21:37Z</published>
+    <arxiv:comment>32 pages. v2 has new title, discussion of hyperbolic codes, other minor edits. v3 has additional corrections and clarifications</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Daniel Gottesman</name>
+    </author>
+  </entry>
+</feed>
