@@ -39,9 +39,12 @@ function Cache () {
 
         if (time != null) {
             if (typeof time !== 'number' || isNaN(time) || time < 0) {
-                throw new Error('Cache timeout must either be a positive number (use 0 for ephemeral objects)');
+                throw new Error('Cache timeout must be a positive number (use 0 for ephemeral objects)');
             }
             use_expire = (time == 0 ? -1 : time + Date.now())
+        }
+        if (use_expire == null) {
+            throw new Error('You must specify a cache lifetime in seconds as third argument to put()');
         }
 
         var oldRecord = _cache[key];
