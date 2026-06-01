@@ -24,20 +24,25 @@ function Cache () {
     var _size = 0;
     var _debug = false;
 
-    this.put = function(key, value, time) {
+    this.put = function(key, value, time, expire) { 
+
+        // expire is only used if time is set to undefined or null.
+
         if (_debug) {
-            console.log('caching: %s = %j (@%s)', key, value, time);
+            console.log('caching: %s = %j (@%s)', key, value, time ?? expire);
         }
 
         // use time=0 for ephemeral objects that are kept in cache until "purge_expired()" is called.  These
         // objects are never saved to disk with exportJson().
 
-        if (typeof time !== 'undefined' && (typeof time !== 'number' || isNaN(time) || time < 0)) {
-            throw new Error('Cache timeout must either be a positive number (use 0 for ephemeral objects)');
+        var use_expire = expire;
+
+        if (time != null) {
+            if (typeof time !== 'number' || isNaN(time) || time < 0) {
+                throw new Error('Cache timeout must either be a positive number (use 0 for ephemeral objects)');
+            }
+            use_expire = (time == 0 ? -1 : time + Date.now())
         }
-        //   else if (typeof timeoutCallback !== 'undefined' && typeof timeoutCallback !== 'function') {
-        //   throw new Error('Cache timeout callback must be a function');
-        // }
 
         var oldRecord = _cache[key];
         if (oldRecord) {
@@ -48,7 +53,7 @@ function Cache () {
 
         var record = {
             value: value,
-            expire: (time == 0 ? -1 : time + Date.now()),
+            expire: use_expire,
         };
 
         // if (!isNaN(record.expire)) {
@@ -236,7 +241,8 @@ function Cache () {
                 // but `put` will throw an error if we try to give it `NaN`.
                 remainingTime = remainingTime > 0 ? remainingTime : undefined;
 
-                this.put(key, record.value, remainingTime);
+                // don't risk creating cache differences just because we recalculated the expire tag
+                this.put(key, record.value, null, record.expire); //remainingTime);
             }
         }
 
