@@ -307,6 +307,13 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
                         formatted_ref_flm_text: formatted_ref_flm_text,
                         // target_href might need to be adjusted later on.
                         target_href: this.get_object_target_href(object_type, objid),
+                        // these objects don't carry a counter; pass explicit
+                        // nulls (RefInstance requires all fields, and a missing
+                        // `undefined` would fail the `!== null` guards in
+                        // render_ref_instance).
+                        counter_value: null,
+                        counter_numprefix: null,
+                        counter_formatter_id: null,
                     }))
                 );
             }
@@ -346,6 +353,12 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
                         formatted_ref_flm_text: referenceable_info.formatted_ref_flm_text,
                         // target_href will need to be adjusted later on.
                         target_href: target_href,
+                        // counter info (if any) is supplied by the float/counter
+                        // feature at render time; pass explicit nulls here so the
+                        // fields aren't left `undefined` (see note above).
+                        counter_value: null,
+                        counter_numprefix: null,
+                        counter_formatter_id: null,
                     }))
                 );
             }

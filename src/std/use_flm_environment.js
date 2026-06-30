@@ -115,11 +115,15 @@ export function use_flm_environment(_this)
                 get_ref(ref_type, ref_label, /*resource_info, render_context*/) {
                     debug(`Default ref_resolver called for invalid reference `
                           + `‘${ref_type}:${ref_label}’`);
-                    return RefInstance(
-                        // ref_type, ref_label, formatted_ref_flm_text, target_href
-                        ref_type, ref_label,
-                        '<??>', null
-                    );
+                    return RefInstance($$kw({
+                        ref_type: ref_type,
+                        ref_label: ref_label,
+                        formatted_ref_flm_text: '<??>',
+                        target_href: null,
+                        counter_value: null,
+                        counter_numprefix: null,
+                        counter_formatter_id: null,
+                    }));
                 }
             }
         );
