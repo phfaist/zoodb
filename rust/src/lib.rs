@@ -1,16 +1,44 @@
 //! wasm-bindgen binding of the `autocitefetch` citation retriever for
 //! `@phfaist/zoodb`.
 //!
-//! See `README.md` in this directory and
-//! `dev-docs/AutocitefetchImplementationPlan.md` at the repository root.
-//! This is the WP0 scaffold: it exports `version()` only.
+//! All host I/O — HTTP and bibliography files ([`host::JsFetcher`]), cache
+//! files ([`host::JsCacheFs`]), timers and the clock — is delegated to
+//! JavaScript callbacks passed in the `host` object of
+//! [`CitationManager::open`]. See `README.md` in this directory and section
+//! 7.1 of `dev-docs/AutocitefetchImplementationPlan.md` at the repository
+//! root.
+//!
+//! Modules:
+//!
+//! * [`config`] — the open config: serde spec types + manual extraction of the
+//!   JavaScript objects serde cannot handle;
+//! * [`host`] — `Fetcher`, `CacheFs`, `Clock`, `Timer` over JS callbacks;
+//! * [`sources`] — spec → registered source (`BoxedSource`, `JsSource`,
+//!   prefix and chain-target checks);
+//! * [`formats`] — JSON/YAML parsing of bibliography files;
+//! * [`convert`] — values and errors across the boundary.
 
 #![forbid(unsafe_code)]
 
-// Link the core crate so the alloc-only / wasm32 build is actually exercised.
-use autocitefetch as _;
+mod config;
+mod convert;
+mod formats;
+mod host;
+mod sources;
 
+use std::cell::RefCell;
+use std::rc::Rc;
+
+use js_sys::{Function, Promise};
+use serde::Serialize;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::{JsFuture, future_to_promise};
+
+use autocitefetch::filecache::FileCacheStore;
+use autocitefetch::{CacheStore, Error};
+
+use crate::convert::{csl_to_js, from_js, js_error, to_js};
+use crate::host::{JsCacheFs, JsClock, JsFetcher, JsTimer};
 
 /// Version of this binding crate.
 pub const BINDING_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -36,6 +64,383 @@ pub fn version() -> JsValue {
     obj.into()
 }
 
+#[wasm_bindgen(typescript_custom_section)]
+const TS_TYPES: &'static str = r#"
+export interface OpenConfig {
+  sources: SourceSpec[];
+  host: HostFunctions;
+  /** '/'-separated; must not be empty (use '.'). */
+  cacheDir: string;
+  /** default 'citations' */
+  cacheBase?: string;
+  /** unique per process run */
+  writerId: string;
+  ttlPolicy?: { stalePercent?: number; jitterPercent?: number; graceDays?: number };
+  retry?: { maxRetries?: number; baseMs?: number; capMs?: number; honorRetryAfter?: boolean };
+  maxChainDepth?: number;
+  dropCslFields?: string[];
+  /** default 1000; 0 disables throttling */
+  throttleEventsMs?: number;
+  legacyEntries?: LegacyEntry[];
+}
+
+export interface LegacyEntry { id: string; value: object; expire: number | null }
+
+export interface HostFunctions {
+  fetch(req: HostRequest): Promise<HostResponse>;
+  cacheFs: HostCacheFs;
+  sleep?(ms: number): Promise<void>;
+  now?(): number;
+  onEvent?(ev: ProgressEvent): void;
+}
+
+export interface HostRequest { url: string; method: 'GET' | 'POST'; headers: Record<string, string>; body: Uint8Array | null }
+export interface HostResponse { status: number; headers: Record<string, string>; body: Uint8Array }
+
+export interface HostCacheFs {
+  read(path: string): Promise<Uint8Array | null>;
+  append(path: string, bytes: Uint8Array): Promise<void>;
+  atomicReplace(path: string, bytes: Uint8Array): Promise<void>;
+  list(dir: string): Promise<string[]>;
+  remove(path: string): Promise<void>;
+  lockExclusive(path: string): Promise<HostGuard>;
+  tryLockExclusive(path: string): Promise<HostGuard | null>;
+}
+export interface HostGuard { release(): void }
+
+export type SourceSpec =
+  | { kind: 'arxiv';  prefix: string; chainDoisTo?: string | null; overrideDois?: Record<string, string | null>; chunkSize?: number; minIntervalMs?: number; ttlMs?: number }
+  | { kind: 'doi';    prefix: string; chunkSize?: number; minIntervalMs?: number; ttlMs?: number }
+  | { kind: 'manual'; prefix: string; format: string; chunkSize?: number; minIntervalMs?: number; ttlMs?: number }
+  | { kind: 'bib';    prefix: string; files?: string[]; entries?: Record<string, object>; format?: 'auto' | 'json' | 'yaml'; chunkSize?: number; minIntervalMs?: number; ttlMs?: number }
+  | { kind: 'js';     prefix: string; source: JsSourceObject; chunkSize?: number; minIntervalMs?: number; ttlMs?: number };
+
+export interface JsSourceObject {
+  retrieveChunk(keys: string[], ctx: { prefix: string }): Promise<JsResolution[]>;
+  normalizeKey?(key: string): string;
+  chainsTo?: string[];
+}
+
+export type JsResolution =
+  | { key: string; outcome: 'concrete'; csl: object; ttlMs?: number }
+  | { key: string; outcome: 'chained';  prefix: string; targetKey: string; setProperties?: object }
+  | { key: string; outcome: 'failed';   message: string }
+  | { key: string; outcome: 'missing';  message: string };
+
+export interface CiteFailure { prefix: string; key: string; message: string; origin: [string, string] | null }
+
+export type ProgressEvent = { type: string; [field: string]: unknown };
+"#;
+
+type Manager =
+    autocitefetch::CitationManager<JsFetcher, FileCacheStore<JsCacheFs>, JsClock, JsTimer>;
+
+/// Shared state behind every handle. Methods clone the `Rc` into their
+/// promise, so no `&mut self` crosses an await and no `RefCell` borrow is held
+/// across one.
+struct Inner {
+    manager: Manager,
+    prefixes: Vec<String>,
+    /// `{imported, skipped}` of a `legacyEntries` import (WP1b); `None` when
+    /// none was requested.
+    legacy_import: Option<(u32, u32)>,
+    /// Tail of the FIFO queue serializing the operations that write the store
+    /// (`retrieve`, `prune`, `flush`); see [`Inner::exclusive`].
+    tail: RefCell<Promise>,
+}
+
+/// Releases the next queued operation when dropped.
+struct Turn(Option<Function>);
+
+impl Drop for Turn {
+    fn drop(&mut self) {
+        if let Some(resolve) = self.0.take() {
+            let _ = resolve.call0(&JsValue::UNDEFINED);
+        }
+    }
+}
+
+impl Inner {
+    /// Wait for this operation's turn among the store-writing operations.
+    ///
+    /// `FileCacheStore::flush` deletes this writer's sidecar after folding it,
+    /// so it must not run concurrently with a `put`/`remove` on the same store
+    /// (see the crate's `filecache` docs); two overlapping `retrieve` calls
+    /// from JavaScript would otherwise interleave exactly that way. Reads
+    /// (`get`, `getMany`, `keys`) are served from memory and do not queue, so
+    /// a `js` source may read the manager from inside its `retrieveChunk`.
+    async fn exclusive(&self) -> Turn {
+        let mut release: Option<Function> = None;
+        let gate = Promise::new(&mut |resolve, _reject| release = Some(resolve));
+        let previous = self.tail.replace(gate);
+        let _ = JsFuture::from(previous).await;
+        Turn(release)
+    }
+}
+
+/// A failure as handed to JavaScript (`CiteFailure`).
+#[derive(Serialize)]
+struct FailureOut {
+    prefix: String,
+    key: String,
+    message: String,
+    origin: Option<(String, String)>,
+}
+
+/// The citation manager: resolves `(prefix, key)` citations to CSL-JSON
+/// through the registered sources, cached in `cacheDir/<cacheBase>.jsonl`.
+#[wasm_bindgen]
+pub struct CitationManager {
+    inner: Rc<Inner>,
+}
+
+#[wasm_bindgen]
+impl CitationManager {
+    /// Parse `config`, open the cache, build and register the sources.
+    /// Rejects with an `Error` naming the offending key or source.
+    #[wasm_bindgen(unchecked_return_type = "Promise<CitationManager>")]
+    pub fn open(#[wasm_bindgen(unchecked_param_type = "OpenConfig")] config: JsValue) -> Promise {
+        future_to_promise(
+            async move { open_impl(config).await.map(JsValue::from).map_err(js_error) },
+        )
+    }
+
+    /// The registered citation prefixes, in spec order.
+    #[wasm_bindgen(getter)]
+    pub fn prefixes(&self) -> Vec<String> {
+        self.inner.prefixes.clone()
+    }
+
+    /// Counts of a `legacyEntries` import, or `null` if none was requested.
+    #[wasm_bindgen(
+        getter,
+        js_name = legacyImport,
+        unchecked_return_type = "{ imported: number; skipped: number } | null"
+    )]
+    pub fn legacy_import(&self) -> JsValue {
+        match self.inner.legacy_import {
+            None => JsValue::NULL,
+            Some((imported, skipped)) => {
+                let obj = js_sys::Object::new();
+                let _ = js_sys::Reflect::set(&obj, &"imported".into(), &imported.into());
+                let _ = js_sys::Reflect::set(&obj, &"skipped".into(), &skipped.into());
+                obj.into()
+            }
+        }
+    }
+
+    /// Fetch every missing or stale citation, following chains. Resolves to
+    /// the per-citation failures (never rejects for a bad citation; an
+    /// unregistered prefix is reported as a failure too). Rejects only on a
+    /// cache error or malformed input.
+    #[wasm_bindgen(unchecked_return_type = "Promise<CiteFailure[]>")]
+    pub fn retrieve(
+        &self,
+        #[wasm_bindgen(unchecked_param_type = "[string, string][]")] cites: JsValue,
+    ) -> Promise {
+        let inner = Rc::clone(&self.inner);
+        future_to_promise(async move {
+            let pairs = parse_cites(cites, "retrieve")?;
+            let _turn = inner.exclusive().await;
+            let report = inner
+                .manager
+                .retrieve(&pairs)
+                .await
+                .map_err(|e| js_error(format!("retrieve: {e}")))?;
+            let failures: Vec<FailureOut> = report
+                .failures
+                .into_iter()
+                .map(|f| FailureOut {
+                    prefix: f.prefix,
+                    key: f.key,
+                    message: f.message,
+                    origin: f.origin,
+                })
+                .collect();
+            to_js(&failures).map_err(js_error)
+        })
+    }
+
+    /// Read one citation as a plain CSL-JSON object (chains followed, `id` =
+    /// normalized `prefix:key`). Rejects if it is not in the cache.
+    #[wasm_bindgen(unchecked_return_type = "Promise<object>")]
+    pub fn get(&self, prefix: String, key: String) -> Promise {
+        let inner = Rc::clone(&self.inner);
+        future_to_promise(async move {
+            match inner.manager.get(&prefix, &key).await {
+                Ok(item) => csl_to_js(&item).map_err(|e| js_error(format!("{prefix}:{key}: {e}"))),
+                Err(Error::NotFound(_)) => Err(js_error(format!("{prefix}:{key}: not in cache"))),
+                Err(e) => Err(js_error(format!("{prefix}:{key}: {e}"))),
+            }
+        })
+    }
+
+    /// Read several citations; `null` where a citation is not in the cache
+    /// (or its chain is broken). Rejects only on a cache error.
+    #[wasm_bindgen(js_name = getMany, unchecked_return_type = "Promise<(object | null)[]>")]
+    pub fn get_many(
+        &self,
+        #[wasm_bindgen(unchecked_param_type = "[string, string][]")] cites: JsValue,
+    ) -> Promise {
+        let inner = Rc::clone(&self.inner);
+        future_to_promise(async move {
+            let pairs = parse_cites(cites, "getMany")?;
+            let out = js_sys::Array::new();
+            for (prefix, key) in &pairs {
+                let value = match inner.manager.get(prefix, key).await {
+                    Ok(item) => {
+                        csl_to_js(&item).map_err(|e| js_error(format!("{prefix}:{key}: {e}")))?
+                    }
+                    Err(Error::Store(e)) => {
+                        return Err(js_error(format!("{prefix}:{key}: cache store error: {e}")));
+                    }
+                    Err(_) => JsValue::NULL,
+                };
+                out.push(&value);
+            }
+            Ok(out.into())
+        })
+    }
+
+    /// All cached ids (`prefix:key`, normalized), sorted.
+    #[wasm_bindgen(unchecked_return_type = "Promise<string[]>")]
+    pub fn keys(&self) -> Promise {
+        let inner = Rc::clone(&self.inner);
+        future_to_promise(async move {
+            let entries = inner
+                .manager
+                .store()
+                .entries()
+                .await
+                .map_err(|e| js_error(format!("keys: cache store error: {e}")))?;
+            let ids: Vec<String> = entries.into_iter().map(|(id, _)| id).collect();
+            to_js(&ids).map_err(js_error)
+        })
+    }
+
+    /// Drop entries expired past the grace window; resolves to the number
+    /// removed. Flushes the cache.
+    #[wasm_bindgen(unchecked_return_type = "Promise<number>")]
+    pub fn prune(&self) -> Promise {
+        let inner = Rc::clone(&self.inner);
+        future_to_promise(async move {
+            let _turn = inner.exclusive().await;
+            let removed = inner
+                .manager
+                .prune()
+                .await
+                .map_err(|e| js_error(format!("prune: {e}")))?;
+            Ok(JsValue::from_f64(removed as f64))
+        })
+    }
+
+    /// Compact buffered writes into `cacheDir/<cacheBase>.jsonl`.
+    #[wasm_bindgen(unchecked_return_type = "Promise<void>")]
+    pub fn flush(&self) -> Promise {
+        let inner = Rc::clone(&self.inner);
+        future_to_promise(async move {
+            let _turn = inner.exclusive().await;
+            inner
+                .manager
+                .store()
+                .flush()
+                .await
+                .map_err(|e| js_error(format!("flush: cache store error: {e}")))?;
+            Ok(JsValue::UNDEFINED)
+        })
+    }
+}
+
+fn parse_cites(cites: JsValue, what: &str) -> Result<Vec<(String, String)>, JsValue> {
+    from_js::<Vec<(String, String)>>(cites).map_err(|e| {
+        js_error(format!(
+            "{what}: expected an array of [prefix, key] pairs: {e}"
+        ))
+    })
+}
+
+async fn open_impl(config: JsValue) -> Result<CitationManager, String> {
+    // 1. Parse the config.
+    let cfg = config::parse_open_config(&config)?;
+    let data = cfg.data;
+    let host = cfg.host;
+
+    // 2. Host backends.
+    let fetcher = JsFetcher::new(host.this.clone(), host.fetch.clone());
+    let cache_fs = JsCacheFs::new(host.cache_fs.clone());
+    let clock = JsClock::new(host.this.clone(), host.now.clone());
+    let timer = JsTimer::new(host.this.clone(), host.sleep.clone());
+
+    // 3. The cache store.
+    let store = FileCacheStore::open(
+        cache_fs,
+        data.cache_dir.clone(),
+        data.cache_base(),
+        data.writer_id.clone(),
+    )
+    .await
+    .map_err(|e| format!("citation cache in `{}`: {e}", data.cache_dir))?;
+
+    // 4. Sources.
+    let mut registrations = Vec::with_capacity(cfg.sources.len());
+    for entry in cfg.sources {
+        registrations.push(sources::build(entry.spec, entry.js_source)?);
+    }
+
+    // 5. Validation.
+    sources::check_unique_prefixes(&registrations)?;
+    sources::check_chain_targets(&registrations)?;
+
+    // 6. Legacy import. HOOK (WP1b): `legacy::import(&store, &registrations,
+    //    &ttl_policy, &data.drop_csl_fields, &clock, entries)` then
+    //    `store.flush()`, recording `{imported, skipped}` in `legacy_import`.
+    let legacy_import: Option<(u32, u32)> = None;
+    if cfg.legacy_entries.is_some() {
+        return Err("legacyEntries: not implemented yet (WP1b)".into());
+    }
+
+    // 7. The manager, with policies and dropped fields.
+    let mut manager = Manager::new(fetcher, store, clock, timer);
+    if let Some(spec) = &data.ttl_policy {
+        manager = manager.with_policy(spec.build()?);
+    }
+    if let Some(spec) = &data.retry {
+        manager = manager.with_retry_policy(spec.build()?);
+    }
+    if let Some(depth) = data.max_chain_depth {
+        manager = manager.with_max_chain_depth(depth as usize);
+    }
+    if let Some(fields) = &data.drop_csl_fields {
+        manager = manager.with_dropped_csl_fields(fields.iter().cloned());
+    }
+
+    // Reporter. HOOK (WP1b): when `host.on_event` is set, build a
+    // `JsReporter` calling it, wrap it in `ThrottledReporter::new(reporter,
+    // clock.clone(), data.throttle_events())` unless the gap is zero, and
+    // attach it with `manager = manager.with_reporter(Rc::new(...))`.
+    // (`JsClock` is `Clone` for this purpose; clone it before step 7.) Until
+    // then the event callback and the throttle gap are parsed and ignored.
+    let _ = (&host.on_event, data.throttle_events());
+
+    // 8. Register.
+    let mut prefixes = Vec::with_capacity(registrations.len());
+    for reg in registrations {
+        prefixes.push(reg.prefix.clone());
+        manager = manager
+            .register(reg.prefix.clone(), reg.source)
+            .map_err(|e| format!("citation source `{}:`: {e}", reg.prefix))?;
+    }
+
+    Ok(CitationManager {
+        inner: Rc::new(Inner {
+            manager,
+            prefixes,
+            legacy_import,
+            tail: RefCell::new(Promise::resolve(&JsValue::UNDEFINED)),
+        }),
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -43,6 +448,9 @@ mod tests {
     #[test]
     fn versions_are_set() {
         assert_eq!(BINDING_VERSION, "0.1.0");
-        assert!(AUTOCITEFETCH_VERSION.starts_with("0.1."), "{AUTOCITEFETCH_VERSION}");
+        assert!(
+            AUTOCITEFETCH_VERSION.starts_with("0.1."),
+            "{AUTOCITEFETCH_VERSION}"
+        );
     }
 }

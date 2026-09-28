@@ -97,6 +97,39 @@ Notes carried to known limitations: `atomicReplace` reuses `writeFileAtomic`
 (staging file `.atomicwrite.citations.jsonl.<token>.<n>.tmp`, no fsync);
 `list()` on a custom fs whose `readdir` lacks `withFileTypes` needs `stat`.
 
+### WP1 — The binding crate
+
+Split by the supervisor into WP1a (core: `host.rs`, `config.rs`,
+`convert.rs`, `formats.rs`, `sources.rs`, `lib.rs`) and WP1b (`reporter.rs`,
+`legacy.rs`, events and legacy mocha cases).
+
+**WP1a** (1 implementer round, 1 review round, PASS). Implementer: full
+`CitationManager` class (`open`, `prefixes`, `retrieve`, `get`, `getMany`,
+`keys`, `prune`, `flush`), all five spec kinds, `BoxedSource` with overrides,
+`JsSource`, host backends, formats; 26 host unit tests; 35 mocha cases in
+`test/test_citationmanager_wasm_module.js` (including the two cases moved
+from WP2: single-process run leaves exactly `citations.jsonl`; foreign
+sidecar folded and kept, with the sidecar line obtained from a real flush).
+wasm 588 018 bytes raw, 784 098 bytes base64 (budgets 900 KB / 1.2 MB).
+`yarn test`: 294 passing. Notable implementation choices (all judged within
+7.1 by the reviewer): `retrieve`/`prune`/`flush` are serialized through a
+FIFO promise queue because the crate forbids `flush` concurrent with
+`put`/`remove` (a JS source calling `retrieve`/`prune`/`flush` on the same
+manager from inside `retrieveChunk` would deadlock; only collectors are
+used there); top-level unknown config keys are checked by hand because
+serde-wasm-bindgen does not enforce `deny_unknown_fields` on plain structs;
+failure messages carry the crate's `source error: ` prefix; the crate's
+arXiv source fetches malformed ids (404 → one failure) so the JS-side
+`check_valid_arxiv_id` pre-check remains WP3's; an unregistered prefix is a
+failure entry, not a rejection (the adapter validates first, 7.4).
+
+Reviewer: PASS; every checklist item verified with file:line evidence,
+independent scratch script confirmed chaining, plain objects, persistence
+across two opens with zero fetches, and the exact-`citations.jsonl` layout.
+One should-fix carried into WP1b: host fallbacks (`now()` throwing,
+`sleep()` rejecting, `normalizeKey` throwing) fall back silently; they must
+`console.error`. Note carried into WP1b: document the deadlock case above.
+
 ## Deviations from the brief
 
 1. **Invariant-8 check regex (WP0).** The brief's reviewer grep
