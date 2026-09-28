@@ -303,7 +303,31 @@ real DOI (521ms)`. (Informational; the default suite never touches the
 network: the whole suite passes with `globalThis.fetch` replaced by a
 throwing stub, see WP4.)
 
-(fresh-install simulation and final checks: filled in below when run)
+Fresh-install simulation on the committed state (`git status` clean, no
+stash): `yarn` then `yarn test` without running `yarn build:wasm`, i.e. with
+the committed `src/citationmanager/_wasm/` artifacts: `359 passing (4s)`,
+0 failing.
+
+Final checks (supervisor, 2026-09-28, commit `ebfe55e` + this report):
+
+| Check | Result |
+|---|---|
+| `yarn test` | 359 passing, 0 failing |
+| `yarn lint` | 20 errors, all pre-existing in files outside this work (see Baseline); 0 in `src/citationmanager/`, `tools/`, `flmprocessor.js` |
+| `( cd rust && cargo clippy --all-targets -- -D warnings && cargo test )` | clippy clean; 35 passed, 0 failed |
+| invariant-8 grep (`\bBuffer\b` reading) on `_wasm/*.js`, `_load_wasm.js` | no match |
+| `BUILD_INFO.json` sizes | wasm 603 337 B (≤ 900 KB), base64 804 526 B (≤ 1.2 MB) |
+| `git diff main --name-only` outside section-10 paths | none |
+| `git diff main -- src/std/` non-docstring lines | none |
+| untracked build products | none (`rust/target/`, `doc/_build/`, `.pnp.*` ignored) |
+| opt-in network test | 35 passing (see above) |
+| docs build (`cd doc && poetry run make html`) | succeeded; no warning mentions `citationmanager` |
+
+Definition of done (section 10): 1 all packages reviewed with evidence
+(this report); 2 `yarn test`/`yarn lint` on Node 18/20/22 and the CI
+`rust` job can only be confirmed by CI itself (not run here; local Node is
+23.7); 3 every invariant of section 6 has tests (WP1–WP4 sections above);
+4 scope verified; 5 this report.
 
 ## Deviations from the brief
 
