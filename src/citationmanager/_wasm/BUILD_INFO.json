@@ -1,0 +1,11 @@
+{
+    "binding": {
+        "name": "zoodb-autocitefetch-wasm",
+        "version": "0.1.0"
+    },
+    "autocitefetch": "0.1.0",
+    "wasm_bindgen": "0.2.127",
+    "wasm_size_bytes": 17284,
+    "b64_module_size_bytes": 23122,
+    "build_date": "2026-09-28T09:53:08.290Z"
+}

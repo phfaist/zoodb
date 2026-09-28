@@ -37,3 +37,9 @@ flm-src
 .parcel-cache
 
 COPY_IN_FLM_JS_SOURCES.txt
+
+
+# Rust binding build output (rust/), and throwaway autocitefetch cache files
+rust/target/
+**/._citations*
+_zoodb_TEST_citation_info_cache/

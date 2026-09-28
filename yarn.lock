@@ -211,6 +211,8 @@ __metadata:
     sax: "npm:^1.4.1"
     stream-parser: "npm:^0.3.1"
     url: "npm:^0.11.4"
+  bin:
+    zoodb-migrate-citations-cache: ./tools/migrate_citations_cache.mjs
   languageName: unknown
   linkType: soft
 

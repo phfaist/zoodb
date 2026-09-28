@@ -15,7 +15,11 @@ HTML Documentation with API reference: in `doc/_build/html/index.html` and linke
 - **Test:** `yarn test` (mocha)
 - **Test with debug:** `yarn test-debug` (enables `DEBUG="zoodb*,mocha*"`)
 - **Single test file:** `yarn mocha test/test_<name>.js`
-- **Lint:** `yarn lint` (eslint on `src/**/*.js`)
+- **Lint:** `yarn lint` (eslint on `src/**/*.js` and `tools/*.mjs`)
+- **Build the wasm citation binding:** `yarn build:wasm` (runs `tools/build_wasm.mjs`: builds `rust/` with `wasm-pack` and regenerates `src/citationmanager/_wasm/`)
+- **Rust checks:** `( cd rust && cargo clippy --all-targets -- -D warnings && cargo test )`
+
+Toolchain prerequisites for the Rust binding only (not needed to use or test the package, since the generated module is committed): Rust stable, the `wasm32-unknown-unknown` target (`rustup target add wasm32-unknown-unknown`), and `wasm-pack` (`cargo install wasm-pack`).
 
 ## Architecture
 
@@ -46,6 +50,12 @@ HTML Documentation with API reference: in `doc/_build/html/index.html` and linke
 **Citation Manager (`src/citationmanager/`):** Manages bibliography/citation data. Sources in `source/` fetch from arXiv, DOI, etc.
 
 **Resource Collector (`src/resourcecollector/`):** Handles external resources (images, files) referenced by zoo objects.
+
+**Rust binding (`rust/`):** A standalone cargo package (`zoodb-autocitefetch-wasm`, not a workspace) wrapping the crates.io crate `autocitefetch` for WebAssembly via `wasm-bindgen`; all host I/O is delegated to JavaScript callbacks. `Cargo.lock` is committed; `rust/target/` is gitignored. Never enable `serde_json/std`. See `rust/README.md` and `dev-docs/AutocitefetchImplementationPlan.md`.
+
+**Generated wasm module (`src/citationmanager/_wasm/`):** Output of `yarn build:wasm` (wasm-bindgen glue, `.d.ts`, the `.wasm` inlined as base64, `BUILD_INFO.json`), committed to git. **Do not edit by hand**; regenerate with `yarn build:wasm`. Loaded through the hand-written, environment-neutral `src/citationmanager/_load_wasm.js` (async, memoized). Neither may reference `import.meta`, `require(`, `process.`, `Buffer`, `__dirname`, `node:` or `fs`.
+
+**Tools (`tools/`):** Node-only ESM scripts: `build_wasm.mjs`, and `migrate_citations_cache.mjs` (package bin `zoodb-migrate-citations-cache`).
 
 **Utilities (`src/util/`):** Helpers for field access (`getfield.js`), HTML minification (`sqzhtml.js`), lexicographic sorting, etc.
 

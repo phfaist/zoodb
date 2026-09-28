@@ -1,5 +1,9 @@
 {
-    "ignorePatterns": [ "src/zooflm/_flm-js/*.js", "flm-js-src/flm-js/**/*.js" ],
+    "ignorePatterns": [
+        "src/zooflm/_flm-js/*.js",
+        "flm-js-src/flm-js/**/*.js",
+        "src/citationmanager/_wasm/"
+    ],
     "env": {
         "browser": true,
         "es2021": true
@@ -8,5 +12,15 @@
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module"
-    }
+    },
+    "overrides": [
+        {
+            "files": [
+                "tools/*.mjs"
+            ],
+            "env": {
+                "node": true
+            }
+        }
+    ]
 }

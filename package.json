@@ -26,6 +26,12 @@
         "url": "^0.11.4"
     },
     "main": "./src/index.js",
+    "bin": {
+        "zoodb-migrate-citations-cache": "./tools/migrate_citations_cache.mjs"
+    },
+    "engines": {
+        "node": ">=18"
+    },
     "devDependencies": {
         "eslint": "^9.17.0",
         "mocha": "11.0.2"
@@ -33,7 +39,8 @@
     "scripts": {
         "test": "mocha",
         "test-debug": "DEBUG=\"zoodb*,mocha*\" mocha",
-        "lint": "eslint 'src/**/*.js'"
+        "lint": "ESLINT_USE_FLAT_CONFIG=false eslint 'src/**/*.js' 'tools/*.mjs'",
+        "build:wasm": "node tools/build_wasm.mjs"
     },
     "exports": {
         ".": "./src/index.js",

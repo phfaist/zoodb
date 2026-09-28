@@ -1,0 +1,43 @@
+[package]
+name = "zoodb-autocitefetch-wasm"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.86"
+license = "MIT"
+publish = false
+description = "wasm-bindgen binding of the autocitefetch citation retriever for @phfaist/zoodb"
+build = "build.rs"
+
+[lib]
+crate-type = ["cdylib", "rlib"]     # rlib so `cargo test` can link unit tests on the host
+
+[dependencies]
+autocitefetch = "0.1"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+serde = { version = "1", default-features = false, features = ["alloc", "derive"] }
+# alloc-only, as the crate requires. Do NOT enable `serde_json/std` anywhere:
+# the autocitefetch core is `#![no_std]` and features unify across the build
+# graph, so `std` here would compile it in a configuration it excludes.
+serde_json = { version = "1", default-features = false, features = ["alloc"] }
+serde-wasm-bindgen = "0.6"
+serde_yaml_ng = "0.10"
+hashbrown = { version = "0.15", default-features = false, features = ["default-hasher"] }
+console_error_panic_hook = { version = "0.1", optional = true }
+
+[features]
+default = []
+debug-panics = ["dep:console_error_panic_hook"]
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["-Os"]
+
+[package.metadata.wasm-pack.profile.release.wasm-bindgen]
+omit-default-module-path = true
