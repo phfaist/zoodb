@@ -125,6 +125,42 @@ function merge_arxiv_feeds(xmls)
 
 
 /**
+ * Wrap a mock host's `fetch` (which takes and returns the binding's
+ * `HostRequest`/`HostResponse` objects) into a Fetch-API-compatible function
+ * `(url, init) => Promise<Response>`, suitable for the citation manager's
+ * `fetch` option (`citation_manager_options.fetch`).  Requests are still
+ * recorded in `host.requests`.
+ *
+ * @param {Object} host - An object returned by `make_mock_host()`.
+ * @returns {Function}
+ */
+export function make_mock_fetch_api(host)
+{
+    return async (url, init = {}) => {
+        const headers = {};
+        for (const [k, v] of Object.entries(init.headers ?? {})) {
+            headers[String(k).toLowerCase()] = String(v);
+        }
+        let body = init.body ?? null;
+        if (typeof body === 'string') {
+            body = encoder.encode(body);
+        }
+        const r = await host.fetch({
+            url: String(url),
+            method: String(init.method ?? 'GET').toUpperCase(),
+            headers,
+            body,
+        });
+        const rbody = to_bytes(r.body);
+        return new Response(rbody.length ? rbody : null, {
+            status: r.status,
+            headers: r.headers ?? {},
+        });
+    };
+}
+
+
+/**
  * Create mock host functions for the citation manager binding.
  *
  * @param {Object} [options]

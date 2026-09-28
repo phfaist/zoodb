@@ -1,0 +1,21 @@
+# Preset bibliography used by test/test_citationmanager_manager.js
+# (CitationSourceBibliographyFile).  A mapping of cite keys to CSL-JSON entries.
+
+Doe2021:
+  type: article-journal
+  title: "A Preset Article About Quantum Codes"
+  author:
+    - family: Doe
+      given: Jane
+    - family: Roe
+      given: Richard
+  container-title: Journal of Test Fixtures
+  volume: "12"
+  page: "34-56"
+  issued:
+    date-parts:
+      - [2021, 3, 14]
+
+NielsenChuang:
+  _ready_formatted:
+    flm: "M. A. Nielsen and I. L. Chuang, \\emph{Quantum Computation and Quantum Information} (Cambridge University Press, 2000)"

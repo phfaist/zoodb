@@ -154,6 +154,71 @@ independent script confirmed the node-fs legacy import writes only
 fetches. Note: an `async` `onEvent` that rejects produces an unhandled
 rejection in the host (the contract is a synchronous callback; documented).
 
+### WP3 — Adapter and sources (2 implementer rounds, 2 review rounds, PASS)
+
+Implementer (round 1): `src/citationmanager/_manager.js` rewritten as the
+adapter over the wasm binding (options and behavior per 7.4; sync
+`get_citation_by_id`/`get_citation`/`keys`; async `purge_expired`/
+`save_cache`/`load_cache`; `store_citation*` throw outside a chunk;
+`retrieve_citations` returns failures per D7; legacy-file warning per 7.7;
+D11 progress sink; empty `cache_dir` → `'.'`; `has_default_fetch` check);
+`source/base.js` (subclass protocol kept; `add_retrieve`,
+`add_retrieve_done`, `run`, `_fetch`, `_jittered_backoff` removed and listed
+in the docstring; new `get_autocitefetch_spec`, `_make_js_source`,
+`validate_cite_key`; `fetch_url` over the host fetch with a real retry
+loop); `source/{arxiv,doi,manual,bibliographyfile}.js` as spec carriers
+with unchanged constructors/options (`check_valid_arxiv_id` kept);
+`source/_specutil.js` helper. Tests: `test_citationmanager_manager.js`
+(30 + opt-in network block, which passed once when run with
+`ZOODB_TEST_NETWORK=1`), `test_citationmanager_source_arxiv.js` (12),
+`test_citationmanager_downstream_sources.js` (6; both downstream classes
+copied verbatim, only the import line differs), fixtures `bib_preset.yml`,
+`override_arxiv_dois.yml`, `legacy_cache_downloaded_info.json` (generated
+with the legacy `Cache#exportJson`). `yarn test`: 340 passing; lint 20
+(the 3 errors of the old `_manager.js` are gone; none in
+`src/citationmanager/`).
+
+Design choices (reviewer judged them within 7.4/7.5): the arXiv malformed-id
+pre-check lives in a new `validate_cite_key` hook and yields a D7 failure
+entry with zero requests (the crate does not validate ids); after
+`initialize()` and each retrieve the adapter preloads every cached entry
+into memory under its normalized id so `CitationCompiler.compile_citations(null)`
+keeps working; built-in sources pass `chunkSize`/`minIntervalMs`/`ttlMs`
+only when set explicitly (so DOI spacing is the crate's 1100 ms instead of
+the legacy 1000 ms; arXiv TTL is the crate's 10 d); a throwing
+`run_retrieve_chunk` keeps the entries stored before the throw and marks
+only the remaining keys failed, with the error message in the failure
+entries and on `console.error`.
+
+Reviewer (round 1): PASS; invariants 2–7 and 9 each mapped to test titles
+with line evidence; independent end-to-end script confirmed sync reads,
+exact `citations.jsonl` layout, and a second manager on the same directory
+serving the same `_hash` with zero fetches; confirmed with a fetch-blocking
+preload that only `test/test_std.js` (pre-existing, via
+`test/test_data/dishes.json` citing `arxiv:1211.3141`) touches the network.
+Two should-fix findings sent to a fix round: (1) a source instance reused
+by a second manager skipped `source_initialize_run` (run counter restarted
+at 1); (2) the chain-target error lacked a remedy hint. Also fixed in the
+round: `cache_entry_default_duration_ms` falsy handling restored to the
+legacy `||` semantics (invariant 1); purged entries are now dropped from
+the in-memory map; an arXiv docstring inaccuracy.
+
+Reviewer (round 2): PASS; each fix verified with scratch scripts (source
+reuse across two managers with a second run, colon-containing keys under
+purge, un-awaited purge followed by retrieve as in `flmprocessor.js`). One
+should-fix (the new helper function sat between the class docblock and the
+class, detaching the Sphinx autoclass description) was fixed by the
+supervisor by moving the helper above the docblock. `yarn test`: 344
+passing.
+
+Notes kept as known limitations: a per-source `user_agent` option no longer
+applies to the built-in crate sources (the single host fetch uses the
+manager's `default_user_agent`); `get_response_object: true` returns the
+plain `{status, ok, headers, body, text(), json()}` object of 7.5 rather
+than a Fetch `Response`; the two spellings of one id (requested vs
+normalized) are separate in-memory items with different `_hash` values,
+as in the legacy manager.
+
 ## Deviations from the brief
 
 1. **Invariant-8 check regex (WP0).** The brief's reviewer grep
@@ -193,6 +258,15 @@ rejection in the host (the contract is a synchronous callback; documented).
 1. Confirm the `\bBuffer\b` reading of the invariant-8 grep (deviation 1).
    If the literal regex must hold, the only way is to post-process the
    wasm-bindgen glue in `tools/build_wasm.mjs`.
+2. **Chain-target strictness (WP3).** The binding validates chain targets at
+   `open` (7.1, `check_chain_targets` copied from the pyo3 binding). An
+   arXiv source with its default `chain_to_doi: true` and no `doi` source
+   registered now fails at `initialize()` with an explicit error, whereas
+   the legacy manager failed lazily and only for papers that had a DOI. A
+   configuration `citations.sources: { arxiv: true, doi: false }` therefore
+   needs either `doi: true` or an arXiv instance with `chain_to_doi: false`.
+   Not changed by the supervisor because it is the brief's specified
+   behavior and `src/std/` may only change docstrings (WP4 documents it).
 
 ## Downstream verification (eczoo_sitegen)
 

@@ -2,6 +2,7 @@
 // const debug = debug_module('zoodb.citationmanager.source.doi');
 
 import { CitationSourceBase } from './base.js';
+import { builtin_spec_overrides } from './_specutil.js';
 
 
 const one_day = 1000 * 3600 * 24;
@@ -10,7 +11,20 @@ const one_day = 1000 * 3600 * 24;
 /**
  * Fetch bibliographic citation information from a DOI (cf. https://doi.org/).
  *
- * See :class:`CitationSourceBase` for options.
+ * The retrieval itself is performed by the ``doi`` source of the Rust
+ * ``autocitefetch`` crate (CSL-JSON content negotiation with doi.org, one DOI
+ * per request, at least 1.1 s between two requests, entries cached for 360
+ * days by default).  DOI keys are normalized to lowercase in the cache.  The
+ * ``reference`` field is dropped from the CSL-JSON data (see the citation
+ * manager's ``drop_csl_fields`` option).
+ *
+ * Options ``chunk_retrieve_delay_ms`` and ``cache_duration_ms`` (or
+ * ``cache_store_options.cache_duration_ms``), if specified, override the
+ * crate's defaults; ``chunk_size`` is always 1.  See
+ * :class:`CitationSourceBase` for further options.
+ *
+ * The method ``run_retrieve_chunk()`` of earlier versions was removed (the
+ * crate performs the requests).
  */
 export class CitationSourceDoi extends CitationSourceBase
 {
@@ -37,43 +51,17 @@ export class CitationSourceDoi extends CitationSourceBase
         );
     }
 
-    async run_retrieve_chunk(id_list)
+    /**
+     * Return the ``doi`` source specification for the ``autocitefetch``
+     * citation manager: ``{ kind: 'doi', prefix, chunkSize: 1, ... }``.
+     *
+     * @returns {Promise<Object>}
+     */
+    async get_autocitefetch_spec()
     {
-        if ( id_list.length != 1 ) {
-            throw new Error(`doi run_retrieve_chunk(): can only retrieve one DOI at a time, `
-                            + `requested ${JSON.stringify(id_list)}`);
-        }
-
-        const doi = id_list[0];
-
-        // DOIs cannot contain spaces.  Check and alert the user with a helpful message before
-        // they pull their hair out trying to find why their DOI citation doesn't work.
-        if (/\s/.test(doi)) {
-            throw new Error(`Malformed DOI ‘${doi}’: DOIs cannot contain spaces`);
-        }
-
-        const doi_encoded = encodeURIComponent(doi);
-
-        let response = await this.fetch_url( 'https://doi.org/' + doi_encoded, {
-            get_response_object: true,
-            method: 'get',
-            headers: Object.assign({}, this._get_default_headers(), {
-                // retrieve https://doi.org/<DOI> with Accept: csl+json type-->
-                'Accept': 'application/vnd.citationstyles.csl+json',
-            }),
-        } );
-        if (response.status !== 200) {
-            console.error(`Error while fetching DOI ‘${doi}’ →`, response);
-            throw new Error(`Fetching DOI citation ‘${doi}’ - bad status code.`);
-        }
-
-        let csljsondata = await response.json();
-
-        // clean up the data a bit, we don't need the full list of references (!)
-        csljsondata.reference = [];
-
-        await this.citation_manager.store_citation(
-            this.cite_prefix, doi, csljsondata, this.cache_store_options
+        return Object.assign(
+            { kind: 'doi', prefix: this.cite_prefix, chunkSize: 1 },
+            builtin_spec_overrides(this, { chunk_size: false }),
         );
     }
 
