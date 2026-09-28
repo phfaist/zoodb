@@ -73,7 +73,13 @@ const default_make_resource_processors_graphics_path =
  *   citation fetch requests.
  * - `citations.cache_dir` — directory for the citations disk cache (default:
  *   `'_zoodb_citations_cache'`).  Created automatically unless
- *   `citations.cache_dir_create` is `false`.
+ *   `citations.cache_dir_create` is `false`.  It holds `citations.jsonl`
+ *   (fetched citation information) and `cache_compiled_citations.json`
+ *   (compiled citation text); temporary files named `._citations*` may appear
+ *   there during a build and should be ignored by version control (e.g., a
+ *   `.gitignore` rule `._citations*`).  A legacy
+ *   `cache_downloaded_info.json` file is no longer read; convert it once with
+ *   the `zoodb-migrate-citations-cache` tool.
  * - `citations.cache_entry_default_duration_ms` — cache TTL in milliseconds.
  * - `citations.skip_save_cache` — set to `true` to skip writing the updated
  *   cache to disk.
@@ -81,6 +87,10 @@ const default_make_resource_processors_graphics_path =
  *   instances.  Setting a key to `false` or `null` removes the built-in
  *   source of that name; setting it to `true` keeps the built-in default.
  *   The built-in sources are `'arxiv'`, `'doi'`, `'manual'`, and `'preset'`.
+ *   An enabled `'arxiv'` source chains the DOIs of published arXiv papers to
+ *   the `'doi'` source, so setting `sources.doi` to `false` requires an arXiv
+ *   source instance constructed with `chain_to_doi: false` (e.g.,
+ *   `sources.arxiv: new CitationSourceArxiv({ chain_to_doi: false, ... })`).
  * - `citations.citation_manager_options` — extra options forwarded to the
  *   :class:`CitationDatabaseManager` constructor.
  * - `resources.rename_figure_template` — function ``(accessor) → string``

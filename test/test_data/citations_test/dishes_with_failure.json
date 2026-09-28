@@ -1,0 +1,12 @@
+[
+    {
+        "dish_id": "cited",
+        "name": "Cited dish",
+        "description": "A dish with citations: arXiv \\cite{arxiv:1902.07714}, preset \\cite{preset:Doe2021}, custom \\cite{custom:xyz}."
+    },
+    {
+        "dish_id": "badly_cited",
+        "name": "Badly cited dish",
+        "description": "A dish citing a DOI that does not exist \\cite{doi:10.9999/nonexistent}."
+    }
+]

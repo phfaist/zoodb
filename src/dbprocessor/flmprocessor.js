@@ -48,9 +48,17 @@ import loMerge from 'lodash/merge.js';
  *
  * - ``citations.cache_fs`` — a filesystem object for cache file access.
  *
- * - ``citations.cache_dir`` — directory path for the two citation cache files
- *   (`cache_downloaded_info.json` and `cache_compiled_citations.json`).
- *   Defaults to ``'.'``.
+ * - ``citations.cache_dir`` — directory path for the two citation cache files:
+ *   ``citations.jsonl`` (fetched citation information, written by the
+ *   :class:`CitationDatabaseManager`) and ``cache_compiled_citations.json``
+ *   (compiled citation text, written by the :class:`CitationCompiler`).
+ *   Defaults to ``'.'``.  While citations are being retrieved, temporary files
+ *   named ``._citations*`` may appear in this directory; add a rule
+ *   ``._citations*`` to your ``.gitignore``.  A legacy cache file
+ *   ``cache_downloaded_info.json`` (from earlier versions) is no longer read;
+ *   convert it once with the ``zoodb-migrate-citations-cache`` tool
+ *   (``tools/migrate_citations_cache.mjs``), otherwise all citations are
+ *   fetched again.
  *
  * - ``citations.cache_entry_default_duration_ms`` — how long fetched citation
  *   information remains valid in the cache (milliseconds).
@@ -62,7 +70,12 @@ import loMerge from 'lodash/merge.js';
  *   directly to :class:`CitationDatabaseManager`.
  *
  * - ``flm_error_policy`` — ``'abort'`` (default) or ``'continue'``.
- *   Controls behaviour when an FLM compilation error occurs.
+ *   Controls behaviour when an FLM compilation error occurs.  It also applies
+ *   to citations that cannot be retrieved: with ``'abort'``, zoo processing
+ *   fails with an error listing them (before any citation is compiled); with
+ *   ``'continue'``, the failures are reported (see
+ *   :meth:`CitationDatabaseManager.retrieve_citations`), the citations that
+ *   could be retrieved are compiled, and processing continues.
  *
  * - ``skip_check_update_existing_citations`` — when `true`, citations already
  *   present in the environment's citations provider are not re-fetched or
@@ -147,10 +160,9 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
             this.citation_manager = new CitationDatabaseManager(
                 this.options.citations.sources,
                 {
-                    default_user_agent: this.options.citations.default_user_agent,
                     cache_fs: this.options.citations.cache_fs,
-                    cache_file: path.join(this.options.citations.cache_dir,
-                                        'cache_downloaded_info.json'),
+                    cache_dir: this.options.citations.cache_dir,
+                    default_user_agent: this.options.citations.default_user_agent,
                     cache_entry_default_duration_ms:
                         this.options.citations.cache_entry_default_duration_ms,
                     skip_save_cache: this.options.citations.skip_save_cache,
@@ -401,19 +413,43 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
         }
 
         // make sure we purge any entries from earlier possible zoo processings
-        this.citation_manager.purge_expired();
+        await this.citation_manager.purge_expired();
 
         try {
 
-            await this.citation_manager.retrieve_citations( new_citations_to_compile );
+            // Citations that cannot be retrieved do not make
+            // retrieve_citations() throw; it returns them (and reports them
+            // along with where they were encountered).
+            const failures = await this.citation_manager.retrieve_citations(
+                new_citations_to_compile
+            );
 
-            //     // citations database ready
-            //     debug("Citation database ready!")
+            if (failures.length && this.options.flm_error_policy !== 'continue') {
+                const failed_ids = failures.map(
+                    ({ prefix, key, origin }) => (origin ?? [prefix, key]).join(':')
+                );
+                throw new Error(
+                    `${failures.length} citation(s) could not be retrieved: `
+                    + failed_ids.join(', ')
+                );
+            }
+
+            let citations_to_compile = new_citations_to_compile;
+            if (failures.length) {
+                // flm_error_policy is 'continue' -- compile those citations
+                // that were successfully retrieved
+                citations_to_compile = new_citations_to_compile.filter(
+                    ({ cite_prefix, cite_key }) =>
+                        this._has_retrieved_citation(cite_prefix, cite_key)
+                );
+                debug(`${failures.length} citation(s) could not be retrieved; `
+                      + `compiling the ${citations_to_compile.length} other one(s)`);
+            }
 
             debug('Compiling citations ...');
 
             this.citation_compiler.compile_citations(
-                new_citations_to_compile
+                citations_to_compile
             );
 
             this.zoo_flm_environment.citations_provider.update_citations(
@@ -429,6 +465,16 @@ export class ZooFLMProcessor extends ZooDbProcessorBase
             } else {
                 throw err;
             }
+        }
+    }
+
+    _has_retrieved_citation(cite_prefix, cite_key)
+    {
+        try {
+            this.citation_manager.get_citation(cite_prefix, cite_key);
+            return true;
+        } catch {
+            return false;
         }
     }
 

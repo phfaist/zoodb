@@ -219,6 +219,49 @@ than a Fetch `Response`; the two spellings of one id (requested vs
 normalized) are separate in-memory items with different `_hash` values,
 as in the legacy manager.
 
+### WP4 — Integration (2 implementer rounds, 1 review round, PASS)
+
+Implementer (round 1): `src/dbprocessor/flmprocessor.js` per 7.6 (manager
+built with `cache_dir` instead of `cache_file`; `citation_manager_options`
+still spread last; `purge_expired()` awaited; failures per D7: abort
+before compiling with `N citation(s) could not be retrieved: prefix:key…`
+using origin attribution, or compile the successes under `'continue'`;
+docstring updated). `src/std/use_flm_processor.js` and `src/std/stdzoodb.js`:
+docstrings only (file names, `._citations*` rule, migration tool, and a
+note that `sources.doi: false` needs an arXiv instance with
+`chain_to_doi: false`). Supervisor's invariant-1 check on the diff: no
+non-comment line changed in `src/std/`; `flmprocessor.js` only swaps
+`cache_file` for `cache_dir`. `tools/migrate_citations_cache.mjs` per 7.7
+(parseArgs, defaults, `js` kind for unknown prefixes, `--dry-run` on the
+memory cache fs, refusal without `--force`, `--remove-legacy`, exit codes
+0/1/2, runs under plain `node`); `tools/README.md`. Tests:
+`test_tools_migrate_citations_cache.js` (12, child process; the fixture
+yields `imported 7, skipped 1`), `test_dbprocessor_flmprocessor_citations.js`
+(3: full standard zoo with the four built-in sources plus a custom JS
+source through a mock fetch, abort policy, continue policy). `test_std.js`
+made offline by routing `citation_manager_options.fetch` through the mock
+host and switching the citation in `test/test_data/dishes.json` from
+`arxiv:1211.3141` (no fixture) to `arxiv:1902.07714`. The whole suite
+passes with `globalThis.fetch` replaced by a throwing stub (359 passing).
+Lint unchanged (20).
+
+Reviewer: PASS; invariant 1 re-read from the diff (`git diff main --
+src/std/` has no non-comment line); D7 handling verified including an
+unregistered prefix under both policies (throws immediately under abort,
+swallowed by the pre-existing catch under `'continue'`, as before);
+end-to-end tool run under plain `node` (exactly `citations.jsonl` plus the
+legacy file; no `_hash`/`reference` in the output; refusal/`--force`/
+`--dry-run`/`--remove-legacy` behave as specified). Deviation accepted:
+the abort condition is `flm_error_policy !== 'continue'` (matches the
+existing catch block; identical behavior for `'abort'`/`'continue'`).
+One should-fix, fixed in a second implementer round: the tool test's
+expectations depended on the fixture's absolute expiry dates (March
+2030); the test now rewrites the `expire` values of its temp copy relative
+to the current time (the shared fixture is unchanged). Notes: for a
+chained failure the abort message lists the origin id only (the adapter's
+per-failure `console.error` gives the target); a missing legacy file exits
+1 (usage error), not 2.
+
 ## Deviations from the brief
 
 1. **Invariant-8 check regex (WP0).** The brief's reviewer grep

@@ -1,0 +1,7 @@
+[
+    {
+        "dish_id": "cited",
+        "name": "Cited dish",
+        "description": "A dish with citations: arXiv \\cite{arxiv:1902.07714}, DOI \\cite{doi:10.1103/physrevx.10.041018}, manual \\cite{manual:{A. Author, \\emph{Some Manual Book} (2020)}}, preset \\cite{preset:Doe2021}, custom \\cite{custom:xyz}."
+    }
+]

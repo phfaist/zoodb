@@ -31,6 +31,9 @@ import { use_flm_processor } from '../src/std/use_flm_processor.js';
 import { makeStandardZooDb } from '../src/std/stdzoodb.js';
 import { makeStandardYamlDbDataLoader } from '../src/std/stdyamldbdataloader.js';
 
+// citations are served from test/_fixtures/ (no network)
+import { make_mock_host, make_mock_fetch_api } from './_helpers/citation_mock_host.js';
+
 
 
 
@@ -42,6 +45,8 @@ import { makeStandardYamlDbDataLoader } from '../src/std/stdyamldbdataloader.js'
 
 async function createMyZooDb()
 {
+    const citations_mock_host = make_mock_host();
+
     const config = {
         fs: fs,
         fs_data_dir: test_data_dir,
@@ -70,6 +75,11 @@ async function createMyZooDb()
                 // default_user_agent: null,
                 cache_dir: '_zoodb_TEST_citation_info_cache',
                 skip_save_cache: true,
+                citation_manager_options: {
+                    fetch: make_mock_fetch_api(citations_mock_host),
+                    sleep: citations_mock_host.sleep,
+                    now: citations_mock_host.now,
+                },
             },
 
             environment_options: {

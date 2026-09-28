@@ -72,8 +72,10 @@ import loMerge from 'lodash/merge.js';
  *   pre-load.  Consumed by `use_flm_processor.js`.
  * - `citations.default_user_agent` — HTTP User-Agent string for citation HTTP
  *   requests.  Consumed by `use_flm_processor.js`.
- * - `citations.cache_dir` — directory for citation cache files (default:
- *   `'_zoodb_citations_cache'`).  Consumed by `use_flm_processor.js`.
+ * - `citations.cache_dir` — directory for citation cache files
+ *   `citations.jsonl` and `cache_compiled_citations.json` (default:
+ *   `'_zoodb_citations_cache'`); temporary files `._citations*` in it should
+ *   be ignored by version control.  Consumed by `use_flm_processor.js`.
  * - `citations.cache_dir_create` — whether to auto-create `cache_dir` (default:
  *   `true`).  Consumed by `use_flm_processor.js`.
  * - `citations.cache_entry_default_duration_ms` — cache TTL in milliseconds.
