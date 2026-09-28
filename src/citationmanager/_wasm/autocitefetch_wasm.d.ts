@@ -27,6 +27,7 @@ export interface HostFunctions {
     cacheFs: HostCacheFs;
     sleep?(ms: number): Promise<void>;
     now?(): number;
+    /** synchronous; must not throw (exceptions are logged with console.error and ignored) */
     onEvent?(ev: ProgressEvent): void;
 }
 
@@ -51,6 +52,19 @@ export type SourceSpec =
 | { kind: 'bib';    prefix: string; files?: string[]; entries?: Record<string, object>; format?: 'auto' | 'json' | 'yaml'; chunkSize?: number; minIntervalMs?: number; ttlMs?: number }
 | { kind: 'js';     prefix: string; source: JsSourceObject; chunkSize?: number; minIntervalMs?: number; ttlMs?: number };
 
+/**
+ * A citation source implemented in JavaScript (`kind: 'js'`).
+ *
+ * `retrieveChunk` must return one resolution per key (keys left out are
+ * reported as `missing`); a rejection fails every key of the chunk.
+ * `normalizeKey` defaults to trimming; if it throws or returns a non-string,
+ * the trimmed key is used and the problem is logged with `console.error`.
+ *
+ * Re-entrancy: `retrieveChunk` runs inside the manager's `retrieve()`. It may
+ * call `get`, `getMany` and `keys` on the same manager, but must NOT call
+ * `retrieve`, `prune` or `flush` on it: those are serialized behind the
+ * running `retrieve()` and awaiting one from here would deadlock.
+ */
 export interface JsSourceObject {
     retrieveChunk(keys: string[], ctx: { prefix: string }): Promise<JsResolution[]>;
     normalizeKey?(key: string): string;
@@ -65,7 +79,38 @@ export type JsResolution =
 
 export interface CiteFailure { prefix: string; key: string; message: string; origin: [string, string] | null }
 
-export type ProgressEvent = { type: string; [field: string]: unknown };
+/** What a `wait_started` / `wait_finished` event is waiting for. */
+export type ProgressWait =
+| { wait: 'rate_limit'; prefix: string }
+| { wait: 'backoff'; url: string; attempt: number }
+| { wait: 'cache_flush' }
+| { wait: 'unknown' };
+
+/**
+ * A progress event handed to `host.onEvent` (synchronously; the callback's
+ * return value is ignored and anything it throws is logged with
+ * `console.error` and otherwise ignored). Same snake_case vocabulary as the
+ * Python binding. Unless `throttleEventsMs` is 0, `source_progress` events
+ * are throttled to one per `throttleEventsMs` (default 1000) per prefix; all
+ * other events are always delivered. `attempt` is 0-based.
+ */
+export type ProgressEvent =
+| { type: 'retrieve_started'; cites: number }
+| { type: 'pass_started'; pass: number; cached: number; to_fetch: number }
+| { type: 'pass_finished'; pass: number; discovered: number }
+| { type: 'retrieve_finished'; considered: number; failed: number }
+| { type: 'source_started'; prefix: string; keys: number; chunks: number }
+| { type: 'source_progress'; prefix: string; done: number; total: number }
+| { type: 'source_finished'; prefix: string; done: number }
+| { type: 'cite_resolved'; prefix: string; key: string; how: 'concrete' }
+| { type: 'cite_resolved'; prefix: string; key: string; how: 'chained'; target: [string, string] }
+| { type: 'cite_failed'; prefix: string; key: string; message: string; grace_served: boolean }
+| ({ type: 'wait_started'; expected_ms: number | null } & ProgressWait)
+| ({ type: 'wait_finished' } & ProgressWait)
+| { type: 'request_started'; url: string; attempt: number }
+| { type: 'request_finished'; url: string; status: number }
+| { type: 'request_finished'; url: string; error: string }
+| { type: 'unknown' };
 
 
 

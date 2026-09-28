@@ -53,3 +53,13 @@ cargo test
 - The optional feature `debug-panics` installs `console_error_panic_hook` at
   module start.
 - `target/` is gitignored.
+- Progress events: with `host.onEvent`, `src/reporter.rs` hands one plain
+  object per crate `Event` to the callback (snake_case shapes of the Python
+  binding, appendix B of the brief), synchronously; exceptions are logged
+  with `console.error` and ignored. `source_progress` samples are throttled
+  per prefix by the crate's `ThrottledReporter` (`throttleEventsMs`, default
+  1000; 0 disables). Without `onEvent` no reporter is installed.
+- Legacy import: `legacyEntries` (produced by
+  `tools/migrate_citations_cache.mjs`) are converted by `src/legacy.rs` into
+  `CacheRecord`s written by the crate's `FileCacheStore` (section 7.7 of the
+  brief); `legacyImport` reports `{ imported, skipped }`.

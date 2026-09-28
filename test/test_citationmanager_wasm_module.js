@@ -93,6 +93,28 @@ function make_tmp_dir()
 }
 
 
+/** Replace `console.error` by a recorder while `fn` runs; returns the recorded calls. */
+async function with_console_error_stub(fn)
+{
+    const calls = [];
+    const orig = console.error;
+    console.error = (...args) => { calls.push(args); };
+    try {
+        await fn(calls);
+    } finally {
+        console.error = orig;
+    }
+    return calls;
+}
+
+const EVENT_TYPES = new Set([
+    'retrieve_started', 'pass_started', 'pass_finished', 'retrieve_finished',
+    'source_started', 'source_progress', 'source_finished',
+    'cite_resolved', 'cite_failed', 'wait_started', 'wait_finished',
+    'request_started', 'request_finished', 'unknown',
+]);
+
+
 describe('autocitefetch wasm module', function () {
 
     this.timeout(10000);
@@ -540,17 +562,20 @@ describe('autocitefetch wasm module', function () {
             assert.ok(!Object.hasOwn(item, 'reference'));
             await mgr.flush();
             assert.ok(mock.cacheFs.export().has('/cache/mycites.jsonl'));
-            // onEvent is accepted (events: WP1b)
+            // onEvent is accepted (events are tested under "progress events")
             const cfg = config_of(mock, ARXIV_DOI_SPECS);
             cfg.host.onEvent = () => {};
             await wasm.CitationManager.open(cfg);
         });
 
-        it('legacyEntries is not implemented yet', async function () {
+        it('legacyEntries: [] imports nothing and reports zero counts', async function () {
             const mock = make_mock_host();
+            const mgr = await wasm.CitationManager.open(config_of(mock, ARXIV_DOI_SPECS, { legacyEntries: [] }));
+            assert.ok(is_plain_object(mgr.legacyImport));
+            assert.deepStrictEqual(mgr.legacyImport, { imported: 0, skipped: 0 });
             await assert_rejects_with(
-                wasm.CitationManager.open(config_of(mock, ARXIV_DOI_SPECS, { legacyEntries: [] })),
-                /legacyEntries: not implemented yet \(WP1b\)/
+                wasm.CitationManager.open(config_of(mock, ARXIV_DOI_SPECS, { legacyEntries: {} })),
+                /legacyEntries.*array/
             );
         });
 
@@ -709,6 +734,353 @@ describe('autocitefetch wasm module', function () {
             assert.ok(main.includes('"custom:mine"'), main);
             assert.strictEqual(fs.readFileSync(foreign, 'utf-8'), entry_line[0] + '\n');
             assert.strictEqual((await mgr.get('custom', 'foreign')).title, 'Title foreign');
+        });
+    });
+
+    describe('progress events (onEvent)', function () {
+
+        function open_with_events(mock, specs, extra = {}) {
+            const events = [];
+            const cfg = config_of(mock, specs, extra);
+            cfg.host.onEvent = (ev) => { events.push(ev); };
+            return wasm.CitationManager.open(cfg).then( (mgr) => ({ mgr, events }) );
+        }
+
+        const of_type = (events, type) => events.filter( (e) => e.type === type );
+
+        it('events have the appendix-B shapes (throttleEventsMs: 0)', async function () {
+            const mock = make_mock_host();
+            const { mgr, events } = await open_with_events(mock, ARXIV_DOI_SPECS, { throttleEventsMs: 0 });
+            assert.strictEqual(events.length, 0, 'open emits nothing');
+            assert.deepStrictEqual(await mgr.retrieve([['arxiv', '1902.07714']]), []);
+
+            for (const ev of events) {
+                assert.ok(is_plain_object(ev), `not a plain object: ${ev}`);
+                assert.ok(EVENT_TYPES.has(ev.type), `unexpected type ${ev.type}`);
+            }
+            assert.deepStrictEqual(events[0], { type: 'retrieve_started', cites: 1 });
+            assert.deepStrictEqual(events[events.length - 1],
+                                   { type: 'retrieve_finished', considered: 2, failed: 0 });
+
+            const passes = of_type(events, 'pass_started');
+            assert.deepStrictEqual(passes[0], { type: 'pass_started', pass: 1, cached: 0, to_fetch: 1 });
+            assert.deepStrictEqual(of_type(events, 'pass_finished')[0],
+                                   { type: 'pass_finished', pass: 1, discovered: 1 });
+
+            for (const prefix of ['arxiv', 'doi']) {
+                assert.deepStrictEqual(
+                    of_type(events, 'source_started').find( (e) => e.prefix === prefix ),
+                    { type: 'source_started', prefix, keys: 1, chunks: 1 }
+                );
+                assert.deepStrictEqual(
+                    of_type(events, 'source_progress').find( (e) => e.prefix === prefix ),
+                    { type: 'source_progress', prefix, done: 1, total: 1 }
+                );
+                assert.deepStrictEqual(
+                    of_type(events, 'source_finished').find( (e) => e.prefix === prefix ),
+                    { type: 'source_finished', prefix, done: 1 }
+                );
+            }
+
+            const resolved = of_type(events, 'cite_resolved');
+            const r_arxiv = resolved.find( (e) => e.prefix === 'arxiv' );
+            assert.deepStrictEqual(r_arxiv, {
+                type: 'cite_resolved', prefix: 'arxiv', key: '1902.07714', how: 'chained',
+                target: ['doi', DOI_1902],
+            });
+            assert.ok(Array.isArray(r_arxiv.target));
+            assert.deepStrictEqual(resolved.find( (e) => e.prefix === 'doi' ), {
+                type: 'cite_resolved', prefix: 'doi', key: DOI_1902, how: 'concrete',
+            });
+
+            const req_started = of_type(events, 'request_started');
+            const req_finished = of_type(events, 'request_finished');
+            assert.strictEqual(req_started.length, 2);
+            assert.strictEqual(req_finished.length, 2);
+            for (const e of req_started) {
+                assert.deepStrictEqual(Object.keys(e).sort(), ['attempt', 'type', 'url']);
+                assert.strictEqual(typeof e.url, 'string');
+                assert.strictEqual(e.attempt, 0);
+            }
+            for (const e of req_finished) {
+                assert.deepStrictEqual(Object.keys(e).sort(), ['status', 'type', 'url']);
+                assert.strictEqual(e.status, 200);
+            }
+            assert.ok(req_started.some( (e) => e.url.includes('export.arxiv.org') ));
+            assert.ok(req_finished.some( (e) => e.url.includes('doi.org') ));
+
+            // each source runs once, so no rate-limit wait; the manager flushes at the end
+            assert.deepStrictEqual(of_type(events, 'wait_started'),
+                                   [{ type: 'wait_started', wait: 'cache_flush', expected_ms: null }]);
+            assert.deepStrictEqual(of_type(events, 'wait_finished'),
+                                   [{ type: 'wait_finished', wait: 'cache_flush' }]);
+        });
+
+        it('rate-limit waits carry prefix and expected_ms', async function () {
+            const mock = make_mock_host();
+            const { mgr, events } = await open_with_events(mock, [{ kind: 'doi', prefix: 'doi' }],
+                                                           { throttleEventsMs: 0 });
+            // chunk size 1: the second DOI waits for the source's 1100 ms interval
+            await mgr.retrieve([['doi', DOI_1902], ['doi', '10.1/nope']]);
+            assert.deepStrictEqual(
+                of_type(events, 'wait_started').find( (e) => e.wait === 'rate_limit' ),
+                { type: 'wait_started', wait: 'rate_limit', prefix: 'doi', expected_ms: 1100 }
+            );
+            assert.deepStrictEqual(
+                of_type(events, 'wait_finished').find( (e) => e.wait === 'rate_limit' ),
+                { type: 'wait_finished', wait: 'rate_limit', prefix: 'doi' }
+            );
+            assert.deepStrictEqual(mock.sleeps, [1100]);
+        });
+
+        it('a failing key produces cite_failed', async function () {
+            const mock = make_mock_host();
+            const { mgr, events } = await open_with_events(mock, [{ kind: 'doi', prefix: 'doi' }],
+                                                           { throttleEventsMs: 0 });
+            const failures = await mgr.retrieve([['doi', '10.1/nope']]);
+            assert.strictEqual(failures.length, 1);
+            const failed = of_type(events, 'cite_failed');
+            assert.strictEqual(failed.length, 1);
+            assert.deepStrictEqual(Object.keys(failed[0]).sort(),
+                                   ['grace_served', 'key', 'message', 'prefix', 'type']);
+            assert.strictEqual(failed[0].prefix, 'doi');
+            assert.strictEqual(failed[0].key, '10.1/nope');
+            assert.strictEqual(typeof failed[0].message, 'string');
+            assert.ok(failed[0].message.length > 0);
+            assert.strictEqual(failed[0].grace_served, false);
+            assert.deepStrictEqual(of_type(events, 'request_finished').map( (e) => e.status ), [404]);
+            assert.deepStrictEqual(events[events.length - 1],
+                                   { type: 'retrieve_finished', considered: 1, failed: 1 });
+        });
+
+        it('a throwing onEvent does not break the retrieve and is logged', async function () {
+            const mock = make_mock_host();
+            let n = 0;
+            const cfg = config_of(mock, ARXIV_DOI_SPECS);
+            cfg.host.onEvent = () => { n += 1; throw new Error('display broke'); };
+            const calls = await with_console_error_stub(async () => {
+                const mgr = await wasm.CitationManager.open(cfg);
+                assert.deepStrictEqual(await mgr.retrieve([['arxiv', '1902.07714']]), []);
+                assert.strictEqual((await mgr.get('arxiv', '1902.07714')).arxivid, '1902.07714');
+            });
+            assert.ok(n > 0);
+            assert.strictEqual(calls.length, n, 'one console.error per throwing call');
+            assert.match(String(calls[0][0]), /onEvent.*retrieve_started.*display broke/);
+        });
+
+        it('default throttling drops only repeated source_progress samples', async function () {
+            // The crate's ThrottledReporter rate-limits only *sample* events
+            // (source_progress, keyed by prefix) to one per throttleEventsMs
+            // (default 1000 ms) on the host clock; every milestone passes. The
+            // mock clock stands still, so after the first source_progress of a
+            // prefix the others are dropped; source_finished still carries the
+            // final count.
+            const specs = () => [
+                { kind: 'js', prefix: 'custom', source: js_source(concrete_for_all).source,
+                  chunkSize: 1, minIntervalMs: 0 },
+            ];
+            const cites = [['custom', 'a'], ['custom', 'b'], ['custom', 'c']];
+
+            const unthrottled = await open_with_events(make_mock_host(), specs(), { throttleEventsMs: 0 });
+            assert.deepStrictEqual(await unthrottled.mgr.retrieve(cites), []);
+            const throttled = await open_with_events(make_mock_host(), specs());
+            assert.deepStrictEqual(await throttled.mgr.retrieve(cites), []);
+
+            assert.deepStrictEqual(of_type(unthrottled.events, 'source_progress').map( (e) => e.done ),
+                                   [1, 2, 3]);
+            assert.deepStrictEqual(of_type(throttled.events, 'source_progress').map( (e) => e.done ),
+                                   [1]);
+            // everything else is identical
+            const milestones = (evs) => evs.filter( (e) => e.type !== 'source_progress' );
+            assert.deepStrictEqual(milestones(throttled.events), milestones(unthrottled.events));
+            for (const type of ['retrieve_started', 'pass_started', 'source_started', 'source_finished',
+                                'cite_resolved', 'pass_finished', 'retrieve_finished']) {
+                assert.ok(of_type(throttled.events, type).length > 0, type);
+            }
+            assert.deepStrictEqual(of_type(throttled.events, 'source_finished'),
+                                   [{ type: 'source_finished', prefix: 'custom', done: 3 }]);
+            assert.strictEqual(of_type(throttled.events, 'cite_resolved').length, 3);
+        });
+    });
+
+    describe('legacyEntries import', function () {
+
+        const NOW = 1_700_000_000_000;
+        const DAY = 24 * 3600 * 1000;
+
+        // A small legacy cache (the `cache_downloaded_info.json` shape), turned
+        // into `legacyEntries` as the migration tool does.
+        const legacy_cache = {
+            'arxiv:1310.2984': {
+                value: { id: 'arxiv:1310.2984', _hash: 'deadbeef', type: 'article',
+                         title: 'Legacy arXiv title', arxivid: '1310.2984',
+                         reference: [{ key: 'r1' }] },
+                expire: NOW + 10 * DAY,
+            },
+            'arxiv:1902.07714': {
+                value: { chained: { cite_prefix: 'doi', cite_key: DOI_1902_ARXIV,
+                                    set_properties: { arxivid: '1902.07714' } } },
+                expire: NOW + 5 * DAY,
+            },
+            [`doi:${DOI_1902_ARXIV}`]: {
+                value: { id: `doi:${DOI_1902_ARXIV}`, _hash: 'cafe', type: 'article-journal',
+                         DOI: DOI_1902_ARXIV, title: 'Legacy DOI title' },
+                expire: 'NaN',
+            },
+            'doi:10.1/expired': {
+                value: { id: 'doi:10.1/expired', title: 'Old' },
+                expire: NOW - 1000,
+            },
+            'nope:thing': {
+                value: { id: 'nope:thing', title: 'Unknown prefix' },
+                expire: NOW + DAY,
+            },
+        };
+        const legacy_entries = () => [
+            ...Object.entries(legacy_cache).map( ([id, { value, expire }]) => ({
+                id, value: structuredClone(value), expire: (expire === 'NaN') ? null : expire,
+            }) ),
+            'not an object',
+            { id: 'nocolon', value: { title: 'x' }, expire: null },
+        ];
+
+        function open_legacy(mock, extra = {}) {
+            return wasm.CitationManager.open(config_of(mock, ARXIV_DOI_SPECS, {
+                dropCslFields: ['reference'],
+                ...extra,
+            }));
+        }
+
+        it('imports entries readable by get, persists them, and keeps existing ids', async function () {
+            const mock = make_mock_host({ now: NOW });
+            const mgr = await open_legacy(mock, { legacyEntries: legacy_entries() });
+            assert.ok(is_plain_object(mgr.legacyImport));
+            assert.deepStrictEqual(mgr.legacyImport, { imported: 3, skipped: 4 });
+            assert.strictEqual(mock.requests.length, 0);
+            // open flushed: the committed file exists, written by the crate
+            assert.ok(mock.cacheFs.export().has('/cache/citations.jsonl'));
+
+            const a = await mgr.get('arxiv', '1310.2984');
+            assert.ok(is_plain_object(a));
+            assert.strictEqual(a.id, 'arxiv:1310.2984');
+            assert.strictEqual(a.title, 'Legacy arXiv title');
+            assert.ok(!Object.hasOwn(a, '_hash'));
+            assert.ok(!Object.hasOwn(a, 'reference'));
+
+            const c = await mgr.get('arxiv', '1902.07714');
+            assert.strictEqual(c.id, 'arxiv:1902.07714');
+            assert.strictEqual(c.arxivid, '1902.07714');
+            assert.strictEqual(c.title, 'Legacy DOI title');
+            assert.strictEqual(c.DOI, DOI_1902_ARXIV);
+
+            const d = await mgr.get('doi', DOI_1902_ARXIV);
+            assert.strictEqual(d.id, `doi:${DOI_1902}`);
+            assert.ok(!Object.hasOwn(d, '_hash'));
+
+            assert.deepStrictEqual(
+                await mgr.getMany([['doi', '10.1/expired'], ['nope', 'thing']]), [null, null]
+            );
+            assert.deepStrictEqual(await mgr.keys(),
+                                   ['arxiv:1310.2984', 'arxiv:1902.07714', `doi:${DOI_1902}`]);
+
+            // fresh: a retrieve fetches nothing
+            assert.deepStrictEqual(
+                await mgr.retrieve([['arxiv', '1310.2984'], ['arxiv', '1902.07714']]), []
+            );
+            assert.strictEqual(mock.requests.length, 0);
+            await mgr.flush();
+
+            // a second open on the same fs, without legacyEntries
+            const mgr2 = await open_legacy(mock);
+            assert.strictEqual(mgr2.legacyImport, null);
+            assert.deepStrictEqual(
+                await mgr2.retrieve([['arxiv', '1310.2984'], ['arxiv', '1902.07714'],
+                                     ['doi', DOI_1902_ARXIV]]),
+                []
+            );
+            assert.strictEqual(mock.requests.length, 0);
+            assert.strictEqual((await mgr2.get('arxiv', '1902.07714')).arxivid, '1902.07714');
+            assert.strictEqual((await mgr2.get('arxiv', '1310.2984')).title, 'Legacy arXiv title');
+
+            // re-importing the same entries keeps the existing records
+            const mgr3 = await open_legacy(mock, { legacyEntries: legacy_entries() });
+            assert.deepStrictEqual(mgr3.legacyImport, { imported: 0, skipped: 7 });
+            assert.deepStrictEqual(await mgr3.keys(), await mgr2.keys());
+        });
+
+        it('with the node cache fs, leaves exactly citations.jsonl', async function () {
+            const dir = make_tmp_dir();
+            try {
+                const mock = make_mock_host({ now: NOW });
+                const cfg = config_of(mock, ARXIV_DOI_SPECS, {
+                    cacheDir: dir, dropCslFields: ['reference'], legacyEntries: legacy_entries(),
+                });
+                cfg.host.cacheFs = make_node_cache_fs(fs);
+                const mgr = await wasm.CitationManager.open(cfg);
+                assert.deepStrictEqual(mgr.legacyImport, { imported: 3, skipped: 4 });
+                assert.deepStrictEqual(fs.readdirSync(dir), ['citations.jsonl']);
+                const text = fs.readFileSync(path.join(dir, 'citations.jsonl'), 'utf-8');
+                assert.ok(text.includes(`"doi:${DOI_1902}"`), text);
+                assert.ok(!text.includes('deadbeef') && !text.includes('"reference"'), text);
+            } finally {
+                fs.rmSync(dir, { recursive: true, force: true });
+            }
+        });
+    });
+
+    describe('host fallbacks are logged', function () {
+
+        it('a throwing now() and a rejecting sleep() still complete the retrieve', async function () {
+            const mock = make_mock_host();
+            let n = 0;
+            const cfg = config_of(mock, [{ kind: 'doi', prefix: 'doi' }]);
+            cfg.host.fetch = async (req) => {
+                n += 1;
+                if (n === 1) {
+                    const err = new TypeError('network down');
+                    err.retryable = true;
+                    throw err;
+                }
+                return mock.fetch(req);
+            };
+            cfg.host.now = () => { throw new Error('clock broke'); };
+            cfg.host.sleep = async () => { throw new Error('sleep broke'); };
+            const calls = await with_console_error_stub(async () => {
+                const mgr = await wasm.CitationManager.open(cfg);
+                assert.deepStrictEqual(await mgr.retrieve([['doi', DOI_1902]]), []);
+                assert.strictEqual((await mgr.get('doi', DOI_1902)).DOI, DOI_1902);
+            });
+            assert.strictEqual(n, 2, 'the backoff sleep "elapsed" and the request was retried');
+            const messages = calls.map( (c) => String(c[0]) );
+            assert.ok(messages.some( (m) => /host\.now\(\) threw \(clock broke\)/.test(m) ),
+                      messages.join('\n'));
+            assert.ok(messages.some( (m) => /host\.sleep\(.*\) failed \(sleep broke\)/.test(m) ),
+                      messages.join('\n'));
+        });
+
+        it('a non-number now() is logged and Date.now() is used', async function () {
+            const mock = make_mock_host();
+            const cfg = config_of(mock, ARXIV_DOI_SPECS);
+            cfg.host.now = () => 'soon';
+            const calls = await with_console_error_stub(async () => {
+                const mgr = await wasm.CitationManager.open(cfg);
+                assert.deepStrictEqual(await mgr.retrieve([['arxiv', '1902.07714']]), []);
+            });
+            assert.ok(calls.some( (c) => /host\.now\(\) did not return a finite number/.test(String(c[0])) ));
+        });
+
+        it('a throwing normalizeKey falls back to trimming and is logged', async function () {
+            const mock = make_mock_host();
+            const src = js_source(concrete_for_all, { normalizeKey: () => { throw new Error('norm broke'); } });
+            const calls = await with_console_error_stub(async () => {
+                const mgr = await wasm.CitationManager.open(config_of(mock, [
+                    { kind: 'js', prefix: 'custom', source: src.source },
+                ]));
+                assert.deepStrictEqual(await mgr.retrieve([['custom', ' Key ']]), []);
+                assert.strictEqual((await mgr.get('custom', 'Key')).id, 'custom:Key');
+            });
+            assert.deepStrictEqual(src.calls[0].keys, ['Key']);
+            assert.ok(calls.some( (c) => /normalizeKey.*threw \(norm broke\)/.test(String(c[0])) ));
         });
     });
 

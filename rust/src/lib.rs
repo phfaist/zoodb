@@ -16,6 +16,8 @@
 //! * [`sources`] — spec → registered source (`BoxedSource`, `JsSource`,
 //!   prefix and chain-target checks);
 //! * [`formats`] — JSON/YAML parsing of bibliography files;
+//! * [`reporter`] — progress events to `host.onEvent` (appendix B shapes);
+//! * [`legacy`] — importing `legacyEntries` from a legacy ZooDb cache;
 //! * [`convert`] — values and errors across the boundary.
 
 #![forbid(unsafe_code)]
@@ -24,6 +26,8 @@ mod config;
 mod convert;
 mod formats;
 mod host;
+mod legacy;
+mod reporter;
 mod sources;
 
 use std::cell::RefCell;
@@ -35,7 +39,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::{JsFuture, future_to_promise};
 
 use autocitefetch::filecache::FileCacheStore;
-use autocitefetch::{CacheStore, Error};
+use autocitefetch::{CacheStore, Clock, Error, TtlPolicy};
 
 use crate::convert::{csl_to_js, from_js, js_error, to_js};
 use crate::host::{JsCacheFs, JsClock, JsFetcher, JsTimer};
@@ -91,6 +95,7 @@ export interface HostFunctions {
   cacheFs: HostCacheFs;
   sleep?(ms: number): Promise<void>;
   now?(): number;
+  /** synchronous; must not throw (exceptions are logged with console.error and ignored) */
   onEvent?(ev: ProgressEvent): void;
 }
 
@@ -115,6 +120,19 @@ export type SourceSpec =
   | { kind: 'bib';    prefix: string; files?: string[]; entries?: Record<string, object>; format?: 'auto' | 'json' | 'yaml'; chunkSize?: number; minIntervalMs?: number; ttlMs?: number }
   | { kind: 'js';     prefix: string; source: JsSourceObject; chunkSize?: number; minIntervalMs?: number; ttlMs?: number };
 
+/**
+ * A citation source implemented in JavaScript (`kind: 'js'`).
+ *
+ * `retrieveChunk` must return one resolution per key (keys left out are
+ * reported as `missing`); a rejection fails every key of the chunk.
+ * `normalizeKey` defaults to trimming; if it throws or returns a non-string,
+ * the trimmed key is used and the problem is logged with `console.error`.
+ *
+ * Re-entrancy: `retrieveChunk` runs inside the manager's `retrieve()`. It may
+ * call `get`, `getMany` and `keys` on the same manager, but must NOT call
+ * `retrieve`, `prune` or `flush` on it: those are serialized behind the
+ * running `retrieve()` and awaiting one from here would deadlock.
+ */
 export interface JsSourceObject {
   retrieveChunk(keys: string[], ctx: { prefix: string }): Promise<JsResolution[]>;
   normalizeKey?(key: string): string;
@@ -129,7 +147,38 @@ export type JsResolution =
 
 export interface CiteFailure { prefix: string; key: string; message: string; origin: [string, string] | null }
 
-export type ProgressEvent = { type: string; [field: string]: unknown };
+/** What a `wait_started` / `wait_finished` event is waiting for. */
+export type ProgressWait =
+  | { wait: 'rate_limit'; prefix: string }
+  | { wait: 'backoff'; url: string; attempt: number }
+  | { wait: 'cache_flush' }
+  | { wait: 'unknown' };
+
+/**
+ * A progress event handed to `host.onEvent` (synchronously; the callback's
+ * return value is ignored and anything it throws is logged with
+ * `console.error` and otherwise ignored). Same snake_case vocabulary as the
+ * Python binding. Unless `throttleEventsMs` is 0, `source_progress` events
+ * are throttled to one per `throttleEventsMs` (default 1000) per prefix; all
+ * other events are always delivered. `attempt` is 0-based.
+ */
+export type ProgressEvent =
+  | { type: 'retrieve_started'; cites: number }
+  | { type: 'pass_started'; pass: number; cached: number; to_fetch: number }
+  | { type: 'pass_finished'; pass: number; discovered: number }
+  | { type: 'retrieve_finished'; considered: number; failed: number }
+  | { type: 'source_started'; prefix: string; keys: number; chunks: number }
+  | { type: 'source_progress'; prefix: string; done: number; total: number }
+  | { type: 'source_finished'; prefix: string; done: number }
+  | { type: 'cite_resolved'; prefix: string; key: string; how: 'concrete' }
+  | { type: 'cite_resolved'; prefix: string; key: string; how: 'chained'; target: [string, string] }
+  | { type: 'cite_failed'; prefix: string; key: string; message: string; grace_served: boolean }
+  | ({ type: 'wait_started'; expected_ms: number | null } & ProgressWait)
+  | ({ type: 'wait_finished' } & ProgressWait)
+  | { type: 'request_started'; url: string; attempt: number }
+  | { type: 'request_finished'; url: string; status: number }
+  | { type: 'request_finished'; url: string; error: string }
+  | { type: 'unknown' };
 "#;
 
 type Manager =
@@ -391,19 +440,28 @@ async fn open_impl(config: JsValue) -> Result<CitationManager, String> {
     sources::check_unique_prefixes(&registrations)?;
     sources::check_chain_targets(&registrations)?;
 
-    // 6. Legacy import. HOOK (WP1b): `legacy::import(&store, &registrations,
-    //    &ttl_policy, &data.drop_csl_fields, &clock, entries)` then
-    //    `store.flush()`, recording `{imported, skipped}` in `legacy_import`.
-    let legacy_import: Option<(u32, u32)> = None;
-    if cfg.legacy_entries.is_some() {
-        return Err("legacyEntries: not implemented yet (WP1b)".into());
-    }
+    // 6. Legacy import (section 7.7), with the manager's TTL policy.
+    let ttl_policy = match &data.ttl_policy {
+        Some(spec) => spec.build()?,
+        None => TtlPolicy::default(),
+    };
+    let dropped_fields: &[String] = data.drop_csl_fields.as_deref().unwrap_or(&[]);
+    let legacy_import = match &cfg.legacy_entries {
+        None => None,
+        Some(entries) => {
+            let ctx = legacy::ImportContext {
+                sources: &registrations,
+                dropped_fields,
+                policy: &ttl_policy,
+                now: clock.now(),
+            };
+            Some(legacy::import(&store, entries, &ctx).await?)
+        }
+    };
 
     // 7. The manager, with policies and dropped fields.
-    let mut manager = Manager::new(fetcher, store, clock, timer);
-    if let Some(spec) = &data.ttl_policy {
-        manager = manager.with_policy(spec.build()?);
-    }
+    let reporter_clock = clock.clone();
+    let mut manager = Manager::new(fetcher, store, clock, timer).with_policy(ttl_policy);
     if let Some(spec) = &data.retry {
         manager = manager.with_retry_policy(spec.build()?);
     }
@@ -414,13 +472,16 @@ async fn open_impl(config: JsValue) -> Result<CitationManager, String> {
         manager = manager.with_dropped_csl_fields(fields.iter().cloned());
     }
 
-    // Reporter. HOOK (WP1b): when `host.on_event` is set, build a
-    // `JsReporter` calling it, wrap it in `ThrottledReporter::new(reporter,
-    // clock.clone(), data.throttle_events())` unless the gap is zero, and
-    // attach it with `manager = manager.with_reporter(Rc::new(...))`.
-    // (`JsClock` is `Clone` for this purpose; clone it before step 7.) Until
-    // then the event callback and the throttle gap are parsed and ignored.
-    let _ = (&host.on_event, data.throttle_events());
+    // Progress events: only when `onEvent` is given; throttled (samples only,
+    // per prefix) unless `throttleEventsMs` is 0.
+    if let Some(on_event) = &host.on_event {
+        manager = manager.with_reporter(reporter::build(
+            host.this.clone(),
+            on_event.clone(),
+            reporter_clock,
+            data.throttle_events(),
+        ));
+    }
 
     // 8. Register.
     let mut prefixes = Vec::with_capacity(registrations.len());

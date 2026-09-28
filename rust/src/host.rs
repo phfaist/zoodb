@@ -25,7 +25,7 @@ use autocitefetch::fetch::{FetchError, Fetcher, Method, Request, Response};
 use autocitefetch::filecache::{CacheFs, CacheGuard, FsError};
 use autocitefetch::{BoxFuture, Clock, Timer, Timestamp};
 
-use crate::convert::error_message;
+use crate::convert::{console_error, error_message};
 
 #[wasm_bindgen]
 extern "C" {
@@ -336,8 +336,9 @@ impl CacheFs for JsCacheFs {
 // --- clock and timer ------------------------------------------------------------
 
 /// [`Clock`] over `host.now()`, else `Date.now()`; truncated to integer ms.
-/// A `host.now()` that throws or returns a non-number falls back to
-/// `Date.now()` (the trait cannot fail).
+/// A `host.now()` that throws or returns a non-number (or a non-finite one)
+/// falls back to `Date.now()` (the trait cannot fail) and logs the problem
+/// through `console.error`.
 #[derive(Clone)]
 pub struct JsClock {
     this: JsValue,
@@ -348,6 +349,33 @@ impl JsClock {
     pub fn new(this: JsValue, now: Option<Function>) -> Self {
         JsClock { this, now }
     }
+
+    /// `host.now()` as finite ms, or `None` after logging why not.
+    fn host_now(&self, f: &Function) -> Option<f64> {
+        match f.call0(&self.this) {
+            Ok(v) => match v.as_f64().filter(|ms| ms.is_finite()) {
+                Some(ms) => Some(ms),
+                None => {
+                    console_error(
+                        "host.now() did not return a finite number of milliseconds; \
+                         using Date.now() instead",
+                        Some(&v),
+                    );
+                    None
+                }
+            },
+            Err(e) => {
+                console_error(
+                    &format!(
+                        "host.now() threw ({}); using Date.now() instead",
+                        error_message(&e)
+                    ),
+                    Some(&e),
+                );
+                None
+            }
+        }
+    }
 }
 
 impl Clock for JsClock {
@@ -355,9 +383,7 @@ impl Clock for JsClock {
         let ms = self
             .now
             .as_ref()
-            .and_then(|f| f.call0(&self.this).ok())
-            .and_then(|v| v.as_f64())
-            .filter(|v| v.is_finite())
+            .and_then(|f| self.host_now(f))
             .unwrap_or_else(js_sys::Date::now);
         Timestamp::from_millis(ms as i64)
     }
@@ -365,7 +391,8 @@ impl Clock for JsClock {
 
 /// [`Timer`] over `host.sleep(ms)`, else a promise resolved by the global
 /// `setTimeout`. A rejected or throwing `host.sleep` counts as an elapsed
-/// sleep (the trait cannot fail).
+/// sleep (the trait cannot fail); the problem is logged through
+/// `console.error`.
 #[derive(Clone)]
 pub struct JsTimer {
     this: JsValue,
@@ -387,7 +414,18 @@ impl Timer for JsTimer {
         Box::pin(async move {
             match &self.sleep {
                 Some(f) => {
-                    let _ = call_async(f, &self.this, &Array::of1(&JsValue::from_f64(ms))).await;
+                    if let Err(e) =
+                        call_async(f, &self.this, &Array::of1(&JsValue::from_f64(ms))).await
+                    {
+                        console_error(
+                            &format!(
+                                "host.sleep({ms}) failed ({}); continuing as if the delay \
+                                 had elapsed",
+                                error_message(&e)
+                            ),
+                            Some(&e),
+                        );
+                    }
                 }
                 None => {
                     let promise = Promise::new(&mut |resolve, _reject| {

@@ -9,6 +9,10 @@
 //! * Every rejection handed to JavaScript is a `js_sys::Error` whose message
 //!   carries context ([`js_error`]); every JavaScript exception caught on the
 //!   Rust side is turned into a message with [`error_message`].
+//! * Problems that cannot be returned to anyone (a throwing `onEvent`, a host
+//!   `now()`/`sleep()` fallback, a throwing `normalizeKey`) are logged with
+//!   [`console_error`], which looks up `globalThis.console.error` at call time
+//!   (no `web-sys`, no logging crate).
 
 use serde::Serialize;
 use serde::de::DeserializeOwned;
@@ -58,4 +62,31 @@ pub fn error_message(value: &JsValue) -> String {
         }
     }
     format!("{value:?}")
+}
+
+/// Log `message` (plus the offending JavaScript value, if any) through
+/// `globalThis.console.error`, looked up at call time with `js_sys::Reflect`.
+///
+/// Used where an error has nowhere to go (a trait method that cannot fail, or
+/// the synchronous reporter). Never throws and never panics: if there is no
+/// `console.error`, or it throws, the message is dropped.
+pub fn console_error(message: &str, detail: Option<&JsValue>) {
+    let global: JsValue = js_sys::global().into();
+    let Ok(console) = js_sys::Reflect::get(&global, &JsValue::from_str("console")) else {
+        return;
+    };
+    if !console.is_object() {
+        return;
+    }
+    let Ok(error) = js_sys::Reflect::get(&console, &JsValue::from_str("error")) else {
+        return;
+    };
+    let Ok(error) = error.dyn_into::<js_sys::Function>() else {
+        return;
+    };
+    let msg = JsValue::from_str(&format!("autocitefetch: {message}"));
+    let _ = match detail {
+        Some(d) => error.call2(&console, &msg, d),
+        None => error.call1(&console, &msg),
+    };
 }

@@ -40,7 +40,7 @@ use autocitefetch::source::{
 use autocitefetch::{BoxFuture, CslValue, Error};
 
 use crate::config::{SourceSpec, chunk_size_from, duration_from_ms};
-use crate::convert::{error_message, from_js};
+use crate::convert::{console_error, error_message, from_js};
 use crate::formats::{self, Format};
 
 /// The message of the `missing` failure recorded for a key a `js` source
@@ -344,6 +344,13 @@ impl JsResolution {
 /// or an unconvertible result fails **every** key of the chunk with that
 /// message. JavaScript sources do their own retries (design decision D10):
 /// they do not go through the crate's `RetryingFetcher`.
+///
+/// **Re-entrancy.** `retrieveChunk` runs inside the manager's `retrieve`. It
+/// may call the read-only methods `get`, `getMany` and `keys` on the same
+/// manager (they are served from memory and do not queue), but it must
+/// **not** call `retrieve`, `prune` or `flush` on it: those are serialized
+/// behind the running `retrieve` (see `Inner::exclusive` in `lib.rs`), so
+/// awaiting one from inside `retrieveChunk` would deadlock.
 pub struct JsSource {
     obj: JsValue,
     retrieve_chunk: Function,
@@ -429,12 +436,36 @@ impl Source for JsSource {
     fn normalize_key(&self, key: &str) -> String {
         // Default (D12): trim only, never lowercase. A `normalizeKey` that
         // throws or returns a non-string falls back to the default, since the
-        // trait method cannot fail.
-        self.normalize
-            .as_ref()
-            .and_then(|f| f.call1(&self.obj, &JsValue::from_str(key)).ok())
-            .and_then(|v| v.as_string())
-            .unwrap_or_else(|| key.trim().to_string())
+        // trait method cannot fail; the problem is logged via `console.error`.
+        let default = || key.trim().to_string();
+        let Some(f) = &self.normalize else {
+            return default();
+        };
+        match f.call1(&self.obj, &JsValue::from_str(key)) {
+            Ok(v) => match v.as_string() {
+                Some(s) => s,
+                None => {
+                    console_error(
+                        &format!(
+                            "source.normalizeKey({key:?}) did not return a string; \
+                             using the trimmed key instead"
+                        ),
+                        Some(&v),
+                    );
+                    default()
+                }
+            },
+            Err(e) => {
+                console_error(
+                    &format!(
+                        "source.normalizeKey({key:?}) threw ({}); using the trimmed key instead",
+                        error_message(&e)
+                    ),
+                    Some(&e),
+                );
+                default()
+            }
+        }
     }
 
     fn chains_to(&self) -> Vec<&str> {

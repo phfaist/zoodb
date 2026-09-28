@@ -130,6 +130,30 @@ One should-fix carried into WP1b: host fallbacks (`now()` throwing,
 `sleep()` rejecting, `normalizeKey` throwing) fall back silently; they must
 `console.error`. Note carried into WP1b: document the deadlock case above.
 
+**WP1b** (1 implementer round, 1 review round, PASS). Implementer:
+`rust/src/reporter.rs` (`JsReporter`, synchronous, appendix-B shapes,
+wrapped in the crate's `ThrottledReporter` unless `throttleEventsMs` is 0,
+installed only when `onEvent` is given; exceptions from `onEvent` logged via
+`globalThis.console.error` and swallowed), `rust/src/legacy.rs` (7.7 binding
+side; `legacyImport` getter), `console_error` helper in `convert.rs`, the
+two carried-over findings fixed (fallbacks now log; re-entrancy rule
+documented in the `.d.ts` and rustdoc), precise `ProgressEvent` union in the
+`.d.ts`, 9 more host unit tests (35 total), 11 mocha cases added (45 in the
+module test; `yarn test` 304 passing). wasm 603 337 bytes raw, 804 526
+bytes base64. Choices within 7.7 (reviewer agreed): dropped CSL fields are
+also stripped from a legacy chained entry's `set_properties` (as the crate
+does for fresh chains); absent `expire` = `null` (365 d); non-numeric
+`expire` skipped; under 1 ms remaining counts as expired; one `TtlPolicy`
+built in `open` shared by the import and the manager.
+
+Reviewer: PASS; every `Event` variant checked field by field against the
+crate and the pyo3 `event_dict`; legacy list of 7.7 verified item by item
+with line evidence; counts of the mocha data recomputed by hand;
+independent script confirmed the node-fs legacy import writes only
+`citations.jsonl` without `_hash`/`reference` and re-opens with zero
+fetches. Note: an `async` `onEvent` that rejects produces an unhandled
+rejection in the host (the contract is a synchronous callback; documented).
+
 ## Deviations from the brief
 
 1. **Invariant-8 check regex (WP0).** The brief's reviewer grep
