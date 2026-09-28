@@ -245,7 +245,7 @@ function check_chain_targets(specs)
  * - ``fs``, ``fs_root_path`` - `fs`-compatible object and root directory used
  *   to read local files (``file:`` URLs and bare paths), e.g. bibliography
  *   files.  Default: `cache_fs` (or else the `fs` option of the first source
- *   that has one) and the first source's ``fsRootFilePath``.
+ *   that has one) and the ``fsRootFilePath`` of the first source that has one.
  *
  * - ``fetch_timeout_ms`` - timeout of http(s) requests (default 120000).
  *

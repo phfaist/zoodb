@@ -78,3 +78,49 @@ jobs:
               echo "Skipping test build website [Node $(yarn node --version)]"
           fi
         working-directory: ./zoodb-example/website
+
+
+  # Build and check the Rust binding of the autocitefetch citation retriever
+  # (rust/).  The generated module in src/citationmanager/_wasm/ is committed
+  # and is not compared with this build's output (wasm-opt is not
+  # byte-reproducible across versions).
+  rust:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: rust
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 'Install Rust (stable, with the wasm32-unknown-unknown target)'
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: clippy
+
+      - name: 'Cache cargo'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin/wasm-pack
+            rust/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('rust/Cargo.lock', 'rust/rust-toolchain.toml') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-
+
+      - name: 'Install wasm-pack'
+        run: 'command -v wasm-pack || cargo install wasm-pack --locked'
+
+      - name: 'cargo clippy'
+        run: 'cargo clippy --all-targets -- -D warnings'
+
+      - name: 'cargo test'
+        run: 'cargo test'
+
+      - name: 'Build the wasm module (build only)'
+        run: 'wasm-pack build --release --target web --out-dir target/pkg --out-name autocitefetch_wasm'

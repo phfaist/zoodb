@@ -11,6 +11,10 @@ Features:
 - Automatically populated relationship fields and backreferences, based
   on simple text fields storing primary keys/IDs.
 - Seamless integration into [11ty](https://11ty.dev/) to generate static HTML websites
+- Automatic retrieval of bibliographic citations (arXiv, DOI, bibliography
+  files), through the Rust crate
+  [`autocitefetch`](https://crates.io/crates/autocitefetch) compiled to
+  WebAssembly (bundled; no Rust toolchain needed to use the package)
 - Highly customizable
 - etc.
 

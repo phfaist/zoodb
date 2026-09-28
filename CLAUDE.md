@@ -47,7 +47,7 @@ Toolchain prerequisites for the Rust binding only (not needed to use or test the
 
 **Standard Setup (`src/std/`):** High-level convenience layer. `stdzoodb.js` exports `makeStandardZooDb()` which wires up a ZooDb with common processors via config. Other `use_*.js` files are config helpers for individual processors.
 
-**Citation Manager (`src/citationmanager/`):** Manages bibliography/citation data. Sources in `source/` fetch from arXiv, DOI, etc.
+**Citation Manager (`src/citationmanager/`):** Manages bibliography/citation data. `_manager.js` (`CitationDatabaseManager`) adapts the wasm binding of the `autocitefetch` crate (retrieval, chaining, retry, TTL, cache); `_hostfetch.js` and `_cachefs.js` are the JavaScript host functions it uses for all I/O. Sources in `source/` (arXiv, DOI, manual, bibliography file) describe crate-native sources; other `CitationSourceBase` subclasses run as JavaScript sources via `run_retrieve_chunk()`. Cache files in `cache_dir`: `citations.jsonl` (written only by the crate), `cache_compiled_citations.json` (by `CitationCompiler`), throwaway `._citations*` (gitignored). The legacy `cache_downloaded_info.json` is no longer read. User docs: `doc/zoodb.citationmanager.rst`.
 
 **Resource Collector (`src/resourcecollector/`):** Handles external resources (images, files) referenced by zoo objects.
 
@@ -55,7 +55,7 @@ Toolchain prerequisites for the Rust binding only (not needed to use or test the
 
 **Generated wasm module (`src/citationmanager/_wasm/`):** Output of `yarn build:wasm` (wasm-bindgen glue, `.d.ts`, the `.wasm` inlined as base64, `BUILD_INFO.json`), committed to git. **Do not edit by hand**; regenerate with `yarn build:wasm`. Loaded through the hand-written, environment-neutral `src/citationmanager/_load_wasm.js` (async, memoized). Neither may reference `import.meta`, `require(`, `process.`, `Buffer`, `__dirname`, `node:` or `fs`.
 
-**Tools (`tools/`):** Node-only ESM scripts: `build_wasm.mjs`, and `migrate_citations_cache.mjs` (package bin `zoodb-migrate-citations-cache`).
+**Tools (`tools/`):** Node-only ESM scripts (see `tools/README.md`): `build_wasm.mjs` (`yarn build:wasm`), and `migrate_citations_cache.mjs` (package bin `zoodb-migrate-citations-cache --cache-dir <dir>`; converts a legacy `cache_downloaded_info.json` into `citations.jsonl`; `--help` for options).
 
 **Utilities (`src/util/`):** Helpers for field access (`getfield.js`), HTML minification (`sqzhtml.js`), lexicographic sorting, etc.
 

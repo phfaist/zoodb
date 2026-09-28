@@ -34,7 +34,7 @@ file is treated as a custom (`js`) source and listed in the output, and
 passed are skipped; entries without a valid expiry are kept for 365 days. The
 CSL field `reference` is dropped unless `--drop-field` is given (which then
 replaces that default). The tool prints `imported N, skipped M`. It refuses to
-run if `<dir>/citations.jsonl` already exists unless `--force` is given (then
+run if `<dir>/<base>.jsonl` (by default `<dir>/citations.jsonl`) already exists unless `--force` is given (then
 entries already present are kept); `--dry-run` only reports the counts;
 `--remove-legacy` deletes the legacy file after a successful import (by default
 it is left untouched). Exit status: 0 on success, 1 on a usage error, 2 on an

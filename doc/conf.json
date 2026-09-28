@@ -4,7 +4,7 @@
         "include": [],
         "includePattern": ".+\\.js(x?)$",
         "exclude": [],
-        "excludePattern": "./flm-src/.*"
+        "excludePattern": "(./flm-src/.*|/rust/target/.*|/src/citationmanager/_wasm/.*)"
     },
     "plugins": [ ],
     "opts": {

@@ -262,6 +262,49 @@ chained failure the abort message lists the origin id only (the adapter's
 per-failure `console.error` gives the target); a missing legacy file exits
 1 (usage error), not 2.
 
+### WP5 — Dependencies, CI, docs, version (1 implementer round, 1 review round, PASS)
+
+Implementer: `package.json` → version `0.2.0`, removed `feedparser`,
+`parse-full-name`, `browser-process-hrtime`, `node-fetch` and the `browser`
+field (kept `sax`/`stream-parser`, deviation 4), added the export
+`./citationmanager/wasm`; `yarn install` run (`yarn.lock` −198 lines, none
+of the four packages left even transitively; `CI=true yarn install
+--immutable` passes). CI: new `rust` job (stable Rust with the wasm32
+target and clippy, `wasm-pack`, cargo cache, `cargo clippy --all-targets
+-- -D warnings`, `cargo test`, `wasm-pack build --release --target web`;
+build only, no diff against the committed output per D3); Node matrix
+untouched. Docs: `doc/zoodb.citationmanager.rst` gained "How citations
+are fetched", "Cache files" (migration usage line verbatim), "Options",
+"Writing a custom source", "Known limitations"; `doc/conf.json` excludes
+the generated `_wasm/` glue and `rust/target/` from jsdoc (the generated
+TypeScript-style annotations produced 10 jsdoc errors); `rust/README.md`,
+`tools/README.md`, `CLAUDE.md`, `README.md` updated. Docs build: no
+warning mentions `citationmanager`; one pre-existing warning in the
+`stdzoodb.js` docstring remains. `yarn test` 359 passing; lint 20.
+
+Reviewer: PASS, no blocking or should-fix findings. Audited every factual
+claim of the new docs against the code and the crate source (crate
+defaults, option defaults, event vocabulary, protocol signatures, cache
+file names, migration usage line, CI semantics incl. `actions/cache` path
+resolution), instantiated every `package.json#exports` entry (invariant
+6), confirmed the four packages are absent from `yarn.lock` even
+transitively, and confirmed `_wasm/` is byte-identical to the committed
+version. Three precision notes (default of `fs_root_path` is the first
+source *that has* an `fsRootFilePath`; `get_response_object` result also
+has `ok`; retry delay has jitter and clamps `Retry-After`) were applied by
+the supervisor in the rst and the manager docstring.
+
+### WP6 — Final verification and handoff (supervisor)
+
+Opt-in network test, run once with `ZOODB_TEST_NETWORK=1 yarn mocha
+test/test_citationmanager_manager.js` on 2026-09-28: `35 passing`, including
+`zoodb.citationmanager._manager (network) ✔ fetches a real arXiv id and a
+real DOI (521ms)`. (Informational; the default suite never touches the
+network: the whole suite passes with `globalThis.fetch` replaced by a
+throwing stub, see WP4.)
+
+(fresh-install simulation and final checks: filled in below when run)
+
 ## Deviations from the brief
 
 1. **Invariant-8 check regex (WP0).** The brief's reviewer grep
@@ -288,13 +331,86 @@ per-failure `console.error` gives the target); a missing legacy file exits
    items that need the wasm module ("single process leaves exactly
    `citations.jsonl`"; "foreign `._citations.other.log` folded and kept")
    are delivered and reviewed as part of WP1.
-4. **Lint script (WP0).** `ESLINT_USE_FLAT_CONFIG=false` prefixed to the
+4. **Dependencies kept: `sax` and `stream-parser` (WP5).** Section 7.8
+   removes six packages, but `src/resourcecollector/processor/_inspectimagefile.js`
+   (lines 5 and 7) imports `stream-parser` and `sax` for image inspection,
+   and `src/resourcecollector/` is outside the paths this work may edit
+   (section 10, item 4). Removing them would break the resource collector.
+   WP5 therefore removes only `feedparser`, `parse-full-name`,
+   `browser-process-hrtime` and `node-fetch` (and the `browser` field, which
+   only mapped `node-fetch`), and keeps `sax` and `stream-parser`. The WP5
+   gate grep is read accordingly: the four removed packages appear nowhere;
+   `sax`/`stream-parser` appear only in `_inspectimagefile.js`. Listed under
+   open questions.
+5. **Lint script (WP0).** `ESLINT_USE_FLAT_CONFIG=false` prefixed to the
    `lint` script (see Baseline), plus an `overrides` entry in
    `.eslintrc.json` giving `tools/*.mjs` the node environment.
 
 ## Known limitations
 
-(appendix D of the brief plus anything discovered)
+From appendix D of the brief:
+
+- Concurrent processes sharing one `cache_dir` are unsupported (D9); the
+  library does no locking on Node. An interrupted run leaves a
+  `._citations.<writer>.log` that later runs fold but never delete; remove
+  `._citations*` files by hand when no build is running.
+- Browser hosts cannot reach arXiv or doi.org directly because of CORS; use a
+  proxying `fetch` in `citation_manager_options.fetch`, or placeholder
+  sources.
+- JS custom sources: one resolution per requested key; no stores from
+  `source_finalize_run`; no Rust-side retry (their `fetch_url` retries
+  instead).
+- `cache_downloaded_info.json` is never read by the library; convert it once
+  with `zoodb-migrate-citations-cache` (which can delete it with
+  `--remove-legacy`); otherwise the first build refetches everything after a
+  warning.
+- `keys()` returns normalized ids (`doi:` keys lowercased);
+  `get_citation_by_id` accepts the spelling encountered in FLM.
+
+Discovered during implementation:
+
+- A custom JS source must not call `retrieve_citations`, `purge_expired` or
+  `save_cache` on the manager from inside `run_retrieve_chunk`: the binding
+  serializes those behind the running retrieve and the call would deadlock.
+  Reading (`get_citation_by_id`, `keys`) is fine.
+- `on_event` must be a synchronous function that does not throw; exceptions
+  are logged and swallowed, but an `async` callback that rejects produces an
+  unhandled rejection in the host.
+- Host fallbacks: a `now()` that throws or returns a non-number, a `sleep()`
+  that rejects, and a `normalizeKey` that throws fall back to `Date.now()`,
+  "elapsed", and trim respectively, each logged with `console.error`. A
+  rejecting `sleep` therefore skips rate limiting.
+- An enabled arXiv source with the default `chain_to_doi: true` requires a
+  `doi` source; otherwise `initialize()` fails with a remedy hint (the legacy
+  manager failed lazily). See open question 2.
+- Built-in sources use the crate's defaults unless overridden in the
+  constructor: DOI requests are spaced 1100 ms (legacy 1000 ms), arXiv
+  entries live 10 days, DOI entries 360 days.
+- A per-source `user_agent` option no longer applies to the built-in
+  sources; the single host fetch sends the manager's `default_user_agent`.
+- `fetch_url(url, { get_response_object: true })` returns the plain
+  `{status, ok, headers, body, text(), json()}` object of 7.5, not a Fetch
+  `Response` (no `headers.get()`).
+- The whole cache is preloaded into memory at `initialize()` and after each
+  retrieve (the crate already holds it in memory), so that
+  `CitationCompiler.compile_citations(null)` can read every key. An entry
+  requested under a non-normalized spelling is a second in-memory item
+  with its own `_hash`, as in the legacy manager.
+- `atomicReplace` reuses `writeFileAtomic`, whose staging file is named
+  `.atomicwrite.citations.jsonl.<token>.<n>.tmp` (not under the
+  `._citations*` rule) and is not fsync'ed; it only survives a crash between
+  write and rename.
+- A custom `cache_fs` whose `readdir` lacks `withFileTypes` needs `stat` for
+  `list()`.
+- For a chained failure the abort message of `ZooFLMProcessor` lists the
+  origin id only; the per-failure `console.error` names the target.
+- `zoodb-migrate-citations-cache` exits 1 (usage error) for a missing or
+  unreadable legacy file path, 2 for a binding import error.
+- `sax` and `stream-parser` remain dependencies (deviation 4).
+- `yarn lint` still reports 20 pre-existing errors in files outside this
+  work; ESLint prints an eslintrc deprecation warning because the lint
+  script sets `ESLINT_USE_FLAT_CONFIG=false`.
+- The invariant-8 gate uses `\bBuffer\b` (deviation 1).
 
 ## Open questions for the user
 
@@ -310,7 +426,52 @@ per-failure `console.error` gives the target); a missing legacy file exits
    needs either `doi: true` or an arXiv instance with `chain_to_doi: false`.
    Not changed by the supervisor because it is the brief's specified
    behavior and `src/std/` may only change docstrings (WP4 documents it).
+3. **`sax` and `stream-parser` stay in `package.json`** (deviation 4)
+   because the resource collector's image inspector uses them. If you want
+   them gone, `_inspectimagefile.js` needs a replacement parser first.
 
 ## Downstream verification (eczoo_sitegen)
 
-(filled in at WP6)
+`eczoo_sitegen` keeps its citation cache in the yarn workspace
+`_zoodb_citations_cache/` (currently holding the legacy
+`cache_downloaded_info.json`, `cache_compiled_citations.json` and a
+`package.json`), configured through `fullopts.js` / `dirs_defaults.js`
+(`ECZOO_CITATIONS_CACHE_DIR`, default `_zoodb_citations_cache`). Its
+`eczoodb.js` registers `arxiv`, `doi`, `manual`, `preset` and the custom
+`qecdborg` source (`CiteSourceExternalQecdbOrg`, tested verbatim in
+`test/test_citationmanager_downstream_sources.js`). Run, from
+`eczoo_sitegen/`, with `@phfaist/zoodb` pointing at this branch (e.g.
+`yarn link` or a `portal:` / `file:` resolution to this checkout):
+
+```sh
+# 0. pick up the new zoodb (whichever way the project links it) and check
+yarn node -e "import('@phfaist/zoodb/citationmanager/wasm').then(m=>m.load_autocitefetch_wasm()).then(w=>console.log(w.version()))"
+
+# 1. convert the legacy cache once (dry run first; add --remove-legacy to delete the old file)
+yarn zoodb-migrate-citations-cache --cache-dir _zoodb_citations_cache --dry-run
+yarn zoodb-migrate-citations-cache --cache-dir _zoodb_citations_cache
+#    expect: "imported N, skipped M into ‘_zoodb_citations_cache/citations.jsonl’"
+#            and "prefixes treated as custom sources (kind js): qecdborg" (if any qecdborg ids were cached)
+
+# 2. ignore the throwaway files in that workspace
+printf '._citations*\n' >> _zoodb_citations_cache/.gitignore   # or the repo's .gitignore
+
+# 3. build the site
+yarn build
+
+# 4. inspect the cache
+ls -la _zoodb_citations_cache/          # citations.jsonl + cache_compiled_citations.json; no ._citations* after a completed run
+head -c 400 _zoodb_citations_cache/citations.jsonl; echo
+wc -l _zoodb_citations_cache/citations.jsonl
+grep -c '"qecdborg:' _zoodb_citations_cache/citations.jsonl    # expect 0: qecdborg entries are ephemeral (cache_duration_ms 0)
+
+# 5. confirm the qecdborg source worked: the built pages carry its links
+grep -rl 'qecdb.org/codes/' _site | head   # adjust the output directory to the site's
+
+# 6. a second build should fetch nothing new (watch the debug log)
+DEBUG='zoodb.citationmanager*' yarn build 2>&1 | grep -E 'retrieve_finished|cite_failed|Found legacy' | head
+```
+
+If the first build prints `Found legacy citations cache … but no ‘citations.jsonl’`,
+step 1 was skipped: run it before building, or every citation is refetched
+(DOIs at one per 1.1 s).

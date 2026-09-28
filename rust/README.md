@@ -41,6 +41,66 @@ cargo clippy --all-targets -- -D warnings
 cargo test
 ```
 
+## Layout
+
+- `src/lib.rs` — the exported API: `version()` and the `CitationManager`
+  class (`open(config)`, `prefixes`, `legacyImport`, `retrieve`, `get`,
+  `getMany`, `keys`, `prune`, `flush`); `#![forbid(unsafe_code)]`.
+- `src/config.rs` — the open config: serde spec types (camelCase,
+  `deny_unknown_fields`) plus manual extraction of the JavaScript objects
+  (`host`, `js` source objects, `legacyEntries`).
+- `src/host.rs` — the crate's host traits over JavaScript callbacks:
+  `JsFetcher`, `JsCacheFs`/`JsGuard`, `JsClock`, `JsTimer`.
+- `src/sources.rs` — building and registering the sources from the specs,
+  including `JsSource` (a source implemented in JavaScript).
+- `src/formats.rs` — JSON/YAML parsing of bibliography files (`format:
+  'auto' | 'json' | 'yaml'`).
+- `src/reporter.rs` — `JsReporter`: crate progress events → plain snake_case
+  objects for `host.onEvent`.
+- `src/legacy.rs` — importing a legacy `cache_downloaded_info.json` (given
+  as `legacyEntries`) into the crate's cache.
+- `src/convert.rs` — value conversion across the Rust ↔ JavaScript boundary
+  and error messages.
+- `build.rs` — reads the resolved `autocitefetch` version from `Cargo.lock`.
+
+## Host interface
+
+The authoritative types are in the generated
+`src/citationmanager/_wasm/autocitefetch_wasm.d.ts` (written from the
+`typescript_custom_section` in `src/lib.rs`). In short,
+`CitationManager.open({ sources, host, cacheDir, cacheBase?, writerId,
+ttlPolicy?, retry?, maxChainDepth?, dropCslFields?, throttleEventsMs?,
+legacyEntries? })` with:
+
+- `host: HostFunctions` — `fetch(req) → Promise<{ status, headers, body }>`
+  (`req = { url, method, headers, body }`, bodies as `Uint8Array`; non-2xx
+  statuses are returned, transport errors thrown with a `retryable` flag),
+  `cacheFs: HostCacheFs`, and optional `sleep(ms)`, `now()`, `onEvent(ev)`.
+- `HostCacheFs` — `read(path)` (`null` if absent), `append(path, bytes)`,
+  `atomicReplace(path, bytes)`, `list(dir)`, `remove(path)`,
+  `lockExclusive(path)` and `tryLockExclusive(path)` (returning a guard
+  `{ release() }`, or `null` from `tryLockExclusive` when not acquired).
+- `sources: SourceSpec[]` — one spec per cite prefix, of kind `arxiv`
+  (`chainDoisTo`, `overrideDois`), `doi`, `manual` (`format`), `bib`
+  (`files` as URLs and/or inline `entries`, `format`) or `js` (`source:
+  { retrieveChunk(keys, ctx), normalizeKey?, chainsTo? }` returning one
+  resolution per key); every kind accepts `chunkSize`, `minIntervalMs`,
+  `ttlMs`.
+
+The JavaScript implementations are `src/citationmanager/_hostfetch.js`,
+`src/citationmanager/_cachefs.js` and the adapter
+`src/citationmanager/_manager.js`.
+
+## Invariants
+
+- No I/O outside the host functions: no `std::fs`, no network, no clock or
+  timer of its own.
+- `#![forbid(unsafe_code)]`.
+- `serde_json` without `std` (see Notes).
+- `cargo clippy --all-targets -- -D warnings` and `cargo test` pass (also run
+  by the `rust` job of `.github/workflows/node-js-test.yml`, which builds the
+  wasm module too but does not compare it to the committed output).
+
 ## Notes
 
 - `serde_json` is used alloc-only (`default-features = false`). Never enable
