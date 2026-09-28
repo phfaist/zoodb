@@ -86,101 +86,56 @@ function make_response_object(host_response)
 
 
 /**
- * Base class for a *citation source*, i.e., an engine that is able to obtain
- * bibliographic citation information based on a citation key.  (E.g., the
- * :class:`CitationSourceArxiv` queries information from `the arXiv
- * <https://arxiv.org>`_ to obtain citation information for a given arXiv
- * identifier.)
+ * Base class for a *citation source*, i.e., an object that obtains
+ * bibliographic citation information for citation keys of a given prefix.
+ * (E.g., :class:`CitationSourceArxiv` obtains citation information for arXiv
+ * identifiers from `the arXiv <https://arxiv.org>`_.)
  *
- * Citation retrieval is performed by the Rust ``autocitefetch`` crate
- * (compiled to WebAssembly) behind :class:`CitationDatabaseManager`.  Each
- * source hands the manager a *source specification* through
- * `get_autocitefetch_spec()`.  The built-in sources
- * (:class:`CitationSourceArxiv`, :class:`CitationSourceDoi`,
- * :class:`CitationSourceManual`, :class:`CitationSourceBibliographyFile`)
- * describe one of the crate's native sources.  Any other subclass is run as a
- * *JavaScript source*: the crate calls back into the subclass'
- * `run_retrieve_chunk()` for each chunk of citation keys to retrieve.
+ * To write your own source, subclass this class and implement
+ * `run_retrieve_chunk()`; see :ref:`citations-custom-source`.
  *
- * **Writing a custom source.**  Subclass this class and reimplement
- * `run_retrieve_chunk(id_list)`.  For each key, call
- * ``this.citation_manager.store_citation(this.cite_prefix, key, csl_json,
- * this.cache_store_options)`` or ``this.citation_manager.store_citation_chained(
- * this.cite_prefix, key, new_cite_prefix, new_cite_key, set_properties)``.
- * (While `run_retrieve_chunk()` runs, `this.citation_manager` is a collector
- * object that records these calls synchronously; awaiting them is allowed but
- * not required.  It also exposes the manager's ``options``.)  Use
- * `fetch_url()` to read local files or remote URLs.  Subclasses may also
- * reimplement `source_initialize_run()` (called once per call to the
- * manager's `retrieve_citations()`, before the first chunk of this source is
- * retrieved) and `source_finalize_run()` (called after every call to
- * `retrieve_citations()`).
+ * Options recognized by all sources:
  *
- * Limitations of custom sources: exactly one resolution is recorded per
- * requested key (keys that were not stored are reported as failures); a
- * source may only store citations for its own prefix; citations cannot be
- * stored from `source_finalize_run()`; and the Rust-side retry policy does not
- * apply to them (`fetch_url()` has its own retry loop instead).
+ * - ``cite_prefix`` - The citation prefix of this source.  The prefix under
+ *   which the source is registered with the citation manager takes precedence.
  *
- * The following methods of earlier versions of this class were removed along
- * with the JavaScript scheduler they belonged to: ``add_retrieve()``,
- * ``add_retrieve_done()``, ``run()``, as well as the internal helpers
- * ``_fetch()`` and ``_jittered_backoff()`` and the scheduler's attributes
- * (``keys_to_retrieve``, ``keys_to_retrieve_remaining``, ``total_queried``,
- * ``fsp_readFile``).  Chunking, rate limiting and chaining are now handled by
- * the citation manager.  New: `get_autocitefetch_spec()` and
- * `validate_cite_key()`.
+ * - ``source_name`` - A descriptive name for this source, used in messages.
+ *   Normally set by the subclass.
  *
- * Important options recognized by this base class are the following:
+ * - ``chunk_size``, ``chunk_retrieve_delay_ms`` - Keys to retrieve are passed
+ *   to `run_retrieve_chunk()` in lists of at most `chunk_size` keys, and two
+ *   calls start at least `chunk_retrieve_delay_ms` milliseconds apart (to
+ *   respect a server's rate limits).
  *
- * - ``source_name`` - A descriptive name for this citation source.  Should
- *   normally be set by the subclass in the override options.  Mostly for use in
- *   debug messages.
+ * - ``cache_duration_ms`` (or ``cache_store_options.cache_duration_ms``) - How
+ *   long the source's entries are kept in the cache before they are retrieved
+ *   again, in milliseconds.  ``0`` means that entries are kept for the current
+ *   run only.  If not set, the citation manager's
+ *   ``cache_entry_default_duration_ms`` applies.
+ *
+ * - ``chains_to_sources`` - The prefixes of the sources to which this source
+ *   may redirect citations with `store_citation_chained()` (e.g., the arXiv
+ *   source redirects to ``doi``).  The citation manager checks that these
+ *   sources are registered.
  *
  * - ``fs``, ``fsRootFilePath`` - An `fs`-compatible object used to read local
- *   files in `fetch_url()`, and a filesystem path that provides the reference
- *   root path for relative file paths.  If no `fs` is given, local files are
- *   read through the citation manager's `fs`.
+ *   files, and the directory relative to which local paths are resolved.  If
+ *   no `fs` is given, the citation manager's is used.
  *
- * - ``chunk_size``, ``chunk_retrieve_delay_ms`` - The citations to retrieve
- *   are split into chunks of at most `chunk_size` keys, and each chunk causes
- *   one call to `run_retrieve_chunk()`.  At least `chunk_retrieve_delay_ms`
- *   milliseconds separate the start of two chunk retrievals.
+ * - ``use_user_agent``, ``user_agent`` - Whether to send a ``User-Agent``
+ *   header with the requests of `fetch_url()`, and which one.  If not set, the
+ *   citation manager's ``default_use_user_agent`` and ``default_user_agent``
+ *   are used.
  *
- * - ``cite_prefix`` - The citation prefix we have been associated with.  An
- *   option value provided here will be overridden by `set_citation_manager()`.
- *
- * - ``chains_to_sources`` - An array of source names (citation prefixes) to
- *   which this source might “chain” to.  For instance, the 'arxiv' source
- *   chains to the 'doi' source.  The manager checks that these prefixes are
- *   registered.
- *
- * - ``waiting_poll_timeout_ms`` - Accepted for compatibility and ignored.
- *
- * - ``cache_store_options`` - Options to use when calling the manager's
- *   `store_citation()` method, for instance, ``{ cache_duration_ms: ... }``.
- *   Its `cache_duration_ms` (else the ``cache_duration_ms`` option) is the
- *   default cache duration of this source's entries; a duration of 0 means
- *   that entries are kept in memory for the current run only.  If neither is
- *   set, the manager's ``cache_entry_default_duration_ms`` applies.
- *
- * - ``use_user_agent``, ``user_agent`` - Specify a custom user agent when
- *   fetching remote content with `fetch_url()`.  If `use_user_agent` is false,
- *   no custom user agent is set.  If it is true, then the user agent
- *   `user_agent` is used.  If either `use_user_agent` or `user_agent` are
- *   null/undefined, then the citation manager's `default_use_user_agent` and
- *   `default_user_agent` are used.
- *
- * - ``fetch_max_retries`` - The maximum number of retries of `fetch_url()`
- *   upon a network error or a retryable HTTP status (429, 500, 502, 503, 504).
+ * - ``fetch_max_retries`` - How many times `fetch_url()` retries a request
+ *   after a network error or an HTTP status 429, 500, 502, 503 or 504.
  *   Default 10.
  */
 export class CitationSourceBase
 {
     /**
-     * Subclasses should call the superclass constructor with the following
-     * arguments to set the options correctly.  Options are merged recursively
-     * using `lodash/merge`.
+     * Subclasses call this constructor with three sets of options, which are
+     * merged recursively.
      *
      * @param {Object} override_options - Any options that should be set to the
      *     given values, regardless of any user options.
@@ -237,9 +192,9 @@ export class CitationSourceBase
     }
 
     /**
-     * The citation manager object will call this method to identify itself.
-     * The source stores a reference to the citation manager and registers the
-     * citation prefix (`cite_prefix`) to be associated with.
+     * Called by the citation manager when the source is registered with it
+     * under the prefix `cite_prefix`.  Sets `this.citation_manager` and
+     * `this.cite_prefix`.
      */
     set_citation_manager(citation_manager, cite_prefix)
     {
@@ -250,11 +205,10 @@ export class CitationSourceBase
     }
 
     /**
-     * Check a citation key before it is sent to the citation manager's
-     * retrieval engine.  Return `null` if the key is acceptable, or an error
-     * message (string) if it is not; in the latter case the citation is
-     * reported as a failure by `retrieve_citations()` and no request is made
-     * for it.  The default implementation accepts every key.
+     * Reimplement to reject malformed citation keys before any request is
+     * made.  Return `null` if the key is acceptable, or else an error message,
+     * in which case the citation is reported as a failure by the manager's
+     * `retrieve_citations()`.  The default implementation accepts every key.
      *
      * @param {string} cite_key - The citation key, without the prefix.
      * @returns {string|null}
@@ -294,40 +248,28 @@ export class CitationSourceBase
     // -------------
 
     /**
-     * Utility method to fetch data from a local file or a remote URL.  Returns
-     * a promise that resolves to the requested data.
+     * Read a remote URL or a local file, for use in `run_retrieve_chunk()` or
+     * `source_initialize_run()`.
      *
-     * The `url` may be any URL (``http:``, ``https:``, ``file:``) or simply a
-     * local path.  A local path is interpreted relative to the
-     * `fsRootFilePath` folder set in the class options.  Requests go through
-     * the citation manager's host fetch function (see the manager's `fetch`,
-     * `fs` and `fetch_timeout_ms` options), so this method can only be called
-     * once the manager has been initialized (e.g., from
-     * `run_retrieve_chunk()`, `source_initialize_run()` or
-     * `get_autocitefetch_spec()`).
+     * The `url` may be an ``http:``, ``https:`` or ``file:`` URL, or a local
+     * path relative to the `fsRootFilePath` option.  Requests use the citation
+     * manager's ``fetch``, ``fs`` and ``fetch_timeout_ms`` options.  After a
+     * network error or an HTTP status 429, 500, 502, 503 or 504, the request
+     * is retried up to `fetch_max_retries` times, after the delay requested by
+     * the server's ``Retry-After`` header or else after an increasing delay.
      *
-     * .. note::
+     * By default, the content is returned as a string (decoded as UTF-8), and
+     * an error is thrown if the status is not 200.  With
+     * ``get_response_object: true``, an object ``{ status, ok, headers, body,
+     * text(), json() }`` is returned instead, whatever the status: ``headers``
+     * is a plain object with lowercase names, ``body`` a ``Uint8Array``, and
+     * ``text()`` and ``json()`` are synchronous.
      *
-     *    Make sure you use `await` on the return value of this function!
-     *
-     * The `fetch_options` may contain ``method`` (default ``'GET'``),
-     * ``headers`` (a plain object; if absent, the default headers including
-     * the user agent are used) and ``body`` (a string or bytes).
-     *
-     * By default, the content of the resource is returned as a string decoded
-     * as UTF-8, and a status other than 200 causes an error to be thrown.  If
-     * `get_response_object` is set to true in the `fetch_options`, then an
-     * object ``{status, ok, headers, body, text(), json()}`` is returned
-     * instead, whatever the status (``headers`` is a plain object with
-     * lowercase names, ``body`` a ``Uint8Array``, and ``text()`` and
-     * ``json()`` are synchronous).
-     *
-     * Network errors and the HTTP statuses 429, 500, 502, 503 and 504 are
-     * retried up to `fetch_max_retries` times, honoring a ``Retry-After``
-     * header and otherwise waiting with an exponential backoff.
-     *
-     * @param {string} url - The URL or local path to fetch.
-     * @param {Object} [fetch_options]
+     * @param {string} url - The URL or local path to read.
+     * @param {Object} [fetch_options] - May contain ``method`` (default
+     *     ``'GET'``), ``headers`` (a plain object; default: the ``User-Agent``
+     *     header, see the `use_user_agent` option), ``body`` (a string or
+     *     bytes), and ``get_response_object``.
      * @returns {Promise<string|Object>}
      */
     async fetch_url(url, fetch_options=undefined)
@@ -435,19 +377,17 @@ export class CitationSourceBase
 
     /**
      * Return the specification of this source for the ``autocitefetch``
-     * citation manager (see ``SourceSpec`` in
+     * retrieval engine (see ``SourceSpec`` in
      * ``src/citationmanager/_wasm/autocitefetch_wasm.d.ts``).  Called once by
      * :class:`CitationDatabaseManager` in its `initialize()` method.
      *
      * The default implementation describes a JavaScript source that calls
      * back into this object's `run_retrieve_chunk()`:
-     * ``{ kind: 'js', prefix, source, chunkSize, minIntervalMs, ttlMs }``,
-     * where ``ttlMs`` is ``cache_store_options.cache_duration_ms`` or the
-     * ``cache_duration_ms`` option (``undefined`` if neither is set, in which
-     * case the manager applies its ``cache_entry_default_duration_ms``).
-     * Built-in sources reimplement this method to describe a native source
-     * of the crate.
+     * ``{ kind: 'js', prefix, source, chunkSize, minIntervalMs, ttlMs }``.
+     * Built-in sources reimplement this method to describe one of the
+     * engine's native sources.  Custom sources should not reimplement it.
      *
+     * @private
      * @returns {Promise<Object>}
      */
     async get_autocitefetch_spec()
@@ -517,38 +457,42 @@ export class CitationSourceBase
     }
 
     /**
-     * Reimplement to perform any required processing at the beginning of a
-     * retrieve run (a call to the manager's `retrieve_citations()`), before
-     * the first chunk of this source is retrieved.  Only called for sources
-     * that have citations to retrieve in that run.  The default implementation
-     * does nothing.
+     * Reimplement to prepare a retrieval, e.g., to load data that
+     * `run_retrieve_chunk()` needs.  Called once per call to the manager's
+     * `retrieve_citations()`, before the first call to `run_retrieve_chunk()`,
+     * and only if this source has citations to retrieve.  The default
+     * implementation does nothing.
      */
     async source_initialize_run()
     {
     }
 
     /**
-     * Reimplement to perform any required processing at the end of a retrieve
-     * run.  Called by the manager for every source after each call to
-     * `retrieve_citations()`.  Citations can no longer be stored at this point.
-     * The default implementation does nothing.
+     * Reimplement to clean up after a retrieval.  Called for every source at
+     * the end of each call to the manager's `retrieve_citations()`.  Citations
+     * cannot be stored at this point.  The default implementation does
+     * nothing.
      */
     async source_finalize_run()
     {
     }
 
     /**
-     * Reimplement to actually retrieve a chunk of citation keys/IDs (without
-     * the cite prefix).  Keys are trimmed of surrounding whitespace.
+     * Reimplement to retrieve the citation information of the keys in
+     * `id_list` (keys without the prefix, trimmed of surrounding whitespace).
+     * Use `fetch_url()` to read remote URLs or local files.
      *
-     * Consider using the utility method `fetch_url()` if you need to read data
-     * from a local file path or from a remote URL.
+     * For each key, call ``this.citation_manager.store_citation(
+     * this.cite_prefix, key, csl_json, this.cache_store_options)`` with the
+     * entry's CSL-JSON data, or ``this.citation_manager.store_citation_chained(
+     * this.cite_prefix, key, new_cite_prefix, new_cite_key, set_properties)``
+     * to redirect the citation to the entry ``new_cite_prefix:new_cite_key``
+     * of another source, adding the properties `set_properties` to it.  Keys
+     * for which nothing is stored are reported as failures.  If this method
+     * throws, the keys that were not stored yet are reported as failures, with
+     * the error's message.
      *
-     * Once the citation information for a citation key/ID is retrieved, call
-     * ``this.citation_manager.store_citation(this.cite_prefix, key, csl_json,
-     * this.cache_store_options)`` (or `store_citation_chained()`).  Keys for
-     * which nothing is stored are reported as missing.  Throwing an error
-     * marks all keys of the chunk that were not stored yet as failed.
+     * @param {Array<string>} id_list - The keys to retrieve.
      */
     async run_retrieve_chunk(/*id_list*/)
     {

@@ -48,17 +48,8 @@ import loMerge from 'lodash/merge.js';
  *
  * - ``citations.cache_fs`` — a filesystem object for cache file access.
  *
- * - ``citations.cache_dir`` — directory path for the two citation cache files:
- *   ``citations.jsonl`` (fetched citation information, written by the
- *   :class:`CitationDatabaseManager`) and ``cache_compiled_citations.json``
- *   (compiled citation text, written by the :class:`CitationCompiler`).
- *   Defaults to ``'.'``.  While citations are being retrieved, temporary files
- *   named ``._citations*`` may appear in this directory; add a rule
- *   ``._citations*`` to your ``.gitignore``.  A legacy cache file
- *   ``cache_downloaded_info.json`` (from earlier versions) is no longer read;
- *   convert it once with the ``zoodb-migrate-citations-cache`` tool
- *   (``tools/migrate_citations_cache.mjs``), otherwise all citations are
- *   fetched again.
+ * - ``citations.cache_dir`` — directory of the citation cache (see
+ *   :ref:`citations-cache`).  Defaults to ``'.'``.
  *
  * - ``citations.cache_entry_default_duration_ms`` — how long fetched citation
  *   information remains valid in the cache (milliseconds).

@@ -7,32 +7,35 @@ import { path_or_url_to_url } from '../../util/url.js';
 
 
 /**
- * A citation source which looks up bibliographic citation information in one or
- * several bibliography files, in JSON-CSL citation format.  The files
- * themselves can be JSON or YAML data files, each containing a mapping of
- * citation keys to CSL-JSON entries (entries may also carry
- * ``_ready_formatted``).
+ * Look up citations in one or several bibliography files.  Each file is a
+ * JSON or YAML file containing an object that maps citation keys to CSL-JSON
+ * entries, e.g.:
  *
- * This source is the ``bib`` source of the Rust ``autocitefetch`` crate
- * (format ``'auto'``: JSON is tried first, then YAML).  The files are read
- * again (through the citation manager's host fetch) whenever entries need to
- * be retrieved, so that edits are picked up.
+ * .. code-block:: yaml
+ *
+ *    Smith1943:
+ *      type: article-journal
+ *      title: "On weird stuff"
+ *      author: [ { family: Smith, given: A. } ]
+ *      container-title: "Journal of Weird Stuff"
+ *      issued: { date-parts: [ [ 1943 ] ] }
+ *
+ * An entry may instead provide its citation text directly, in FLM, as
+ * ``_ready_formatted: { flm: "..." }``.
+ *
+ * Entries are kept in the cache for a short time only (see
+ * `cache_duration_ms`), so that edits to the files are picked up.
  *
  * Options:
  *
- * - ``bibliography_files`` - A list of JSON/CSL (or YAML/CSL) files in which to
- *   look for citations.  Local paths are relative to ``fsRootFilePath``; URLs
- *   are also accepted.  Required.
+ * - ``bibliography_files`` - Required.  The list of bibliography files, as
+ *   local paths (relative to ``fsRootFilePath``) or URLs.
  *
- * - ``cache_duration_ms`` - How long entries are cached (milliseconds).  The
- *   default value `true` means 60 seconds if all files are local and 3 minutes
- *   if any file is remote.
+ * - ``cache_duration_ms`` - How long entries are kept in the cache, in
+ *   milliseconds.  Default: 60 seconds if all files are local, 3 minutes
+ *   otherwise.
  *
  * - See :class:`CitationSourceBase` for further options.
- *
- * The methods ``source_initialize_run()`` and ``run_retrieve_chunk()`` of
- * earlier versions were removed (the crate reads and parses the files), as
- * was the attribute ``bibdata``.
  */
 export class CitationSourceBibliographyFile extends CitationSourceBase
 {
@@ -84,9 +87,10 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
 
     /**
      * Return the ``bib`` source specification for the ``autocitefetch``
-     * citation manager: ``{ kind: 'bib', prefix, files, format: 'auto', ttlMs
-     * }`` where ``files`` are the URLs of the bibliography files.
+     * retrieval engine: ``{ kind: 'bib', prefix, files, format: 'auto', ttlMs
+     * }``.
      *
+     * @private
      * @returns {Promise<Object>}
      */
     async get_autocitefetch_spec()

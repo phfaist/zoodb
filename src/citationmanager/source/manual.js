@@ -5,16 +5,12 @@
 import { CitationSourceBase } from './base.js';
 
 /**
- * A citation "source" which interprets the "ID" directly as the FLM text
- * content of the citation.  The resulting entries are of the form
- * ``{ _ready_formatted: { flm: <key> } }`` and are only kept in memory for the
- * current run (they are never written to the cache file).
+ * A citation source whose keys are the citation text itself, in FLM, as in
+ * ``\cite{manual:{A. Smith et al., \emph{J. Weird Stuff} 12, 1003 (1943)}}``.
+ * The key is used verbatim.  Nothing is fetched, and the entries (of the form
+ * ``{ _ready_formatted: { flm: <key> } }``) are not written to the cache.
  *
- * This source is the ``manual`` source of the Rust ``autocitefetch`` crate
- * (with format ``'flm'``); keys are used verbatim (not even trimmed).
- *
- * See :class:`CitationSourceBase` for options.  The method
- * ``run_retrieve_chunk()`` of earlier versions was removed.
+ * See :class:`CitationSourceBase` for options.
  */
 export class CitationSourceManual extends CitationSourceBase
 {
@@ -47,8 +43,9 @@ export class CitationSourceManual extends CitationSourceBase
 
     /**
      * Return the ``manual`` source specification for the ``autocitefetch``
-     * citation manager: ``{ kind: 'manual', prefix, format: 'flm', ttlMs: 0 }``.
+     * retrieval engine: ``{ kind: 'manual', prefix, format: 'flm', ttlMs: 0 }``.
      *
+     * @private
      * @returns {Promise<Object>}
      */
     async get_autocitefetch_spec()

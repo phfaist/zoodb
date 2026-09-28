@@ -87,7 +87,7 @@ function snake_to_camel_options(obj, mapping)
 
 
 /**
- * The default progress sink (design decision D11): milestones and long waits
+ * The default progress sink: milestones and long waits
  * are logged through ``debug('zoodb.citationmanager.progress')`` (unless
  * `progress_debug` is false); backoff waits and failures served from an
  * expired cache entry are reported with `console.warn`.
@@ -183,109 +183,46 @@ function check_chain_targets(specs)
 
 
 /**
- * Manage a database of bibliographic references, as well as a collection of
- * source objects that are capable of fetching bibliographic citation
- * information from various sources.
+ * Retrieve and cache bibliographic citation information for citations of the
+ * form ``cite_prefix:cite_key``.  See :doc:`zoodb.citationmanager` for an
+ * overview.
  *
- * Citation retrieval, chaining (e.g., arXiv → DOI), rate limiting, retries and
- * the on-disk cache are handled by the Rust crate ``autocitefetch``, compiled
- * to WebAssembly and bundled with this package.  This class adapts it to the
- * historical API of ZooDb's citation manager: citation information is read
- * synchronously with `get_citation_by_id()` once it has been retrieved with
- * `retrieve_citations()`.
+ * The first argument, `sources`, is an object mapping each citation prefix to
+ * a citation source instance (e.g., :class:`CitationSourceArxiv`,
+ * :class:`CitationSourceDoi`, or any subclass of :class:`CitationSourceBase`).
  *
- * The constructor should be given a collection of sources in the first argument
- * (`sources`).  The `sources` should be an object where the keys correspond to
- * a `cite_prefix` and where the values are citation source instances (e.g.,
- * :class:`CitationSourceArxiv` or :class:`CitationSourceBibliographyFile`, or
- * any subclass of :class:`CitationSourceBase`).
+ * Call and await `initialize()` before anything else.  Then, await
+ * `retrieve_citations()` with the citations you need, and read them with
+ * `get_citation()` or `get_citation_by_id()`.
  *
- * The cache is stored in ``<cache_dir>/<cache_base>.jsonl`` (by default
- * ``citations.jsonl``).  Temporary files named ``._<cache_base>*`` may appear
- * in the same directory while the manager runs; they should be ignored by
- * version control.  A legacy cache file ``cache_downloaded_info.json`` is never
- * read; convert it once with the ``zoodb-migrate-citations-cache`` tool.
+ * Options (the second argument):
  *
- * Possible options:
- *
- * - ``cache_fs`` - 'fs'-compatible module object to provide filesystem access
- *   for the cache (it must provide ``readFile``, ``writeFile``,
- *   ``appendFile``, ``rename``, ``readdir``, ``unlink`` and ``mkdir``, either
- *   directly or under ``promises``).  Not needed if `skip_save_cache` is set.
+ * - ``cache_fs`` - an `fs`-compatible object used to read and write the cache
+ *   (it must provide ``readFile``, ``writeFile``, ``appendFile``, ``rename``,
+ *   ``readdir``, ``unlink`` and ``mkdir``, directly or under ``promises``).
+ *   Not needed if `skip_save_cache` is set.
  *
  * - ``cache_dir`` - the directory holding the cache (default ``'.'``).  It is
  *   created if needed.
  *
- * - ``cache_file`` - *deprecated*.  If given (and `cache_dir` is not), the
- *   cache directory is the directory part of this path.
- *
- * - ``cache_base`` - base name of the cache file (default ``'citations'``).
- *
- * - ``cache_entry_default_duration_ms`` - the default duration of time (in
- *   milliseconds) that citation information for an entry should be stored in
- *   cache before being re-queried again from the source.  Applies to custom
- *   (JavaScript) sources that do not specify a duration themselves (default:
- *   30 days).  A falsy value (including ``0``) means the default; to make a
- *   source's entries ephemeral, give that source ``cache_duration_ms: 0``.
- *
- * - ``default_use_user_agent``, ``default_user_agent`` - specify defaults
- *   as to whether or not to set a custom user agent when sources fetch
- *   remote content, and if so, then which user agent to specify.
- *
  * - ``skip_save_cache`` - if true, the cache is kept in memory only and
  *   nothing is written to disk.
  *
- * Additional options (these may be given through
- * ``flm_options.citations.citation_manager_options``):
+ * - ``cache_entry_default_duration_ms`` - how long (in milliseconds) entries
+ *   of custom sources that do not set a duration themselves are kept before
+ *   being retrieved again (default: 30 days).  A falsy value, including ``0``,
+ *   means the default; to keep a source's entries for the current run only,
+ *   give that source the option ``cache_duration_ms: 0``.
  *
- * - ``fetch`` - a Fetch-API-compatible function ``(url, init) => Response``
- *   used for http(s) requests (default: ``globalThis.fetch``).  In a browser,
- *   a proxying fetch is needed to reach arXiv and doi.org.
+ * - ``default_user_agent``, ``default_use_user_agent`` - the ``User-Agent``
+ *   header sent with requests to remote servers, and whether to send it at
+ *   all (default: true).
  *
- * - ``fs``, ``fs_root_path`` - `fs`-compatible object and root directory used
- *   to read local files (``file:`` URLs and bare paths), e.g. bibliography
- *   files.  Default: `cache_fs` (or else the `fs` option of the first source
- *   that has one) and the ``fsRootFilePath`` of the first source that has one.
+ * - ``cache_file`` - *deprecated*; use `cache_dir`.  If given (and
+ *   `cache_dir` is not), the cache directory is the directory part of this
+ *   path.
  *
- * - ``fetch_timeout_ms`` - timeout of http(s) requests (default 120000).
- *
- * - ``retry`` - retry policy of the crate's sources, ``{ max_retries,
- *   base_ms, cap_ms, honor_retry_after }``.
- *
- * - ``ttl_policy`` - ``{ stale_percent, jitter_percent, grace_days }``.
- *
- * - ``max_chain_depth`` - maximal length of a chain of chained citations.
- *
- * - ``drop_csl_fields`` - CSL-JSON fields that are removed from fetched
- *   entries (default ``['reference']``).
- *
- * - ``on_event`` - a synchronous callback receiving progress events
- *   (``{ type: 'retrieve_started', ... }``, see the ``ProgressEvent`` type in
- *   ``_wasm/autocitefetch_wasm.d.ts``).  If given, it replaces the default
- *   progress reporting and events are not throttled.
- *
- * - ``progress_debug`` - if false, the default progress reporting does not
- *   log to ``debug('zoodb.citationmanager.progress')`` (warnings are still
- *   printed).  Default true.
- *
- * - ``writer_id`` - identifier of this process in the names of the cache's
- *   temporary files (default: a random token).
- *
- * - ``sleep``, ``now`` - replace the timer (``async (ms) => {}``) and the
- *   clock (``() => milliseconds since epoch``) used for rate limiting,
- *   backoff and cache expiry (mostly useful for tests).
- *
- * Changes with respect to earlier versions: `purge_expired()`, `load_cache()`
- * and `save_cache()` are asynchronous; `retrieve_citations()` returns the
- * failures instead of throwing; `store_citation()` and
- * `store_citation_chained()` throw (sources store citations through a
- * collector, see :class:`CitationSourceBase`); the attributes ``cache``,
- * ``cache_fsp`` and ``cache_file`` were removed.
- *
- * .. warning::
- *
- *    Do not forget to call and await the result of the `initialize()` method on
- *    the newly created object before retrieving citations.
+ * Further options are listed in :ref:`citations-advanced-options`.
  */
 export class CitationDatabaseManager
 {
@@ -343,10 +280,10 @@ export class CitationDatabaseManager
     }
 
     /**
-     * Load the WebAssembly module, set up the host functions (fetch, cache
-     * filesystem, progress reporting) and the sources, and open the cache.
-     * Must be called (and awaited) before `retrieve_citations()`.  Calling it
-     * again has no effect.
+     * Set up the sources and load the cache.  Must be called, and awaited,
+     * before any other method.  Calling it again has no effect.
+     *
+     * @returns {Promise}
      */
     initialize()
     {
@@ -573,8 +510,10 @@ export class CitationDatabaseManager
     }
 
     /**
-     * Kept for API compatibility; does nothing.  The cache is opened by
-     * `initialize()`.
+     * Does nothing; the cache is loaded by `initialize()`.  Kept for
+     * compatibility with earlier versions.
+     *
+     * @private
      */
     async load_cache()
     {
@@ -582,9 +521,11 @@ export class CitationDatabaseManager
     }
 
     /**
-     * Write buffered cache updates to the cache file
-     * ``<cache_dir>/<cache_base>.jsonl``.  (Updates are also written when the
-     * manager is done retrieving citations.)
+     * Write pending updates to the cache file.  You normally do not need to
+     * call this method, since updates are written when `retrieve_citations()`
+     * finishes.
+     *
+     * @returns {Promise}
      */
     async save_cache()
     {
@@ -596,12 +537,10 @@ export class CitationDatabaseManager
     }
 
     /**
-     * Remove any citation information entries that have expired (past a grace
-     * period) from the cache.  Returns a promise resolving to the number of
-     * entries removed.  (It is safe not to await it before calling
-     * `retrieve_citations()`: operations on the cache are run in order.)
+     * Remove from the cache the entries that have expired, past their grace
+     * period (see the `ttl_policy` option).
      *
-     * @returns {Promise<number>}
+     * @returns {Promise<number>} The number of entries removed.
      */
     async purge_expired()
     {
@@ -630,19 +569,24 @@ export class CitationDatabaseManager
     }
 
     /**
-     * Return the citation information associated with the given citation key/id
-     * with prefix.  The `id` argument is a string of the form
-     * `cite_prefix:cite_key`, spelled as it was requested in
-     * `retrieve_citations()` (or as listed by `keys()`).  Chained citations are
-     * already resolved.
+     * Return the citation information of a citation that was retrieved with
+     * `retrieve_citations()` (or that is in the cache).
      *
-     * Returns the JSON/CSL object data associated with the given citation
-     * information.  Its ``id`` is the requested `id` and its ``_hash`` a hash
-     * of the entry's contents; it may contain ``_ready_formatted`` instead of
+     * The returned object contains the entry's CSL-JSON fields.  Its ``id`` is
+     * the given `id`, and ``_hash`` is a hash of the entry's contents.  A
+     * citation that was redirected to another entry (an arXiv paper that has
+     * a DOI) returns the data of that entry.  Entries that provide their
+     * citation text directly, such as manual citations, contain
+     * ``_ready_formatted`` (e.g., ``{ flm: '<citation text>' }``) instead of
      * CSL-JSON fields.
      *
-     * An `Error` is thrown if the given id is not found in the current
-     * database.  This method is synchronous.
+     * This method is synchronous.
+     *
+     * @param {string} id - The citation, as ``cite_prefix:cite_key``, spelled
+     *     as it was passed to `retrieve_citations()` or as returned by
+     *     `keys()`.
+     * @returns {Object}
+     * @throws {Error} If the citation is not available.
      */
     get_citation_by_id(id)
     {
@@ -654,11 +598,11 @@ export class CitationDatabaseManager
     }
 
     /**
-     * Get the citation information object associated with the given
-     * `cite_prefix` and `cite_key`.
+     * Same as ``get_citation_by_id(`${cite_prefix}:${cite_key}`)``.
      *
-     * This method is a shorthand for concatenating the citation prefix and key
-     * together with a colon and calling `get_citation_by_id()`.
+     * @param {string} cite_prefix
+     * @param {string} cite_key
+     * @returns {Object}
      */
     get_citation(cite_prefix, cite_key)
     {
@@ -667,11 +611,12 @@ export class CitationDatabaseManager
     }
 
     /**
-     * Return a list of all citation keys available in the cache.  The return
-     * value is an array of strings of the form `cite_prefix:cite_key`, with the
-     * keys normalized by their sources (e.g., DOIs in lowercase).  This method
-     * is synchronous; the list is updated by `initialize()`,
-     * `retrieve_citations()` and `purge_expired()`.
+     * Return all citations available in the cache, as an array of strings
+     * ``cite_prefix:cite_key``.  Keys are in their normalized form (e.g., DOIs
+     * in lowercase), which can differ from the spelling that was requested.
+     * This method is synchronous.
+     *
+     * @returns {Array<string>}
      */
     keys()
     {
@@ -679,26 +624,27 @@ export class CitationDatabaseManager
     }
 
     /**
-     * Retrieve a number of citations from the respective sources.
+     * Retrieve the given citations from their sources, unless they are
+     * already in the cache and do not need to be refreshed.  Await this method
+     * before reading the citations with `get_citation()`.
      *
-     * - `citations` is an array of objects of the form ``{cite_prefix:...,
-     *   cite_key:..., encountered_in: {resource_info, what}}`` (where
-     *   `encountered_in` is optional and used in error messages).
+     * Citations that cannot be retrieved do not cause an error.  They are
+     * printed with `console.error`, along with where they were encountered,
+     * and returned.  Each failure is an object ``{ prefix, key, message,
+     * origin }``: ``prefix`` and ``key`` identify the citation that failed,
+     * and if it was reached by redirection from a requested citation (e.g.,
+     * the DOI of an arXiv paper), ``origin`` is the ``[prefix, key]`` of the
+     * requested citation, else ``null``.  The failures are also stored in
+     * `this.last_failures`.
      *
-     * Citations that are missing from the cache or whose cache entry is stale
-     * are fetched from their sources, following chained citations.
-     *
-     * An error is thrown immediately if a citation's prefix has no registered
-     * source.  Citations that cannot be retrieved do not cause an error:
-     * they are reported with `console.error` (along with where they were
-     * encountered), and returned as an array of failures ``{prefix, key,
-     * message, origin}`` (``origin`` is the ``[prefix, key]`` of the requested
-     * citation a failed chained citation descends from, or ``null``).  The
-     * same array is stored in `this.last_failures`.
-     *
-     * Make sure you `await` this method before reading the citations.
-     *
-     * @returns {Promise<Array<Object>>} The failures.
+     * @param {Array<Object>} citations - The citations to retrieve, as objects
+     *     ``{ cite_prefix, cite_key, encountered_in }``.  The optional
+     *     ``encountered_in`` is ``{ resource_info, what }``, where
+     *     ``resource_info.source_path`` and ``what`` describe where the
+     *     citation appears, for error messages.
+     * @returns {Promise<Array<Object>>} The citations that could not be
+     *     retrieved.
+     * @throws {Error} If a citation's prefix has no registered source.
      */
     async retrieve_citations(citations)
     {
@@ -798,11 +744,10 @@ export class CitationDatabaseManager
 
 
     /**
-     * Citations can no longer be stored directly in the manager.  A source's
-     * `run_retrieve_chunk()` calls ``this.citation_manager.store_citation()``
-     * on a collector object that stands in for the manager during the call
-     * (see :class:`CitationSourceBase`).  Calling this method on the manager
-     * itself throws an error.
+     * Throws an error: citations are stored by sources, from within their
+     * `run_retrieve_chunk()` (see :class:`CitationSourceBase`).
+     *
+     * @private
      */
     store_citation(/*cite_prefix, cite_key, entry_csl_json, options*/)
     {
@@ -810,9 +755,9 @@ export class CitationDatabaseManager
     }
 
     /**
-     * Citations can no longer be stored directly in the manager; see
-     * `store_citation()`.  Calling this method on the manager itself throws an
-     * error.
+     * Throws an error; see `store_citation()`.
+     *
+     * @private
      */
     store_citation_chained(/*cite_prefix, cite_key, new_cite_prefix, new_cite_key,
                              set_properties*/)

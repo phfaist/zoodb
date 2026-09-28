@@ -9,22 +9,21 @@ const one_day = 1000 * 3600 * 24;
 
 
 /**
- * Fetch bibliographic citation information from a DOI (cf. https://doi.org/).
+ * Fetch bibliographic citation information from `doi.org
+ * <https://doi.org/>`_, for citations such as ``doi:10.1103/PhysRevA.52.R2493``.
+ * DOIs are case-insensitive; they are stored in lowercase in the cache.
  *
- * The retrieval itself is performed by the ``doi`` source of the Rust
- * ``autocitefetch`` crate (CSL-JSON content negotiation with doi.org, one DOI
- * per request, at least 1.1 s between two requests, entries cached for 360
- * days by default).  DOI keys are normalized to lowercase in the cache.  The
- * ``reference`` field is dropped from the CSL-JSON data (see the citation
- * manager's ``drop_csl_fields`` option).
+ * By default, DOIs are queried one at a time, with at least 1.1 seconds
+ * between requests, and entries are kept in the cache for 360 days.  The
+ * ``reference`` field (the list of references of the cited paper) is removed
+ * from the entries; see the citation manager's ``drop_csl_fields`` option.
  *
- * Options ``chunk_retrieve_delay_ms`` and ``cache_duration_ms`` (or
- * ``cache_store_options.cache_duration_ms``), if specified, override the
- * crate's defaults; ``chunk_size`` is always 1.  See
- * :class:`CitationSourceBase` for further options.
+ * Options:
  *
- * The method ``run_retrieve_chunk()`` of earlier versions was removed (the
- * crate performs the requests).
+ * - ``chunk_retrieve_delay_ms``, ``cache_duration_ms`` (or
+ *   ``cache_store_options.cache_duration_ms``) - Override the defaults above.
+ *
+ * - See :class:`CitationSourceBase` for further options.
  */
 export class CitationSourceDoi extends CitationSourceBase
 {
@@ -53,8 +52,9 @@ export class CitationSourceDoi extends CitationSourceBase
 
     /**
      * Return the ``doi`` source specification for the ``autocitefetch``
-     * citation manager: ``{ kind: 'doi', prefix, chunkSize: 1, ... }``.
+     * retrieval engine: ``{ kind: 'doi', prefix, chunkSize: 1, ... }``.
      *
+     * @private
      * @returns {Promise<Object>}
      */
     async get_autocitefetch_spec()

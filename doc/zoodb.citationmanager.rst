@@ -1,293 +1,484 @@
 Managing bibliographic citations
 ================================
 
-Citation manager
-----------------
+When FLM text cites a paper, as in ``\cite{arxiv:quant-ph/9705052}`` or
+``\cite{doi:10.1103/PhysRevA.52.R2493}``, the zoo needs that paper's
+bibliographic information (authors, title, journal, year, …) in order to
+format the reference.  The *citation manager*,
+:class:`CitationDatabaseManager`, provides this information:
 
-.. code::
+- Each citation is a ``prefix:key`` pair.  The prefix selects a *citation
+  source*, and the key identifies the entry within that source.  ZooDb ships
+  sources that query the `arXiv <https://arxiv.org/>`_ and `doi.org
+  <https://doi.org/>`_, that look up entries in local bibliography files, and
+  that take the citation text verbatim from the key.  You can
+  :ref:`write your own source <citations-custom-source>`.
+
+- Retrieved entries are stored as `CSL-JSON
+  <https://citeproc-js.readthedocs.io/en/latest/csl-json/markup.html>`_ objects
+  in an on-disk :ref:`cache <citations-cache>`.  Later builds reuse the cache
+  and only contact remote servers for new citations or for entries that are
+  due for a refresh.
+
+- An arXiv paper that has been published is resolved to the entry of its DOI,
+  so that the published version is cited.
+
+- Requests to remote servers respect the servers' rate limits, and are retried
+  when they fail temporarily.
+
+The citation manager only *retrieves* citation information.  Formatting it
+into reference text according to a CSL style is done by the
+:class:`CitationCompiler`.
+
+
+Citations in a standard zoo
+---------------------------
+
+With :func:`makeStandardZooDb` you never create a citation manager yourself:
+the FLM processor (see :func:`use_flm_processor`) creates one, retrieves every
+citation it encounters in the zoo's FLM content, and hands the results to the
+citation compiler.  You configure it through ``flm_options.citations`` in the
+zoo's configuration:
+
+.. code-block:: js
+
+   flm_options: {
+       citations: {
+           // CSL style used to format the citations
+           csl_style: csl_style,
+           // where to keep the citation cache (this is the default)
+           cache_dir: '_zoodb_citations_cache',
+           // YAML/JSON file mapping arXiv IDs to DOIs, for arXiv entries whose
+           // DOI is missing or wrong (path relative to fs_data_dir)
+           override_arxiv_dois_file: 'citations_info/override_arxiv_dois.yml',
+           // YAML/JSON files with predefined entries, cited with preset:<key>
+           preset_bibliography_files: [ 'citations_info/bib_preset.yml' ],
+           // User-Agent header sent to remote servers
+           default_user_agent: 'MyZoo/1.0 (https://example.org/myzoo)',
+       },
+   },
+
+The citation prefixes available in a standard zoo are:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 25 60
+
+   * - Prefix
+     - Example
+     - Citation information
+   * - ``arxiv``
+     - ``\cite{arxiv:2101.01234}``
+     - Fetched from the arXiv API.  If the paper has a DOI, the citation
+       resolves to the ``doi`` entry of that DOI (see
+       :class:`CitationSourceArxiv`).
+   * - ``doi``
+     - ``\cite{doi:10.1103/PhysRevA.52.R2493}``
+     - Fetched from doi.org (see :class:`CitationSourceDoi`).
+   * - ``preset``
+     - ``\cite{preset:Smith1943}``
+     - Looked up in the ``preset_bibliography_files`` (see
+       :class:`CitationSourceBibliographyFile`).
+   * - ``manual``
+     - ``\cite{manual:{A. Smith, \emph{J. Weird Stuff} (1943)}}``
+     - The key itself is the citation text, in FLM (see
+       :class:`CitationSourceManual`).
+
+To add, replace or remove sources, use ``citations.sources``: map a prefix to a
+source instance to add or replace that source, or to ``false`` to remove a
+built-in source.  Because arXiv citations resolve to DOI entries, removing the
+``doi`` source requires an arXiv source that does not chain to DOIs:
+
+.. code-block:: js
+
+   citations: {
+       sources: {
+           mysource: new MyCitationSource(),  // a custom source
+           doi: false,
+           arxiv: new CitationSourceArxiv({ chain_to_doi: false }),
+       },
+   }
+
+**Citations that cannot be retrieved** (a malformed arXiv ID, a DOI that does
+not exist, a network failure, …) are printed along with the file and field in
+which they were encountered.  By default the zoo build then fails with an error
+that lists them.  With ``flm_error_policy: 'continue'``, the build proceeds and
+formats the citations that could be retrieved.
+
+The other available keys of ``flm_options.citations`` are listed with
+:func:`makeStandardZooDb`.  Options of the citation manager itself, such as
+those listed under :ref:`citations-advanced-options`, can be passed through
+``citations.citation_manager_options``.
+
+
+.. _citations-cache:
+
+The citation cache
+------------------
+
+The cache lives in the directory ``cache_dir`` (``_zoodb_citations_cache`` in
+a standard zoo) and consists of:
+
+``citations.jsonl``
+   The retrieved citation information.
+
+``cache_compiled_citations.json``
+   The formatted citations, maintained by the :class:`CitationCompiler`.
+
+``._citations*``
+   Temporary files that exist while a build runs.  Exclude them from version
+   control, e.g., with the ``.gitignore`` rule ``._citations*``.
+
+Keep the cache directory between builds (e.g., in version control or in your
+CI cache) so that citations are not all fetched again at every build.
+
+**Refreshing.**  Each entry is kept for a lifetime that depends on its source:
+10 days for arXiv entries, 360 days for DOI entries, 60 seconds for entries of
+local bibliography files (3 minutes if any file is remote, so that edits to
+the files are picked up), and 30 days by default for custom sources.  Manual
+citations are never written to the cache.  An entry is refreshed as it
+approaches the end of its lifetime.  If the refresh fails shortly after the
+entry has expired (within 14 days by default), the expired entry is used
+anyway and a warning is printed.  These durations can be changed with the
+sources' ``cache_duration_ms`` option and with the manager's ``ttl_policy``
+option.
+
+**One build at a time.**  Only one process should use a given cache directory
+at a time; two builds that share it concurrently may lose entries that the
+other one fetched.  A build that is interrupted may leave a
+``._citations.<id>.log`` file behind.  Its contents are taken into account by
+the next build, but the file is not removed; delete ``._citations*`` files
+yourself when no build is running.
+
+
+Using the citation manager directly
+-----------------------------------
+
+Outside of a standard zoo, create the manager with the sources you need (an
+object mapping each citation prefix to a source instance), initialize it, and
+retrieve the citations you are going to need.  Once retrieved, citation
+information can be read synchronously.
+
+.. code-block:: js
+
+   import fs from 'fs';
 
    import { CitationDatabaseManager } from '@phfaist/zoodb/citationmanager';
+   import { CitationSourceArxiv } from '@phfaist/zoodb/citationmanager/source/arxiv.js';
+   import { CitationSourceDoi } from '@phfaist/zoodb/citationmanager/source/doi.js';
+
+   const citation_manager = new CitationDatabaseManager(
+       {
+           arxiv: new CitationSourceArxiv(),
+           doi: new CitationSourceDoi(),
+       },
+       {
+           cache_fs: fs,
+           cache_dir: 'citations_cache',
+       }
+   );
+
+   await citation_manager.initialize();
+
+   const failures = await citation_manager.retrieve_citations([
+       { cite_prefix: 'arxiv', cite_key: 'quant-ph/9705052' },
+       { cite_prefix: 'doi', cite_key: '10.1103/PhysRevA.52.R2493' },
+   ]);
+   // failures: [ { prefix, key, message, origin }, ... ]
+
+   const csl_entry = citation_manager.get_citation('arxiv', 'quant-ph/9705052');
+   console.log(csl_entry.title);
+
+``retrieve_citations()`` does not throw when a citation cannot be retrieved.
+It prints the failures and returns them; see
+:js:meth:`CitationDatabaseManager.retrieve_citations`.
+
+To keep the cache in memory only, for instance in tests, pass
+``skip_save_cache: true`` instead of ``cache_fs`` and ``cache_dir``.
 
 
-Note: See also :class:`CitationCompiler` in the FLM-related modules.
+Progress and warnings
+~~~~~~~~~~~~~~~~~~~~~
+
+Retrieving many citations for the first time can take a while, as the arXiv
+and doi.org servers only accept a limited rate of requests.  To follow the
+progress, set the environment variable
+``DEBUG=zoodb.citationmanager.progress``.  Retries after a failed request, and
+expired entries used because they could not be refreshed, are always printed
+as warnings.
+
+To handle progress reporting yourself, pass an ``on_event`` callback in the
+manager's options (see :ref:`citations-advanced-options`).  It is called
+synchronously with event objects whose ``type`` field is one of:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 35 65
+
+   * - ``type``
+     - Meaning
+   * - ``retrieve_started``, ``retrieve_finished``
+     - A call to ``retrieve_citations()`` starts or ends.
+   * - ``pass_started``, ``pass_finished``
+     - A retrieval pass starts or ends (chained citations, e.g., the DOI of an
+       arXiv paper, are retrieved in a further pass).
+   * - ``source_started``, ``source_progress``, ``source_finished``
+     - Progress of the requests made by one source (fields ``prefix``,
+       ``done``, ``total``).
+   * - ``request_started``, ``request_finished``
+     - A single request made by a source.
+   * - ``wait_started``, ``wait_finished``
+     - A wait (field ``wait``: ``'rate_limit'``, ``'backoff'`` before a
+       retry, ``'cache_flush'`` or ``'unknown'``).
+   * - ``cite_resolved``, ``cite_failed``
+     - A citation was retrieved, or could not be (``grace_served`` is true
+       if an expired entry is used instead).
+   * - ``unknown``
+     - An event of a type not listed here.
+
+The complete list of fields of each event is given by the ``ProgressEvent``
+type in ``src/citationmanager/_wasm/autocitefetch_wasm.d.ts``.
 
 
-How citations are fetched
-~~~~~~~~~~~~~~~~~~~~~~~~~
+In a browser
+~~~~~~~~~~~~
 
-Citation retrieval is performed by the Rust crate `autocitefetch
-<https://crates.io/crates/autocitefetch>`_, compiled to WebAssembly by the
-binding crate in ``rust/`` of the ZooDb repository.  The compiled module is
-inlined as base64 in the generated (committed) directory
-``src/citationmanager/_wasm/`` and loaded asynchronously, once per process,
-by ``src/citationmanager/_load_wasm.js`` (also exported as
-``@phfaist/zoodb/citationmanager/wasm``) when
-:class:`CitationDatabaseManager`'s ``initialize()`` is awaited.  Users of the
-package need no Rust toolchain and no build step; the same module works on
-Node.js (18 or later) and in browsers.
-
-The WebAssembly module does no I/O of its own.  Everything goes through
-JavaScript *host functions* supplied by :class:`CitationDatabaseManager`:
-``fetch`` (http(s) requests through the Fetch API, and ``file:`` URLs or bare
-paths read through an ``fs`` object), the cache filesystem (``read``,
-``append``, ``atomicReplace``, ``list``, ``remove`` and the locking calls),
-``sleep``, ``now``, and a progress-event callback.
-
-The crate provides:
-
-- **Chunking and rate limiting** per source (by default, the arXiv source
-  queries up to 100 ids per request, at least 3.1 s apart, and the DOI source
-  one DOI per request, at least 1.1 s apart).
-
-- **Retry with exponential backoff** on network errors and on HTTP statuses
-  429, 500, 502, 503 and 504, honoring a numeric ``Retry-After`` header (see
-  the ``retry`` option below).
-
-- **Expiry with stale-while-revalidate and grace.**  Every cached entry has a
-  lifetime (TTL) set by its source, jittered so that entries fetched together
-  do not all expire together.  After ``stale_percent`` of its lifetime an
-  entry is *stale*: it is still used, and revalidated with a probability that
-  grows as the entry approaches its expiry.  An expired entry is fetched
-  again; if that fails within the *grace* period after expiry, the expired
-  entry is used anyway and a warning is printed.
-
-- **Chaining**, e.g. an arXiv entry that has a published DOI is resolved to
-  the ``doi:`` entry (arXiv → DOI), up to ``max_chain_depth`` links.
-
-Progress is reported as plain event objects with a ``type`` field (the same
-snake_case vocabulary as the crate's Python binding): ``retrieve_started``,
-``pass_started``, ``pass_finished``, ``retrieve_finished``,
-``source_started``, ``source_progress``, ``source_finished``,
-``cite_resolved``, ``cite_failed`` (with ``grace_served``),
-``wait_started`` / ``wait_finished`` (``wait`` is ``'rate_limit'``,
-``'backoff'``, ``'cache_flush'`` or ``'unknown'``), ``request_started``,
-``request_finished``, and ``unknown`` for variants this build does not know.
-The exact shapes are given by the ``ProgressEvent`` type in
-``src/citationmanager/_wasm/autocitefetch_wasm.d.ts``.  By default,
-milestones and waits of 2 s or more are logged with
-``debug('zoodb.citationmanager.progress')`` (enable with
-``DEBUG=zoodb.citationmanager.progress``), while backoff waits and failures
-served from an expired entry are printed with ``console.warn``;
-``source_progress`` events are throttled to one per second per prefix.
-Supplying an ``on_event`` callback replaces this default and disables the
-throttling.
-
-Per-citation failures do not throw: ``retrieve_citations()`` returns the list
-of failures (``{ prefix, key, message, origin }``) and prints each one with
-the location where the citation was encountered.
+The citation manager also runs in browsers.  Browsers cannot query the arXiv
+or doi.org directly, because these servers do not allow cross-origin requests:
+pass a ``fetch`` function that goes through a proxy of yours in the manager's
+options, or use only local sources (manual citations, bibliography files).
+There is no cache on disk in a browser; set ``skip_save_cache: true``.
 
 
-Cache files
-~~~~~~~~~~~
+.. _citations-advanced-options:
 
-All files live in the cache directory ``cache_dir`` (for a standard zoo,
-``flm_options.citations.cache_dir``, default ``_zoodb_citations_cache``):
+Advanced options
+~~~~~~~~~~~~~~~~
 
-- ``citations.jsonl`` (``<cache_base>.jsonl``) — the fetched citation
-  information, one record per line.  It is written only by the crate (never
-  by JavaScript code), and compacted when the manager flushes.
-
-- ``cache_compiled_citations.json`` — the formatted citations, written by the
-  :class:`CitationCompiler` (unchanged).
-
-- ``._citations*`` — throwaway files (per-process append logs) that exist
-  while a build runs.  Add one rule to your ``.gitignore``::
-
-      ._citations*
-
-On Node.js the library does **no file locking**: the cache directory is
-assumed to be used by a single process at a time.  Two builds sharing one
-``cache_dir`` concurrently may lose each other's new entries.  A run that is
-interrupted may leave its ``._citations.<writer>.log`` file behind; later runs
-fold its contents into the cache but never delete it, so remove
-``._citations*`` files by hand when no build is running.
-
-The legacy cache file ``cache_downloaded_info.json`` (written by ZooDb before
-0.2) is **no longer read**.  If it exists and ``citations.jsonl`` does not, the
-manager prints a warning naming the migration tool, and all citations are then
-fetched again.  To keep them, convert the legacy file once per project with
-the ``zoodb-migrate-citations-cache`` tool (package ``bin``, e.g.
-``yarn zoodb-migrate-citations-cache --cache-dir _zoodb_citations_cache``):
-
-.. code-block:: text
-
-   Usage: zoodb-migrate-citations-cache --cache-dir <dir> [--legacy-file <path>] [--cache-base citations] [--prefix <name>=<kind>]... [--drop-field <name>]... [--dry-run] [--force] [--remove-legacy]
-
-Nothing is fetched.  Prefixes ``arxiv``, ``doi``, ``manual`` and ``preset``
-map to the built-in sources; any other prefix is treated as a custom source
-(override with ``--prefix <name>=<kind>``).  The tool refuses to overwrite an
-existing ``<dir>/<base>.jsonl`` unless ``--force`` is given, and leaves the
-legacy file untouched unless ``--remove-legacy`` is given.  Run it with
-``--help`` for the full option list.
-
-
-Options
-~~~~~~~
-
-The manager's options are documented with :class:`CitationDatabaseManager`
-below.  The following keys may be given to a standard zoo through
-``flm_options.citations.citation_manager_options`` (all optional):
+Besides the options documented with :class:`CitationDatabaseManager` below,
+the manager accepts the following options (all optional).  In a standard zoo,
+pass them in ``flm_options.citations.citation_manager_options``.
 
 ``fetch``
-   A Fetch-API-compatible function ``(url, init) => Promise<Response>`` used
-   for http(s) requests.  Default: ``globalThis.fetch``.  In a browser, a
-   proxying fetch is needed to reach arXiv and doi.org (CORS).
-
-``fs``
-   An ``fs``-compatible object used to read local files (``file:`` URLs and
-   bare paths, e.g. bibliography files).  Default: the manager's ``cache_fs``,
-   else the ``fs`` option of the first source that has one.
-
-``fs_root_path``
-   The directory relative to which bare local paths are resolved.  Default:
-   the ``fsRootFilePath`` of the first source that has one (for a standard
-   zoo, ``fs_data_dir``), else ``''``.
+   A function compatible with the Fetch API, ``(url, init) => Promise<Response>``,
+   used for all http(s) requests.  Default: ``globalThis.fetch``.
 
 ``fetch_timeout_ms``
    Timeout of each http(s) request, in milliseconds.  Default ``120000``.
 
+``fs``, ``fs_root_path``
+   An ``fs``-compatible object used to read local files (bibliography files,
+   the arXiv DOI overrides file), and the directory relative to which their
+   paths are resolved.  Default: the ``cache_fs`` option, and the directory
+   given to the sources as ``fsRootFilePath`` (``fs_data_dir`` in a standard
+   zoo).
+
 ``retry``
-   Retry policy of the built-in sources' requests:
-   ``{ max_retries, base_ms, cap_ms, honor_retry_after }``; omitted fields
-   keep their defaults ``5``, ``500``, ``30000``, ``true`` (the delay starts
-   at ``base_ms``, doubles at each retry with some jitter and is capped at
-   ``cap_ms``; a ``Retry-After`` header is clamped to that range).
+   How failed requests of the built-in sources are retried: ``{ max_retries, base_ms, cap_ms, honor_retry_after }``, with
+   defaults ``5``, ``500``, ``30000`` and ``true``.  Requests are retried after
+   a network error or an HTTP status 429, 500, 502, 503 or 504.  The wait
+   before a retry starts at about ``base_ms`` milliseconds and doubles at each
+   retry, up to ``cap_ms``; a ``Retry-After`` header sent by the server is
+   honored within the same bounds.  (Custom sources retry their requests
+   themselves; see :js:meth:`CitationSourceBase.fetch_url`.)
 
 ``ttl_policy``
-   Expiry policy: ``{ stale_percent, jitter_percent, grace_days }``; defaults
-   ``80``, ``15`` (±15 % jitter on each entry's lifetime) and ``14``.
+   How cache entries are refreshed: ``{ stale_percent, jitter_percent,
+   grace_days }``, with defaults ``80``, ``15`` and ``14``.  Once
+   ``stale_percent`` percent of its lifetime has passed, an entry is still
+   used, but may be refreshed, with a probability that increases as its expiry
+   approaches.  Entry lifetimes are varied randomly by up to ±
+   ``jitter_percent`` percent, so that entries fetched together are not all
+   refreshed together.  An expired entry that cannot be refreshed is still used
+   during ``grace_days`` days after its expiry.
 
 ``max_chain_depth``
-   Maximal length of a chain of chained citations.  Default ``16``.
+   The maximal number of successive redirections of a citation to another
+   entry (as for arXiv → DOI).  Default ``16``.
 
 ``drop_csl_fields``
-   CSL-JSON fields removed from fetched entries before they are stored.
-   Default ``['reference']``.
+   CSL-JSON fields removed from retrieved entries before they are stored.
+   Default ``['reference']`` (the list of references of the cited paper that
+   doi.org may return).
 
 ``on_event``
-   A synchronous callback receiving every progress event (see above).  It
-   replaces the default reporting, and events are not throttled.  Exceptions
-   it throws are logged and ignored.
+   A synchronous callback that receives every progress event (see above).  It
+   replaces the default progress reporting.  Errors that it throws are
+   printed and otherwise ignored.
 
 ``progress_debug``
-   If ``false``, the default reporting does not log to
+   If ``false``, the default progress reporting does not log to
    ``debug('zoodb.citationmanager.progress')`` (warnings are still printed).
    Default ``true``.
 
-``writer_id``
-   Identifier of this process in the names of the ``._citations*`` files.
-   Default: a random token.
-
 ``cache_base``
-   Base name of the cache file.  Default ``'citations'``
-   (``citations.jsonl``).
+   The base name of the cache file.  Default ``'citations'``, for
+   ``citations.jsonl``.
+
+``writer_id``
+   An identifier of this process, used in the names of the temporary
+   ``._citations*`` files.  Default: a random token.
 
 ``sleep``, ``now``
-   Replace the timer (``async (ms) => {}``, default ``setTimeout``) and the
-   clock (``() => milliseconds since epoch``, default ``Date.now``) used for
-   rate limiting, backoff and expiry.  Mostly useful for tests.
-
-The manager options ``cache_fs``, ``cache_dir``, ``default_user_agent``,
-``cache_entry_default_duration_ms`` and ``skip_save_cache`` are set from the
-corresponding ``flm_options.citations`` keys, as before.
-
-Behavior change: the arXiv source chains DOIs to the ``doi`` source, which
-must therefore be registered.  Setting ``citations.sources.doi: false`` while
-the arXiv source is enabled requires an arXiv source constructed with
-``chain_to_doi: false`` (e.g., ``sources.arxiv: new CitationSourceArxiv({
-chain_to_doi: false })``); otherwise ``initialize()`` throws an error that
-says so.
+   Replace the timer (``async (ms) => {}``) and the clock
+   (``() => milliseconds since epoch``) used for rate limiting, retries and
+   cache expiry.  Mostly useful for tests.
 
 
-Writing a custom source
-~~~~~~~~~~~~~~~~~~~~~~~
+.. _citations-custom-source:
 
-A custom source subclasses :class:`CitationSourceBase` (see below) and
-implements ``async run_retrieve_chunk(id_list)``.  The crate calls it for each
-chunk of keys (at most ``chunk_size`` keys, chunks started at least
-``chunk_retrieve_delay_ms`` apart).  For each key, it calls
+Writing a custom citation source
+--------------------------------
+
+A citation source is a subclass of :class:`CitationSourceBase` that implements
+``async run_retrieve_chunk(id_list)``.  The manager calls it with lists of keys
+(without the prefix) that need to be retrieved.  For each key, the source calls
+``this.citation_manager.store_citation()`` with the entry's CSL-JSON data, or
+``this.citation_manager.store_citation_chained()`` to redirect the citation to
+an entry of another source.  Use :js:meth:`CitationSourceBase.fetch_url` to
+read remote URLs or local files.
 
 .. code-block:: js
 
-   this.citation_manager.store_citation(
-       this.cite_prefix, key, csl_json_object, this.cache_store_options
-   );
-   // or, to point the key to another source's entry:
-   this.citation_manager.store_citation_chained(
-       this.cite_prefix, key, new_cite_prefix, new_cite_key, set_properties
-   );
+   import { CitationSourceBase }
+       from '@phfaist/zoodb/citationmanager/source/base.js';
 
-While ``run_retrieve_chunk()`` runs, ``this.citation_manager`` is a collector
-that records these calls (awaiting them is allowed but not needed) and still
-exposes the manager's ``options``.  Use ``this.fetch_url(url, fetch_options)``
-to read remote URLs, ``file:`` URLs or paths relative to ``fsRootFilePath``;
-it returns the body as a string, or, with ``get_response_object: true``, an
-object ``{ status, ok, headers, body, text(), json() }``.  ``fetch_url`` retries
-network errors and HTTP statuses 429, 500, 502, 503 and 504 (honoring a
-numeric ``Retry-After``) up to ``fetch_max_retries`` times, since the crate's
-own retry policy does not apply to JavaScript sources.  Optionally
-reimplement ``source_initialize_run()`` (called once per
-``retrieve_citations()``, before this source's first chunk),
-``source_finalize_run()`` (called after each ``retrieve_citations()``), and
-``validate_cite_key(cite_key)`` (return an error message to reject a key
-before any request is made, or ``null``).  The options ``chunk_size``,
-``chunk_retrieve_delay_ms``, ``chains_to_sources``, ``cache_store_options``,
-``cache_duration_ms``, ``use_user_agent``, ``user_agent``,
-``fetch_max_retries``, ``fs`` and ``fsRootFilePath`` are described with
-:class:`CitationSourceBase`.  If a source sets no cache duration, the
-manager's ``cache_entry_default_duration_ms`` (30 days) applies.
+   export class MyCitationSource extends CitationSourceBase
+   {
+       constructor(options)
+       {
+           super(
+               // options that the user cannot override
+               { source_name: 'My citation info source' },
+               // the user's options
+               options,
+               // defaults: prefix, at most 20 keys per call to
+               // run_retrieve_chunk(), and calls at least 1 s apart
+               { cite_prefix: 'mysource', chunk_size: 20,
+                 chunk_retrieve_delay_ms: 1000 },
+           );
+       }
 
-Restrictions:
+       async run_retrieve_chunk(id_list)
+       {
+           for (const key of id_list) {
+               const csl_json = JSON.parse(await this.fetch_url(
+                   `https://example.org/csl/${encodeURIComponent(key)}.json`
+               ));
+               this.citation_manager.store_citation(
+                   this.cite_prefix, key, csl_json, this.cache_store_options
+               );
+           }
+       }
+   }
 
-- Exactly one resolution is recorded per requested key, and only for the
-  source's own prefix; keys for which nothing was stored are reported as
-  failures.
+Register it like any other source, e.g., ``citations.sources.mysource: new
+MyCitationSource()`` in a standard zoo, and cite with
+``\cite{mysource:<key>}``.
 
-- Citations cannot be stored from ``source_finalize_run()`` (the call
-  throws).
+A few rules apply:
 
-- Do not call ``retrieve_citations()``, ``purge_expired()`` or
-  ``save_cache()`` on the manager from inside ``run_retrieve_chunk()``: they
-  wait for the running retrieval and would deadlock.
+- Store exactly one entry per key of ``id_list``, and only for the source's own
+  prefix.  Keys for which nothing was stored are reported as failures.  If
+  ``run_retrieve_chunk()`` throws, the keys of that list that were not stored
+  yet are reported as failures, with the error's message.
 
-- Calling ``store_citation()`` / ``store_citation_chained()`` on the manager
-  itself outside a chunk throws.
+- List the prefixes to which the source redirects citations with
+  ``store_citation_chained()`` in its ``chains_to_sources`` option; the
+  manager then checks that these sources are registered.
+
+- ``store_citation()`` and ``store_citation_chained()`` may only be called
+  while ``run_retrieve_chunk()`` runs, not from ``source_finalize_run()`` or
+  from elsewhere.
+
+- Do not call the manager's ``retrieve_citations()``, ``purge_expired()`` or
+  ``save_cache()`` from ``run_retrieve_chunk()``: they would wait for the
+  running retrieval to finish, and never return.
+
+- Implement ``validate_cite_key()`` to reject malformed keys before any
+  request is made.
+
+Unless the source sets a ``cache_duration_ms``, its entries are kept for the
+manager's ``cache_entry_default_duration_ms`` (30 days).
 
 
-Known limitations
-~~~~~~~~~~~~~~~~~
+Upgrading from ZooDb 0.1
+------------------------
 
-- Concurrent processes sharing one ``cache_dir`` are unsupported; there is no
-  locking on Node.js.  An interrupted run leaves a
-  ``._citations.<writer>.log`` file that later runs fold but never delete;
-  remove ``._citations*`` files by hand when no build is running.
+The citation manager was reimplemented in ZooDb 0.2.  Retrieval is now
+performed by the `autocitefetch <https://crates.io/crates/autocitefetch>`_
+library, which is bundled with the package (there is nothing to install).
 
-- Browsers cannot reach arXiv or doi.org directly because of CORS: pass a
-  proxying ``fetch`` in ``citation_manager_options.fetch``, or use placeholder
-  sources.  Nothing is persisted in a browser: set ``skip_save_cache`` so that
-  the cache is kept in memory.
+**The cache file changed.**  The cache file ``cache_downloaded_info.json`` of
+earlier versions is no longer read; citation information is now stored in
+``citations.jsonl``.  If you do nothing, the first build prints a warning and
+fetches all citations again.  To avoid this, convert the old cache once, from
+your project's directory:
 
-- Custom (JavaScript) sources: one resolution per requested key; no stores
-  from ``source_finalize_run()``; no crate-side retry (``fetch_url`` retries
-  instead).
+.. code-block:: text
 
-- ``cache_downloaded_info.json`` is never read; convert it once with
-  ``zoodb-migrate-citations-cache`` (which deletes it with
-  ``--remove-legacy``), otherwise the first build fetches everything again
-  after a warning.
+   yarn zoodb-migrate-citations-cache --cache-dir _zoodb_citations_cache
 
-- ``keys()`` returns normalized ids (``doi:`` keys are lowercased);
-  ``get_citation_by_id()`` accepts the spelling encountered in the FLM text.
+The conversion fetches nothing.  It leaves ``cache_downloaded_info.json`` in
+place (unless ``--remove-legacy`` is given) and refuses to overwrite an
+existing ``citations.jsonl`` (unless ``--force`` is given).  Citation prefixes
+other than ``arxiv``, ``doi``, ``manual`` and ``preset`` are assumed to belong
+to custom sources; use ``--prefix <name>=<kind>`` to say otherwise.  Run it
+with ``--help`` for all options.
 
-- The per-source ``user_agent`` / ``use_user_agent`` options apply only to
-  requests made through ``fetch_url()`` (custom sources, and the arXiv
-  source's ``override_arxiv_dois_file``); the requests of the built-in sources
-  (arXiv, DOI, bibliography files) use the manager's ``default_user_agent``
-  and ``default_use_user_agent``.
+Also add the rule ``._citations*`` to your ``.gitignore``.
 
-- ``fetch_url(url, { get_response_object: true })`` returns a plain object
-  ``{ status, ok, headers, body, text(), json() }``, not a Fetch ``Response``.
+**Configuration.**  The ``arxiv`` source now requires the ``doi`` source,
+unless it is constructed with ``chain_to_doi: false`` (see
+`Citations in a standard zoo`_).  The arXiv source's ``api_get_method:
+'post'`` is no longer supported.  The manager's ``cache_file`` option is
+deprecated in favor of ``cache_dir``.  The sources' ``user_agent`` and
+``use_user_agent`` options now only apply to requests made with
+:js:meth:`CitationSourceBase.fetch_url` (custom sources and the arXiv DOI
+overrides file); the arXiv, DOI and bibliography file sources use the manager's
+``default_user_agent``.
 
+**API changes of** :class:`CitationDatabaseManager`:
+
+- ``retrieve_citations()`` returns the citations that could not be retrieved
+  instead of throwing an error.
+- ``purge_expired()`` and ``save_cache()`` are asynchronous.  ``load_cache()``
+  does nothing (the cache is loaded by ``initialize()``).
+- ``keys()`` returns normalized keys (DOIs in lowercase).
+  ``get_citation_by_id()`` accepts the keys as they were requested.
+- ``store_citation()`` and ``store_citation_chained()`` can only be called by
+  sources, from ``run_retrieve_chunk()``.
+- The attributes ``cache``, ``cache_fsp`` and ``cache_file`` were removed.
+
+**API changes of the citation sources** (only relevant if you wrote a custom
+source or subclassed a built-in source):
+
+- :class:`CitationSourceBase`: the manager now splits the keys into chunks and
+  schedules the calls to ``run_retrieve_chunk()``.  The methods
+  ``add_retrieve()``, ``add_retrieve_done()`` and ``run()``, the helpers
+  ``_fetch()`` and ``_jittered_backoff()``, and the attributes
+  ``keys_to_retrieve``, ``keys_to_retrieve_remaining``, ``total_queried`` and
+  ``fsp_readFile`` were removed; the option ``waiting_poll_timeout_ms`` is
+  ignored.  New: ``validate_cite_key()``.  ``fetch_url()`` with
+  ``get_response_object: true`` returns a plain object ``{ status, ok,
+  headers, body, text(), json() }`` rather than a Fetch ``Response``.
+- The built-in sources no longer retrieve citations in JavaScript: the methods
+  ``run_retrieve_chunk()`` of all of them, ``source_initialize_run()`` of the
+  arXiv and bibliography file sources, ``get_author_csl()``,
+  ``handle_arxiv_article_response()`` and ``call_store_callback()`` of the
+  arXiv source, and the attributes ``data_for_versionless_arxivid`` (arXiv) and
+  ``bibdata`` (bibliography files) were removed.
+
+
+API reference
+-------------
+
+Citation manager
+~~~~~~~~~~~~~~~~
+
+.. code::
+
+   import { CitationDatabaseManager } from '@phfaist/zoodb/citationmanager';
 
 
 .. js:autoclass:: src/citationmanager/_manager.CitationDatabaseManager
@@ -295,10 +486,8 @@ Known limitations
    :members:
 
 
-
-
-Citation Sources
-----------------
+Citation sources
+~~~~~~~~~~~~~~~~
 
 .. code::
 
@@ -320,6 +509,9 @@ Citation Sources
    :short-name:
    :members:
 
+.. js:autofunction:: src/citationmanager/source/arxiv.check_valid_arxiv_id
+   :short-name:
+
 .. js:autoclass:: src/citationmanager/source/doi.CitationSourceDoi
    :short-name:
    :members:
@@ -333,11 +525,11 @@ Citation Sources
    :members:
 
 
-Citation Source Base Class
---------------------------
+Citation source base class
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code::
-   
+
    // base class, e.g. to write your own citation source implementation
    import {
        CitationSourceBase

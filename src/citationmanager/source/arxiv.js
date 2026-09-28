@@ -11,9 +11,12 @@ import { builtin_spec_overrides } from './_specutil.js';
 const _rx_arxiv = /^(\d{4}\.\d{4,}|[a-zA-Z.-]+\/\d{7})(v\d+)?$/;
 
 /**
- * Checks if the `arxivid` looks like a valid arXiv identifier by testing it
- * against a regular expression.  Use this function to catch malformed arXiv
- * IDs before querying them to the server.
+ * Return `true` if `arxivid` looks like a valid arXiv identifier (e.g.,
+ * ``2101.01234``, ``quant-ph/9705052`` or ``2101.01234v2``), and `false`
+ * otherwise.
+ *
+ * @param {string} arxivid
+ * @returns {boolean}
  */
 export function check_valid_arxiv_id(arxivid)
 {
@@ -22,55 +25,38 @@ export function check_valid_arxiv_id(arxivid)
 
 /**
  * Fetch bibliographic citation information from `the arXiv
- * <https://arxiv.org/>`_.
+ * <https://arxiv.org/>`_, for citations such as ``arxiv:2101.01234`` or
+ * ``arxiv:quant-ph/9705052`` (a version suffix such as ``v2`` is allowed).
+ * Malformed identifiers are reported as failures without any request being
+ * made.
  *
- * The retrieval itself is performed by the ``arxiv`` source of the Rust
- * ``autocitefetch`` crate (arXiv API queries with the GET method, chunks of
- * 100 identifiers, at least 3.1 s between two queries, entries cached for 10
- * days by default).  This class describes that source; see
- * `get_autocitefetch_spec()`.
+ * By default, the arXiv API is queried for up to 100 identifiers at a time,
+ * with at least 3.1 seconds between queries, and entries are kept in the cache
+ * for 10 days.
  *
  * Options:
  *
- * - ``chain_to_doi`` - If `true` (the default), then arXiv identifiers that
- *   refer to papers which have a DOI, i.e., which have been published in some
- *   publication venue, will be “chained” to the corresponding DOI citation.
- *   The chained citation has the `cite_prefix` 'doi' and carries the
- *   additional property ``arxivid``.
+ * - ``chain_to_doi`` - If `true` (the default), the citation of a paper that
+ *   has a DOI (i.e., that has been published) is redirected to the entry of
+ *   that DOI in the ``doi`` source, so that the published version is cited.
+ *   The DOI entry receives the additional property ``arxivid``.  The ``doi``
+ *   source must then be registered with the citation manager.
  *
- * - ``override_arxiv_dois``, ``override_arxiv_dois_file`` - Manually specify a
- *   list of DOIs that should be associated with certain arXiv IDs.  The
- *   `override_arxiv_dois` is an object whose keys are arXiv IDs and whose
- *   values are the corresponding DOI (or `null` to prevent chaining to a DOI).
- *   For a given arXiv identifier, if it is found in this object, then the DOI
- *   specified here overrides the DOI value that was fetched from the arXiv's
- *   API.  Instead of (or in addition to) `override_arxiv_dois`, you may set
- *   `override_arxiv_dois_file` to a local path (relative to
- *   `fsRootFilePath`) or URL of a JSON or YAML file that contains the mapping
- *   of arXiv identifiers to a DOI.  The file is read once, when the citation
- *   manager is initialized; entries of `override_arxiv_dois` take precedence
- *   over those of the file.
- *
- * - ``api_get_method`` - Accepted for compatibility.  Only the GET method is
- *   supported; setting this option to ``'post'`` prints a warning.
+ * - ``override_arxiv_dois``, ``override_arxiv_dois_file`` - Correct the DOIs
+ *   of arXiv papers whose DOI is missing or wrong on the arXiv.
+ *   `override_arxiv_dois` is an object mapping arXiv identifiers to DOIs (or
+ *   to `null`, to cite the arXiv entry even if the paper has a DOI).
+ *   `override_arxiv_dois_file` is the path (relative to `fsRootFilePath`) or
+ *   URL of a YAML or JSON file containing such a mapping.  The file is read
+ *   when the citation manager is initialized.  Entries of
+ *   `override_arxiv_dois` take precedence over those of the file.
  *
  * - ``chunk_size``, ``chunk_retrieve_delay_ms``, ``cache_duration_ms`` (or
- *   ``cache_store_options.cache_duration_ms``) - If specified, override the
- *   defaults of the crate's arXiv source.
+ *   ``cache_store_options.cache_duration_ms``) - Override the defaults above.
+ *
+ * - ``api_get_method`` - Obsolete; only ``'get'`` is supported.
  *
  * - See :class:`CitationSourceBase` for further options.
- *
- * Malformed arXiv identifiers (see :func:`check_valid_arxiv_id`) are reported
- * as failures by the citation manager without any request being made (see
- * `validate_cite_key()`).
- *
- * Since the crate now parses the arXiv API responses, this class no longer
- * overrides ``source_initialize_run()`` (the base class's no-op is inherited;
- * the override file is now read by `load_override_arxiv_dois()`) nor
- * ``source_finalize_run()``.  Methods of earlier versions that were removed:
- * ``add_retrieve()``, ``run_retrieve_chunk()``, ``get_author_csl()``,
- * ``handle_arxiv_article_response()`` and ``call_store_callback()``; also the
- * attribute ``data_for_versionless_arxivid``.
  */
 export class CitationSourceArxiv extends CitationSourceBase
 {
@@ -108,10 +94,7 @@ export class CitationSourceArxiv extends CitationSourceBase
     }
 
     /**
-     * Reject malformed arXiv identifiers (see :func:`check_valid_arxiv_id`)
-     * before any request is made.  If an ID isn't valid (has the wrong number
-     * of digits, for instance), then arxiv.org simply responds with a "400 Bad
-     * Request" which is tough to debug.
+     * Reject malformed arXiv identifiers (see :func:`check_valid_arxiv_id`).
      */
     validate_cite_key(cite_key)
     {
@@ -123,9 +106,8 @@ export class CitationSourceArxiv extends CitationSourceBase
     }
 
     /**
-     * Load the DOI overrides: the contents of `override_arxiv_dois_file` (if
-     * set; read with `fetch_url()` and parsed as YAML, which includes JSON),
-     * updated with the entries of `override_arxiv_dois`.
+     * Return the DOI overrides: the contents of `override_arxiv_dois_file` (if
+     * set), updated with the entries of `override_arxiv_dois`.
      *
      * @returns {Promise<Object>} A mapping of arXiv ID to DOI (or `null`).
      */
@@ -156,10 +138,10 @@ export class CitationSourceArxiv extends CitationSourceBase
 
     /**
      * Return the ``arxiv`` source specification for the ``autocitefetch``
-     * citation manager: ``{ kind: 'arxiv', prefix, chainDoisTo, overrideDois,
-     * ... }`` with ``chainDoisTo`` ``'doi'`` (or ``null`` if `chain_to_doi` is
-     * false) and the DOI overrides of `load_override_arxiv_dois()`.
+     * retrieval engine: ``{ kind: 'arxiv', prefix, chainDoisTo, overrideDois,
+     * ... }``.
      *
+     * @private
      * @returns {Promise<Object>}
      */
     async get_autocitefetch_spec()
