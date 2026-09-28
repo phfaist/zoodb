@@ -74,6 +74,29 @@ field; an immutable CI install would fail), fixed by the supervisor with
 output modulo banner; `init({ module_or_path: bytes })` path confirmed (D4);
 base64 escaping verified lossless by sha256 comparison.
 
+### WP2 — Host implementations (JavaScript) (1 implementer round, 1 review round, PASS)
+
+Run before WP1 (see deviation 3). Implementer: `src/citationmanager/_hostfetch.js`
+(`make_host_fetch`, `has_default_fetch`), `src/citationmanager/_cachefs.js`
+(`make_node_cache_fs`, `make_memory_cache_fs`, `check_cache_fs_methods`),
+shared test mock host `test/_helpers/citation_mock_host.js` (routes arXiv
+`id_list` and `doi.org` requests to `test/_fixtures/`, `url_map` overrides,
+records requests/sleeps, settable `now`, memory cache fs), and 51 tests in
+`test/test_citationmanager_hostfetch.js` and `test/test_citationmanager_cachefs.js`.
+`yarn test`: 259 passing. Lint unchanged (23 pre-existing).
+
+Reviewer: PASS; verified D9 lock methods never touch the filesystem, values
+crossing to wasm are plain `Uint8Array`, methods work detached, mock host
+URL shapes match the crate's `arxiv.rs`/`doi.rs`. One should-fix: the memory
+cache fs lists an empty directory `''` as "bare names", whereas the crate
+joins paths as `{dir}/{name}`, so `cacheDir: ''` would not round-trip. Not
+changed in WP2 (its tests pin that semantics); instead WP3's adapter must
+normalize an empty `cache_dir` to `'.'` before opening the store, which also
+prevents the node fs from writing `/citations.jsonl` at the filesystem root.
+Notes carried to known limitations: `atomicReplace` reuses `writeFileAtomic`
+(staging file `.atomicwrite.citations.jsonl.<token>.<n>.tmp`, no fsync);
+`list()` on a custom fs whose `readdir` lacks `withFileTypes` needs `stat`.
+
 ## Deviations from the brief
 
 1. **Invariant-8 check regex (WP0).** The brief's reviewer grep
@@ -91,7 +114,16 @@ base64 escaping verified lossless by sha256 comparison.
    escapes the first character of any such accidental match as `\uXXXX`
    inside the JS string literal; the decoded bytes are unchanged. This keeps
    the invariant-8 grep deterministic across rebuilds.
-3. **Lint script (WP0).** `ESLINT_USE_FLAT_CONFIG=false` prefixed to the
+3. **Sequencing.** WP2 (`_hostfetch.js`, `_cachefs.js`, their tests and a
+   shared test mock host) was run before WP1, because WP1's acceptance test
+   needs `make_node_cache_fs` / `make_memory_cache_fs` and WP2's last two
+   acceptance items need WP1's module. The brief (section 8) states that
+   WP1 and these host-side files can run in parallel; running WP2 first
+   makes each package fully testable at its gate. The two WP2 acceptance
+   items that need the wasm module ("single process leaves exactly
+   `citations.jsonl`"; "foreign `._citations.other.log` folded and kept")
+   are delivered and reviewed as part of WP1.
+4. **Lint script (WP0).** `ESLINT_USE_FLAT_CONFIG=false` prefixed to the
    `lint` script (see Baseline), plus an `overrides` entry in
    `.eslintrc.json` giving `tools/*.mjs` the node environment.
 
