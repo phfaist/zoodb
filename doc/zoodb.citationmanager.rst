@@ -209,6 +209,20 @@ changed: an arXiv entry that points to a DOI entry is extended, but not the DOI
 entry.  ``--dry-run`` reports what would change.  Run the tool when no build is
 running; it refuses to run if a ``._citations.<id>.log`` file is present.
 
+**Merging caches.**  To update a cache with the entries fetched elsewhere (for
+instance by another checkout of the zoo, or by a CI build), use the
+``zoodb-merge-citations-cache`` tool:
+
+.. code-block:: text
+
+   yarn zoodb-merge-citations-cache --cache-dir _zoodb_citations_cache --from path/to/other/citations.jsonl
+
+Entries present in only one of the two files are kept.  For a citation present
+in both, the copy that expires last is kept (the one in ``--cache-dir`` on a
+tie).  The ``--from`` file is only read; ``--from`` may also be a cache
+directory.  ``--dry-run`` reports what would change.  As above, run the tool
+when no build is running.
+
 
 Using the citation manager directly
 -----------------------------------

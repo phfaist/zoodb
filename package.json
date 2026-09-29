@@ -24,6 +24,7 @@
     "main": "./src/index.js",
     "bin": {
         "zoodb-extend-citations-ttl": "./tools/extend_citations_ttl.mjs",
+        "zoodb-merge-citations-cache": "./tools/merge_citations_cache.mjs",
         "zoodb-migrate-citations-cache": "./tools/migrate_citations_cache.mjs"
     },
     "engines": {

@@ -58,3 +58,27 @@ does not extend the `doi` entry). The tool refuses to run while a sidecar log
 `._<base>.*.log` exists, since its lines would override the edited ones at the
 next compaction. `--dry-run` only reports the counts. Exit status: 0 on
 success, 1 on a usage error, 2 on an error reading or writing the cache.
+
+## `merge_citations_cache.mjs`
+
+Usage: `zoodb-merge-citations-cache --cache-dir <dir> --from <file-or-dir> [--cache-base citations] [--dry-run]`
+
+Updates `<dir>/citations.jsonl` with the entries of another citations cache
+file, e.g. `yarn zoodb-merge-citations-cache --cache-dir
+_zoodb_citations_cache --from ../other/_zoodb_citations_cache/citations.jsonl`
+(it is a package `bin`; in this repository, `node
+tools/merge_citations_cache.mjs ...`). If `--from` is a directory,
+`<from>/<base>.jsonl` is used; that file is only read. Entries present in only
+one file are kept; for an id present in both, the copy with the later
+`expires` is kept (the one in `--cache-dir` on a tie). Lines are copied byte
+for byte from the file they come from, and the output is sorted by id (UTF-8
+byte order, as the crate writes it), so git diffs stay minimal. Within a file,
+a later line for an id overrides an earlier one, and ephemeral records
+(`stale_after >= expires`, never persisted by the crate) are dropped. Chained
+entries are chosen by their own id, like all others. The tool refuses to run
+while a sidecar log `._<base>.*.log` exists next to either file. The file is
+replaced atomically, and only if some entry was added or updated;
+`--dry-run` only reports the counts. Everything is done in memory with a
+single pass over each file, so caches of tens of thousands of entries merge in
+well under a second. Exit status: 0 on success, 1 on a usage error, 2 on an
+error reading or writing the cache.
