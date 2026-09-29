@@ -208,6 +208,7 @@ __metadata:
     stream-parser: "npm:^0.3.1"
     url: "npm:^0.11.4"
   bin:
+    zoodb-extend-citations-ttl: ./tools/extend_citations_ttl.mjs
     zoodb-migrate-citations-cache: ./tools/migrate_citations_cache.mjs
   languageName: unknown
   linkType: soft
