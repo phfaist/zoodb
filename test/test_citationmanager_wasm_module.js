@@ -111,7 +111,7 @@ const EVENT_TYPES = new Set([
     'retrieve_started', 'pass_started', 'pass_finished', 'retrieve_finished',
     'source_started', 'source_progress', 'source_finished',
     'cite_resolved', 'cite_failed', 'wait_started', 'wait_finished',
-    'request_started', 'request_finished', 'unknown',
+    'request_started', 'request_finished', 'refresh_planned', 'unknown',
 ]);
 
 
@@ -584,6 +584,94 @@ describe('autocitefetch wasm module', function () {
             const mgr = await wasm.CitationManager.open(config_of(mock, ARXIV_DOI_SPECS));
             await assert_rejects_with(mgr.retrieve([['arxiv']]), /retrieve: .*\[prefix, key\]/);
             await assert_rejects_with(mgr.getMany('x'), /getMany: /);
+        });
+    });
+
+    describe('refresh batching', function () {
+
+        it('refreshBatching() reports the sources\' defaults', async function () {
+            const mock = make_mock_host();
+            const src = js_source(concrete_for_all);
+            const mgr = await wasm.CitationManager.open(config_of(mock, [
+                ...ARXIV_DOI_SPECS,
+                { kind: 'js', prefix: 'custom', source: src.source },
+            ]));
+            assert.deepStrictEqual(mgr.refreshBatching('arxiv'),
+                                   { minBatch: 20, maxDeferDays: 2,
+                                     topUp: { minAgePercent: 50, fill: 'chunk' } });
+            assert.deepStrictEqual(mgr.refreshBatching('doi'),
+                                   { minBatch: 10, maxDeferDays: 30,
+                                     topUp: { minAgePercent: 80, fill: 0 } });
+            assert.deepStrictEqual(mgr.refreshBatching('custom'),
+                                   { minBatch: 0, maxDeferDays: 0, topUp: null });
+            assert.strictEqual(mgr.refreshBatching('nope'), null);
+        });
+
+        it('refreshBatching overrides adjust the default', async function () {
+            const mock = make_mock_host();
+            const mgr = await wasm.CitationManager.open(config_of(mock, [
+                { kind: 'arxiv', prefix: 'arxiv',
+                  refreshBatching: { minBatch: 50, topUp: { fill: 5 }, eager: undefined } },
+                { kind: 'doi', prefix: 'doi', refreshBatching: 'eager' },
+                { kind: 'bib', prefix: 'b', entries: {}, refreshBatching: { topUp: false } },
+            ]));
+            assert.deepStrictEqual(mgr.refreshBatching('arxiv'),
+                                   { minBatch: 50, maxDeferDays: 2,
+                                     topUp: { minAgePercent: 50, fill: 5 } });
+            assert.deepStrictEqual(mgr.refreshBatching('doi'),
+                                   { minBatch: 0, maxDeferDays: 0, topUp: null });
+            assert.strictEqual(mgr.refreshBatching('b').topUp, null);
+        });
+
+        it('invalid refreshBatching values are rejected by name', async function () {
+            const mock = make_mock_host();
+            const open_doi = (rb) => wasm.CitationManager.open(config_of(mock, [
+                { kind: 'doi', prefix: 'doi', refreshBatching: rb },
+            ]));
+            await assert_rejects_with(open_doi({ min_batch: 3 }),
+                                      /citation source `doi:`.*refreshBatching.*min_batch/);
+            await assert_rejects_with(open_doi('lazy'), /refreshBatching.*lazy/);
+            await assert_rejects_with(open_doi({ minBatch: -1 }), /minBatch/);
+            await assert_rejects_with(open_doi({ topUp: { minAgePercent: 150 } }), /0-100/);
+            await assert_rejects_with(
+                open_doi({ eager: true, topUp: { fill: 'chunk' } }),
+                /top-up is off.*minAgePercent/
+            );
+        });
+
+        it('defers a small refresh and emits refresh_planned', async function () {
+            const mock = make_mock_host();
+            const events = [];
+            const src = js_source(concrete_for_all);
+            const cfg = config_of(mock, [
+                { kind: 'js', prefix: 'custom', source: src.source, ttlMs: 1000, minIntervalMs: 0,
+                  refreshBatching: { minBatch: 3, maxDeferDays: 1 } },
+            ], { throttleEventsMs: 0 });
+            cfg.host.onEvent = (ev) => { events.push(ev); };
+            const mgr = await wasm.CitationManager.open(cfg);
+
+            await mgr.retrieve([['custom', 'a'], ['custom', 'b']]);
+            assert.strictEqual(src.calls.length, 1);
+
+            // both expired, but only 2 < minBatch: served from cache, not refetched
+            mock.set_now(mock.now() + 60_000);
+            assert.deepStrictEqual(await mgr.retrieve([['custom', 'a'], ['custom', 'b']]), []);
+            assert.strictEqual(src.calls.length, 1);
+            const planned = events.filter( (ev) => ev.type === 'refresh_planned' );
+            assert.deepStrictEqual(planned, [
+                { type: 'refresh_planned', prefix: 'custom', deferred: 2, pulled_forward: 0 },
+            ]);
+            assert.strictEqual((await mgr.get('custom', 'a')).title, 'Title a');
+
+            // a cache miss is required work: the deferred entries go along
+            await mgr.retrieve([['custom', 'a'], ['custom', 'b'], ['custom', 'c']]);
+            assert.strictEqual(src.calls.length, 2);
+            assert.deepStrictEqual([...src.calls[1].keys].sort(), ['a', 'b', 'c']);
+
+            // past maxDeferDays, an expired entry is refetched on its own
+            mock.set_now(mock.now() + 2 * 86400_000);
+            await mgr.retrieve([['custom', 'a']]);
+            assert.strictEqual(src.calls.length, 3);
         });
     });
 

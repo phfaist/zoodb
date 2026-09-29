@@ -136,6 +136,14 @@ function make_default_progress_sink({ progress_debug })
         case 'source_finished':
             debug_progress(`Source ‘${ev.prefix}’ done (${ev.done})`);
             break;
+        case 'refresh_planned':
+            if (ev.deferred > 0) {
+                debug_progress(`Source ‘${ev.prefix}’: ${ev.deferred} stale citation(s) left for a larger batch later`);
+            }
+            if (ev.pulled_forward > 0) {
+                debug_progress(`Source ‘${ev.prefix}’: refreshing ${ev.pulled_forward} nearly-due citation(s) along with the others`);
+            }
+            break;
         case 'cite_failed':
             debug_progress(`Failed ‘${ev.prefix}:${ev.key}’: ${ev.message}`);
             break;
@@ -621,6 +629,22 @@ export class CitationDatabaseManager
     keys()
     {
         return [ ...this._keys ];
+    }
+
+    /**
+     * Return the refresh batching in effect for the source registered under
+     * `cite_prefix` (its default, adjusted by its ``refresh_batching``
+     * option), as ``{ minBatch, maxDeferDays, topUp: null | { minAgePercent,
+     * fill } }``, or `null` if no source is registered under `cite_prefix`.
+     * Available once the manager is initialized.
+     *
+     * @param {string} cite_prefix
+     * @returns {Object|null}
+     */
+    get_refresh_batching(cite_prefix)
+    {
+        this._check_initialized('get_refresh_batching()');
+        return this._wasm.refreshBatching(cite_prefix);
     }
 
     /**

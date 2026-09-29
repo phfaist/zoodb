@@ -85,7 +85,10 @@ legacyEntries? })` with:
   (`files` as URLs and/or inline `entries`, `format`) or `js` (`source:
   { retrieveChunk(keys, ctx), normalizeKey?, chainsTo? }` returning one
   resolution per key); every kind accepts `chunkSize`, `minIntervalMs`,
-  `ttlMs`.
+  `ttlMs` and `refreshBatching` (`'eager'`, `'default'` or `{ eager?,
+  minBatch?, maxDeferDays?, topUp?: false | { minAgePercent?, fill?: 'chunk' |
+  number } }`, applied on top of the source's default; see `src/batching.rs`).
+  `CitationManager.refreshBatching(prefix)` returns the setting in effect.
 
 The JavaScript implementations are `src/citationmanager/_hostfetch.js`,
 `src/citationmanager/_cachefs.js` and the adapter

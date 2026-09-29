@@ -2,6 +2,7 @@
 // const debug = debug_module('zoodb.citationmanager.source.bibliographyfile');
 
 import { CitationSourceBase } from './base.js';
+import { refresh_batching_spec_override } from './_specutil.js';
 
 import { path_or_url_to_url } from '../../util/url.js';
 
@@ -102,6 +103,7 @@ export class CitationSourceBibliographyFile extends CitationSourceBase
             format: 'auto',
             ttlMs: this.options.cache_store_options?.cache_duration_ms
                 ?? this.options.cache_duration_ms,
+            ...refresh_batching_spec_override(this),
         };
     }
 

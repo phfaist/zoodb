@@ -37,7 +37,7 @@ use autocitefetch::source::{
     ArxivSource, BibliographyFileSource, DoiSource, ManualSource, Outcome, Resolution, RetrieveCtx,
     Source,
 };
-use autocitefetch::{BoxFuture, CslValue, Error};
+use autocitefetch::{BoxFuture, CslValue, Error, RefreshBatching};
 
 use crate::config::{SourceSpec, chunk_size_from, duration_from_ms};
 use crate::convert::{console_error, error_message, from_js};
@@ -99,6 +99,12 @@ impl Source for BoxedSource {
 
     fn chains_to(&self) -> Vec<&str> {
         self.inner.chains_to()
+    }
+
+    fn refresh_batching(&self) -> RefreshBatching {
+        // The spec's `refreshBatching` is applied on the manager
+        // (`with_refresh_batching`), on top of this default.
+        self.inner.refresh_batching()
     }
 
     fn retrieve_chunk<'a>(

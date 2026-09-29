@@ -315,5 +315,33 @@ describe('zoodb.citationmanager.source.arxiv', function () {
                                    { kind: 'doi', prefix: 'doi', chunkSize: 1 });
         });
 
+        it('passes the refresh_batching option to the spec and the engine', async function () {
+            const { options } = mock_env();
+            const source = new CitationSourceArxiv({
+                refresh_batching: { min_batch: 50, max_defer_days: 7,
+                                    top_up: { min_age_percent: 60, fill: 'chunk' } },
+            });
+            const doi = new CitationSourceDoi({ refresh_batching: 'eager' });
+            const manager = new CitationDatabaseManager({ arxiv: source, doi }, options);
+            const spec = await source.get_autocitefetch_spec();
+            assert.deepStrictEqual(spec.refreshBatching, {
+                minBatch: 50, maxDeferDays: 7, topUp: { minAgePercent: 60, fill: 'chunk' },
+            });
+            assert.strictEqual((await doi.get_autocitefetch_spec()).refreshBatching, 'eager');
+            await manager.initialize();
+            assert.deepStrictEqual(manager.get_refresh_batching('arxiv'), {
+                minBatch: 50, maxDeferDays: 7, topUp: { minAgePercent: 60, fill: 'chunk' },
+            });
+            assert.deepStrictEqual(manager.get_refresh_batching('doi'),
+                                   { minBatch: 0, maxDeferDays: 0, topUp: null });
+        });
+
+        it('rejects an invalid refresh_batching option at initialization', async function () {
+            const { options } = mock_env();
+            const doi = new CitationSourceDoi({ refresh_batching: { min_btach: 3 } });
+            const manager = new CitationDatabaseManager({ doi }, options);
+            await assert.rejects(manager.initialize(), /refreshBatching.*min_btach/);
+        });
+
     });
 });

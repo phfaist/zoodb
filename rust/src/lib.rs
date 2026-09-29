@@ -10,6 +10,7 @@
 //!
 //! Modules:
 //!
+//! * [`batching`] — per-source `refreshBatching` overrides;
 //! * [`config`] — the open config: serde spec types + manual extraction of the
 //!   JavaScript objects serde cannot handle;
 //! * [`host`] — `Fetcher`, `CacheFs`, `Clock`, `Timer` over JS callbacks;
@@ -22,6 +23,7 @@
 
 #![forbid(unsafe_code)]
 
+mod batching;
 mod config;
 mod convert;
 mod formats;
@@ -114,11 +116,29 @@ export interface HostCacheFs {
 export interface HostGuard { release(): void }
 
 export type SourceSpec =
-  | { kind: 'arxiv';  prefix: string; chainDoisTo?: string | null; overrideDois?: Record<string, string | null>; chunkSize?: number; minIntervalMs?: number; ttlMs?: number }
-  | { kind: 'doi';    prefix: string; chunkSize?: number; minIntervalMs?: number; ttlMs?: number }
-  | { kind: 'manual'; prefix: string; format: string; chunkSize?: number; minIntervalMs?: number; ttlMs?: number }
-  | { kind: 'bib';    prefix: string; files?: string[]; entries?: Record<string, object>; format?: 'auto' | 'json' | 'yaml'; chunkSize?: number; minIntervalMs?: number; ttlMs?: number }
-  | { kind: 'js';     prefix: string; source: JsSourceObject; chunkSize?: number; minIntervalMs?: number; ttlMs?: number };
+  | { kind: 'arxiv';  prefix: string; chainDoisTo?: string | null; overrideDois?: Record<string, string | null>; chunkSize?: number; minIntervalMs?: number; ttlMs?: number; refreshBatching?: RefreshBatchingSpec }
+  | { kind: 'doi';    prefix: string; chunkSize?: number; minIntervalMs?: number; ttlMs?: number; refreshBatching?: RefreshBatchingSpec }
+  | { kind: 'manual'; prefix: string; format: string; chunkSize?: number; minIntervalMs?: number; ttlMs?: number; refreshBatching?: RefreshBatchingSpec }
+  | { kind: 'bib';    prefix: string; files?: string[]; entries?: Record<string, object>; format?: 'auto' | 'json' | 'yaml'; chunkSize?: number; minIntervalMs?: number; ttlMs?: number; refreshBatching?: RefreshBatchingSpec }
+  | { kind: 'js';     prefix: string; source: JsSourceObject; chunkSize?: number; minIntervalMs?: number; ttlMs?: number; refreshBatching?: RefreshBatchingSpec };
+
+/**
+ * Adjusts a source's refresh batching (deferring small amounts of refresh work,
+ * topping up requests with nearly-due entries). Settings not given keep the
+ * source's own default; `eager: true` starts from 'eager' instead.
+ */
+export type RefreshBatchingSpec =
+  | 'eager'
+  | 'default'
+  | { eager?: boolean; minBatch?: number; maxDeferDays?: number;
+      topUp?: false | null | 'off' | { minAgePercent?: number; fill?: 'chunk' | number } };
+
+/** The refresh batching in effect for a prefix (see `CitationManager.refreshBatching`). */
+export interface RefreshBatching {
+  minBatch: number;
+  maxDeferDays: number;
+  topUp: { minAgePercent: number; fill: 'chunk' | number } | null;
+}
 
 /**
  * A citation source implemented in JavaScript (`kind: 'js'`).
@@ -178,6 +198,7 @@ export type ProgressEvent =
   | { type: 'request_started'; url: string; attempt: number }
   | { type: 'request_finished'; url: string; status: number }
   | { type: 'request_finished'; url: string; error: string }
+  | { type: 'refresh_planned'; prefix: string; deferred: number; pulled_forward: number }
   | { type: 'unknown' };
 "#;
 
@@ -275,6 +296,17 @@ impl CitationManager {
                 let _ = js_sys::Reflect::set(&obj, &"skipped".into(), &skipped.into());
                 obj.into()
             }
+        }
+    }
+
+    /// The refresh batching in effect for `prefix` (the source's default with
+    /// any `refreshBatching` override applied), or `null` if no source is
+    /// registered under `prefix`.
+    #[wasm_bindgen(js_name = refreshBatching, unchecked_return_type = "RefreshBatching | null")]
+    pub fn refresh_batching(&self, prefix: String) -> Result<JsValue, JsValue> {
+        match self.inner.manager.refresh_batching(&prefix) {
+            None => Ok(JsValue::NULL),
+            Some(b) => to_js(&batching::to_value(&b)).map_err(js_error),
         }
     }
 
@@ -432,7 +464,11 @@ async fn open_impl(config: JsValue) -> Result<CitationManager, String> {
 
     // 4. Sources.
     let mut registrations = Vec::with_capacity(cfg.sources.len());
+    let mut batching_overrides = Vec::new();
     for entry in cfg.sources {
+        if let Some(over) = entry.refresh_batching {
+            batching_overrides.push((entry.spec.prefix().to_string(), over));
+        }
         registrations.push(sources::build(entry.spec, entry.js_source)?);
     }
 
@@ -490,6 +526,15 @@ async fn open_impl(config: JsValue) -> Result<CitationManager, String> {
         manager = manager
             .register(reg.prefix.clone(), reg.source)
             .map_err(|e| format!("citation source `{}:`: {e}", reg.prefix))?;
+    }
+    // After registering, since an override adjusts the source's own default
+    // rather than replacing it.
+    for (prefix, over) in batching_overrides {
+        let base = manager
+            .refresh_batching(&prefix)
+            .expect("the prefix was just registered");
+        let batching = over.apply(base, &format!("citation source `{prefix}:`"))?;
+        manager = manager.with_refresh_batching(prefix, batching);
     }
 
     Ok(CitationManager {

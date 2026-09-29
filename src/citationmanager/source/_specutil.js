@@ -29,5 +29,70 @@ export function builtin_spec_overrides(source, { chunk_size=true }={})
     if (ttl_ms != null) {
         spec.ttlMs = ttl_ms;
     }
+    Object.assign(spec, refresh_batching_spec_override(source));
     return spec;
+}
+
+
+const _refresh_batching_keys = {
+    eager: 'eager',
+    min_batch: 'minBatch',
+    max_defer_days: 'maxDeferDays',
+    top_up: 'topUp',
+};
+const _refresh_batching_top_up_keys = {
+    min_age_percent: 'minAgePercent',
+    fill: 'fill',
+};
+
+function _rename_keys(obj, mapping)
+{
+    const out = {};
+    for (const [k, v] of Object.entries(obj)) {
+        if (v === undefined) {
+            continue;
+        }
+        // Unknown keys are passed on unchanged, so that the engine's error
+        // message names the key as the user spelled it.
+        out[mapping[k] ?? k] = v;
+    }
+    return out;
+}
+
+/**
+ * Convert a source's ``refresh_batching`` option (``'eager'``,
+ * ``'default'``, or ``{ eager, min_batch, max_defer_days, top_up: false |
+ * { min_age_percent, fill } }``) to the ``refreshBatching`` value of an
+ * ``autocitefetch`` source spec.  Validation is left to the engine.
+ *
+ * @param {*} value
+ * @returns {*} The spec value, or `undefined` if `value` is `undefined` or
+ *     `null`.
+ */
+export function refresh_batching_spec(value)
+{
+    if (value == null) {
+        return undefined;
+    }
+    if (typeof value !== 'object' || Array.isArray(value)) {
+        return value; // 'eager', 'default', or an error for the engine to report
+    }
+    const spec = _rename_keys(value, _refresh_batching_keys);
+    if (spec.topUp != null && typeof spec.topUp === 'object' && ! Array.isArray(spec.topUp)) {
+        spec.topUp = _rename_keys(spec.topUp, _refresh_batching_top_up_keys);
+    }
+    return spec;
+}
+
+/**
+ * Return ``{ refreshBatching }`` from a source's ``refresh_batching`` option,
+ * or an empty object if the option is not set.
+ *
+ * @param {CitationSourceBase} source - The source instance.
+ * @returns {Object}
+ */
+export function refresh_batching_spec_override(source)
+{
+    const rb = refresh_batching_spec(source.options?.refresh_batching);
+    return (rb === undefined) ? {} : { refreshBatching: rb };
 }

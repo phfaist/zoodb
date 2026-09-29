@@ -3,6 +3,7 @@
 
 
 import { CitationSourceBase } from './base.js';
+import { refresh_batching_spec_override } from './_specutil.js';
 
 /**
  * A citation source whose keys are the citation text itself, in FLM, as in
@@ -55,6 +56,7 @@ export class CitationSourceManual extends CitationSourceBase
             prefix: this.cite_prefix,
             format: 'flm',
             ttlMs: 0,
+            ...refresh_batching_spec_override(this),
         };
     }
 

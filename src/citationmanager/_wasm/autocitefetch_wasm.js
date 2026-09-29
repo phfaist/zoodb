@@ -101,6 +101,22 @@ export class CitationManager {
         return ret;
     }
     /**
+     * The refresh batching in effect for `prefix` (the source's default with
+     * any `refreshBatching` override applied), or `null` if no source is
+     * registered under `prefix`.
+     * @param {string} prefix
+     * @returns {RefreshBatching | null}
+     */
+    refreshBatching(prefix) {
+        const ptr0 = passStringToWasm0(prefix, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.citationmanager_refreshBatching(this.__wbg_ptr, ptr0, len0);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return takeFromExternrefTable0(ret[0]);
+    }
+    /**
      * Fetch every missing or stale citation, following chains. Resolves to
      * the per-citation failures (never rejects for a bad citation; an
      * unregistered prefix is reported as a failure too). Rejects only on a
@@ -501,7 +517,7 @@ function __wbg_get_imports() {
             return ret;
         },
         __wbindgen_cast_0000000000000001: function(arg0, arg1) {
-            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 295, ret: Result(Unit), inner_ret: Some(Result(Unit)) }, mutable: true }) -> Externref`.
+            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 249, ret: Result(Unit), inner_ret: Some(Result(Unit)) }, mutable: true }) -> Externref`.
             const ret = makeMutClosure(arg0, arg1, wasm_bindgen_68cc7bfd7663d6e5___convert__closures_____invoke___wasm_bindgen_68cc7bfd7663d6e5___JsValue__core_7d5f0a2ba6a62c33___result__Result_____wasm_bindgen_68cc7bfd7663d6e5___JsError___true_);
             return ret;
         },

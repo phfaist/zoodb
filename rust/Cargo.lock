@@ -4,9 +4,9 @@ version = 4
 
 [[package]]
 name = "autocitefetch"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f92e1f5d41815b94f53744590af79d8f606ff091e142b05de7ecde459317881"
+checksum = "253b605e79ad8faf47ea42df30139b247648c7738e7332912594ede5573c91aa"
 dependencies = [
  "futures-util",
  "hashbrown 0.15.5",

@@ -84,20 +84,50 @@ The citation prefixes available in a standard zoo are:
      - The key itself is the citation text, in FLM (see
        :class:`CitationSourceManual`).
 
-To add, replace or remove sources, use ``citations.sources``: map a prefix to a
-source instance to add or replace that source, or to ``false`` to remove a
-built-in source.  Because arXiv citations resolve to DOI entries, removing the
-``doi`` source requires an arXiv source that does not chain to DOIs:
+To configure, add, replace or remove sources, use ``citations.sources``,
+which maps a prefix to one of:
+
+- an options object, merged over the defaults of the built-in source of that
+  prefix (see the options of :class:`CitationSourceArxiv`,
+  :class:`CitationSourceDoi`, :class:`CitationSourceBibliographyFile`,
+  :class:`CitationSourceManual` and :class:`CitationSourceBase`);
+- an options object with a ``source_class`` key, to create a source of that
+  class (a custom source, or a replacement of a built-in one) with the other
+  options;
+- a source instance, used as is;
+- ``false`` (or ``null``) to remove a built-in source, or ``true`` to keep it
+  with its default options.
+
+Sources created from options receive the ``fs`` and ``fsRootFilePath``
+(``fs_data_dir``) options unless they set them, so relative file paths work as
+for the built-in sources.  Options common to all of them can be given in
+``citations.source_options``.  The ``preset`` source is only created by default
+if ``preset_bibliography_files`` is set.  Because arXiv citations resolve to DOI
+entries, removing the ``doi`` source requires an arXiv source that does not
+chain to DOIs:
 
 .. code-block:: js
 
    citations: {
+       source_options: {
+           user_agent: 'MyZoo/1.0 (https://example.org/myzoo)',
+       },
        sources: {
-           mysource: new MyCitationSource(),  // a custom source
+           arxiv: {
+               chain_to_doi: false,
+               override_arxiv_dois_file: 'citations_info/override_arxiv_dois.yml',
+               refresh_batching: { min_batch: 50 },
+           },
            doi: false,
-           arxiv: new CitationSourceArxiv({ chain_to_doi: false }),
+           preset: { bibliography_files: [ 'citations_info/bib_preset.yml' ] },
+           mysource: { source_class: MyCitationSource, api_url: 'https://…' },
+           other: new OtherCitationSource(),
        },
    }
+
+The ``override_arxiv_dois_file`` and ``preset_bibliography_files`` keys of
+``flm_options.citations`` remain available as shortcuts for the corresponding
+options of the ``arxiv`` and ``preset`` sources.
 
 **Citations that cannot be retrieved** (a malformed arXiv ID, a DOI that does
 not exist, a network failure, …) are printed along with the file and field in
@@ -142,6 +172,20 @@ entry has expired (within 14 days by default), the expired entry is used
 anyway and a warning is printed.  These durations can be changed with the
 sources' ``cache_duration_ms`` option and with the manager's ``ttl_policy``
 option.
+
+**Refresh batching.**  Refreshing a few entries at a time would cost a whole
+rate-limited request for each handful of entries (the arXiv API answers 100
+identifiers in one request).  Instead, a source may *defer* a small amount of
+refresh work, serving the cached entries meanwhile, until there is enough of it
+to be worth a request, and *top up* a request that goes out anyway with
+entries that are nearly due.  The built-in defaults: arXiv waits for 20 stale
+entries (at most 2 days past their expiry) and fills its requests with entries
+at least half-way through their lifetime; doi.org waits for 10 stale entries
+(at most 30 days past expiry); a bibliography file refreshes all its entries
+together; custom sources refetch exactly what is due.  A cache miss is always
+fetched immediately, and deferred entries go along with it.  Adjust this with
+the ``refresh_batching`` option of a source (see
+:ref:`citations-refresh-batching`).
 
 **One build at a time.**  Only one process should use a given cache directory
 at a time; two builds that share it concurrently may lose entries that the
@@ -248,6 +292,10 @@ synchronously with event objects whose ``type`` field is one of:
    * - ``cite_resolved``, ``cite_failed``
      - A citation was retrieved, or could not be (``grace_served`` is true
        if an expired entry is used instead).
+   * - ``refresh_planned``
+     - :ref:`Refresh batching <citations-refresh-batching>` deferred
+       ``deferred`` stale entries of source ``prefix``, or pulled
+       ``pulled_forward`` nearly-due entries forward into its requests.
    * - ``unknown``
      - An event of a type not listed here.
 
@@ -338,6 +386,40 @@ pass them in ``flm_options.citations.citation_manager_options``.
    Replace the timer (``async (ms) => {}``) and the clock
    (``() => milliseconds since epoch``) used for rate limiting, retries and
    cache expiry.  Mostly useful for tests.
+
+
+.. _citations-refresh-batching:
+
+Refresh batching options
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Every source accepts a ``refresh_batching`` option that adjusts the source's
+own default (settings that are not given keep it).  In a standard zoo, set it
+with ``citations.sources.<prefix>.refresh_batching``.
+
+.. code-block:: js
+
+   refresh_batching: 'eager'      // refetch whatever is due, as soon as it is due
+   refresh_batching: 'default'    // the source's default (same as not setting it)
+   refresh_batching: {
+       eager: false,        // true: start from 'eager' rather than the default
+       min_batch: 50,       // with nothing needed now, wait for 50 stale entries...
+       max_defer_days: 7,   // ...but refetch an entry at most 7 days past its expiry
+       top_up: {            // or false: never pull entries forward
+           min_age_percent: 50,  // entries at least half-way through their lifetime
+           fill: 'chunk',        // up to the request's capacity, or a number of entries
+       },
+   }
+
+``max_defer_days`` is at most the ``grace_days`` of the manager's
+``ttl_policy``.  With ``top_up: { fill: N }``, up to ``N`` entries are added to
+a request going out anyway (and, with ``fill: 0``, only as many as needed to
+reach ``min_batch``).  Turning top-up on for a source that has it off needs a
+``min_age_percent``.  The structure is that of the ``refresh_batching`` option of
+the Python ``flm-citations`` package.  The setting in effect is returned by
+:js:meth:`CitationDatabaseManager.get_refresh_batching`, and a
+``refresh_planned`` progress event ``{ prefix, deferred, pulled_forward }``
+reports when batching changed what a source fetches.
 
 
 .. _citations-custom-source:

@@ -32,6 +32,7 @@ use wasm_bindgen::{JsCast, JsValue};
 
 use autocitefetch::{CslValue, RetryPolicy, TtlPolicy};
 
+use crate::batching::BatchingOverride;
 use crate::convert::from_js;
 
 // --- plain data ----------------------------------------------------------------
@@ -383,10 +384,12 @@ pub struct HostConfig {
     pub on_event: Option<Function>,
 }
 
-/// One source spec plus the JavaScript `source` object of a `js` spec.
+/// One source spec plus the JavaScript `source` object of a `js` spec and the
+/// parsed `refreshBatching` override (both extracted by hand).
 pub struct SpecEntry {
     pub spec: SourceSpec,
     pub js_source: Option<JsValue>,
+    pub refresh_batching: Option<BatchingOverride>,
 }
 
 /// Everything `open` needs, parsed and validated.
@@ -530,7 +533,8 @@ fn parse_spec(index: usize, raw: JsValue) -> Result<SpecEntry, String> {
     } else {
         Some(source)
     };
-    let copy = shallow_copy(&raw, &["source"]);
+    let refresh_batching = parse_refresh_batching(get(&raw, "refreshBatching"), &what)?;
+    let copy = shallow_copy(&raw, &["source", "refreshBatching"]);
     let spec: SourceSpec = from_js(copy.into()).map_err(|e| format!("{what}: {e}"))?;
     match (&spec, &js_source) {
         (SourceSpec::Js { .. }, None) => {
@@ -547,7 +551,33 @@ fn parse_spec(index: usize, raw: JsValue) -> Result<SpecEntry, String> {
         }
         (_, None) => {}
     }
-    Ok(SpecEntry { spec, js_source })
+    Ok(SpecEntry {
+        spec,
+        js_source,
+        refresh_batching,
+    })
+}
+
+/// A spec's `refreshBatching` (`undefined`/`null` → none). `undefined`-valued
+/// keys are dropped first, so `{ topUp: undefined }` leaves top-up alone rather
+/// than reading as `null` (which turns it off).
+fn parse_refresh_batching(raw: JsValue, what: &str) -> Result<Option<BatchingOverride>, String> {
+    if raw.is_undefined() || raw.is_null() {
+        return Ok(None);
+    }
+    let raw = if raw.is_object() && !Array::is_array(&raw) {
+        let copy = shallow_copy(&raw, &[]);
+        let top_up = get(&copy, "topUp");
+        if top_up.is_object() && !Array::is_array(&top_up) {
+            let _ = Reflect::set(&copy, &"topUp".into(), &shallow_copy(&top_up, &[]).into());
+        }
+        copy.into()
+    } else {
+        raw
+    };
+    let value: serde_json::Value =
+        from_js(raw).map_err(|e| format!("{what}: `refreshBatching`: {e}"))?;
+    BatchingOverride::parse(&value, what).map(Some)
 }
 
 /// Parse and validate the `open` config object.

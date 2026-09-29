@@ -94,6 +94,7 @@ pub fn event_type(ev: &Event<'_>) -> &'static str {
         Event::WaitFinished { .. } => "wait_finished",
         Event::RequestStarted { .. } => "request_started",
         Event::RequestFinished { .. } => "request_finished",
+        Event::RefreshPlanned { .. } => "refresh_planned",
         _ => "unknown",
     }
 }
@@ -231,6 +232,15 @@ pub fn event_object(ev: &Event<'_>) -> JsValue {
                 Err(e) => set(&d, "error", e.to_string()),
             }
         }
+        Event::RefreshPlanned {
+            prefix,
+            deferred,
+            pulled_forward,
+        } => {
+            set(&d, "prefix", prefix);
+            set(&d, "deferred", num(deferred));
+            set(&d, "pulled_forward", num(pulled_forward));
+        }
         _ => {}
     }
     d.into()
@@ -333,6 +343,14 @@ mod tests {
                     result: Ok(200),
                 },
                 "request_finished",
+            ),
+            (
+                Event::RefreshPlanned {
+                    prefix: "arxiv",
+                    deferred: 3,
+                    pulled_forward: 0,
+                },
+                "refresh_planned",
             ),
         ];
         for (ev, ty) in &cases {

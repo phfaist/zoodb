@@ -55,6 +55,145 @@ const default_make_resource_processors_graphics_path =
 
 
 
+// The built-in citation sources of use_flm_processor(), with their default
+// options.  `citations_options` is `flm_options.citations`; some of its keys
+// are older shortcuts for options of the built-in sources.
+const builtin_citation_sources = {
+    arxiv: {
+        source_class: CitationSourceArxiv,
+        default_options: (citations_options) => ({
+            override_arxiv_dois_file: citations_options.override_arxiv_dois_file,
+        }),
+    },
+    doi: {
+        source_class: CitationSourceDoi,
+    },
+    manual: {
+        source_class: CitationSourceManual,
+    },
+    preset: {
+        source_class: CitationSourceBibliographyFile,
+        // only created by default if there are bibliography files
+        enabled_by_default: (citations_options) =>
+            citations_options.preset_bibliography_files != null,
+        default_options: (citations_options) => ({
+            bibliography_files: citations_options.preset_bibliography_files,
+        }),
+    },
+};
+
+function is_citation_source_instance(value)
+{
+    return typeof value?.get_autocitefetch_spec === 'function';
+}
+
+function is_plain_object(value)
+{
+    if (value == null || typeof value !== 'object') {
+        return false;
+    }
+    const proto = Object.getPrototypeOf(value);
+    return proto === null || proto === Object.prototype;
+}
+
+/**
+ * Build the citation source instances of `use_flm_processor()` from
+ * ``flm_options.citations`` (see there for the accepted structure of
+ * ``citations.sources``).
+ *
+ * @param {Object} citations_options - ``flm_options.citations``.
+ * @param {Object} ctx - ``{ fs, fs_data_dir }``, used as the ``fs`` and
+ *     ``fsRootFilePath`` options of sources created here (unless their options
+ *     set them).
+ * @returns {Object} An object mapping citation prefixes to source instances.
+ */
+export function make_citation_sources(citations_options, { fs, fs_data_dir })
+{
+    const sources_setting = citations_options.sources ?? {};
+    const common_options = citations_options.source_options ?? {};
+
+    const create = (name, source_class, default_options, user_options) => {
+        const options = Object.assign(
+            { fs, fsRootFilePath: fs_data_dir },
+            common_options,
+            default_options,
+            user_options,
+        );
+        for (const k of Object.keys(options)) {
+            if (options[k] === undefined) {
+                delete options[k];
+            }
+        }
+        try {
+            return new source_class(options);
+        } catch (err) {
+            throw new Error(`Cannot create citation source ‘${name}’: ${err.message}`,
+                            { cause: err });
+        }
+    };
+
+    // Built-in sources first, then the others, in the order given.
+    const names = new Set([
+        ...Object.keys(builtin_citation_sources),
+        ...Object.keys(sources_setting),
+    ]);
+
+    const citation_sources = {};
+    for (const name of names) {
+        const setting = sources_setting[name];
+        const builtin = Object.hasOwn(builtin_citation_sources, name)
+              ? builtin_citation_sources[name] : null;
+        if (setting === false || setting === null) {
+            continue; // disabled
+        }
+        if (setting === undefined
+            && builtin?.enabled_by_default?.(citations_options) === false) {
+            continue;
+        }
+        if (setting === true && builtin == null) {
+            throw new Error(
+                `Cannot activate source ‘${name}’ that is not known to use_flm_processor()`
+            );
+        }
+        if (is_citation_source_instance(setting)) {
+            citation_sources[name] = setting;
+            continue;
+        }
+        if (setting !== undefined && setting !== true && ! is_plain_object(setting)) {
+            throw new Error(
+                `Invalid setting for citation source ‘${name}’: expected true, false/null, `
+                + `an options object, or a citation source instance`
+            );
+        }
+        const { source_class, ...user_options } = is_plain_object(setting) ? setting : {};
+        if (source_class != null) {
+            if (typeof source_class !== 'function') {
+                throw new Error(
+                    `Citation source ‘${name}’: ‘source_class’ must be a class (constructor)`
+                );
+            }
+            citation_sources[name] = create(name, source_class, {}, user_options);
+            continue;
+        }
+        if (builtin == null) {
+            throw new Error(
+                `Citation source ‘${name}’ is not a built-in source of use_flm_processor() `
+                + `(${Object.keys(builtin_citation_sources).join(', ')}); give a source `
+                + `instance, or an options object with a ‘source_class’`
+            );
+        }
+        citation_sources[name] = create(
+            name,
+            builtin.source_class,
+            builtin.default_options?.(citations_options) ?? {},
+            user_options,
+        );
+    }
+
+    return citation_sources;
+}
+
+
 /**
  * Factory function that creates and configures a :class:`ZooFLMProcessor` for
  * use with :func:`makeStandardZooDb`.
@@ -66,9 +205,11 @@ const default_make_resource_processors_graphics_path =
  *   `refs` option.
  * - `citations.csl_style` — CSL style XML string for the citation formatter.
  * - `citations.override_arxiv_dois_file` — path to a file that overrides
- *   arXiv-to-DOI mappings, relative to `fs_data_dir`.
+ *   arXiv-to-DOI mappings, relative to `fs_data_dir`.  Shortcut for
+ *   ``sources.arxiv.override_arxiv_dois_file``, which takes precedence.
  * - `citations.preset_bibliography_files` — array of bibliography file paths
- *   to pre-load into the `preset` citation source.
+ *   to pre-load into the `preset` citation source.  Shortcut for
+ *   ``sources.preset.bibliography_files``, which takes precedence.
  * - `citations.default_user_agent` — HTTP User-Agent header value for
  *   citation fetch requests.
  * - `citations.cache_dir` — directory of the citation cache (default:
@@ -77,11 +218,37 @@ const default_make_resource_processors_graphics_path =
  * - `citations.cache_entry_default_duration_ms` — cache TTL in milliseconds.
  * - `citations.skip_save_cache` — set to `true` to skip writing the updated
  *   cache to disk.
- * - `citations.sources` — object mapping citation source names to source
- *   instances.  Setting a key to `false` or `null` removes the built-in
- *   source of that name; setting it to `true` keeps the built-in default.
- *   The built-in sources are `'arxiv'`, `'doi'`, `'manual'`, and `'preset'`
- *   (see :doc:`zoodb.citationmanager`).
+ * - `citations.sources` — object mapping citation prefixes to source
+ *   settings.  The built-in sources are `'arxiv'`, `'doi'`, `'manual'`, and
+ *   `'preset'` (see :doc:`zoodb.citationmanager`).  Each value is one of:
+ *
+ *   - `true` — keep the built-in source with its default options;
+ *   - `false` or `null` — remove the built-in source;
+ *   - a plain options object — options for the built-in source of that name,
+ *     merged over its defaults (e.g. ``{ refresh_batching: 'eager' }``);
+ *   - a plain options object with a `source_class` key — create a source of
+ *     that class with the remaining options (for a custom source, or to
+ *     replace a built-in one);
+ *   - a source instance — used as is.
+ *
+ *   The `preset` source is only created by default if
+ *   `citations.preset_bibliography_files` is set; otherwise set
+ *   ``preset: { bibliography_files: [...] }`` to enable it.
+ *
+ *   Sources created here receive the `fs` and `fsRootFilePath`
+ *   (= `fs_data_dir`) options unless their options set them.  Example::
+ *
+ *       sources: {
+ *           arxiv: { refresh_batching: { min_batch: 50 } },
+ *           doi: { refresh_batching: 'eager' },
+ *           preset: { bibliography_files: ['bib/preset.yml'] },
+ *           manual: false,
+ *           mydb: { source_class: MyCitationSource, api_url: '...' },
+ *       }
+ *
+ * - `citations.source_options` — options applied to every source created by
+ *   `use_flm_processor()` (i.e., not to source instances), before the
+ *   source-specific ones (e.g. ``{ user_agent: '...' }``).
  * - `citations.citation_manager_options` — extra options forwarded to the
  *   :class:`CitationDatabaseManager` constructor.
  * - `resources.rename_figure_template` — function ``(accessor) → string``
@@ -132,41 +299,10 @@ export async function use_flm_processor(_this)
           flm_options.resources?.make_resource_processors_graphics_path
           ?? default_make_resource_processors_graphics_path;
 
-    let citation_sources = {
-        arxiv: new CitationSourceArxiv({
-            override_arxiv_dois_file:
-            flm_options.citations?.override_arxiv_dois_file,
-            fs,
-            fsRootFilePath: fs_data_dir,
-        }),
-        doi: new CitationSourceDoi(),
-        manual: new CitationSourceManual(),
-        preset: new CitationSourceBibliographyFile({
-            bibliography_files:
-            flm_options.citations?.preset_bibliography_files,
-            fs,
-            fsRootFilePath: fs_data_dir,
-        }),
-    };
-    for (const [source_name, source_setting]
-         of Object.entries(flm_options.citations?.sources ?? {})) {
-        if (source_setting === false || source_setting === null) {
-            delete citation_sources[source_name];
-            continue;
-        }
-        if (source_setting === true) {
-            if (citation_sources[source_name] == null) {
-                throw new Error(
-                    `Cannot activate source ‘${source_name}’ that is not known to `
-                    + `use_flm_processor()`
-                );
-            }
-            // keep this source in citation_sources as is
-            continue;
-        }
-        // at this point, it has to be a source object instance
-        citation_sources[source_name] = source_setting;
-    }
+    const citation_sources = make_citation_sources(
+        flm_options.citations ?? {},
+        { fs, fs_data_dir }
+    );
 
     let flm_processor_config = {
         zoo_flm_environment: _this.zoo_flm_environment,

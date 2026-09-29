@@ -12,7 +12,7 @@ build = "build.rs"
 crate-type = ["cdylib", "rlib"]     # rlib so `cargo test` can link unit tests on the host
 
 [dependencies]
-autocitefetch = "0.1"
+autocitefetch = "0.1.1"
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 js-sys = "0.3"

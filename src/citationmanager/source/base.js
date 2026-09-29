@@ -4,6 +4,7 @@ const debug = debug_module('zoodb.citationmanager.sources.base');
 import loMerge from 'lodash/merge.js';
 
 import { path_or_url_to_url } from '../../util/url.js';
+import { refresh_batching_spec_override } from './_specutil.js';
 
 
 const RETRYABLE_STATUSES = new Set([
@@ -112,6 +113,30 @@ function make_response_object(host_response)
  *   again, in milliseconds.  ``0`` means that entries are kept for the current
  *   run only.  If not set, the citation manager's
  *   ``cache_entry_default_duration_ms`` applies.
+ *
+ * - ``refresh_batching`` - How refetching stale cache entries is batched
+ *   into requests: a few stale entries can be *deferred* (their cached copies
+ *   are served meanwhile) until there are enough of them to be worth a
+ *   request, and a request that goes out anyway can be *topped up* with
+ *   entries that are nearly due.  Each source has its own default (the arXiv
+ *   and DOI sources batch, a bibliography file refreshes all of its entries at
+ *   once, other sources refetch exactly what is due).  The value is
+ *   ``'eager'`` (refetch whatever is due, as soon as it is due),
+ *   ``'default'``, or an object adjusting the source's default::
+ *
+ *       {
+ *           eager: false,           // true: start from 'eager' instead
+ *           min_batch: 50,          // wait for 50 stale entries...
+ *           max_defer_days: 7,      // ...but at most 7 days past expiry
+ *           top_up: {               // or false: never pull entries forward
+ *               min_age_percent: 50, // entries half-way through their lifetime
+ *               fill: 'chunk',       // up to the request's capacity, or a count
+ *           },
+ *       }
+ *
+ *   Settings that are not given keep the source's default.  This is the same
+ *   structure as the ``refresh_batching`` option of the Python
+ *   ``flm-citations`` package.  See :ref:`citations-refresh-batching`.
  *
  * - ``chains_to_sources`` - The prefixes of the sources to which this source
  *   may redirect citations with `store_citation_chained()` (e.g., the arXiv
@@ -401,6 +426,7 @@ export class CitationSourceBase
             ttlMs: this.options.cache_store_options?.cache_duration_ms
                 ?? this.options.cache_duration_ms
                 ?? undefined,
+            ...refresh_batching_spec_override(this),
         };
     }
 

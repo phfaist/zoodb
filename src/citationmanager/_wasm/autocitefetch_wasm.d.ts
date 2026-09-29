@@ -46,11 +46,29 @@ export interface HostCacheFs {
 export interface HostGuard { release(): void }
 
 export type SourceSpec =
-| { kind: 'arxiv';  prefix: string; chainDoisTo?: string | null; overrideDois?: Record<string, string | null>; chunkSize?: number; minIntervalMs?: number; ttlMs?: number }
-| { kind: 'doi';    prefix: string; chunkSize?: number; minIntervalMs?: number; ttlMs?: number }
-| { kind: 'manual'; prefix: string; format: string; chunkSize?: number; minIntervalMs?: number; ttlMs?: number }
-| { kind: 'bib';    prefix: string; files?: string[]; entries?: Record<string, object>; format?: 'auto' | 'json' | 'yaml'; chunkSize?: number; minIntervalMs?: number; ttlMs?: number }
-| { kind: 'js';     prefix: string; source: JsSourceObject; chunkSize?: number; minIntervalMs?: number; ttlMs?: number };
+| { kind: 'arxiv';  prefix: string; chainDoisTo?: string | null; overrideDois?: Record<string, string | null>; chunkSize?: number; minIntervalMs?: number; ttlMs?: number; refreshBatching?: RefreshBatchingSpec }
+| { kind: 'doi';    prefix: string; chunkSize?: number; minIntervalMs?: number; ttlMs?: number; refreshBatching?: RefreshBatchingSpec }
+| { kind: 'manual'; prefix: string; format: string; chunkSize?: number; minIntervalMs?: number; ttlMs?: number; refreshBatching?: RefreshBatchingSpec }
+| { kind: 'bib';    prefix: string; files?: string[]; entries?: Record<string, object>; format?: 'auto' | 'json' | 'yaml'; chunkSize?: number; minIntervalMs?: number; ttlMs?: number; refreshBatching?: RefreshBatchingSpec }
+| { kind: 'js';     prefix: string; source: JsSourceObject; chunkSize?: number; minIntervalMs?: number; ttlMs?: number; refreshBatching?: RefreshBatchingSpec };
+
+/**
+ * Adjusts a source's refresh batching (deferring small amounts of refresh work,
+ * topping up requests with nearly-due entries). Settings not given keep the
+ * source's own default; `eager: true` starts from 'eager' instead.
+ */
+export type RefreshBatchingSpec =
+| 'eager'
+| 'default'
+| { eager?: boolean; minBatch?: number; maxDeferDays?: number;
+topUp?: false | null | 'off' | { minAgePercent?: number; fill?: 'chunk' | number } };
+
+/** The refresh batching in effect for a prefix (see `CitationManager.refreshBatching`). */
+export interface RefreshBatching {
+    minBatch: number;
+    maxDeferDays: number;
+    topUp: { minAgePercent: number; fill: 'chunk' | number } | null;
+}
 
 /**
  * A citation source implemented in JavaScript (`kind: 'js'`).
@@ -110,6 +128,7 @@ export type ProgressEvent =
 | { type: 'request_started'; url: string; attempt: number }
 | { type: 'request_finished'; url: string; status: number }
 | { type: 'request_finished'; url: string; error: string }
+| { type: 'refresh_planned'; prefix: string; deferred: number; pulled_forward: number }
 | { type: 'unknown' };
 
 
@@ -151,6 +170,12 @@ export class CitationManager {
      */
     prune(): Promise<number>;
     /**
+     * The refresh batching in effect for `prefix` (the source's default with
+     * any `refreshBatching` override applied), or `null` if no source is
+     * registered under `prefix`.
+     */
+    refreshBatching(prefix: string): RefreshBatching | null;
+    /**
      * Fetch every missing or stale citation, following chains. Resolves to
      * the per-citation failures (never rejects for a bad citation; an
      * unregistered prefix is reported as a failure too). Rejects only on a
@@ -185,6 +210,7 @@ export interface InitOutput {
     readonly citationmanager_open: (a: any) => any;
     readonly citationmanager_prefixes: (a: number) => [number, number];
     readonly citationmanager_prune: (a: number) => any;
+    readonly citationmanager_refreshBatching: (a: number, b: number, c: number) => [number, number, number];
     readonly citationmanager_retrieve: (a: number, b: any) => any;
     readonly version: () => any;
     readonly wasm_bindgen_68cc7bfd7663d6e5___convert__closures_____invoke___wasm_bindgen_68cc7bfd7663d6e5___JsValue__core_7d5f0a2ba6a62c33___result__Result_____wasm_bindgen_68cc7bfd7663d6e5___JsError___true_: (a: number, b: number, c: any) => [number, number];
