@@ -39,3 +39,22 @@ entries already present are kept); `--dry-run` only reports the counts;
 `--remove-legacy` deletes the legacy file after a successful import (by default
 it is left untouched). Exit status: 0 on success, 1 on a usage error, 2 on an
 import error. `--help` prints the full option list.
+
+## `extend_citations_ttl.mjs`
+
+Usage: `zoodb-extend-citations-ttl --cache-dir <dir> --prefix <name> [--prefix <name>]... --add <duration> [--cache-base citations] [--dry-run]`
+
+Prolongs the time-to-live of all entries of `<dir>/citations.jsonl` whose cite
+prefix is one of the given prefixes, e.g. `yarn zoodb-extend-citations-ttl
+--cache-dir _zoodb_citations_cache --prefix arxiv --add 60d` adds 60 days to
+all arXiv entries (it is a package `bin`; in this repository, `node
+tools/extend_citations_ttl.mjs ...`). Both timestamps of a record
+(`stale_after` and `expires`) are shifted by the duration (a number and a unit
+`w`, `d`, `h` or `m`; negative values, as in `--add=-10d`, shorten it). Only
+the timestamps at the end of the selected lines are rewritten; all other bytes
+of the file are kept, and the file is replaced atomically. Chained entries are
+selected by their own prefix only (an `arxiv` entry chained to a `doi` entry
+does not extend the `doi` entry). The tool refuses to run while a sidecar log
+`._<base>.*.log` exists, since its lines would override the edited ones at the
+next compaction. `--dry-run` only reports the counts. Exit status: 0 on
+success, 1 on a usage error, 2 on an error reading or writing the cache.

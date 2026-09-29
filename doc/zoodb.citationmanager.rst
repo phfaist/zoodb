@@ -150,6 +150,21 @@ other one fetched.  A build that is interrupted may leave a
 the next build, but the file is not removed; delete ``._citations*`` files
 yourself when no build is running.
 
+**Extending lifetimes.**  To keep the cached entries of a source for longer
+without fetching them again (for instance before a build that must not hit the
+arXiv API), shift their lifetime with the ``zoodb-extend-citations-ttl`` tool.
+For example, to add 60 days to all arXiv entries:
+
+.. code-block:: text
+
+   yarn zoodb-extend-citations-ttl --cache-dir _zoodb_citations_cache --prefix arxiv --add 60d
+
+``--prefix`` may be repeated; ``--add`` takes a number followed by ``w``,
+``d``, ``h`` or ``m``.  Only the entries with the given citation prefix are
+changed: an arXiv entry that points to a DOI entry is extended, but not the DOI
+entry.  ``--dry-run`` reports what would change.  Run the tool when no build is
+running; it refuses to run if a ``._citations.<id>.log`` file is present.
+
 
 Using the citation manager directly
 -----------------------------------
