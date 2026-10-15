@@ -6,12 +6,16 @@
 //   NODE_MODULES=<a node_modules holding yaml> node run_zoo.mjs \
 //       --kind example --data <zoodb-example/data> --schemas <zoodb-example/schemas> [--out <dir>]
 //   NODE_MODULES=... node run_zoo.mjs --kind eczoo --data <eczoodb/test_data> --schemas <eczoodb/schemas>
+// Milestone 2 options: --citations <cache_compiled_citations.json> fills the citations
+// table from the existing compiled cache; the graphics table is always filled from the
+// files found beside the data; --srcset N enables Parcel srcset candidates up to density N.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import { loadZooFlm } from './load.mjs';
+import { citationsFromCache, collectGraphics } from './host_tables.mjs';
 
 const args = Object.fromEntries(
     process.argv.slice(2).reduce((acc, a, i, arr) => {
@@ -147,7 +151,7 @@ const loaded = await loadZooFlm();
 const { ZooFlm } = loaded;
 
 let t0 = performance.now();
-const engine = new ZooFlm({ dollar_math: false });
+const engine = new ZooFlm({ dollar_math: false, srcset: args.srcset ? { image_max_zoom_factor: Number(args.srcset) } : undefined });
 const engine_ms = performance.now() - t0;
 const build_diagnostics = engine.build_diagnostics();
 
@@ -178,14 +182,29 @@ const scanSummary = {
     refs_resolved: scan.trees.reduce((n, t) => n + t.refs_resolved.length, 0),
     refs_unresolved: scan.trees.reduce((n, t) => n + t.refs_unresolved.length, 0),
     unresolved_sample: [...new Set(scan.trees.flatMap((t) => t.refs_unresolved))].slice(0, 12),
-    graphics: scan.trees.flatMap((t) => t.graphics),
+    graphics: scan.trees.flatMap((t) => t.graphics.map((g) => `${g.path} @ ${g.origin}`)),
     cited: scan.cited.length,
     cited_sample: scan.cited.slice(0, 8).map(([k]) => k),
     duplicate_labels: scan.duplicate_labels,
 };
 
+// Milestone 2: the host tables, filled from what the scan reported (Q6, Q7).
+const hostTables = {};
+t0 = performance.now();
+if (args.citations) {
+    const c = citationsFromCache(args.citations, scan.cited.map(([k]) => k));
+    engine.set_citations(c.entries);
+    hostTables.citations = { set: engine.citations_len(), missing: c.missing };
+}
+{
+    const g = collectGraphics(scan.trees.flatMap((t) => t.graphics), { dataDir: args.data, permalink: (name) => `/pic/${name}` });
+    engine.set_graphics(g.entries);
+    hostTables.graphics = { set: engine.graphics_len(), missing: g.missing, entries: g.entries.map(({ origin, path: p, media_type, address, kind, width_px, height_px, dpi, width_pt, height_pt }) => ({ origin, path: p, media_type, address, kind, width_px, height_px, dpi, width_pt, height_pt })) };
+}
+hostTables.ms = Math.round(performance.now() - t0);
+
 const renderTally = new Map();
-let render_ms = 0, html_chars = 0;
+let render_ms = 0, html_chars = 0, img_tags = [];
 const outDir = args.out ?? null;
 if (outDir) fs.mkdirSync(outDir, { recursive: true });
 let requires = new Set(), definitions = null;
@@ -199,6 +218,7 @@ for (const obj of objects) {
     out.requires.forEach((r) => requires.add(r));
     if (definitions == null || out.requires.length > definitions.requires_count) definitions = Object.assign(out.definitions, { requires_count: out.requires.length });
     html_chars += out.trees.reduce((n, t) => n + t.length, 0);
+    for (const t of out.trees) img_tags.push(...(t.match(/<img\b[^>]*>/g) ?? []));
     if (outDir) {
         const css = out.definitions.filter((d) => d.kind === 'style').flatMap((d) => d.parts.filter((p) => p.kind === 'inline').map((p) => p.text)).join('\n');
         const body = obj.fragments.map((f, i) => `<section data-field="${f.field}">${out.trees[i]}</section>`).join('\n');
@@ -216,7 +236,8 @@ console.log(JSON.stringify({
     objects: objects.length, fields, chars,
     parse: { ms: Math.round(parse_ms), diagnostics: tallyOut(parseTally) },
     scan: { ms: Math.round(scan_ms), ...scanSummary, diagnostics: tallyOut(scanTally) },
-    render: { ms: Math.round(render_ms), html_chars, requires: [...requires],
+    host_tables: hostTables,
+    render: { ms: Math.round(render_ms), html_chars, img_tags, requires: [...requires],
               definitions_of_richest_page: (definitions ?? []).map((d) => `${d.kind} ${d.id} (${d.parts.map((p) => p.kind + (p.kind === 'url' ? ' ' + p.text : '')).join(', ')})`),
               diagnostics: tallyOut(renderTally) },
     node_rss_mb: Math.round(process.memoryUsage().rss / 1048576),

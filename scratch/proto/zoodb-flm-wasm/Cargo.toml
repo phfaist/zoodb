@@ -19,11 +19,16 @@ js-sys = "0.3"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde-wasm-bindgen = "0.6"
+# The `DiagnosticInfo` derive expands to `::techy::…` paths, so the crate that
+# declares a diagnostic needs techy in its extern prelude (same version as flm-core's).
+techy = "0.1"
 console_error_panic_hook = { version = "0.1", optional = true }
 
 [features]
 default = []
 debug-panics = ["dep:console_error_panic_hook"]
+# Names the `GraphicsPublished` constructor requested upstream (U2); does not build today.
+published-insert = []
 
 [profile.release]
 opt-level = "s"

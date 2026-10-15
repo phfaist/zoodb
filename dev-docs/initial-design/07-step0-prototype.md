@@ -183,11 +183,101 @@ Results:
 This settles R16 (the marker composition) and R14 (the index cost) for the shape of
 Q4/Q8/Q9 as decided.
 
+## Milestone 2: the citations and graphics tables, the services as lookups, `srcset` (2026-10-16)
+
+A service of flm-core is fixed when the registry is built and runs synchronously
+inside a run, so the wasm host cannot hand it a JavaScript callback that awaits
+anything. The engine therefore holds two tables that JavaScript fills *before* a run
+from what the scan reported, and the services are lookups over them (`src/host.rs`):
+
+- `set_citations([{ key, text }])`: the compiled citation texts of the existing
+  citation manager (`cache_compiled_citations.json`, FLM source with `\textit`,
+  `\textbf`, `\href`), keyed by `prefix:key` with the prefix in lower case. The
+  `CitationProvider` answers a cited key by that normalized key, parses the text with
+  `ProviderCx::parse_entry`, and gives the normalized key as the work's identity, so
+  `arXiv:…` and `arxiv:…` are one work. A key not in the table is "not mine", which
+  flm-core reports as `flm.citations.no-entry` at the first citation: the signal for
+  the collect-then-rerun fallback of Q6.
+- `set_graphics([{ origin, path, identity, media_type, address, kind, width_px,
+  height_px, dpi, width_pt, height_pt }])`: one entry per image the JavaScript resource
+  collector found and inspected, keyed by the canonical path of the source the image
+  is written in (`people/Alice.yml#biography`, which is what the inspect stage hands
+  the services, following the provenance chain back to the first source with a
+  canonical path) and the path as written. The `GraphicsResolver` returns the identity,
+  media type and address; its `read` returns no content (the host inspected the file
+  outside the run and the inspector does not read the content); the
+  `GraphicsInspector` returns the pixel size and resolution of a raster image or the
+  physical size of a vector image. A miss is `flm.graphics.resolve-failed`.
+
+The scan now lists images from the element index (`flm.element-index`) instead of
+`flm.graphics.info`, whose stage would ask the resolver before anything is collected;
+each entry carries the path as written and the origin, the key of the graphics table.
+`js/host_tables.mjs` fills both tables: the citations from a compiled cache, and the
+images found beside the object's source file (extensions tried as the collector does),
+hashed, addressed through a permalink function, and inspected with the measures of
+ZooDb's collector (PNG `IHDR`/`pHYs`, JPEG `SOF`/JFIF density, SVG `width`/`height` or
+`viewBox`). Run it through the two runners:
+
+```sh
+node js/run_zoo.mjs --kind example --data …/zoodb-example/data --schemas …/zoodb-example/schemas \
+    --citations …/zoodb-example/website/_zoodb_citations_cache/cache_compiled_citations.json [--srcset 2]
+node js/run_zoo.mjs --kind eczoo --data …/eczoodb/test_data --schemas …/eczoodb/schemas \
+    --citations …/eczoodb/_TEST_zoodb_citations_cache/cache_compiled_citations.json
+node js/compose_example.mjs --data … --schemas …   # the citations cache found beside the data
+```
+
+Results (runs alone, Node, the module of this milestone at 5,008,498 B, 59.7 KB more
+than milestone 1 for the two services, the feature and the tables):
+
+| | zoodb-example (5 objects, 11 fields) | eczoodb test_data (43 objects, 109 fields) |
+|---|---|---|
+| cited keys found / missing | 4 / 0 | 66 / 1 (`manual:{A. Smith …}`, absent from the test cache) |
+| images found / missing | 1 / 0 (PNG 666 px, 300 dpi) | 6 distinct for 8 uses / 0 (PNG 600 dpi, JPEG 1050 dpi, two SVG) |
+| fill both tables | 7 ms | 22–29 ms |
+| parse / scan / render | 10–11 / 23–26 / 73–76 ms | 48–57 / 34–36 / 231–256 ms |
+| `flm.citations.*` / `flm.graphics.*` in the render | none | one `no-entry` for the missing key; nothing for images |
+
+Every `<img>` now carries the address the host gave and the size the inspector
+reported (`src="/pic/Smiley-eba41315.png" style="--flm-element-width: 159.84pt; …"`:
+666 px at 300 dpi), and the bibliography piece shows the compiled entries with their
+italics, bold and links. Bob's composed page from milestone 1 renders with its four
+citations resolved and Alice's with her figure. The citation table costs nothing
+measurable per run (the EC zoo render is 217–256 ms with or without it). The EC zoo
+render is slower than in milestone 0 (101–120 ms): the inspect stage and the
+resolver now run for every image, and the runs were timed on a busier machine; worth
+re-measuring in step 2, not a concern.
+
+**`srcset` (R8): the plan mechanism is verified, the table write is blocked.** The
+compiled-in ZooDb feature (`src/zoodb_feature.rs`, feature name `zoodb`) declares the
+html published table as a peer table and registers `zoodb.graphics.publish.html`, a
+per-tree stage that reads `flm.graphics.info` and computes, for each image, the
+address by reference and Parcel's candidates as ZooDb computes them today
+(`…?as=webp&width=W&height=H` with the descriptor `Nx` for each density below the
+image's resolution; the `srcset` entry of the engine's configuration carries
+`pixel_density_list` or `image_max_zoom_factor`). The native test confirms what the
+design relied on: with the stage registered and no preference, the plan refuses the
+html workflow, naming both writers (`flm.graphics.publish.html`,
+`zoodb.graphics.publish.html`); with `Overrides::prefer` naming the ZooDb stage, the
+plan builds and the stage runs for every tree. What it cannot do is write the value:
+`GraphicsPublished` has a private map, and its only public constructor is `Default`
+(empty); `absorb` takes another `GraphicsPublished`. The stage therefore reports
+`zoodb.graphics.publish-failed` for a tree with images and writes an empty table
+(the image rule then refuses the image, `flm.lowering.rule-failed`), and the complete
+path is kept behind the cargo feature `published-insert`, which names the one-line
+constructor requested upstream as **U2** (05). The engine registers and prefers the
+stage only when `srcset` is configured, so every run without it is unaffected. The
+alternatives were weighed and rejected in 05: rewriting the emitted HTML, or a ZooDb
+image rule duplicating the standard rule's private option and size logic.
+
+Also learned: `\includegraphics` is declared inside floats only under
+`StdcoreConfig::new()` (`GraphicsConfig::global` opens it at top level), and the
+`DiagnosticInfo` derive expands to `::techy::…` paths, so a crate that declares a
+diagnostic of its own lists `techy` as a dependency (same version as flm-core's).
+
 ### Not covered yet (the remaining milestones of step zero)
 
-1. The citations table and the graphics map filled from JavaScript before a run, with
-   the provider, resolver and inspector as lookups over them (Q6, Q7), and the `srcset`
-   publish stage (R8).
+1. ~~The citations table and the graphics map~~ Done in milestone 2, except the `srcset`
+   table write, blocked on U2.
 2. The standalone check stage over the tables (Q5, R17) and the `field` element for the
    FLM-files loader (Q16), the first two pieces of the compiled-in ZooDb feature.
 3. Settings and user definitions given as data from JavaScript (Q14) through

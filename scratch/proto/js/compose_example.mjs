@@ -10,6 +10,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import { loadZooFlm } from './load.mjs';
+import { citationsFromCache, collectGraphics } from './host_tables.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, arr) => {
     if (a.startsWith('--')) acc.push([a.slice(2), arr[i + 1]]);
@@ -46,7 +47,7 @@ const permalink = (type, id) => `/${type}/${id}`;
 // ---- the engine: fragments, snippet run, index -----------------------------------------------
 
 const loaded = await loadZooFlm();
-const engine = new loaded.ZooFlm({ dollar_math: false });
+const engine = new loaded.ZooFlm({ dollar_math: false, srcset: args.srcset ? { image_max_zoom_factor: Number(args.srcset) } : undefined });
 const timings = {};
 const time = (name, f) => { const t0 = performance.now(); const r = f(); timings[name] = Math.round((performance.now() - t0) * 10) / 10; return r; };
 
@@ -65,6 +66,20 @@ time('parse', () => {
         (p.relations?.friends ?? []).forEach((r, i) => { if (r.friend_detail) add(`relations.friends[${i}].friend_detail`, r.friend_detail, false); });
         (p.relations?.friend_of ?? []).forEach((r, i) => { if (r.friend_detail) add(`relations.friend_of[${i}].friend_detail`, r.friend_detail, false); });
     }
+});
+
+// Milestone 2: the scan over every fragment, then the citations and graphics
+// tables filled from what it reported (Q6, Q7).
+const scan = time('scan', () => engine.scan([...fragments.values()].map((f) => f.handle)));
+const citationsCache = args.citations ?? path.join(args.data, '..', 'website', '_zoodb_citations_cache', 'cache_compiled_citations.json');
+const hostTables = {};
+time('host_tables', () => {
+    const c = citationsFromCache(citationsCache, scan.cited.map(([k]) => k));
+    engine.set_citations(c.entries);
+    const g = collectGraphics(scan.trees.flatMap((t) => t.graphics), { dataDir: args.data, permalink: (name) => `/pic/${name}` });
+    engine.set_graphics(g.entries);
+    hostTables.citations = { cited: scan.cited.length, set: engine.citations_len(), missing: c.missing };
+    hostTables.graphics = { refs: scan.trees.reduce((n, t) => n + t.graphics.length, 0), set: engine.graphics_len(), missing: g.missing };
 });
 
 // The snippet run (Q9 b): every standalone fragment rendered once, in one run.
@@ -163,7 +178,10 @@ console.log(JSON.stringify({
     snippet_run: { fragments: snippets.size, diagnostics: snippetRun.diagnostics.map((d) => d.identifier) },
     index: { entries: indexEntries.length, diagnostics: indexDiags.length },
     pages: Object.fromEntries(Object.entries(pages).map(([id, r]) => [id, { trees: r.order.length, leftover_markers: r.leftover, html_chars: r.html.length }])),
+    host_tables: hostTables,
     render_diagnostics: Object.fromEntries(renderDiags),
+    bob_bibliography: bob.out.pieces.find((p) => p.name === 'flm.citations.bibliography')?.html.replace(/\s+/g, ' ').slice(0, 700) ?? null,
+    alice_img: /<img\b[^>]*>/.exec(pages.alice.html)?.[0] ?? null,
     bob_links: [...bob.html.matchAll(/<a [^>]*href="\/person\/[^"]*"[^>]*>[^<]*(?:<[^a][^>]*>[^<]*)*<\/a>/g)].map((m) => m[0]).slice(0, 6),
     bob_figure: /<figure[^>]*>/.exec(bob.html)?.[0] ?? null,
     bob_pieces: bob.out.pieces.map((p) => `${p.name} (${p.place})`),

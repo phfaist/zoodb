@@ -8,6 +8,12 @@ use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 
 use flm_core::core::plan::{Overrides, Plan, PlanRequest};
+use flm_core::model::names::StageName;
+use flm_core::stdcore::features::citations::{CitationProvider, PROVIDERS_SLOT};
+use flm_core::stdcore::features::graphics::{GraphicsInspector, GraphicsResolver, INSPECTOR_SLOT, RESOLVER_SLOT};
+
+use crate::host::{CitationEntry, GraphicsEntry, HostCitations, HostGraphics, HostTables};
+use crate::zoodb_feature::{PUBLISH_STAGE, SrcsetConfig, ZoodbFeature};
 use flm_core::core::registry::{DefContent, FlmRegistry, RegistryBuilder, RegistryInputs};
 use flm_core::core::run::{Externals, Run, RunOptions};
 use flm_core::lang::{FlmDiagnostic, FlmOrigin, FlmParsing, FlmSource, ParseOptions, parse_fragment};
@@ -19,7 +25,9 @@ use flm_core::stdcore::backends::html::{
     PIECES_TABLE,
 };
 use flm_core::stdcore::features::citations::KEYS;
-use flm_core::stdcore::features::graphics::INFO;
+use flm_core::core::lowering::chars_at_lowering;
+use flm_core::stdcore::features::graphics::{GraphicsImage, PATH_ARG};
+use flm_core::stdcore::features::index::ELEMENT_INDEX;
 use flm_core::stdcore::features::refs::{
     EXTERNAL_INDEX, ExternalIndex, ExternalTarget, LABELS, REF_RESOLUTIONS, RefsRenderOptions, Resolution, UnresolvedRefs, value_of,
 };
@@ -36,6 +44,10 @@ pub struct EngineConfig {
     /// Whether `$…$` delimits mathematics (the EC zoo writes `\(…\)`).
     #[serde(default)]
     pub dollar_math: bool,
+    /// Alternative image sources for the html output (Q7); none when absent.
+    /// With it, the ZooDb publish stage is preferred over the standard one.
+    #[serde(default)]
+    pub srcset: Option<SrcsetConfig>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -109,12 +121,21 @@ pub struct HtmlOut {
     pub has_errors: bool,
 }
 
+#[derive(Debug, Clone, Serialize)]
+pub struct GraphicsRefOut {
+    /// The path as written.
+    pub path: String,
+    /// The canonical path of the source the image is written in: the key
+    /// the host's graphics table uses.
+    pub origin: Option<String>,
+}
+
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct ScanTreeOut {
     pub labels: Vec<String>,
     pub refs_resolved: Vec<String>,
     pub refs_unresolved: Vec<String>,
-    pub graphics: Vec<String>,
+    pub graphics: Vec<GraphicsRefOut>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -137,6 +158,10 @@ pub struct Engine {
     /// The external index installed in every render run (Q4): labels of zoo
     /// objects, with their link target and display content.
     external_index: ExternalIndex,
+    /// The citations and graphics tables the services read (Q6, Q7).
+    host: Arc<HostTables>,
+    /// Whether the html plan prefers the ZooDb publish stage (srcset).
+    prefer_zoodb_publish: bool,
 }
 
 fn severity_word(severity: Severity) -> &'static str {
@@ -179,14 +204,45 @@ pub fn layout_of(name: &str) -> Result<FragmentLayout, String> {
 
 impl Engine {
     pub fn new(config: &EngineConfig) -> Result<Engine, String> {
+        let host = Arc::new(HostTables::default());
         let mut builder = RegistryBuilder::new();
         builder.use_package(stdcore::package(StdcoreConfig::new()));
         builder.use_package(flm_core::math_passthrough::package());
+        builder.feature(Arc::new(ZoodbFeature { srcset: config.srcset.clone() }));
+        // The services are lookups over the host tables (Q6, Q7).
+        builder.contribute_to(PROVIDERS_SLOT, Arc::new(HostCitations(Arc::clone(&host))) as Arc<dyn CitationProvider>);
+        builder.contribute_to(RESOLVER_SLOT, Arc::new(HostGraphics(Arc::clone(&host))) as Arc<dyn GraphicsResolver>);
+        builder.contribute_to(INSPECTOR_SLOT, Arc::new(HostGraphics(Arc::clone(&host))) as Arc<dyn GraphicsInspector>);
         let mut inputs = RegistryInputs::new();
         inputs.parsing = FlmParsing { dollar_math: config.dollar_math, ..FlmParsing::default() };
         inputs.build_identity = Some(String::from("zoodb-flm-wasm-proto 0.0.1"));
         let registry = builder.build(&inputs).map_err(|e| e.render())?;
-        Ok(Engine { registry, fragments: Vec::new(), plans: BTreeMap::new(), external_index: ExternalIndex::new() })
+        Ok(Engine {
+            registry,
+            fragments: Vec::new(),
+            plans: BTreeMap::new(),
+            external_index: ExternalIndex::new(),
+            host,
+            prefer_zoodb_publish: config.srcset.is_some(),
+        })
+    }
+
+    /// Replaces the citations table: `[{ key, text }]`, `text` being FLM.
+    pub fn set_citations(&mut self, entries: Vec<CitationEntry>) {
+        self.host.set_citations(entries);
+    }
+
+    pub fn citations_len(&self) -> usize {
+        self.host.citations_len()
+    }
+
+    /// Replaces the graphics table (see `host::GraphicsEntry`).
+    pub fn set_graphics(&mut self, entries: Vec<GraphicsEntry>) {
+        self.host.set_graphics(entries);
+    }
+
+    pub fn graphics_len(&self) -> usize {
+        self.host.graphics_len()
     }
 
     pub fn build_diagnostics(&self) -> Vec<DiagOut> {
@@ -264,6 +320,7 @@ impl Engine {
 
     pub fn render_html(&mut self, handles: &[u32], options: &RenderOptions) -> Result<HtmlOut, String> {
         let key = format!("html:{}:{}", options.unresolved_refs_warning, options.title.as_deref().unwrap_or(""));
+        let prefer_zoodb_publish = self.prefer_zoodb_publish;
         let plan = self.plan(key, |registry| {
             let mut html_options = HtmlRenderOptions::default();
             if let Some(title) = &options.title {
@@ -274,6 +331,7 @@ impl Engine {
             };
             let overrides = Overrides {
                 render_options: OptionValues::new().with(html_options).with(refs_options),
+                prefer: if prefer_zoodb_publish { vec![StageName::from(PUBLISH_STAGE)] } else { Vec::new() },
                 ..Overrides::none()
             };
             Plan::for_workflow(registry, html::WORKFLOW, &overrides).map_err(|e| e.to_string())
@@ -351,10 +409,12 @@ impl Engine {
     pub fn scan(&mut self, handles: &[u32]) -> Result<ScanOut, String> {
         // A bare plan request (no workflow, so no `flm.validated`): the scan
         // demands the tables it reads and nothing else, so that no citation is
-        // retrieved and no output is produced (R13).
+        // retrieved, no image is resolved and no output is produced (R13).
+        // Images are listed from the element index (Q7), not from
+        // `flm.graphics.info`, whose stage would ask the resolver.
         let plan = self.plan(String::from("scan"), |registry| {
             let request = PlanRequest {
-                demands: vec!["flm.citations.keys".into(), "flm.labels".into(), "flm.refs.resolutions".into(), "flm.graphics.info".into()],
+                demands: vec!["flm.citations.keys".into(), "flm.labels".into(), "flm.refs.resolutions".into(), "flm.element-index".into()],
                 ..PlanRequest::default()
             };
             Plan::build(registry, &request).map_err(|e| e.to_string())
@@ -384,10 +444,16 @@ impl Engine {
                 }
             }
         }
-        if let Some(info) = run.table(INFO).map_err(|e| e.to_string())? {
-            for (addr, record) in info.iter() {
-                if let Some(&i) = index_of.get(&addr.tree) {
-                    trees[i].graphics.push(record.path.clone());
+        if let Some(index) = run.table(ELEMENT_INDEX).map_err(|e| e.to_string())? {
+            for (i, (&h, id)) in handles.iter().zip(ids.iter()).enumerate() {
+                let tree = self.fragments[h as usize].tree();
+                for (_, node, _) in index.values_of::<GraphicsImage>(*id, tree) {
+                    // The path as written, when it is characters (as the
+                    // inspect stage and the image rules read it).
+                    let Ok(Some(content)) = node.argument_content_nodes_named(PATH_ARG) else { continue };
+                    let Ok(Ok(path)) = chars_at_lowering(content.iter()) else { continue };
+                    let origin = node.span().source().origin().canonical_path().map(str::to_owned);
+                    trees[i].graphics.push(GraphicsRefOut { path, origin });
                 }
             }
         }
@@ -431,7 +497,9 @@ mod tests {
         assert!(!scan_ids.iter().any(|id| id.starts_with("flm.citations.")), "{scan_ids:?}");
         assert_eq!(scan.trees[1].labels, vec!["figure:x"]);
         assert_eq!(scan.trees[0].refs_unresolved, vec!["person:bob"]);
-        assert_eq!(scan.trees[1].graphics, vec!["images/Smiley"]);
+        assert_eq!(scan.trees[1].graphics.len(), 1);
+        assert_eq!(scan.trees[1].graphics[0].path, "images/Smiley");
+        assert_eq!(scan.trees[1].graphics[0].origin.as_deref(), Some("a.yml#biography"));
 
         let out = engine
             .render_html(&[a.handle, b.handle], &RenderOptions { unresolved_refs_warning: true, ..Default::default() })
@@ -458,5 +526,71 @@ mod tests {
         for d in &out.diagnostics {
             assert!(d.origin.is_some(), "{d:?}");
         }
+        // Without host tables: no provider entry, no image size.
+        assert!(ids.contains(&"flm.citations.no-entry"), "{ids:?}");
+        assert!(ids.contains(&"flm.graphics.unknown-size") || ids.contains(&"flm.graphics.resolve-failed"), "{ids:?}");
+
+        // With the host tables filled (Q6, Q7): the citation entry shows in
+        // the bibliography piece, the image gets its address and size.
+        engine.set_citations(vec![CitationEntry {
+            key: "arXiv:1234.5678".into(),
+            text: "A. Author, \\emph{A title}, \\href{https://arxiv.org/abs/1234.5678}{arXiv:1234.5678} (2020)".into(),
+        }]);
+        engine.set_graphics(vec![GraphicsEntry {
+            origin: "a.yml#biography".into(),
+            path: "images/Smiley".into(),
+            identity: "people/images/Smiley.png".into(),
+            media_type: "image/png".into(),
+            address: "/pic/Smiley-0123abcd.png".into(),
+            kind: "raster".into(),
+            width_px: Some(400),
+            height_px: Some(200),
+            dpi: Some(192.0),
+            width_pt: None,
+            height_pt: None,
+        }]);
+        let out3 = engine.render_html(&[a.handle, b.handle], &RenderOptions::default()).unwrap();
+        let ids3: Vec<&str> = out3.diagnostics.iter().map(|d| d.identifier.as_str()).collect();
+        assert!(!ids3.iter().any(|id| id.starts_with("flm.citations.") || id.starts_with("flm.graphics.")), "{:?}", out3.diagnostics);
+        let bib = out3.pieces.iter().find(|p| p.name == "flm.citations.bibliography").expect("bibliography piece");
+        assert!(bib.html.contains("A title") && bib.html.contains("href=\"https://arxiv.org/abs/1234.5678\""), "{}", bib.html);
+        assert!(out3.trees[1].contains("src=\"/pic/Smiley-0123abcd.png\""), "{}", out3.trees[1]);
+        // 400 px at 192 dpi = 150 pt wide.
+        assert!(out3.trees[1].contains("150pt") || out3.trees[1].contains("150"), "{}", out3.trees[1]);
+    }
+
+    /// R8: with the srcset configuration, the html plan prefers the ZooDb
+    /// publish stage over the standard one (two writers of one table), and
+    /// the stage runs. The table write itself is blocked (U2).
+    #[test]
+    fn the_zoodb_publish_stage_is_preferred_and_runs() {
+        let config = EngineConfig { srcset: Some(SrcsetConfig { image_max_zoom_factor: Some(2), ..Default::default() }), ..Default::default() };
+        let mut engine = Engine::new(&config).unwrap();
+        let b = engine.parse("\\begin{figure}\\includegraphics{images/Smiley}\\end{figure}", "a.yml#biography", FragmentLayout::InlineOrBlocks).unwrap();
+        engine.set_graphics(vec![GraphicsEntry {
+            origin: "a.yml#biography".into(),
+            path: "images/Smiley".into(),
+            identity: "x".into(),
+            media_type: "image/png".into(),
+            address: "/pic/Smiley.png".into(),
+            kind: "raster".into(),
+            width_px: Some(400),
+            height_px: Some(200),
+            dpi: Some(192.0),
+            width_pt: None,
+            height_pt: None,
+        }]);
+        let out = engine.render_html(&[b.handle], &RenderOptions::default()).unwrap();
+        let ids: Vec<&str> = out.diagnostics.iter().map(|d| d.identifier.as_str()).collect();
+        if cfg!(feature = "published-insert") {
+            assert!(out.trees[0].contains("srcset=\"/pic/Smiley.png?as=webp&amp;width=200&amp;height=100 1x\""), "{}", out.trees[0]);
+        } else {
+            assert!(ids.contains(&"zoodb.graphics.publish-failed"), "{ids:?}");
+        }
+        // Without the preference, two writers of one table: the plan refuses.
+        engine.prefer_zoodb_publish = false;
+        engine.plans.clear();
+        let err = engine.render_html(&[b.handle], &RenderOptions::default()).unwrap_err();
+        assert!(err.contains("zoodb.graphics.publish.html") && err.contains("flm.graphics.publish.html"), "{err}");
     }
 }

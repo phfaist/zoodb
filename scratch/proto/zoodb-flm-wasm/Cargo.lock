@@ -530,5 +530,6 @@ dependencies = [
  "serde",
  "serde-wasm-bindgen",
  "serde_json",
+ "techy",
  "wasm-bindgen",
 ]
