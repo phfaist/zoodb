@@ -274,12 +274,54 @@ Also learned: `\includegraphics` is declared inside floats only under
 `DiagnosticInfo` derive expands to `::techy::…` paths, so a crate that declares a
 diagnostic of its own lists `techy` as a dependency (same version as flm-core's).
 
+## Milestone 3: the standalone check and the `field` element (2026-10-16)
+
+Two more pieces of the compiled-in ZooDb feature (`src/zoodb_feature.rs`), both exercised
+natively and through the module.
+
+**The standalone check (Q5, R17).** The feature declares an external table
+`zoodb.standalone.trees` (the set of tree identifiers parsed from standalone fields,
+which the engine installs per scan run with `Externals::install_unstamped` from the
+handles JavaScript names: `scan(handles, standalone_handles)`), a capability
+`zoodb.standalone.checked`, and a `Check` stage of document scope,
+`zoodb.standalone.check`, that provides it. The scan plan demands the capability. The
+stage reads, for every standalone tree, `flm.refpoints` (every reference point of the
+tree, `RefPoints::of_tree`), the sites of `flm.refs.resolutions` (`SiteId::addr`
+carries the tree), and the element index for `flm.citations.cite`, `flm.citations.refcite`
+and `flm.graphics.image`; each is the Error `zoodb.standalone.violation` at the node's
+span, so the diagnostic carries the field through the tree's origin
+(`b.yml#name`). Every point R17 listed to verify holds: the site identifier carries the
+node address, an external table installs unstamped per run and reads as optional
+(`Needs::reads_opt`, absent when no tree is marked), a stage reads the tables of three
+standard features without declaring them, and the diagnostic names the field. A
+footnote in a standalone field is reported twice, as the note and as its mark, since
+both are reference points. Over the data: 5 standalone fields in `zoodb-example`, 25 in
+the EC zoo test data, no violation; the scan's cost is unchanged (13 ms, 29 ms).
+
+**The `field` element (Q16).** `\begin{field}{name} … \end{field}` is declared as an
+environment with a mandatory argument and a verbatim body (`BodyDef::new().verbatim()`),
+element `zoodb.field` with a block role, never rendered: the html plan lists it as
+unsupported (`Overrides::unsupported`), so a data field that holds one is reported at
+the node rather than refusing the plan. `parse_fields(text, origin)` parses the file
+as blocks with the registry's language and returns each field's name and the byte
+range of its body (between the closing brace of the name and `\end{field}`), plus the
+parse diagnostics and one `zoodb.fields.stray-content` Error per line outside the
+fields that is neither blank nor a comment. `js/flm_fields.mjs` applies the loader's
+own trim, dotted-path assignment (`key1.innerkey.[]` appends) and front-matter split,
+and reproduces the expected objects of `test/test_dbdataloader_flmfilesdb.js` exactly;
+an unclosed field is `core.environments.missing-terminator` with its position. Parsing
+the fixture takes 2 ms. Q15's positions come for free: every byte range is in the file's
+own text.
+
+Module size 5,033,996 B (+25.5 KB). Render timings on a quiet machine, both tables
+filled: `zoodb-example` 34 ms, EC zoo test data 135 ms, so milestone 2's slower figures
+were machine noise.
+
 ### Not covered yet (the remaining milestones of step zero)
 
 1. ~~The citations table and the graphics map~~ Done in milestone 2, except the `srcset`
    table write, blocked on U2.
-2. The standalone check stage over the tables (Q5, R17) and the `field` element for the
-   FLM-files loader (Q16), the first two pieces of the compiled-in ZooDb feature.
+2. ~~The standalone check stage and the `field` element~~ Done in milestone 3.
 3. Settings and user definitions given as data from JavaScript (Q14) through
    `stdcore::factory`, and the `quote` feature's configuration for the EC zoo.
 4. The handbook: one `latex-recomposed` run over a handful of codes (Q12, R7).

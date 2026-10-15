@@ -8,12 +8,13 @@ use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 
 use flm_core::core::plan::{Overrides, Plan, PlanRequest};
-use flm_core::model::names::StageName;
+use flm_core::model::names::{BackendName, ElementName, StageName};
 use flm_core::stdcore::features::citations::{CitationProvider, PROVIDERS_SLOT};
 use flm_core::stdcore::features::graphics::{GraphicsInspector, GraphicsResolver, INSPECTOR_SLOT, RESOLVER_SLOT};
 
 use crate::host::{CitationEntry, GraphicsEntry, HostCitations, HostGraphics, HostTables};
-use crate::zoodb_feature::{PUBLISH_STAGE, SrcsetConfig, ZoodbFeature};
+use crate::zoodb_feature::{FIELD_ELEMENT, FIELD_ENVIRONMENT, FIELD_NAME_ARG, PUBLISH_STAGE, STANDALONE_CHECKED, STANDALONE_TREES, SrcsetConfig, StandaloneTrees, ZoodbFeature};
+use flm_core::model::element::element_of;
 use flm_core::core::registry::{DefContent, FlmRegistry, RegistryBuilder, RegistryInputs};
 use flm_core::core::run::{Externals, Run, RunOptions};
 use flm_core::lang::{FlmDiagnostic, FlmOrigin, FlmParsing, FlmSource, ParseOptions, parse_fragment};
@@ -145,8 +146,26 @@ pub struct ScanOut {
     /// Cited keys in order of first citation, with the origin of that citation.
     pub cited: Vec<(String, Option<String>)>,
     pub duplicate_labels: Vec<String>,
+    /// The number of `zoodb.standalone.violation` diagnostics (Q5).
+    pub standalone_violations: usize,
     pub diagnostics: Vec<DiagOut>,
     pub has_errors: bool,
+}
+
+/// One field of an FLM data file (Q16): its name and the byte range of its
+/// verbatim body in the file's text.
+#[derive(Debug, Clone, Serialize)]
+pub struct FieldOut {
+    pub name: String,
+    pub start: usize,
+    pub end: usize,
+    pub text: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct FieldsOut {
+    pub fields: Vec<FieldOut>,
+    pub diagnostics: Vec<DiagOut>,
 }
 
 // ---------------------------------------------------------------------------
@@ -191,6 +210,13 @@ fn diag_out(diagnostic: &FlmDiagnostic, cache: &mut LineIndexCache<FlmOrigin>) -
 fn diags_out<'a>(diagnostics: impl IntoIterator<Item = &'a FlmDiagnostic>) -> Vec<DiagOut> {
     let mut cache = LineIndexCache::<FlmOrigin>::new();
     diagnostics.into_iter().map(|d| diag_out(d, &mut cache)).collect()
+}
+
+fn line_col(text: &str, at: usize) -> (usize, usize) {
+    let before = &text[..at.min(text.len())];
+    let line = before.matches('\n').count() + 1;
+    let col = before.rsplit('\n').next().map(|l| l.chars().count()).unwrap_or(0) + 1;
+    (line, col)
 }
 
 pub fn layout_of(name: &str) -> Result<FragmentLayout, String> {
@@ -329,9 +355,14 @@ impl Engine {
             let refs_options = RefsRenderOptions {
                 unresolved: if options.unresolved_refs_warning { UnresolvedRefs::Allow } else { UnresolvedRefs::Error },
             };
+            // The `field` environment of the FLM-files loader (Q16) is never
+            // rendered: a data field holding one is reported at the node.
+            let mut unsupported = BTreeMap::new();
+            unsupported.insert(BackendName::from(html::BACKEND), vec![ElementName::from(FIELD_ELEMENT)]);
             let overrides = Overrides {
                 render_options: OptionValues::new().with(html_options).with(refs_options),
                 prefer: if prefer_zoodb_publish { vec![StageName::from(PUBLISH_STAGE)] } else { Vec::new() },
+                unsupported,
                 ..Overrides::none()
             };
             Plan::for_workflow(registry, html::WORKFLOW, &overrides).map_err(|e| e.to_string())
@@ -406,7 +437,70 @@ impl Engine {
         })
     }
 
-    pub fn scan(&mut self, handles: &[u32]) -> Result<ScanOut, String> {
+    /// Parses an FLM data file (Q16): returns every `\\begin{field}{name} …
+    /// \\end{field}` with its name and the byte range of its body; content
+    /// outside the fields other than whitespace and comments is a
+    /// diagnostic.
+    pub fn parse_fields(&self, text: &str, origin: &str) -> Result<FieldsOut, String> {
+        let origin = if origin.is_empty() { FlmOrigin::none() } else { FlmOrigin::new(origin) };
+        let source = Arc::new(FlmSource::new(text).with_origin(origin));
+        let fragment = parse_fragment(self.registry.lang(), source, FragmentLayout::Blocks, &ParseOptions::default())
+            .map_err(|e| e.diagnostic().message().to_string())?;
+        let mut diagnostics = diags_out(fragment.diags().iter());
+        let end_marker = format!("\\end{{{FIELD_ENVIRONMENT}}}");
+        let mut fields = Vec::new();
+        let mut covered: Vec<(usize, usize)> = Vec::new();
+        let mut stack: Vec<_> = fragment.tree().root().children().iter().map(|n| n.clone()).collect();
+        while let Some(node) = stack.pop() {
+            if element_of(&node).name.to_string() == FIELD_ELEMENT {
+                let span = node.span();
+                let Ok(Some(name_nodes)) = node.argument_content_nodes_named(FIELD_NAME_ARG) else { continue };
+                let name = match chars_at_lowering(name_nodes.iter()) {
+                    Ok(Ok(name)) => name.trim().to_string(),
+                    _ => continue,
+                };
+                let arg_end = name_nodes.iter().map(|n| n.span().end()).max().unwrap_or(span.start()) + 1;
+                let body_end = span.end().saturating_sub(end_marker.len()).max(arg_end);
+                fields.push(FieldOut { name, start: arg_end, end: body_end, text: text[arg_end..body_end].to_string() });
+                covered.push((span.start(), span.end()));
+                continue;
+            }
+            stack.extend(node.children().iter().map(|n| n.clone()));
+        }
+        fields.sort_by_key(|f| f.start);
+        covered.sort();
+        // Stray content: anything outside the fields that is not whitespace or a comment.
+        let mut pos = 0;
+        let mut ranges = covered.clone();
+        ranges.push((text.len(), text.len()));
+        for (start, end) in ranges {
+            let gap = &text[pos..start.max(pos)];
+            for (i, line) in gap.split_inclusive('\n').enumerate() {
+                let trimmed = line.trim();
+                if !trimmed.is_empty() && !trimmed.starts_with('%') {
+                    let at = pos + gap.split_inclusive('\n').take(i).map(str::len).sum::<usize>();
+                    let (l, c) = line_col(text, at);
+                    diagnostics.push(DiagOut {
+                        identifier: String::from("zoodb.fields.stray-content"),
+                        severity: "error",
+                        message: format!("content outside any field: `{}`", trimmed.chars().take(40).collect::<String>()),
+                        origin: fragment.tree().root().span().source().origin().canonical_path().map(str::to_owned),
+                        start: at,
+                        end: at + line.len(),
+                        line: Some(l),
+                        col: Some(c),
+                    });
+                }
+            }
+            pos = end.max(pos);
+        }
+        Ok(FieldsOut { fields, diagnostics })
+    }
+
+    /// Runs the scan over `handles` as one document; `standalone` names the
+    /// handles parsed from standalone fields, which the check stage of Q5
+    /// verifies.
+    pub fn scan(&mut self, handles: &[u32], standalone: &[u32]) -> Result<ScanOut, String> {
         // A bare plan request (no workflow, so no `flm.validated`): the scan
         // demands the tables it reads and nothing else, so that no citation is
         // retrieved, no image is resolved and no output is produced (R13).
@@ -414,13 +508,23 @@ impl Engine {
         // `flm.graphics.info`, whose stage would ask the resolver.
         let plan = self.plan(String::from("scan"), |registry| {
             let request = PlanRequest {
-                demands: vec!["flm.citations.keys".into(), "flm.labels".into(), "flm.refs.resolutions".into(), "flm.element-index".into()],
+                demands: vec![
+                    "flm.citations.keys".into(),
+                    "flm.labels".into(),
+                    "flm.refs.resolutions".into(),
+                    "flm.element-index".into(),
+                    STANDALONE_CHECKED.into(),
+                ],
                 ..PlanRequest::default()
             };
             Plan::build(registry, &request).map_err(|e| e.to_string())
         })?;
         let (doc, ids) = self.place(handles)?;
-        let mut run = Run::new(doc, plan, Externals::none()).map_err(|e| e.to_string())?;
+        let standalone_trees = StandaloneTrees {
+            trees: handles.iter().zip(ids.iter()).filter(|(h, _)| standalone.contains(h)).map(|(_, id)| *id).collect(),
+        };
+        let externals = Externals::none().install_unstamped(STANDALONE_TREES, standalone_trees);
+        let mut run = Run::new(doc, plan, externals).map_err(|e| e.to_string())?;
         run.execute(&RunOptions::sequential()).map_err(|e| e.to_string())?;
 
         let index_of: BTreeMap<TreeId, usize> = ids.iter().enumerate().map(|(i, id)| (*id, i)).collect();
@@ -467,7 +571,9 @@ impl Engine {
             })
             .unwrap_or_default();
         let view = run.diagnostics();
-        Ok(ScanOut { trees, cited, duplicate_labels, has_errors: view.has_errors(), diagnostics: diags_out(view.iter()) })
+        let diagnostics = diags_out(view.iter());
+        let standalone_violations = diagnostics.iter().filter(|d| d.identifier == "zoodb.standalone.violation").count();
+        Ok(ScanOut { trees, cited, duplicate_labels, standalone_violations, has_errors: view.has_errors(), diagnostics })
     }
 }
 
@@ -491,7 +597,7 @@ mod tests {
         assert!(a.diagnostics.is_empty(), "{:?}", a.diagnostics);
         assert!(b.diagnostics.is_empty(), "{:?}", b.diagnostics);
 
-        let scan = engine.scan(&[a.handle, b.handle]).unwrap();
+        let scan = engine.scan(&[a.handle, b.handle], &[]).unwrap();
         assert_eq!(scan.cited.len(), 1);
         let scan_ids: Vec<&str> = scan.diagnostics.iter().map(|d| d.identifier.as_str()).collect();
         assert!(!scan_ids.iter().any(|id| id.starts_with("flm.citations.")), "{scan_ids:?}");
@@ -557,6 +663,47 @@ mod tests {
         assert!(out3.trees[1].contains("src=\"/pic/Smiley-0123abcd.png\""), "{}", out3.trees[1]);
         // 400 px at 192 dpi = 150 pt wide.
         assert!(out3.trees[1].contains("150pt") || out3.trees[1].contains("150"), "{}", out3.trees[1]);
+    }
+
+    /// Q5: a standalone tree holding a reference, a citation, an image or a
+    /// reference point is reported by the check stage of the scan.
+    #[test]
+    fn the_standalone_check_reports_document_facts() {
+        let mut engine = Engine::new(&EngineConfig::default()).unwrap();
+        let ok = engine.parse("A \\emph{plain} name \\(x^2\\)", "a.yml#name", FragmentLayout::Inline).unwrap();
+        let bad = engine.parse("See \\ref{person:bob} and \\cite{arxiv:1}\\footnote{a note}", "b.yml#name", FragmentLayout::Inline).unwrap();
+        let doc = engine.parse("A paragraph with \\ref{person:bob}.", "b.yml#biography", FragmentLayout::InlineOrBlocks).unwrap();
+        assert!(ok.diagnostics.is_empty() && bad.diagnostics.is_empty() && doc.diagnostics.is_empty(), "{:?} {:?} {:?}", ok.diagnostics, bad.diagnostics, doc.diagnostics);
+        let scan = engine.scan(&[ok.handle, bad.handle, doc.handle], &[ok.handle, bad.handle]).unwrap();
+        let violations: Vec<&DiagOut> = scan.diagnostics.iter().filter(|d| d.identifier == "zoodb.standalone.violation").collect();
+        assert_eq!(scan.standalone_violations, violations.len());
+        assert!(violations.iter().all(|d| d.origin.as_deref() == Some("b.yml#name")), "{violations:?}");
+        let whats: Vec<&str> = violations.iter().map(|d| d.message.as_str()).collect();
+        assert!(whats.iter().any(|m| m.contains("a reference,")), "{whats:?}");
+        assert!(whats.iter().any(|m| m.contains("a citation")), "{whats:?}");
+        assert!(whats.iter().any(|m| m.contains("a reference point")), "{whats:?}");
+        // A footnote is two reference points (the note and its mark).
+        assert_eq!(violations.len(), 4, "{whats:?}");
+        // Not marked standalone: nothing reported.
+        let scan2 = engine.scan(&[bad.handle], &[]).unwrap();
+        assert_eq!(scan2.standalone_violations, 0);
+    }
+
+    /// Q16: the fields of an FLM data file, with their verbatim bodies.
+    #[test]
+    fn fields_of_a_data_file_are_read_verbatim() {
+        let engine = Engine::new(&EngineConfig::default()).unwrap();
+        let text = "\n\\begin{field}{key2}\nvalue2\n\\end{field}\n\n\\begin{field}{key3.subkey.subsubkey}\nAnother \\emph{other} value % not a comment\n\\end{field}\n\n%%\n%% Note that comments at this level are allowed.\n%%\n\n\\begin{field}{key1.innerkey.[]} three \\end{field}\n";
+        let out = engine.parse_fields(text, "dummy/xyz.flm").unwrap();
+        assert!(out.diagnostics.is_empty(), "{:?}", out.diagnostics);
+        let got: Vec<(&str, &str)> = out.fields.iter().map(|f| (f.name.as_str(), f.text.as_str())).collect();
+        assert_eq!(got, vec![("key2", "\nvalue2\n"), ("key3.subkey.subsubkey", "\nAnother \\emph{other} value % not a comment\n"), ("key1.innerkey.[]", " three ")]);
+        for f in &out.fields {
+            assert_eq!(&text[f.start..f.end], f.text);
+        }
+        let stray = engine.parse_fields("stray text\n\\begin{field}{a}x\\end{field}\n", "d.flm").unwrap();
+        assert_eq!(stray.fields.len(), 1);
+        assert!(stray.diagnostics.iter().any(|d| d.identifier == "zoodb.fields.stray-content"), "{:?}", stray.diagnostics);
     }
 
     /// R8: with the srcset configuration, the html plan prefers the ZooDb

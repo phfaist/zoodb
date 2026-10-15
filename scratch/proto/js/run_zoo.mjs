@@ -172,8 +172,9 @@ for (const obj of objects) {
 const parse_ms = performance.now() - t0;
 
 const allHandles = objects.flatMap((o) => o.fragments.map((f) => f.handle));
+const standaloneHandles = objects.flatMap((o) => o.fragments.filter((f) => f.mode.standalone).map((f) => f.handle));
 t0 = performance.now();
-const scan = engine.scan(allHandles);
+const scan = engine.scan(allHandles, standaloneHandles);
 const scan_ms = performance.now() - t0;
 const scanTally = new Map();
 tally(scanTally, scan.diagnostics, 'scan');
@@ -186,6 +187,8 @@ const scanSummary = {
     cited: scan.cited.length,
     cited_sample: scan.cited.slice(0, 8).map(([k]) => k),
     duplicate_labels: scan.duplicate_labels,
+    standalone_fields: standaloneHandles.length,
+    standalone_violations: scan.standalone_violations,
 };
 
 // Milestone 2: the host tables, filled from what the scan reported (Q6, Q7).

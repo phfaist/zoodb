@@ -70,7 +70,7 @@ time('parse', () => {
 
 // Milestone 2: the scan over every fragment, then the citations and graphics
 // tables filled from what it reported (Q6, Q7).
-const scan = time('scan', () => engine.scan([...fragments.values()].map((f) => f.handle)));
+const scan = time('scan', () => engine.scan([...fragments.values()].map((f) => f.handle), [...fragments.values()].filter((f) => f.standalone).map((f) => f.handle)));
 const citationsCache = args.citations ?? path.join(args.data, '..', 'website', '_zoodb_citations_cache', 'cache_compiled_citations.json');
 const hostTables = {};
 time('host_tables', () => {
@@ -179,6 +179,7 @@ console.log(JSON.stringify({
     index: { entries: indexEntries.length, diagnostics: indexDiags.length },
     pages: Object.fromEntries(Object.entries(pages).map(([id, r]) => [id, { trees: r.order.length, leftover_markers: r.leftover, html_chars: r.html.length }])),
     host_tables: hostTables,
+    scan: { diagnostics: scan.diagnostics.map((d) => d.identifier), standalone_violations: scan.standalone_violations },
     render_diagnostics: Object.fromEntries(renderDiags),
     bob_bibliography: bob.out.pieces.find((p) => p.name === 'flm.citations.bibliography')?.html.replace(/\s+/g, ' ').slice(0, 700) ?? null,
     alice_img: /<img\b[^>]*>/.exec(pages.alice.html)?.[0] ?? null,

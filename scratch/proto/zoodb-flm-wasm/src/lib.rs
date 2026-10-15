@@ -100,9 +100,17 @@ impl ZooFlm {
     }
 
     /// Runs the scan (a bare plan over the tables the host reads) over the
-    /// given fragments as one document and returns the scan tables.
-    pub fn scan(&mut self, handles: Vec<u32>) -> Result<JsValue, JsError> {
-        let out = self.engine.scan(&handles).map_err(|e| JsError::new(&e))?;
+    /// given fragments as one document and returns the scan tables;
+    /// `standalone` lists the handles of standalone fields (Q5).
+    pub fn scan(&mut self, handles: Vec<u32>, standalone: Vec<u32>) -> Result<JsValue, JsError> {
+        let out = self.engine.scan(&handles, &standalone).map_err(|e| JsError::new(&e))?;
+        to_js(&out)
+    }
+
+    /// Reads the fields of an FLM data file (Q16): `{ fields: [{ name, start,
+    /// end, text }], diagnostics }`.
+    pub fn parse_fields(&self, text: &str, origin: &str) -> Result<JsValue, JsError> {
+        let out = self.engine.parse_fields(text, origin).map_err(|e| JsError::new(&e))?;
         to_js(&out)
     }
 }

@@ -1,5 +1,6 @@
 //! The ZooDb feature of the registry: what ZooDb adds beside the standard
-//! features. In this milestone, the `srcset` publish stage (Q7, R8).
+//! features: the `srcset` publish stage (Q7, R8), the standalone check stage
+//! (Q5) and the `field` environment of the FLM-files loader (Q16).
 //!
 //! The standard `graphics` feature registers `flm.graphics.publish.html`,
 //! which writes `flm.graphics.published.html` (the address of each image and
@@ -10,18 +11,28 @@
 //! Parcel produces from a query string, as ZooDb computes them today. The
 //! plan picks the writer the host prefers (`Overrides::prefer`).
 
+use std::collections::BTreeSet;
 use std::sync::Arc;
 
 use serde::Deserialize;
 
 use flm_core::core::data::store::StageOut;
+use flm_core::core::data::table::{Table, TableName};
 use flm_core::core::plan::PlanCx;
-use flm_core::core::registry::{BuildError, FeatureBuilder, FeatureInfo, FlmFeature};
+use flm_core::core::registry::{BuildError, CapabilityDef, FeatureBuilder, FeatureInfo, FlmFeature};
 use flm_core::core::run::StageCx;
 use flm_core::core::stage::{Effect, Needs, Scope, Stage, StageDecl};
 use flm_core::lang::FlmOrigin;
-use flm_core::model::addr::NodeAddr;
+use flm_core::lang::mint::{ArgDef, BodyDef, ElementDef, SyntaxDef};
+use flm_core::model::addr::{NodeAddr, TreeId};
+use flm_core::model::aspects::{BlockRole, BlockRoleAspect, FixedBlockRole};
+use flm_core::model::element::{ElementSpec, element_of};
 use flm_core::model::names::StageName;
+use flm_core::stdcore::features::citations::{CITE, REFCITE};
+use flm_core::stdcore::features::graphics::IMAGE_ELEMENT;
+use flm_core::stdcore::features::index::ELEMENT_INDEX;
+use flm_core::stdcore::features::refpoints::REFPOINTS;
+use flm_core::stdcore::features::refs::REF_RESOLUTIONS;
 use flm_core::stdcore::backends::html;
 use flm_core::stdcore::backends::pres::SrcsetCandidate;
 use flm_core::stdcore::features::graphics::{
@@ -33,6 +44,36 @@ use flm_core::techy::source::{Source, SourceSpan};
 
 pub const FEATURE: &str = "zoodb";
 pub const PUBLISH_STAGE: &str = "zoodb.graphics.publish.html";
+
+// --- the standalone check (Q5) ---------------------------------------------------------
+
+/// The external table the host installs per run: the trees parsed from
+/// standalone fields.
+pub const STANDALONE_TREES: TableName<StandaloneTrees> = TableName::new("zoodb.standalone.trees");
+/// The capability the check stage provides; a plan that demands it runs the check.
+pub const STANDALONE_CHECKED: &str = "zoodb.standalone.checked";
+pub const STANDALONE_CHECK_STAGE: &str = "zoodb.standalone.check";
+
+#[derive(Debug, Clone, Default)]
+pub struct StandaloneTrees {
+    pub trees: BTreeSet<TreeId>,
+}
+
+impl Table for StandaloneTrees {
+    fn absorb(&mut self, piece: StandaloneTrees) {
+        self.trees.extend(piece.trees);
+    }
+}
+
+// --- the `field` environment of the FLM-files loader (Q16) ------------------------------
+
+pub const FIELD_ELEMENT: &str = "zoodb.field";
+pub const FIELD_ENVIRONMENT: &str = "field";
+pub const FIELD_NAME_ARG: &str = "fieldname";
+
+/// The per-value data of the `field` element, for the element index.
+#[derive(Debug, Default, Clone, Copy)]
+pub struct FieldElement;
 
 /// How alternative sources are produced: the `graphics_use_srcset_parceljs`
 /// option of ZooDb today.
@@ -65,6 +106,28 @@ impl FlmFeature for ZoodbFeature {
     }
 
     fn register(&self, b: &mut FeatureBuilder<'_>) -> Result<(), BuildError> {
+        let owner = b.feature().clone();
+        // Q5: the standalone check.
+        b.external_table(STANDALONE_TREES, "the trees parsed from standalone fields, which the host names per run")?;
+        b.capability(CapabilityDef::new(STANDALONE_CHECKED).docs("every standalone tree was checked to state no fact about the document"))?;
+        b.stage(Arc::new(StandaloneCheckStage))?;
+        // Q16: `\begin{field}{name} … \end{field}`, a verbatim body that the
+        // FLM-files loader reads; never rendered.
+        b.element(
+            ElementDef::new(
+                owner,
+                [FIELD_ENVIRONMENT],
+                SyntaxDef::Environment { args: vec![ArgDef::mandatory(FIELD_NAME_ARG)], body: BodyDef::new().verbatim() },
+                Arc::new(
+                    ElementSpec::new(FIELD_ELEMENT)
+                        .docs("`\\begin{field}{name} … \\end{field}`: one field of a zoo object in an FLM data file, its body kept verbatim.")
+                        .with::<dyn BlockRoleAspect>(Arc::new(FixedBlockRole(BlockRole::Block)))
+                        .with_value(Arc::new(FieldElement)),
+                ),
+            )
+            .docs("`\\begin{field}{name} … \\end{field}`: a field of an FLM data file."),
+        )?;
+        // Q7: the srcset publish stage.
         b.peer_backend(html::BACKEND, "the html backend, whose published image addresses this feature writes")?;
         b.peer_table::<GraphicsPublished>(
             published_table(html::BACKEND).name().clone(),
@@ -192,5 +255,66 @@ fn build_published(entries: Vec<(NodeAddr, PublishedImage)>) -> Result<GraphicsP
             "cannot write {} published image(s): flm-core offers no constructor for `GraphicsPublished` (U2)",
             entries.len()
         ))
+    }
+}
+
+/// Condition `zoodb.standalone.violation`, an Error: a standalone field holds
+/// something that states a fact about the document (a reference point, a
+/// reference, a citation, an image), so it cannot be shown anywhere.
+#[derive(Debug, Clone, PartialEq, Eq, DiagnosticInfo)]
+#[diagnostic(id = "zoodb.standalone.violation", message = "a standalone field holds {what}, which only a document can hold")]
+struct StandaloneViolation {
+    what: String,
+}
+
+/// The standalone check (Q5): for every tree the host marked standalone, one
+/// pass over the reference points, the reference sites and the element index.
+struct StandaloneCheckStage;
+
+impl Stage for StandaloneCheckStage {
+    fn decl(&self) -> StageDecl {
+        StageDecl::new(StageName::from(STANDALONE_CHECK_STAGE), Effect::Check, Scope::Document)
+            .provides(STANDALONE_CHECKED)
+            .docs("Reports every reference point, reference, citation and image inside a standalone tree.")
+    }
+
+    fn needs(&self, _cx: &PlanCx<'_>) -> Needs {
+        Needs::new().reads_opt(STANDALONE_TREES).reads(REFPOINTS).reads(REF_RESOLUTIONS).reads(ELEMENT_INDEX)
+    }
+
+    fn run(&self, cx: &StageCx<'_>, out: &mut StageOut<'_>) {
+        let Ok(Some(standalone)) = cx.get(STANDALONE_TREES) else { return };
+        let mut report = |span: flm_core::lang::FlmSpan, what: String| {
+            out.diags.push(Diagnostic::error(StandaloneViolation { what }, span));
+        };
+        for &id in &standalone.trees {
+            let Some(tree) = cx.frozen_tree(id) else { continue };
+            if let Ok(Some(points)) = cx.get(REFPOINTS) {
+                for record in points.of_tree(id) {
+                    report(record.span.clone(), format!("a reference point ({:?})", record.point.kind));
+                }
+            }
+            if let Ok(Some(resolutions)) = cx.get(REF_RESOLUTIONS) {
+                for site in resolutions.sites.keys() {
+                    if site.addr.tree == id {
+                        if let Some(node) = tree.get(site.addr.node) {
+                            report(node.span().clone(), String::from("a reference"));
+                        }
+                    }
+                }
+            }
+            if let Ok(Some(index)) = cx.get(ELEMENT_INDEX) {
+                for (node_id, _) in index.entries(id) {
+                    let Some(node) = tree.get(*node_id) else { continue };
+                    let name = element_of(&node).name.to_string();
+                    let what = match name.as_str() {
+                        CITE | REFCITE => "a citation",
+                        IMAGE_ELEMENT => "an image",
+                        _ => continue,
+                    };
+                    report(node.span().clone(), String::from(what));
+                }
+            }
+        }
     }
 }
