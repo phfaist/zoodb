@@ -53,15 +53,16 @@ function crateOf(name) {
     const parts = n.split('::');
     return parts.slice(0, depth).join('::');
 }
-const by = new Map(); let codeTotal = 0, unnamed = 0;
+const by = new Map(); const counts = new Map(); let codeTotal = 0, unnamed = 0;
 fnSizes.forEach((sz, i) => {
     codeTotal += sz;
     const name = names.get(i + importedFns);
     if (!name) { unnamed += sz; return; }
     const k = crateOf(name);
-    by.set(k, (by.get(k) ?? 0) + sz);
+    by.set(k, (by.get(k) ?? 0) + sz); counts.set(k, (counts.get(k) ?? 0) + 1);
 });
 const rows = [...by.entries()].sort((a, b) => b[1] - a[1]);
 console.log(`file ${total} bytes; code section ${codeTotal} bytes in ${fnSizes.length} functions; unnamed ${unnamed}`);
 console.log('sections:', sections.map(([id, s]) => `${id}:${s}`).join(' '));
-for (const [k, v] of rows.slice(0, 40)) console.log(String(v).padStart(9), (100 * v / codeTotal).toFixed(1).padStart(5) + '%', k);
+const limit = Number(process.env.LIMIT ?? 40), filter = process.env.FILTER ?? '';
+for (const [k, v] of rows.filter(([k]) => k.startsWith(filter)).slice(0, limit)) console.log(String(v).padStart(9), (100 * v / codeTotal).toFixed(1).padStart(5) + '%', String(counts.get(k)).padStart(5) + ' fns', k);

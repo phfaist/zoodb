@@ -6,7 +6,7 @@ pub mod engine;
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
 
-use crate::engine::{Engine, EngineConfig, RenderOptions};
+use crate::engine::{Engine, EngineConfig, ExternalEntry, RenderOptions};
 
 #[wasm_bindgen(start)]
 pub fn start() {
@@ -46,6 +46,18 @@ impl ZooFlm {
 
     pub fn fragment_count(&self) -> u32 {
         self.engine.fragment_count() as u32
+    }
+
+    /// Replaces the external index: `[{ label, href, display }]`, `display`
+    /// being FLM text. Returns the parse diagnostics of the display texts.
+    pub fn set_external_index(&mut self, entries: JsValue) -> Result<JsValue, JsError> {
+        let entries: Vec<ExternalEntry> = serde_wasm_bindgen::from_value(entries).map_err(|e| JsError::new(&e.to_string()))?;
+        let out = self.engine.set_external_index(&entries).map_err(|e| JsError::new(&e))?;
+        to_js(&out)
+    }
+
+    pub fn external_index_len(&self) -> u32 {
+        self.engine.external_index_len() as u32
     }
 
     /// Parses `text` as one fragment; `layout` is `blocks`, `inline` or `auto`.

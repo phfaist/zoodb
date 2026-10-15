@@ -20,7 +20,10 @@ use flm_core::stdcore::backends::html::{
 };
 use flm_core::stdcore::features::citations::KEYS;
 use flm_core::stdcore::features::graphics::INFO;
-use flm_core::stdcore::features::refs::{LABELS, REF_RESOLUTIONS, RefsRenderOptions, Resolution, UnresolvedRefs};
+use flm_core::stdcore::features::refs::{
+    EXTERNAL_INDEX, ExternalIndex, ExternalTarget, LABELS, REF_RESOLUTIONS, RefsRenderOptions, Resolution, UnresolvedRefs, value_of,
+};
+use flm_core::model::aspects::Label;
 use flm_core::stdcore::{self, StdcoreConfig};
 use flm_core::techy::error::Severity;
 use flm_core::techy::source::LineIndexCache;
@@ -46,6 +49,16 @@ pub struct DiagOut {
     pub end: usize,
     pub line: Option<usize>,
     pub col: Option<usize>,
+}
+
+/// One entry of the external index: a label of another document (a zoo
+/// object, `person:bob`), where a link to it leads, and the FLM text a
+/// reference to it shows.
+#[derive(Debug, Clone, Deserialize)]
+pub struct ExternalEntry {
+    pub label: String,
+    pub href: String,
+    pub display: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -121,6 +134,9 @@ pub struct Engine {
     registry: Arc<FlmRegistry>,
     fragments: Vec<Arc<Fragment>>,
     plans: BTreeMap<String, Arc<Plan>>,
+    /// The external index installed in every render run (Q4): labels of zoo
+    /// objects, with their link target and display content.
+    external_index: ExternalIndex,
 }
 
 fn severity_word(severity: Severity) -> &'static str {
@@ -170,7 +186,7 @@ impl Engine {
         inputs.parsing = FlmParsing { dollar_math: config.dollar_math, ..FlmParsing::default() };
         inputs.build_identity = Some(String::from("zoodb-flm-wasm-proto 0.0.1"));
         let registry = builder.build(&inputs).map_err(|e| e.render())?;
-        Ok(Engine { registry, fragments: Vec::new(), plans: BTreeMap::new() })
+        Ok(Engine { registry, fragments: Vec::new(), plans: BTreeMap::new(), external_index: ExternalIndex::new() })
     }
 
     pub fn build_diagnostics(&self) -> Vec<DiagOut> {
@@ -190,6 +206,41 @@ impl Engine {
         let handle = self.fragments.len() as u32;
         self.fragments.push(Arc::new(fragment));
         Ok(ParsedOut { handle, diagnostics })
+    }
+
+    /// Replaces the external index. Each display text is parsed inline with
+    /// the registry's language and copied into a synthesized value, as the
+    /// `ExternalTarget` documentation prescribes. Returns the parse
+    /// diagnostics of the display texts.
+    pub fn set_external_index(&mut self, entries: &[ExternalEntry]) -> Result<Vec<DiagOut>, String> {
+        let mut index = ExternalIndex::new();
+        let mut diagnostics = Vec::new();
+        let guard = self.registry.lang().guard();
+        for entry in entries {
+            let label = Label::parse(&entry.label).ok_or_else(|| format!("`{}` is not a `type:label`", entry.label))?;
+            let source = Arc::new(FlmSource::new(&entry.display).with_origin(FlmOrigin::synthetic(format!("index:{}", entry.label))));
+            let fragment = parse_fragment(self.registry.lang(), source, FragmentLayout::Inline, &ParseOptions::default())
+                .map_err(|e| e.diagnostic().message().to_string())?;
+            diagnostics.extend(diags_out(fragment.diags().iter()));
+            let root = fragment.tree().root();
+            let children: Vec<_> = root.children().iter().map(|n| n.clone()).collect();
+            let display = value_of(&children, &root, guard).map_err(|e| format!("display of `{}`: {e:?}", entry.label))?;
+            index = index.with(label, ExternalTarget { href: entry.href.clone(), display });
+        }
+        self.external_index = index;
+        Ok(diagnostics)
+    }
+
+    pub fn external_index_len(&self) -> usize {
+        self.external_index.targets.len()
+    }
+
+    fn externals(&self) -> Externals {
+        if self.external_index.targets.is_empty() {
+            Externals::none()
+        } else {
+            Externals::none().install_unstamped(EXTERNAL_INDEX, self.external_index.clone())
+        }
     }
 
     fn place(&self, handles: &[u32]) -> Result<(Arc<Doc>, Vec<TreeId>), String> {
@@ -228,7 +279,7 @@ impl Engine {
             Plan::for_workflow(registry, html::WORKFLOW, &overrides).map_err(|e| e.to_string())
         })?;
         let (doc, ids) = self.place(handles)?;
-        let mut run = Run::new(doc, plan, Externals::none()).map_err(|e| e.to_string())?;
+        let mut run = Run::new(doc, plan, self.externals()).map_err(|e| e.to_string())?;
         run.execute(&RunOptions::sequential()).map_err(|e| e.to_string())?;
 
         let fragments = run.table(OUTPUT_TABLE).map_err(|e| e.to_string())?.ok_or("the html workflow wrote no output table")?;
@@ -386,6 +437,21 @@ mod tests {
             .render_html(&[a.handle, b.handle], &RenderOptions { unresolved_refs_warning: true, ..Default::default() })
             .unwrap();
         assert!(out.trees[0].contains("<em"), "{}", out.trees[0]);
+
+        // With the external index, the object reference resolves to a link
+        // showing the parsed display content.
+        let index_diags = engine
+            .set_external_index(&[ExternalEntry {
+                label: "person:bob".into(),
+                href: "/person/bob".into(),
+                display: "Bob \\emph{Bee}".into(),
+            }])
+            .unwrap();
+        assert!(index_diags.is_empty(), "{index_diags:?}");
+        let out2 = engine.render_html(&[a.handle], &RenderOptions::default()).unwrap();
+        assert!(out2.trees[0].contains("href=\"/person/bob\""), "{}", out2.trees[0]);
+        assert!(out2.trees[0].contains("Bob <em"), "{}", out2.trees[0]);
+        assert!(!out2.diagnostics.iter().any(|d| d.identifier == "flm.refs.unresolved"), "{:?}", out2.diagnostics);
         assert!(!out.definitions.is_empty());
         let ids: Vec<&str> = out.diagnostics.iter().map(|d| d.identifier.as_str()).collect();
         assert!(ids.contains(&"flm.refs.unresolved"), "{ids:?}");

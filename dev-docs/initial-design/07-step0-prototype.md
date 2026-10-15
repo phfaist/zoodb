@@ -61,6 +61,19 @@ Code size by crate, measured on the unstripped artifact (4.96 MB of code before
 | `serde_path_to_error` + `schemars` + `serde_json` (the settings-as-data machinery, linked through every feature's `settings()` method) | 13% |
 | everything else | 5% |
 
+The standard library's share is monomorphization driven by `flm-core`'s and techy's
+generic code, counted on the unstripped artifact: the B-tree maps are 2,570 functions
+and 639 KB (12.9%; the node, map, entry, navigate and search code is instantiated once
+per distinct key and value type pair, on the order of a hundred pairs); the slice sorts
+are 732 functions and 291 KB (5.9%; the stable sort is instantiated once per distinct
+element type and comparator closure, about 115 times at 2.5 KB each); `Vec` is 806
+functions and 121 KB plus 89 KB of `collect`; drop glue is 739 functions and 63 KB.
+Fewer distinct map instantiations (one key type, boxed or indexed values) and a sort
+whose core takes a `dyn` comparator would cut perhaps half of the map code and most of
+the sort code, roughly 400 to 500 KB of the 4.0 MB code section, about a tenth of the
+module. That is flm-rs work, parked under the ruling; it is noted in
+`05-upstream-requests.md`.
+
 What follows for the design: the module cannot be inlined as base64 for the browser
 apps (5.5 to 6.8 MB of JavaScript); it is served as a `.wasm` file, compressed by the
 server and cached (1.1 to 1.7 MB on the wire), which settles the open choice of Q17 for
@@ -126,16 +139,58 @@ when the switch is made.
   `flm.html.mathjax` pointing at `https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js`.
 - **The data**: both sets parse without a single parse diagnostic.
 
+## Milestone 1: markers, the external index, the host-built `ref()` (2026-10-15)
+
+`js/compose_example.mjs` composes the five person pages of `zoodb-example` the way its
+`person.11ty.js` template does, through the composer protocol of Q4.3/Q8, and the
+engine gained `set_external_index(entries)` (label, href, display as FLM text), which
+parses each display inline and copies it into a synthesized value, and installs the
+index in every render run. Run it with:
+
+```sh
+NODE_MODULES=$ECZOO/eczoo_sitegen/node_modules node compose_example.mjs \
+    --data ../../../../zoodb-example/data --schemas ../../../../zoodb-example/schemas \
+    --out ../out/compose --index-size 2000
+```
+
+What it does: parses the fields (names inline, the rest auto), renders every
+standalone fragment once in one run (the snippet cache, Q9 b), installs the index of
+the five people, then for each page runs the JavaScript composer once with helpers
+`ne`, `rdr`, `rdrblock`, `ref`, `refhref`, `piece`: `rdr` of a standalone fragment
+returns the cached HTML, `rdr` of any other fragment returns a marker and records the
+fragment in document order, `ref(type, id)` builds the link from the permalink and the
+snippet cache, `piece(name)` returns a marker; then one `render_html` over the recorded
+fragments in that order, and the markers are replaced by the trees' HTML and the
+pieces' HTML.
+
+Results:
+
+- Every marker of every page is substituted (zero left over); pages with two fragments
+  (a friend detail after the biography) number and order as composed.
+- An in-content `\ref{person:alice}` resolves through the index to
+  `<a class="flm-pres-link" href="/person/alice" data-flm-kind="ref">Alice Aaliz</a>`,
+  the display rendered from the parsed name (R6 verified); `\hyperref[person:alice]{…}`
+  resolves too; the host-built `ref()` from the snippet cache gives the same text. No
+  `flm.refs.unresolved` remains.
+- The bibliography piece is placed where the composer put its marker (with
+  `flm.citations.no-entry` markup inside, since no provider is wired yet); the footnote
+  list piece is absent on pages without footnotes, as expected.
+- R14: an index of 2,005 entries is built (every display parsed) in 103 ms and installed
+  per run by cloning a map of shared trees; rendering a page with it installed takes
+  4.7 ms, the same as without. Memory after everything: 76 MB.
+- Timings: parse 2.6 ms, snippet run 18.5 ms, five pages composed and rendered 22.7 ms.
+
+This settles R16 (the marker composition) and R14 (the index cost) for the shape of
+Q4/Q8/Q9 as decided.
+
 ### Not covered yet (the remaining milestones of step zero)
 
-1. The marker composition of Q4.3/Q8 on one `zoodb-example` page (R16), with the
-   external index of object targets installed from JavaScript and the host-built
-   `ref()` (Q4, R6, R14).
-2. A citation provider and a graphics resolver and inspector as synchronous JavaScript
-   callbacks (Q6, Q7), and the `srcset` publish stage (R8).
-3. The standalone check stage over the tables (Q5, R17) and the `field` element for the
+1. The citations table and the graphics map filled from JavaScript before a run, with
+   the provider, resolver and inspector as lookups over them (Q6, Q7), and the `srcset`
+   publish stage (R8).
+2. The standalone check stage over the tables (Q5, R17) and the `field` element for the
    FLM-files loader (Q16), the first two pieces of the compiled-in ZooDb feature.
-4. Settings and user definitions given as data from JavaScript (Q14) through
+3. Settings and user definitions given as data from JavaScript (Q14) through
    `stdcore::factory`, and the `quote` feature's configuration for the EC zoo.
-5. The handbook: one `latex-recomposed` run over a handful of codes (Q12, R7).
-6. The truncation helper over the parsed tree (R18) and the text backend (Q11).
+4. The handbook: one `latex-recomposed` run over a handful of codes (Q12, R7).
+5. The truncation helper over the parsed tree (R18) and the text backend (Q11).
