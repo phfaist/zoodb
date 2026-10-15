@@ -317,12 +317,46 @@ Module size 5,033,996 B (+25.5 KB). Render timings on a quiet machine, both tabl
 filled: `zoodb-example` 34 ms, EC zoo test data 135 ms, so milestone 2's slower figures
 were machine noise.
 
+## Milestone 4: settings and user definitions as data (2026-10-16)
+
+The engine now builds the standard package through `stdcore::factory()` instead of
+`stdcore::package(StdcoreConfig::new())`: the configuration takes `settings`, one map
+per feature as flm-core's settings-as-data route reads them (`{ feature: { key: value
+} }`), and `off`, the standard features switched off by name. Each feature's map is read
+through its declaration (`SettingsDecl::read`), which refuses an unknown key or a value
+of the wrong shape with the key's path (`the feature `math` has no setting
+`no_such_key``; `the value of `quote.environments.quote.sections` is invalid: invalid
+type: map, expected a sequence`), and gives the feature's configuration (into the
+package), its document options (set on every document the engine places) and its
+render options (merged into every plan's request before the per-call ones). User
+definitions go under `userdefs`: `macros`, `environments` and `specials`, each a map
+from the name to `{ args, content, defaults, docs, … }`, `args` written as argument
+codes (`"{"`, `"[{"`) and `content` one template or `{ text, math }`. `ZooFlm.features()`
+returns the standard features and, for each that takes settings, the JSON Schema of its
+settings, for documentation and for validation on the JavaScript side. `js/settings.mjs`
+exercises it through the module:
+
+- 33 standard features, 23 with settings; the top-level keys of each are listed in the
+  script's output (`citations`: placement, mark, style, heading title and level, note
+  separator; `refs`: join, unresolved, safe label types, protect; `graphics`: global,
+  strategy, convert, magnification; `html`: title, lang, source spans, definitions, …).
+- A macro `\kw{#1}` defined as data renders `\kw{term}` as `<strong …>term</strong>`; a
+  per-mode definition `\zoo` gives `the Zoo` in text and `\mathcal{Z}` inside `\(…\)`;
+  `annotations` is switched off; the unknown key is refused.
+- The EC zoo's one custom feature (`FeatureQuote`) is the standard `quote` feature's
+  default environments (`quote`, `blockquote`, `address`); `\begin{quote}` parses and
+  renders without any setting. Its `environments` map takes a list of sections per
+  environment; nothing needs to be set for the EC zoo.
+- `dollar_math` stays a parsing input (`RegistryInputs.parsing`), not a setting.
+
+Both data sets render as before through the factory-built registry. Module size
+5,072,374 B (+38.4 KB for the settings declarations and the schema generator).
+
 ### Not covered yet (the remaining milestones of step zero)
 
 1. ~~The citations table and the graphics map~~ Done in milestone 2, except the `srcset`
    table write, blocked on U2.
 2. ~~The standalone check stage and the `field` element~~ Done in milestone 3.
-3. Settings and user definitions given as data from JavaScript (Q14) through
-   `stdcore::factory`, and the `quote` feature's configuration for the EC zoo.
+3. ~~Settings and user definitions as data~~ Done in milestone 4.
 4. The handbook: one `latex-recomposed` run over a handful of codes (Q12, R7).
 5. The truncation helper over the parsed tree (R18) and the text backend (Q11).

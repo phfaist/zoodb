@@ -33,7 +33,8 @@ use flm_core::stdcore::features::refs::{
     EXTERNAL_INDEX, ExternalIndex, ExternalTarget, LABELS, REF_RESOLUTIONS, RefsRenderOptions, Resolution, UnresolvedRefs, value_of,
 };
 use flm_core::model::aspects::Label;
-use flm_core::stdcore::{self, StdcoreConfig};
+use flm_core::core::settings::PackageSettings;
+use flm_core::stdcore;
 use flm_core::techy::error::Severity;
 use flm_core::techy::source::LineIndexCache;
 
@@ -49,6 +50,23 @@ pub struct EngineConfig {
     /// With it, the ZooDb publish stage is preferred over the standard one.
     #[serde(default)]
     pub srcset: Option<SrcsetConfig>,
+    /// The settings of the standard features as data (Q14): one map per
+    /// feature, `{ feature: { key: value } }`, read through the feature's
+    /// declaration (`stdcore::factory`). User definitions go under
+    /// `userdefs` (`macros`, `environments`, `specials`).
+    #[serde(default)]
+    pub settings: serde_json::Map<String, serde_json::Value>,
+    /// Standard features switched off by name.
+    #[serde(default)]
+    pub off: Vec<String>,
+}
+
+/// One feature of the standard package with its settings schema, for
+/// documentation and validation on the JavaScript side.
+#[derive(Debug, Clone, Serialize)]
+pub struct FeatureInfoOut {
+    pub name: String,
+    pub schema: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -181,6 +199,10 @@ pub struct Engine {
     host: Arc<HostTables>,
     /// Whether the html plan prefers the ZooDb publish stage (srcset).
     prefer_zoodb_publish: bool,
+    /// The option values the settings gave (Q14): set on every document and
+    /// merged into every plan's render options, before the per-call ones.
+    document_options: OptionValues,
+    render_options: OptionValues,
 }
 
 fn severity_word(severity: Severity) -> &'static str {
@@ -231,8 +253,26 @@ pub fn layout_of(name: &str) -> Result<FragmentLayout, String> {
 impl Engine {
     pub fn new(config: &EngineConfig) -> Result<Engine, String> {
         let host = Arc::new(HostTables::default());
+        // The standard package from its settings as data (Q14).
+        let factory = stdcore::factory().map_err(|e| e.to_string())?;
+        let mut package_settings = PackageSettings::new();
+        let mut document_options = OptionValues::new();
+        let mut render_options = OptionValues::new();
+        for (feature, values) in &config.settings {
+            let decl = factory.settings(feature).ok_or_else(|| format!("the feature `{feature}` takes no settings (or does not exist)"))?;
+            let values = values.as_object().ok_or_else(|| format!("the settings of `{feature}` must be a map"))?;
+            let read = decl.read(values).map_err(|errors| {
+                errors.iter().map(|e| e.to_string()).collect::<Vec<_>>().join("; ")
+            })?;
+            document_options.merge_from(read.document_options());
+            render_options.merge_from(read.render_options());
+            package_settings.insert(read);
+        }
+        for feature in &config.off {
+            package_settings.switch_off(feature.as_str());
+        }
         let mut builder = RegistryBuilder::new();
-        builder.use_package(stdcore::package(StdcoreConfig::new()));
+        builder.use_package(factory.build(&package_settings).map_err(|e| e.to_string())?);
         builder.use_package(flm_core::math_passthrough::package());
         builder.feature(Arc::new(ZoodbFeature { srcset: config.srcset.clone() }));
         // The services are lookups over the host tables (Q6, Q7).
@@ -250,7 +290,20 @@ impl Engine {
             external_index: ExternalIndex::new(),
             host,
             prefer_zoodb_publish: config.srcset.is_some(),
+            document_options,
+            render_options,
         })
+    }
+
+    /// The standard features and, for each that takes settings, the JSON
+    /// Schema of its settings.
+    pub fn features() -> Result<Vec<FeatureInfoOut>, String> {
+        let factory = stdcore::factory().map_err(|e| e.to_string())?;
+        Ok(factory
+            .features()
+            .iter()
+            .map(|f| FeatureInfoOut { name: f.name.to_string(), schema: f.settings.as_ref().map(|d| d.json_schema()) })
+            .collect())
     }
 
     /// Replaces the citations table: `[{ key, text }]`, `text` being FLM.
@@ -332,7 +385,7 @@ impl Engine {
             let fragment = self.fragments.get(h as usize).ok_or_else(|| format!("unknown fragment handle {h}"))?;
             ids.push(content.place(Arc::clone(fragment)));
         }
-        Ok((Arc::new(Doc::new(content)), ids))
+        Ok((Arc::new(Doc::with_options(content, self.document_options.clone())), ids))
     }
 
     fn plan(&mut self, key: String, make: impl FnOnce(&Arc<FlmRegistry>) -> Result<Plan, String>) -> Result<Arc<Plan>, String> {
@@ -347,6 +400,7 @@ impl Engine {
     pub fn render_html(&mut self, handles: &[u32], options: &RenderOptions) -> Result<HtmlOut, String> {
         let key = format!("html:{}:{}", options.unresolved_refs_warning, options.title.as_deref().unwrap_or(""));
         let prefer_zoodb_publish = self.prefer_zoodb_publish;
+        let settings_render_options = self.render_options.clone();
         let plan = self.plan(key, |registry| {
             let mut html_options = HtmlRenderOptions::default();
             if let Some(title) = &options.title {
@@ -359,8 +413,11 @@ impl Engine {
             // rendered: a data field holding one is reported at the node.
             let mut unsupported = BTreeMap::new();
             unsupported.insert(BackendName::from(html::BACKEND), vec![ElementName::from(FIELD_ELEMENT)]);
+            // The settings' render options first, the per-call ones over them.
+            let mut render_options = settings_render_options;
+            render_options.merge_from(&OptionValues::new().with(html_options).with(refs_options));
             let overrides = Overrides {
-                render_options: OptionValues::new().with(html_options).with(refs_options),
+                render_options,
                 prefer: if prefer_zoodb_publish { vec![StageName::from(PUBLISH_STAGE)] } else { Vec::new() },
                 unsupported,
                 ..Overrides::none()
@@ -663,6 +720,45 @@ mod tests {
         assert!(out3.trees[1].contains("src=\"/pic/Smiley-0123abcd.png\""), "{}", out3.trees[1]);
         // 400 px at 192 dpi = 150 pt wide.
         assert!(out3.trees[1].contains("150pt") || out3.trees[1].contains("150"), "{}", out3.trees[1]);
+    }
+
+    /// Q14: settings as data: a user macro, a feature switched off, a render
+    /// option, and the schema of a feature's settings.
+    #[test]
+    fn settings_as_data_configure_the_registry() {
+        let config: EngineConfig = serde_json::from_value(serde_json::json!({
+            "settings": {
+                "userdefs": {
+                    "macros": {
+                        "kw": { "args": "{", "content": "\\textbf{#1}", "docs": "A keyword." },
+                        "zoo": { "content": { "text": "the Zoo", "math": "\\mathcal{Z}" } }
+                    }
+                }
+            },
+            "off": ["annotations"]
+        }))
+        .unwrap();
+        let mut engine = Engine::new(&config).unwrap();
+        assert!(engine.build_diagnostics().is_empty(), "{:?}", engine.build_diagnostics());
+        let a = engine.parse("A \\kw{term} of \\zoo, \\(\\zoo\\).", "a.yml#x", FragmentLayout::Inline).unwrap();
+        assert!(a.diagnostics.is_empty(), "{:?}", a.diagnostics);
+        let out = engine.render_html(&[a.handle], &RenderOptions::default()).unwrap();
+        assert!(out.trees[0].contains("<strong") && out.trees[0].contains("term") && out.trees[0].contains("the Zoo"), "{}", out.trees[0]);
+        assert!(out.trees[0].contains("mathcal"), "{}", out.trees[0]);
+        // The `quote` feature's default environments are on (the EC zoo's FeatureQuote).
+        let q = engine.parse("\\begin{quote}Said.\\end{quote}", "a.yml#q", FragmentLayout::InlineOrBlocks).unwrap();
+        assert!(q.diagnostics.is_empty(), "{:?}", q.diagnostics);
+
+        let features = Engine::features().unwrap();
+        let names: Vec<&str> = features.iter().map(|f| f.name.as_str()).collect();
+        assert!(names.contains(&"userdefs") && names.contains(&"quote") && names.contains(&"citations"), "{names:?}");
+        let userdefs = features.iter().find(|f| f.name == "userdefs").unwrap();
+        assert!(userdefs.schema.as_ref().unwrap().to_string().contains("macros"));
+
+        // An unknown key is refused with its path.
+        let bad: EngineConfig = serde_json::from_value(serde_json::json!({ "settings": { "math": { "no_such_key": 1 } } })).unwrap();
+        let err = match Engine::new(&bad) { Ok(_) => panic!("accepted an unknown key"), Err(e) => e };
+        assert!(err.contains("no_such_key"), "{err}");
     }
 
     /// Q5: a standalone tree holding a reference, a citation, an image or a

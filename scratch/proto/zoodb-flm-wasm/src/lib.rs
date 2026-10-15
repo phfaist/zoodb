@@ -43,6 +43,11 @@ impl ZooFlm {
         Ok(ZooFlm { engine })
     }
 
+    /// The standard features and the JSON Schema of each one's settings (Q14).
+    pub fn features() -> Result<JsValue, JsError> {
+        to_js(&Engine::features().map_err(|e| JsError::new(&e))?)
+    }
+
     pub fn build_diagnostics(&self) -> Result<JsValue, JsError> {
         to_js(&self.engine.build_diagnostics())
     }
