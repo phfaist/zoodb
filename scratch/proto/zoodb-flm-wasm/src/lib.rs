@@ -8,7 +8,7 @@ pub mod zoodb_feature;
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
 
-use crate::engine::{Engine, EngineConfig, ExternalEntry, RenderOptions};
+use crate::engine::{Engine, EngineConfig, ExternalEntry, LatexOptions, RenderOptions};
 use crate::host::{CitationEntry, GraphicsEntry};
 
 #[wasm_bindgen(start)]
@@ -101,6 +101,14 @@ impl ZooFlm {
     pub fn render_html(&mut self, handles: Vec<u32>, options: JsValue) -> Result<JsValue, JsError> {
         let options: RenderOptions = if options.is_undefined() || options.is_null() { RenderOptions::default() } else { from_js(options)? };
         let out = self.engine.render_html(&handles, &options).map_err(|e| JsError::new(&e))?;
+        to_js(&out)
+    }
+
+    /// Renders the given fragments as one document with the `latex-recomposed`
+    /// workflow (Q12): `{ trees, style_name, style, document, diagnostics }`.
+    pub fn render_latex(&mut self, handles: Vec<u32>, options: JsValue) -> Result<JsValue, JsError> {
+        let options: LatexOptions = if options.is_undefined() || options.is_null() { LatexOptions::default() } else { from_js(options)? };
+        let out = self.engine.render_latex(&handles, &options).map_err(|e| JsError::new(&e))?;
         to_js(&out)
     }
 

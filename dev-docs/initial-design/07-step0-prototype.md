@@ -357,6 +357,46 @@ Both data sets render as before through the factory-built registry. Module size
 1. ~~The citations table and the graphics map~~ Done in milestone 2, except the `srcset`
    table write, blocked on U2.
 2. ~~The standalone check stage and the `field` element~~ Done in milestone 3.
+## Milestone 5: the handbook's recomposed LaTeX in one run (2026-10-16)
+
+`render_latex(handles, { raw_label_types, drop_comments, unresolved_refs_warning })`
+runs the `latex-recomposed` workflow over the given fragments as one document, with the
+external index installed as for HTML, the object label types marked `Raw`
+(`RefsRecomposeOptions::safe_label_types`), every other type safe, and returns the
+per-tree LaTeX (`flm.output.latex-recomposed`), the style file the run produced
+(`flm.output.latex-recomposed.style`, `flmrecomposed.<hash>.sty`) and, for reference,
+the whole document the workflow's final stage assembles. `js/handbook_example.mjs` does
+what `genltx_code.js` does today over the EC zoo test data: `\eczcode{id}{name}{…}` and
+`\codefieldsection{title}` as the handbook's own strings, each code's name from a snippet
+run with the LaTeX output, every other field a marker, one run over all markers (the
+shape (A) of Q12), and an `.eczaux` with one `\eczauxDefRefCode` per code.
+
+| | EC zoo test data |
+|---|---|
+| codes / fragments / trees in the one run / snippets | 10 / 109 / 72 / 25 |
+| parse / scan / snippet run / the run / substitution | 23 / 16 / 12 / 34 / 0.1 ms |
+| LaTeX produced / style file / assembled document | 24.9 KB / 37.0 KB (`flmrecomposed.58ecd68c.sty`) / 21.9 KB |
+| safe labels: written / distinct | 12 / 12 (`ref1`…`ref12`, unique over the run) |
+| references: safe / raw object keys | 2 / 5 (`\flmRef{code:ecc}`, `\flmRef{topic:CSS-to-homology-correspondence}`, …) |
+| citation hooks (`\flmCitePreSpace\flmCite{arXiv:…}`) | 61 |
+| images | `\begin{flmFloat}…\flmIncludeGraphics{figures/testfigure-d6b1271c.png}`, the address from the graphics table |
+| leftover markers / `[[` left in math | 0 / 6 |
+
+What R7 asked to verify, as found: safe labels are numbered once over the run and stay
+unique without any prefixing, so the handbook's global-key machinery goes away under (A);
+a raw object type is written as the document spelled it, inside the same `\flmRef` hook
+as a safe label, so `\flmRefsHyperref`'s dispatch on an aux definition works unchanged;
+`\eqref` over a safe label stays `\eqref{ref1}`; `drop_comments` removes the comments
+(flm-core requires `%%` to start one; a lone `%` is the Error `flm.lang.percent-forbidden`,
+which the EC zoo data already obeys); the style file is one per run and requests
+`zref-clever`, `hyperref`'s hooks and the rest through its package block, so it replaces
+`flmlatexdefaults.sty`; the memory of the run stays at 71.5 MB. Not done by FLM: the
+`[[`/`]]` ligatures of mathematics (6 left in these 10 codes), which the handbook
+rewrote in its patched recomposer; mathematics is passed through byte for byte, so the
+handbook either keeps a rewrite of its own over the math source or defines the ligature
+in LaTeX. One full-size run over the whole zoo (R5) remains to be timed once the loaders
+exist; the per-tree cost here (0.5 ms per tree) extrapolates to a few seconds.
+
 3. ~~Settings and user definitions as data~~ Done in milestone 4.
-4. The handbook: one `latex-recomposed` run over a handful of codes (Q12, R7).
+4. ~~The handbook~~ Done in milestone 5 (the full-size run remains for R5).
 5. The truncation helper over the parsed tree (R18) and the text backend (Q11).

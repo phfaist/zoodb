@@ -25,7 +25,11 @@ use flm_core::stdcore::backends::html::{
     self, DEFINITIONS_TABLE, DefinitionKind, DefinitionOverride, HtmlRenderOptions, OUTPUT_TABLE,
     PIECES_TABLE,
 };
+use flm_core::stdcore::backends::latex_recomposed::{
+    self, DOCUMENT as LATEX_DOCUMENT, LatexRecomposedRenderOptions, OUTPUT_TABLE as LATEX_OUTPUT_TABLE, STYLE_FILE, style_artifact,
+};
 use flm_core::stdcore::features::citations::KEYS;
+use flm_core::stdcore::features::refs::{RefsRecomposeOptions, SafeLabelMode};
 use flm_core::core::lowering::chars_at_lowering;
 use flm_core::stdcore::features::graphics::{GraphicsImage, PATH_ARG};
 use flm_core::stdcore::features::index::ELEMENT_INDEX;
@@ -105,6 +109,34 @@ pub struct RenderOptions {
     /// Unresolved references are Warnings instead of Errors.
     #[serde(default)]
     pub unresolved_refs_warning: bool,
+}
+
+/// Options of a recomposed-LaTeX run (Q12).
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct LatexOptions {
+    /// Label types written as the document spelled them (`code`, `domain`,
+    /// `kingdom`: the handbook's aux definitions resolve them); every other
+    /// type gets a safe label.
+    #[serde(default)]
+    pub raw_label_types: Vec<String>,
+    #[serde(default)]
+    pub drop_comments: bool,
+    #[serde(default)]
+    pub unresolved_refs_warning: bool,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct LatexOut {
+    /// One LaTeX text per handle given, in the same order.
+    pub trees: Vec<String>,
+    /// The style file the run produced (`<stem>.<hash>.sty`), if any.
+    pub style_name: Option<String>,
+    pub style: Option<String>,
+    /// The whole document as the workflow's final stage assembles it (the
+    /// handbook composes its own instead).
+    pub document: Option<String>,
+    pub diagnostics: Vec<DiagOut>,
+    pub has_errors: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -557,6 +589,43 @@ impl Engine {
     /// Runs the scan over `handles` as one document; `standalone` names the
     /// handles parsed from standalone fields, which the check stage of Q5
     /// verifies.
+    /// Renders the given fragments as one document with the
+    /// `latex-recomposed` workflow (Q12): the handbook composes the LaTeX
+    /// around the per-tree texts.
+    pub fn render_latex(&mut self, handles: &[u32], options: &LatexOptions) -> Result<LatexOut, String> {
+        let key = format!("latex:{}:{}:{}", options.unresolved_refs_warning, options.drop_comments, options.raw_label_types.join(","));
+        let settings_render_options = self.render_options.clone();
+        let plan = self.plan(key, |registry| {
+            let latex_options = LatexRecomposedRenderOptions { drop_comments: options.drop_comments, ..Default::default() };
+            let recompose = RefsRecomposeOptions {
+                safe_label_types: options.raw_label_types.iter().map(|t| (t.clone(), SafeLabelMode::Raw)).collect(),
+                ..Default::default()
+            };
+            let refs_options = RefsRenderOptions {
+                unresolved: if options.unresolved_refs_warning { UnresolvedRefs::Allow } else { UnresolvedRefs::Error },
+            };
+            let mut render_options = settings_render_options;
+            render_options.merge_from(&OptionValues::new().with(latex_options).with(recompose).with(refs_options));
+            let mut unsupported = BTreeMap::new();
+            unsupported.insert(BackendName::from(latex_recomposed::BACKEND), vec![ElementName::from(FIELD_ELEMENT)]);
+            let overrides = Overrides { render_options, unsupported, ..Overrides::none() };
+            Plan::for_workflow(registry, latex_recomposed::WORKFLOW, &overrides).map_err(|e| e.to_string())
+        })?;
+        let (doc, ids) = self.place(handles)?;
+        let mut run = Run::new(doc, plan, self.externals()).map_err(|e| e.to_string())?;
+        run.execute(&RunOptions::sequential()).map_err(|e| e.to_string())?;
+        let fragments = run.table(LATEX_OUTPUT_TABLE).map_err(|e| e.to_string())?.ok_or("the latex-recomposed workflow wrote no output table")?;
+        let trees: Vec<String> = ids.iter().map(|id| fragments.trees.get(id).map(|f| f.text.clone()).unwrap_or_default()).collect();
+        let text_of = |bytes: Option<&[u8]>| bytes.map(|b| String::from_utf8_lossy(b).into_owned());
+        let (style_name, style) = match run.table(STYLE_FILE).map_err(|e| e.to_string())?.and_then(|set| style_artifact(set).cloned()) {
+            Some(artifact) => (Some(format!("{}.sty", artifact.id.name)), text_of(artifact.as_bytes())),
+            None => (None, None),
+        };
+        let document = run.table(LATEX_DOCUMENT).map_err(|e| e.to_string())?.and_then(|set| set.entry().and_then(|a| text_of(a.as_bytes())));
+        let view = run.diagnostics();
+        Ok(LatexOut { trees, style_name, style, document, has_errors: view.has_errors(), diagnostics: diags_out(view.iter()) })
+    }
+
     pub fn scan(&mut self, handles: &[u32], standalone: &[u32]) -> Result<ScanOut, String> {
         // A bare plan request (no workflow, so no `flm.validated`): the scan
         // demands the tables it reads and nothing else, so that no citation is
@@ -720,6 +789,31 @@ mod tests {
         assert!(out3.trees[1].contains("src=\"/pic/Smiley-0123abcd.png\""), "{}", out3.trees[1]);
         // 400 px at 192 dpi = 150 pt wide.
         assert!(out3.trees[1].contains("150pt") || out3.trees[1].contains("150"), "{}", out3.trees[1]);
+    }
+
+    /// Q12: one recomposed-LaTeX run over several fragments: safe labels
+    /// numbered once over the run, object references raw, citations as hooks,
+    /// comments dropped, the style file produced.
+    #[test]
+    fn recomposed_latex_for_the_handbook() {
+        let mut engine = Engine::new(&EngineConfig::default()).unwrap();
+        engine.set_external_index(&[ExternalEntry { label: "code:x".into(), href: "/c/x".into(), display: "The X code".into() }]).unwrap();
+        let a = engine.parse("A code \\(E=mc^2\\) with \\begin{align}a=b\\label{eq:one}\\end{align} see \\eqref{eq:one} and \\cite{arXiv:1234.5678}.", "a.yml#description", FragmentLayout::InlineOrBlocks).unwrap();
+        let b = engine.parse("Related to \\ref{code:x}; %% a comment\nand \\begin{align}c=d\\label{eq:two}\\end{align}\\ref{eq:two}, \\ref{eq:one}.", "b.yml#description", FragmentLayout::InlineOrBlocks).unwrap();
+        assert!(a.diagnostics.is_empty() && b.diagnostics.is_empty(), "{:?} {:?}", a.diagnostics, b.diagnostics);
+        let out = engine
+            .render_latex(&[a.handle, b.handle], &LatexOptions { raw_label_types: vec!["code".into()], drop_comments: true, unresolved_refs_warning: false })
+            .unwrap();
+        let ids: Vec<&str> = out.diagnostics.iter().map(|d| d.identifier.as_str()).collect();
+        assert!(!ids.iter().any(|i| i.starts_with("flm.refs.")), "{:?}", out.diagnostics);
+        // `\eqref` stays `\eqref` (LaTeX's own) over the safe label.
+        assert!(out.trees[0].contains("\\flmLabels{\\label{ref1}}") && out.trees[0].contains("\\eqref{ref1}"), "{}", out.trees[0]);
+        assert!(out.trees[1].contains("\\flmLabels{\\label{ref2}}") && out.trees[1].contains("\\flmRef{ref2}") && out.trees[1].contains("\\flmRef{ref1}"), "{}", out.trees[1]);
+        assert!(out.trees[1].contains("code:x"), "{}", out.trees[1]);
+        assert!(!out.trees[1].contains("a comment"), "{}", out.trees[1]);
+        assert!(out.trees[0].contains("\\flmCite{arXiv:1234.5678}"), "{}", out.trees[0]);
+        assert!(out.style.as_deref().map(|s| s.contains("flmRef")).unwrap_or(false), "{:?}", out.style_name);
+        assert!(out.style_name.as_deref().map(|n| n.ends_with(".sty")).unwrap_or(false));
     }
 
     /// Q14: settings as data: a user macro, a feature switched off, a render
