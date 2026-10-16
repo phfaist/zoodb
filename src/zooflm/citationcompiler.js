@@ -1,11 +1,6 @@
 import debug_module from 'debug';
 const debug = debug_module('zoodb.zooflm.citationcompiler');
 
-import * as zooflm from './index.js';
-const {
-    $$kw, // repr,
-} = zooflm;
-
 import { split_prefix_label } from '../util/index.js';
 import { promisifyMethods } from '../util/prify.js';
 import { writeFileAtomic } from '../util/atomicfilewrite.js';
@@ -63,15 +58,39 @@ function escape_html(x)
 
 
 
+// The function that decides whether a chunk of text is valid FLM, as the
+// last call of install_csl_flm_output_format() gave it.
+let _flm_parses = null;
+
 /**
  * Extend the global CSL object (the citation formatter library) to enable FLM
- * code output.
+ * code output: the output format ``'flm'``, whose text escaping keeps a chunk
+ * of text the formatter produces as it is when it is valid FLM, and escapes
+ * the characters FLM reads specially otherwise.
  *
- * If you use the :class:`ZooFLMProcessor` (in most cases you should), then this
- * function is called automatically and you shouldn't worry about it.
+ * The format is installed once in the global CSL object; every call sets the
+ * function it uses to decide whether a chunk is valid FLM, for every
+ * compilation that follows, whichever compiler runs it.  The function
+ * installed belongs to the engine whose ``parses`` it calls: an engine freed
+ * since makes the next compilation throw.  So install it again before
+ * compiling citations with another engine; :class:`ZooFlmProcessor` installs
+ * ``(text) => engine.parses(text)`` before each compilation.
+ *
+ * @param {object} options
+ * @param {function(string): boolean} options.parses - whether a text is valid
+ *     FLM (parses with no error), such as ``(text) => engine.parses(text)``
+ *     of a :js:class:`ZooFlmEngine`
  */
-export function install_csl_flm_output_format(zooflmenviron)
+export function install_csl_flm_output_format({ parses } = {})
 {
+    if (typeof parses !== 'function') {
+        throw new TypeError(
+            `install_csl_flm_output_format(): give { parses }, the function that tells `
+            + `whether a text is valid FLM (such as (text) => engine.parses(text))`
+        );
+    }
+    _flm_parses = parses;
+
     if (Object.hasOwn(CSL.Output.Formats, 'flm')) {
         // FLM format already exists, not re-installing it
         return;
@@ -113,29 +132,12 @@ export function install_csl_flm_output_format(zooflmenviron)
             // change inline math $...$ -> \(...\)
             text = text.replace(/\$(.*?)\$/g, '\\($1\\)');
 
-            // attempt to parse as FLM, just in case it works and in this case let's
-            // use it!
-            try {
-                zooflmenviron.make_fragment(
-                    text,
-                    $$kw({
-                        is_block_level: false,
-                        standalone_mode: true,
-                        silent: true,
-                        // -- would only work if we could recompose the compiled
-                        // -- nodes into valid strict FLM text
-                        // parsing_mode: 'safer-latexier',
-                        // tolerant_parsing: true,
-                    }),
-                );
-                // `text` is valid FLM --- keep text directly
-                //debug(`citation text chunk is valid FLM: ${JSON.stringify(text)}`);
-            } catch (err) {
-                debug(`Invalid FLM: ${JSON.stringify(text)}: ${zooflm.get_zooflm_error_string(err)}`);
-                // not valid FLM -- escape anything suspicious and use that
-                text = escape_flm(text);
-                //text = `\\begin{verbatimtext}${text}\\end{verbatimtext}`;
-                console.log('escaped text = ', text);
+            // keep the text as it is if it is valid FLM; escape anything
+            // suspicious otherwise
+            if (!_flm_parses(text)) {
+                const escaped = escape_flm(text);
+                debug(`Invalid FLM: ${JSON.stringify(text)}, escaped: ${JSON.stringify(escaped)}`);
+                text = escaped;
             }
 
             // if (text.length > 20) {
@@ -264,14 +266,9 @@ const _default_format_link_text = {
  *
  * - `output_format` — citeproc-js output format name.  Must be either
  *   `'flm'` (default, requires :func:`install_csl_flm_output_format` to have
- *   been called) or `'html'`.
- *
- * - `flm_compile_fragments` — when `true`, produced FLM strings are compiled
- *   into FLM fragment instances immediately.  Requires `flm_environment` to
- *   be set.  Default: `false`.
- *
- * - `flm_environment` — FLM environment instance used when
- *   `flm_compile_fragments` is `true`.
+ *   been called) or `'html'`.  The compiled citations are FLM source text
+ *   (for ``'flm'``), which the FLM processor installs in the engine's
+ *   citations table.
  *
  * - `format_link_text` — object mapping link-type names (e.g. `'arxiv'`,
  *   `'doi'`, `'url'`) to functions that produce the display text string for
@@ -320,13 +317,6 @@ export class CitationCompiler
         // The output format.  By default, FLM.
         this.output_format = this.options.output_format ?? 'flm';
 
-        // Whether or not we should compile FLM fragment instances so they don't
-        // have to be compiled later.  If flm_compile_fragments is set, then we
-        // need to also give an FLM environment instance to use to compile these
-        // fragments.
-        this.flm_compile_fragments = this.options.flm_compile_fragments ?? false;
-        this.flm_environment = this.options.flm_environment ?? null;
-
         // Options to format links
         this.format_link_text = Object.assign(
             {}, this.options.format_link_text, _default_format_link_text
@@ -348,7 +338,8 @@ export class CitationCompiler
             }
         };
 
-        // The database of compiled citations.  Stores FLM fragment instances.
+        // The database of compiled citations (the citation text as a string:
+        // FLM source, or HTML for the 'html' output format).
         this.compiled_citations = {};
 
         // The cache stores the compiled FLM text.
@@ -410,8 +401,7 @@ export class CitationCompiler
         debug(`Loaded compiled citations cache from ‘${this.cache_file}’ `
               + `(${this.cache.size()} items)`);
 
-        // store from cache object to `this.compiled_citations` & compile
-        // FLM fragments as necessary
+        // store from cache object to `this.compiled_citations`
         for (const cite_id of this.cache.keys()) {
             const c = this.cache.get(cite_id);
             this._save_compiled_citation(c, { put_in_cache: false });
@@ -430,7 +420,7 @@ export class CitationCompiler
             fsp,
             fileName: this.cache_file,
             data: this.cache.exportJson(),
-            processPid: (process != null) ? process.pid : 'XX',
+            processPid: globalThis.process?.pid ?? 'XX',
         });
     }
 
@@ -594,7 +584,7 @@ export class CitationCompiler
                 hash: c.hash,
                 cite_prefix,
                 cite_key,
-                citation_text: c.citation_text?.flm_text ?? c.citation_text
+                citation_text: c.citation_text,
             };
             this.cache.put(
                 cite_id,
@@ -607,18 +597,6 @@ export class CitationCompiler
         // cache object (in load_cache()), in which case we don't want the cache
         // object to be directly modified.
         c = Object.assign({}, c);
-
-        if (this.output_format === 'flm' && this.flm_compile_fragments
-            && this.flm_environment != null) {
-            c.citation_text = this.flm_environment.make_fragment(
-                c.citation_text,
-                $$kw({
-                    is_block_level: false,
-                    standalone_mode: true,
-                    what: `Citation text for ${c.cite_prefix}:${c.cite_key}`,
-                }),
-            )
-        }
 
         this.compiled_citations[cite_id] = c;
     }

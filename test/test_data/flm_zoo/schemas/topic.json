@@ -1,0 +1,11 @@
+{
+    "_zoo_primarykey": "topic_id",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["topic_id", "name"],
+    "properties": {
+        "topic_id": { "type": "string" },
+        "name": { "type": "string", "_flm": "standalone" },
+        "description": { "type": "string", "_flm": "block_level" }
+    }
+}

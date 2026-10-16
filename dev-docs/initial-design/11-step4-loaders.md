@@ -23,15 +23,16 @@ refused with a clear message and fixed in the data once by a tool.
    document API (`parseDocument` with a `LineCounter`), reports the document's errors as
    the loader's parse error (file, line, column, the message), and returns the plain
    value as today plus, when the file is YAML, a map of the positions of every string
-   scalar by its field path (`a.b[2].c`): `{ line, col }` of the value's first character
+   scalar by its field path in the field compiler's dotted form (`a.b.2.c`, as
+   `obj._zoodb.flm_fields` names fields): `{ line, col }` of the value's first character
    (1-based), `style` (`literal`, `folded`, `plain`, `quoted`), and for a block scalar its
    `indent` (the number of columns removed from each line) so that a line `i` (0-based) of
    the value is the source line `line + 1 + i` at column `indent + 1` for `literal` (exact,
    verified in 03 Q15 on 1921 block scalars), and approximately so for `folded`, `plain`
    and `quoted` (multi-line values of those styles fold lines; the position map marks them
    `approx: true`). `parse_file_into_objects` stores the positions of the object's fields
-   in `obj._zoodb.field_positions` (field path relative to the object). JSON files have no
-   positions.
+   in `obj._zoodb.flm_field_positions` (the name the field compiler of step 3 reads; field
+   path relative to the object). JSON files have no positions.
 3. **The refused pattern.** When `yaml` reports the error of a quoted scalar whose
    continuation line is not indented more than its parent (its message names the
    problem), the loader's error says in one sentence what to change ("a quoted value that
@@ -50,11 +51,12 @@ refused with a clear message and fixed in the data once by a tool.
    fixed. Tested on fixtures of the pattern in `test/test_data/yaml_fixtures/reindent/`
    (an untouched file, a file with the pattern, a file with the pattern inside a list
    item). The EC zoo's 127 files are fixed with it in step 6, outside this repository.
-5. **Diagnostics with file positions.** The field compiler (step 3) passes
-   `obj._zoodb.field_positions[field]` as the fragment origin's `start_line`, `start_col`,
-   `indent` and `approx`; the engine's diagnostics mapping (step 2, D7) gives `file_line`
-   and `file_col` from them. `format_diagnostic` writes the file position when it is
-   there, and `(approx.)` when the style was not literal.
+5. **Diagnostics with file positions.** The field compiler (step 3) already reads
+   `obj._zoodb.flm_field_positions[field]` as `{ line, col, indent, approx }` into the
+   fragment origin's `start_line`, `start_col`, `indent` and `approx`; the engine's
+   diagnostics mapping (step 2, D7) gives `file_line` and `file_col` from them.
+   `format_diagnostic` writes the file position when it is there and, still to do in
+   this step, `(approx.)` when the style was not literal.
 
 ## B. The FLM-files loader (Q16)
 
@@ -85,16 +87,18 @@ edits in `../zoodb-example` on a branch (open question for him, raised 2026-10-1
 port:
 
 - `peopledbjs/myzoodb.js`: `use_flm_environment` → `use_flm_engine`; `flm_options.load_wasm:
-  load_zoodb_flm_wasm_node` (from `@phfaist/zoodb/zooflm/wasm-node`); `environment_options`
-  → `engine: { settings: {…}, dollar_math: false }`; `refs`, `citations`, `resources`
-  unchanged.
+  load_zoodb_flm_wasm_node` (from `@phfaist/zoodb/zooflm/wasm-node`); the commented
+  `environment_options` block → a commented `engine: { settings: {…} }` block; `refs`,
+  `citations`, `resources` unchanged (step 3 confirmed these are the only two changes
+  the setup needs).
 - `website/src/person/person.11ty.js`: the composer through `zoodb.zoo_flm_engine.render_document({
   compose, title })` with the same `ne`, `rdr`, `rdrblock`, `ref` helpers,
   `<RENDER_ENDNOTES/>` → `endnotes()`, `render_text_standalone(data.person.name)` →
   `zoodb.zoo_flm_engine.snippet(data.person.name, 'text')`; the template's shape stays.
 - `website/src/index.11ty.js`: `render_html_standalone(name)` → `snippet(name, 'html')`.
 - `website/src/dynamic_style/flm.css.11ty.js`: `zoodb.zoo_flm_engine.html_stylesheet()`.
-- `website/src/dat/zoodbdata.11ty.js`, `pic/pic.11ty.js`, the search index: unchanged.
+- `website/src/dat/zoodbdata.11ty.js` (the dump: `data.zooflm` replaces `refs_data`; the
+  file passes the dump through unchanged), `pic/pic.11ty.js`, the search index: unchanged.
 - Verification: a script `scratch/proto/js/build_example.mjs` that loads the example's zoo
   through the ported `myzoodb.js` (copied into the scratch folder, pointed at the example's
   data and schemas, read-only) with the worktree's `@phfaist/zoodb` and renders every

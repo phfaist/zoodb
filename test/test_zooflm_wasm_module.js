@@ -139,6 +139,14 @@ describe('FLM wasm module', function () {
             engine.free();
         });
 
+        it('version() gives the binding\'s and flm-core\'s versions, as in Cargo.lock', function () {
+            const lock = fs.readFileSync(lock_file, 'utf-8');
+            assert.deepStrictEqual(wasm.ZooFlmCore.version(), {
+                binding: lock_version(lock, 'zoodb-flm-wasm'),
+                flm_core: lock_version(lock, 'flm-core'),
+            });
+        });
+
         it('features() lists the standard features with their settings schemas', function () {
             const features = wasm.ZooFlmCore.features();
             assert.ok(Array.isArray(features));
@@ -203,9 +211,9 @@ describe('FLM wasm module', function () {
             const scan = engine.scan([a.handle, b.handle], []);
             assert.deepStrictEqual(scan.diagnostics, []);
             assert.strictEqual(scan.trees.length, 2);
-            assert.deepStrictEqual(scan.trees[0].labels, ['eq:x']);
-            assert.strictEqual(scan.trees[1].refs_resolved.length, 1);
-            assert.deepStrictEqual(scan.trees[1].refs_unresolved, []);
+            assert.deepStrictEqual(scan.trees[0].labels, [{ label: 'eq:x', anchor: 'eq-x', display: null }]);
+            assert.deepStrictEqual(scan.trees[1].refs, [{ label: 'eq:x', resolved: true }]);
+            assert.deepStrictEqual(scan.duplicate_labels, []);
 
             const text = engine.render_text([a.handle, b.handle]);
             assert.deepStrictEqual(text.diagnostics, []);

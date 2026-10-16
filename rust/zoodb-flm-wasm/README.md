@@ -54,6 +54,7 @@ core.
 | method | returns |
 |---|---|
 | `new ZooFlmCore(config)`, config `{ dollar_math?, settings?, off?, srcset? }`: `settings` one map per standard feature (`{ math: { … } }`, user definitions under `userdefs`: `macros`, `environments`, `specials`), `off` features switched off by name, `srcset` `{ pixel_density_list?, image_max_zoom_factor? }` | the core; throws on an unknown feature or setting, naming the feature and the key |
+| `ZooFlmCore.version()` (static) | `{ binding, flm_core }`: this crate's version and the `flm-core` version it was built against (read from `Cargo.lock` by `build.rs`) |
 | `ZooFlmCore.features()` (static) | `[{ name, schema }]`, `schema` the JSON Schema of the feature's settings or `null` |
 | `build_diagnostics()` | `[CoreDiagnostic]` |
 | `parse(text, origin, layout)`, layout `'blocks'`, `'inline'` or `'auto'` | `{ handle, empty, diagnostics }`; `empty`: the tree holds only whitespace, comments and paragraph breaks |
@@ -63,7 +64,7 @@ core.
 | `render_html(handles, { title?, unresolved_refs_warning? })` | `{ trees: [html], tree_requires: [[definition id]], pieces: [{ name, place: 'before-content'\|'after-content', html, requires }], requires, definitions: [Definition], diagnostics, has_errors }`, one tree per handle in order; `requires` the union of `tree_requires`; `definitions` what the run's document requires, resolved (parts `inline`, `file`, `url`, or `host` for a definition the host supplies), the backend's page style included |
 | `render_text(handles, { width?, link_addresses?, unresolved_refs_warning?, per_tree?, pieces? })` | `{ text, trees, tree_diagnostics, diagnostics, has_errors }`; with `per_tree`, `trees` and `tree_diagnostics` hold each tree rendered alone and that run's diagnostics (a reference to another tree does not resolve there) |
 | `render_latex(handles, { raw_label_types?, drop_comments?, unresolved_refs_warning? })` | `{ trees, style_name, style, document, diagnostics, has_errors }` |
-| `scan(handles, standalone_handles)` | `{ trees: [{ labels, refs_resolved: [href], refs_unresolved: [label], graphics: [{ path, origin }] }], cited: [[key, origin]], duplicate_labels, standalone_violations, diagnostics, has_errors }` |
+| `scan(handles, standalone_handles)` | `{ trees: [{ labels: [{ label, anchor, display }], refs: [{ label, resolved }], graphics: [{ path, origin }] }], cited: [[key, origin]], duplicate_labels: [{ label, origin, start, end }], standalone_violations, diagnostics, has_errors }`; per label its anchor when it is the one the label forms (`label_anchor`: `type-label`, the same in every document; `null` for a point anchored on its number, a renumbered title or after a collision) and the FLM source of the content its point shows (`null` for a point shown by its number alone; one braced group without its braces); per tree its reference sites as labels; a duplicate with the later point's origin and byte range |
 | `truncate(text, origin, layout, { chars, min_chars?, marker?, first_paragraph? })` | `{ source, truncated, cut_at, diagnostics }`: the shortened FLM source, to be parsed again |
 | `parse_fields(text, origin)` | `{ fields: [{ name, start, end, text }], diagnostics }`: the `\begin{field}{name} … \end{field}` of an FLM data file |
 | `set_external_index([{ label, href, display }])` | `[CoreDiagnostic]` of the display texts (FLM, parsed inline; origin `index:LABEL`) |
@@ -76,8 +77,9 @@ A run's diagnostics include the parse diagnostics of the fragments it places
 `unresolved_refs_warning` defaults to `false` (an unresolved reference is an
 Error) for html and LaTeX, `true` for text. The scan is a bare plan request
 for the tables the host reads (`flm.citations.keys`, `flm.labels`,
-`flm.refs.resolutions`, `flm.element-index`, the standalone check): nothing is
-retrieved, resolved or output.
+`flm.anchors`, `flm.refs.targets`, `flm.refs.resolutions`,
+`flm.element-index`, the standalone check): nothing is retrieved, resolved or
+output.
 
 ## Host tables
 

@@ -83,13 +83,13 @@ const scanTally = new Map();
 tally(scanTally, scan.diagnostics, 'scan');
 const scanSummary = {
     labels: scan.trees.reduce((n, t) => n + t.labels.length, 0),
-    refs_resolved: scan.trees.reduce((n, t) => n + t.refs_resolved.length, 0),
-    refs_unresolved: scan.trees.reduce((n, t) => n + t.refs_unresolved.length, 0),
-    unresolved_sample: [...new Set(scan.trees.flatMap((t) => t.refs_unresolved))].slice(0, 12),
+    refs_resolved: scan.trees.reduce((n, t) => n + t.refs.filter((r) => r.resolved).length, 0),
+    refs_unresolved: scan.trees.reduce((n, t) => n + t.refs.filter((r) => !r.resolved).length, 0),
+    unresolved_sample: [...new Set(scan.trees.flatMap((t) => t.refs.filter((r) => !r.resolved).map((r) => r.label)))].slice(0, 12),
     graphics: scan.trees.flatMap((t) => t.graphics.map((g) => `${g.path} @ ${g.origin}`)),
     cited: scan.cited.length,
     cited_sample: scan.cited.slice(0, 8).map(([k]) => k),
-    duplicate_labels: scan.duplicate_labels,
+    duplicate_labels: scan.duplicate_labels.map((d) => `${d.label} @ ${d.origin}`),
     standalone_fields: standaloneHandles.length,
     standalone_violations: scan.standalone_violations,
 };

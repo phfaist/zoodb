@@ -136,6 +136,26 @@ describe('ZooFlmEngine', function () {
             }
         });
 
+        it('a core configured with srcset cannot publish an image while U2 is open', async function () {
+            // The ZooDb publish stage needs the flm-core constructor of
+            // upstream request U2 (cargo feature published-insert); until it
+            // lands, an image under srcset is the Error
+            // zoodb.graphics.publish-failed (the standard setup does not
+            // enable srcset for that reason). When U2 lands, this test changes
+            // to the <img> with its srcset.
+            const e = await ZooFlmEngine.create({ load_wasm, core: { srcset: { image_max_zoom_factor: 2 } } });
+            try {
+                const f = e.make_fragment(PEOPLE.alice.biography, { origin: origin('alice', 'biography') });
+                e.set_graphics(GRAPHICS);
+                const out = e.render_fragment(f, { error_policy: 'continue' });
+                assert.ok(out.diagnostics.some( (d) => d.identifier === 'zoodb.graphics.publish-failed'
+                                                && /U2/.test(d.message) ), JSON.stringify(out.diagnostics));
+                assert.doesNotMatch(out.html, /<img /);
+            } finally {
+                e.free();
+            }
+        });
+
         it('refuses a wrong setting, naming the feature and the key', async function () {
             await assert.rejects(
                 ZooFlmEngine.create({ load_wasm, core: { settings: { math: { no_such_key: 1 } } } }),
@@ -610,6 +630,111 @@ describe('ZooFlmEngine', function () {
         });
     });
 
+    describe('parses, settings hash, dump and load', function () {
+
+        it('parses() tells whether a text is valid FLM, keeping nothing', function () {
+            const count = engine.core.fragment_count();
+            assert.strictEqual(engine.parses('A \\emph{b} \\(x\\) \\zoo{}'), true);
+            assert.strictEqual(engine.parses('A \\nosuchmacro'), false);
+            assert.strictEqual(engine.parses('cost: $5'), false);
+            assert.strictEqual(engine.parses('\\begin{field}\\end{field}'), false);
+            assert.strictEqual(engine.core.fragment_count(), count);
+            assert.throws( () => engine.parses(null), TypeError );
+        });
+
+        it('settings_hash follows the core configuration', async function () {
+            const settings = { userdefs: { macros: { zoo: { content: 'the Zoo' } } } };
+            const a = await ZooFlmEngine.create({ load_wasm, core: { off: ['annotations', 'quote'], settings } });
+            const b = await ZooFlmEngine.create({
+                load_wasm, core: { settings, srcset: null, dollar_math: null, off: ['quote', 'annotations'] },
+            });
+            const c = await ZooFlmEngine.create({ load_wasm, core: { off: ['annotations', 'quote'], settings, dollar_math: true } });
+            try {
+                assert.deepStrictEqual(Object.keys(a.core_version).sort(), ['binding', 'flm_core']);
+                assert.match(a.core_version.flm_core, /^\d+\.\d+\.\d+/);
+                assert.match(a.settings_hash, /^[0-9a-f]{16}$/);
+                assert.strictEqual(a.settings_hash, b.settings_hash);
+                assert.notStrictEqual(a.settings_hash, c.settings_hash);
+                assert.notStrictEqual(a.settings_hash, engine.settings_hash);
+            } finally {
+                [a, b, c].forEach( (e) => e.free() );
+            }
+        });
+
+        it('dump() gives the tables and the snippets; load() installs them in another engine', async function () {
+            const make = (e) => {
+                const f = {};
+                for (const [id, person] of Object.entries(PEOPLE)) {
+                    f[id] = {};
+                    for (const [field, source] of Object.entries(person)) {
+                        f[id][field] = e.make_fragment(source, { origin: origin(id, field), standalone: (field === 'name') });
+                    }
+                }
+                return f;
+            };
+            const page = (f) => (R) => `<h1>${R.rdr(f.bob.name)}</h1>${R.rdrblock(f.bob.biography)}`
+                + `<p>${R.rdr(f.bob.notes)}</p><p>${R.ref('person', 'alice')}</p>${R.rdrblock(f.alice.biography)}${R.endnotes()}`;
+            const e1 = await ZooFlmEngine.create({ load_wasm, core: CORE });
+            const e2 = await ZooFlmEngine.create({ load_wasm, core: CORE });
+            let e3 = null;
+            try {
+                const f1 = make(e1);
+                e1.set_citations(CITATIONS);
+                e1.set_graphics(GRAPHICS);
+                e1.render_snippets([f1.alice.name, f1.bob.name]);
+                const entries = (href) => Object.keys(f1).map( (id) => ({
+                    label: `person:${id}`, href: href(id), display: f1[id].name,
+                }) );
+                e1.set_index(entries( (id) => `hb/${id}` ), { context: 'handbook' });
+                e1.set_index([...entries( (id) => `/person/${id}` ),
+                              { label: 'figure:smiley', href: '/person/alice#figure-1', display: 'the smiley' }]);
+
+                const dump = JSON.parse(JSON.stringify(e1.dump()));
+                assert.strictEqual(dump.settings_hash, e1.settings_hash);
+                assert.deepStrictEqual(dump.index.handbook, [
+                    { label: 'person:alice', href: 'hb/alice', display: PEOPLE.alice.name },
+                    { label: 'person:bob', href: 'hb/bob', display: PEOPLE.bob.name },
+                ]);
+                assert.strictEqual(dump.index.default.length, 3);
+                assert.deepStrictEqual(dump.citations, CITATIONS);
+                assert.deepStrictEqual(dump.graphics, GRAPHICS);
+                assert.deepStrictEqual(dump.snippets.map( (sn) => [sn.label, sn.layout, sn.text] ), [
+                    ['people/alice.yml#name', 'inline', 'Alice Aaliz'],
+                    ['people/bob.yml#name', 'inline', 'Bob \\(B_0\\)'],
+                ]);
+                assert.ok(dump.snippets[1].requires.includes('flm.html.style.math-passthrough'));
+
+                assert.deepStrictEqual(e2.load(dump), { diagnostics: [], has_errors: false });
+                assert.deepStrictEqual(Object.keys(e2.tables.index).sort(), ['default', 'handbook']);
+                const f2 = make(e2);
+                // the names' snippets come from the dump
+                assert.strictEqual(e2.snippet_entry(f2.bob.name, 'html').value, e1.snippet(f1.bob.name));
+                assert.strictEqual(e2.snippet_entry(f2.alice.name, 'text').value, 'Alice Aaliz');
+                // the same page, byte for byte, in both contexts
+                for (const context of ['default', 'handbook']) {
+                    const one = e1.render_document({ context, compose: page(f1) });
+                    const two = e2.render_document({ context, compose: page(f2) });
+                    assert.deepStrictEqual(two.diagnostics, []);
+                    assert.strictEqual(two.html, one.html, context);
+                }
+                // a fragment with the label but another source or layout gets nothing
+                const other = e2.make_fragment('Bob B.', { origin: origin('bob', 'name'), standalone: true });
+                const blocks = e2.make_fragment(PEOPLE.bob.name, {
+                    origin: origin('bob', 'name'), standalone: true, layout: 'blocks',
+                });
+                assert.strictEqual(e2.snippet_entry(other, 'html'), null);
+                assert.strictEqual(e2.snippet_entry(blocks, 'html'), null);
+
+                assert.throws( () => e2.load(null), TypeError );
+                // another configuration refuses the dump
+                e3 = await ZooFlmEngine.create({ load_wasm });
+                assert.throws( () => e3.load(dump), /another core configuration/ );
+            } finally {
+                [e1, e2, e3].forEach( (e) => e?.free() );
+            }
+        });
+    });
+
     describe('stylesheet, truncation and scan', function () {
 
         it('html_definitions() lists every definition; html_stylesheet() leaves out the page', function () {
@@ -683,10 +808,14 @@ describe('ZooFlmEngine', function () {
             const scan = engine.scan(fragments);
             const tree = (f) => scan.trees.find( (t) => t.fragment === f );
             assert.strictEqual(scan.trees.length, fragments.length);
-            assert.deepStrictEqual(tree(F.bob.biography).labels, ['eq:energy']);
-            assert.deepStrictEqual(tree(F.alice.biography).labels, ['figure:smiley']);
-            assert.deepStrictEqual(tree(F.bob.notes).refs_resolved, ['#eq-energy']);
-            assert.deepStrictEqual(tree(F.bob.biography).refs_unresolved, ['person:alice']);
+            assert.deepStrictEqual(tree(F.bob.biography).labels, [{ label: 'eq:energy', anchor: 'eq-energy', display: null }]);
+            // A float is anchored on its number, which depends on the
+            // document: no anchor; it shows its caption, without the braces.
+            assert.deepStrictEqual(tree(F.alice.biography).labels,
+                                   [{ label: 'figure:smiley', anchor: null, display: 'A smiley.' }]);
+            assert.deepStrictEqual(tree(F.bob.notes).refs, [{ label: 'eq:energy', resolved: true }]);
+            assert.deepStrictEqual(tree(F.bob.biography).refs, [{ label: 'person:alice', resolved: false }]);
+            assert.deepStrictEqual(tree(F.alice.biography).refs, [{ label: 'figure:smiley', resolved: true }]);
             assert.deepStrictEqual(tree(F.alice.biography).graphics,
                                    [{ path: 'images/Smiley', origin: 'people/alice.yml#biography' }]);
             assert.deepStrictEqual(scan.cited.map( ({ key, origin, fragment }) => [key, origin, fragment] ),

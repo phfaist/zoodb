@@ -7,9 +7,8 @@ const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const test_data_dir = path.join(__dirname, 'test_data');
 
-import {
-    ZooFLMEnvironment,
-} from '../src/zooflm/_environment.js';
+import { load_zoodb_flm_wasm_node } from '../src/zooflm/_load_wasm_node.js';
+import { ZooFlmEngine } from '../src/zooflm/engine.js';
 
 import {
     install_csl_flm_output_format,
@@ -41,16 +40,43 @@ describe('zoodb.zooflm.citationcompiler', function () {
 
     describe('install_csl_flm_output_format', function () {
 
+        let engine;
+        let parses;
+
+        before(async function () {
+            engine = await ZooFlmEngine.create({ load_wasm: load_zoodb_flm_wasm_node });
+            parses = (text) => engine.parses(text);
+        });
+
+        after(function () {
+            engine?.free();
+        });
+
         it('installs the FLM output format on CSL', function () {
-            const env = new ZooFLMEnvironment();
-            install_csl_flm_output_format(env);
+            install_csl_flm_output_format({ parses });
 
             assert.ok(Object.hasOwn(CSL.Output.Formats, 'flm'));
+            assert.throws( () => install_csl_flm_output_format({}), /parses/ );
+        });
+
+        it('text_escape keeps valid FLM and escapes the rest, with the last parses() given', function () {
+            install_csl_flm_output_format({ parses });
+            const text_escape = CSL.Output.Formats.flm.text_escape;
+            assert.strictEqual(text_escape('A \\emph{title}'), 'A \\emph{title}');
+            assert.strictEqual(text_escape('50 % off'), '50 \\% off');
+            assert.strictEqual(text_escape('inline $x$ math'), 'inline \\(x\\) math');
+            // an unknown macro is not valid FLM: escaped
+            assert.strictEqual(text_escape('a \\nosuch{b}'), 'a \\textbackslash nosuch\\{b\\}');
+            // every call sets the function used
+            const seen = [];
+            install_csl_flm_output_format({ parses: (text) => { seen.push(text); return true; } });
+            assert.strictEqual(text_escape('a \\nosuch{b}'), 'a \\nosuch{b}');
+            assert.deepStrictEqual(seen, ['a \\nosuch{b}']);
+            install_csl_flm_output_format({ parses });
         });
 
         it('REGRESSION: text_escape handles whitespace-only text', function () {
-            const env = new ZooFLMEnvironment();
-            install_csl_flm_output_format(env);
+            install_csl_flm_output_format({ parses });
 
             const text_escape = CSL.Output.Formats.flm.text_escape;
 
@@ -60,8 +86,7 @@ describe('zoodb.zooflm.citationcompiler', function () {
         });
 
         it('text_escape handles empty string', function () {
-            const env = new ZooFLMEnvironment();
-            install_csl_flm_output_format(env);
+            install_csl_flm_output_format({ parses });
 
             const text_escape = CSL.Output.Formats.flm.text_escape;
             const result = text_escape('');
@@ -69,8 +94,7 @@ describe('zoodb.zooflm.citationcompiler', function () {
         });
 
         it('text_escape handles null/undefined', function () {
-            const env = new ZooFLMEnvironment();
-            install_csl_flm_output_format(env);
+            install_csl_flm_output_format({ parses });
 
             const text_escape = CSL.Output.Formats.flm.text_escape;
             const result = text_escape(null);

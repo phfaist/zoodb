@@ -124,6 +124,12 @@ export interface CoreConfig {
     off?: string[] | null;
 }
 
+/** The versions of the module's build: this binding crate's and the `flm-core` version it was built against. */
+export interface CoreVersion {
+    binding: string;
+    flm_core: string;
+}
+
 /** A standard feature and the JSON Schema of its settings (`null`: it takes none). */
 export interface FeatureInfo {
     name: string;
@@ -266,13 +272,33 @@ export interface ScanGraphicsRef {
     origin: string | null;
 }
 
+/** A label a tree defines: its anchor when it is the one the label itself forms (`type-label`, the same in every document; `null` for a point anchored otherwise: on its number, a renumbered title, a collision) and the FLM source of the content the point shows (`null`: none; a single braced group without its braces). */
+export interface ScanLabel {
+    label: string;
+    anchor: string | null;
+    display: string | null;
+}
+
+/** A reference site: the label it points at, and whether it resolved inside the scanned document (the scan installs no external index). */
+export interface ScanRef {
+    label: string;
+    resolved: boolean;
+}
+
+/** A label written for a second point: where the later point is (the origin label of its source, byte offsets into it). */
+export interface ScanDuplicate {
+    label: string;
+    origin: string | null;
+    start: number;
+    end: number;
+}
+
 /** What the scan found in one tree. */
 export interface ScanTree {
-    labels: string[];
-    /** The href of each resolved reference. */
-    refs_resolved: string[];
-    /** The label of each unresolved reference. */
-    refs_unresolved: string[];
+    /** The labels whose point the tree holds, in the order of the points. */
+    labels: ScanLabel[];
+    /** The reference sites of the tree, in tree order. */
+    refs: ScanRef[];
     graphics: ScanGraphicsRef[];
 }
 
@@ -281,7 +307,7 @@ export interface ScanOut {
     trees: ScanTree[];
     /** Cited keys in order of first citation, each with the origin of that citation. */
     cited: [string, string | null][];
-    duplicate_labels: string[];
+    duplicate_labels: ScanDuplicate[];
     standalone_violations: number;
     diagnostics: CoreDiagnostic[];
     has_errors: boolean;
@@ -312,6 +338,19 @@ pub struct ZooFlmCore {
     engine: Engine,
 }
 
+/// Version of this binding crate.
+pub const BINDING_VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// Version of the `flm-core` crate this binding was built against, read from
+/// `Cargo.lock` by `build.rs`.
+pub const FLM_CORE_VERSION: &str = env!("FLM_CORE_VERSION");
+
+#[derive(Serialize)]
+struct VersionOut {
+    binding: &'static str,
+    flm_core: &'static str,
+}
+
 #[wasm_bindgen]
 impl ZooFlmCore {
     /// Builds the registry from `config` (`CoreConfig`); throws on an unknown
@@ -321,6 +360,13 @@ impl ZooFlmCore {
         let config: EngineConfig = if config.is_undefined() || config.is_null() { EngineConfig::default() } else { from_js(config, "the configuration")? };
         let engine = Engine::new(&config).map_err(|e| JsError::new(&e))?;
         Ok(ZooFlmCore { engine })
+    }
+
+    /// The versions of the module's build: `{ binding, flm_core }` (this
+    /// crate's version and the `flm-core` version it was built against).
+    #[wasm_bindgen(unchecked_return_type = "CoreVersion")]
+    pub fn version() -> Result<JsValue, JsError> {
+        to_js(&VersionOut { binding: BINDING_VERSION, flm_core: FLM_CORE_VERSION })
     }
 
     /// The standard features and the JSON Schema of each one's settings (Q14).
@@ -481,8 +527,14 @@ impl ZooFlmCore {
 
 #[cfg(test)]
 mod tests {
-    use super::drop_nulls;
+    use super::{BINDING_VERSION, FLM_CORE_VERSION, drop_nulls};
     use serde_json::json;
+
+    #[test]
+    fn the_versions_are_known() {
+        assert_eq!(BINDING_VERSION, env!("CARGO_PKG_VERSION"));
+        assert!(FLM_CORE_VERSION != "unknown" && FLM_CORE_VERSION.split('.').count() == 3, "{FLM_CORE_VERSION}");
+    }
 
     #[test]
     fn null_keys_are_left_out_except_in_the_settings() {

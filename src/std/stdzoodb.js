@@ -22,9 +22,11 @@ import loMerge from 'lodash/merge.js';
  * - `ZooDbClass` — class to instantiate (default: :class:`ZooDb`).
  * - `SchemaLoaderClass` — class used to load JSON Schemas (default:
  *   :class:`SchemaLoader`).  Set to `false` to skip schema loading.
- * - `continue_with_errors` — if `true`, FLM compilation errors become
- *   warnings instead of aborting (sets `flm_error_policy` to `'continue'`).
- *   Default: `false`.
+ * - `continue_with_errors` — if `true`, FLM errors do not abort the zoo
+ *   processing: the error policy of the FLM engine and processor
+ *   (`_this.flm_error_policy`) is `'continue'` instead of `'abort'`; the
+ *   diagnostics are kept on the objects (``_zoodb.flm_diagnostics``) and the
+ *   renders show the backend's recovery markup.  Default: `false`.
  * - `fs` — filesystem access object (Node.js `fs` module or compatible).
  *   Required by the FLM processor for reading data and citation cache files.
  * - `fs_data_dir` — root directory for resolving data file paths.
@@ -34,8 +36,10 @@ import loMerge from 'lodash/merge.js';
  * The `zoo_permalinks` object should expose the following methods:
  * - `object(object_type, object_id) → string` — builds a URL for a zoo
  *   object.
- * - `graphics_resource(gresource) → string` — builds a URL for a graphics
- *   resource.
+ * - `graphics_resource(resource_data) → string` — builds a URL for a
+ *   collected image; ``resource_data.src_url`` is the target name the
+ *   retriever gave the file (see :class:`ZooFlmProcessor` for the other
+ *   properties).
  *
  * Processor activation keys (each accepts either `null`/`false` to disable or
  * a factory function ``(_this) → processorInstance``):
@@ -45,25 +49,38 @@ import loMerge from 'lodash/merge.js';
  * - `use_gitlastmodified_processor` — factory for
  *   :class:`GetGitLastModifiedDbProcessor`.
  *   Consumed by `use_gitlastmodified_processor.js`.
- * - `use_flm_environment` — factory for :class:`ZooFLMEnvironment`.
- *   Consumed by `use_flm_environment.js`.
- * - `use_flm_processor` — factory for :class:`ZooFLMProcessor`.
- *   Consumed by `use_flm_processor.js`.
+ * - `use_flm_engine` — factory for the zoo's FLM engine
+ *   (:js:class:`ZooFlmEngine`, set as `zoodb.zoo_flm_engine`), e.g.
+ *   :func:`use_flm_engine` of `use_flm_engine.js`.
+ * - `use_flm_processor` — factory for :class:`ZooFlmProcessor` (requires
+ *   the engine), e.g. :func:`use_flm_processor` of `use_flm_processor.js`.
  * - `use_searchable_text_processor` — factory for
  *   :class:`SearchableTextProcessor`.
  *   Consumed by `use_searchable_text_processor.js`.
  *
- * FLM options (`flm_options` sub-object, used by `use_flm_environment.js` and
+ * FLM options (`flm_options` sub-object, used by `use_flm_engine.js` and
  * `use_flm_processor.js`):
  *
- * - `environment_options` — options forwarded to the :class:`ZooFLMEnvironment`
- *   constructor.  Consumed by `use_flm_environment.js`.
- * - `refs` — object mapping ref types to configuration; forwarded to
- *   :class:`ZooFLMProcessor`.  Consumed by `use_flm_processor.js`.
- * - `allow_unresolved_references` — when `true`, unresolved FLM cross-references
- *   render as `<??>` instead of throwing.  Consumed by `use_flm_environment.js`.
- * - `allow_unresolved_citations` — when `true`, unknown citation keys render
- *   verbatim.  Consumed by `use_flm_environment.js`.
+ * - `load_wasm` — the loader of the FLM module (default: the
+ *   environment-neutral loader, which fetches the module in a browser; under
+ *   Node, pass ``load_zoodb_flm_wasm_node`` from
+ *   ``@phfaist/zoodb/zooflm/wasm-node``).  Consumed by `use_flm_engine.js`.
+ * - `engine` — the core's configuration as data: ``dollar_math`` (default
+ *   `false`), ``settings`` (the settings of the standard features, one map per
+ *   feature; user definitions under ``userdefs``), ``off`` (standard features
+ *   switched off by name), ``render_value_options``.  Consumed by
+ *   `use_flm_engine.js`.  (Replaces the former `environment_options`.)
+ * - `refs`, `refs_defaults` — per object type, the display of references to
+ *   objects (``formatted_ref_flm_text_fn(object_id, object)``); forwarded to
+ *   :class:`ZooFlmProcessor`.  Consumed by `use_flm_processor.js`.
+ * - `contexts` — further output contexts of the index (``{ NAME: {
+ *   object_href } }``) beside ``default``.  Consumed by
+ *   `use_flm_processor.js`.
+ * - `allow_unresolved_references` — when `true`, references that resolve to
+ *   nothing are Warnings (the label shown) instead of Errors.  Consumed by
+ *   `use_flm_engine.js`.
+ * - `allow_unresolved_citations` — when `true`, cited keys without a compiled
+ *   citation show as verbatim text.  Consumed by `use_flm_processor.js`.
  * - `citations.csl_style` — CSL style XML string for citation formatting.
  *   Consumed by `use_flm_processor.js`.
  * - `citations.override_arxiv_dois_file` — path to a file overriding arXiv DOI
@@ -90,9 +107,15 @@ import loMerge from 'lodash/merge.js';
  *   resolving a graphics source name.  Consumed by `use_flm_processor.js`.
  * - `resources.graphics_resources_fs_data_dir` — base directory for graphics
  *   files (defaults to `fs_data_dir`).  Consumed by `use_flm_processor.js`.
+ * - `resources.global_vector_scale`, `resources.global_raster_scale` — scale
+ *   factors of the physical size of images.  Consumed by
+ *   `use_flm_processor.js`.
  * - `resources.graphics_use_srcset_parceljs` — options for generating
  *   Parcel-compatible `srcset` attributes for raster images.
- *   Consumed by `use_flm_environment.js`.
+ *   Consumed by `use_flm_engine.js`, which accepts the option but does not
+ *   enable it for now: the alternative sources need the flm-core constructor
+ *   of upstream request U2, and until it lands images are published without
+ *   `srcset` and the engine's creation warns once.
  *
  * Other options:
  *
@@ -127,14 +150,23 @@ export async function makeStandardZooDb(config)
 
             use_gitlastmodified_processor: null,
 
-            use_flm_environment: null,
+            use_flm_engine: null,
 
             use_flm_processor: null,
             flm_options: {
 
-                environment_options: null,
+                load_wasm: null,
+
+                engine: {
+                    dollar_math: false,
+                    settings: {},
+                    off: [],
+                    render_value_options: null,
+                },
 
                 refs: {},
+                refs_defaults: {},
+                contexts: {},
 
                 citations: {
                     csl_style: null, // CSL style (XML data)
@@ -188,7 +220,7 @@ export async function makeStandardZooDb(config)
             },
 
             zoo_permalinks: null, //{ object:, graphics_resource: }
-            // e.g.  graphics_resource:  (gresource) => `/fig/${gresource.src_url}`,
+            // e.g.  graphics_resource:  (resource_data) => `/fig/${resource_data.src_url}`,
 
             // set schemas: false  to forbid creating a SchemaLoader instance
             schemas: {
@@ -209,16 +241,31 @@ export async function makeStandardZooDb(config)
             `StandardZooDb: The zoo_permalinks: config property is not set`
         );
     }
+    if (_this.config.use_flm_environment != null && _this.config.use_flm_environment !== false) {
+        throw new Error(
+            `StandardZooDb: the config entry use_flm_environment is gone; use use_flm_engine `
+            + `(e.g. use_flm_engine from '@phfaist/zoodb/std/use_flm_engine')`
+        );
+    }
+    if (_this.config.flm_options?.environment_options != null) {
+        throw new Error(
+            `StandardZooDb: flm_options.environment_options is no longer read; the FLM engine `
+            + `takes its configuration as data in flm_options.engine ({ dollar_math, settings, off })`
+        );
+    }
 
     // NOTE! read-only properties, assining to this property won't take
     // effect later on because the property value is used here already in
-    // use_flm_environment().
+    // use_flm_engine() and use_flm_processor().
     _this.zoo_permalinks = Object.assign({}, _this.config.zoo_permalinks);
     _this.zoo_object_permalink = _this.zoo_permalinks.object;
 
-    _this.zoo_flm_environment = null;
-    if (_this.config.use_flm_environment) {
-        _this.zoo_flm_environment = await _this.config.use_flm_environment(_this);
+    _this.flm_error_policy = (_this.config.continue_with_errors ? 'continue' : 'abort');
+    debug(`flm_error_policy = ${_this.flm_error_policy}`);
+
+    _this.zoo_flm_engine = null;
+    if (_this.config.use_flm_engine) {
+        _this.zoo_flm_engine = await _this.config.use_flm_engine(_this);
     }
 
     _this.zoodb_processors = [];
@@ -242,9 +289,6 @@ export async function makeStandardZooDb(config)
     } else {
         _this.zoo_gitlastmodified_processor = null;
     }
-
-    _this.flm_error_policy = (_this.config.continue_with_errors ? 'continue' : 'abort');
-    debug(`flm_error_policy = ${_this.flm_error_policy}`);
 
     //
     // FLM Processor

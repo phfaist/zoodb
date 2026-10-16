@@ -38,6 +38,12 @@ export interface CoreConfig {
     off?: string[] | null;
 }
 
+/** The versions of the module's build: this binding crate's and the `flm-core` version it was built against. */
+export interface CoreVersion {
+    binding: string;
+    flm_core: string;
+}
+
 /** A standard feature and the JSON Schema of its settings (`null`: it takes none). */
 export interface FeatureInfo {
     name: string;
@@ -180,13 +186,33 @@ export interface ScanGraphicsRef {
     origin: string | null;
 }
 
+/** A label a tree defines: its anchor when it is the one the label itself forms (`type-label`, the same in every document; `null` for a point anchored otherwise: on its number, a renumbered title, a collision) and the FLM source of the content the point shows (`null`: none; a single braced group without its braces). */
+export interface ScanLabel {
+    label: string;
+    anchor: string | null;
+    display: string | null;
+}
+
+/** A reference site: the label it points at, and whether it resolved inside the scanned document (the scan installs no external index). */
+export interface ScanRef {
+    label: string;
+    resolved: boolean;
+}
+
+/** A label written for a second point: where the later point is (the origin label of its source, byte offsets into it). */
+export interface ScanDuplicate {
+    label: string;
+    origin: string | null;
+    start: number;
+    end: number;
+}
+
 /** What the scan found in one tree. */
 export interface ScanTree {
-    labels: string[];
-    /** The href of each resolved reference. */
-    refs_resolved: string[];
-    /** The label of each unresolved reference. */
-    refs_unresolved: string[];
+    /** The labels whose point the tree holds, in the order of the points. */
+    labels: ScanLabel[];
+    /** The reference sites of the tree, in tree order. */
+    refs: ScanRef[];
     graphics: ScanGraphicsRef[];
 }
 
@@ -195,7 +221,7 @@ export interface ScanOut {
     trees: ScanTree[];
     /** Cited keys in order of first citation, each with the origin of that citation. */
     cited: [string, string | null][];
-    duplicate_labels: string[];
+    duplicate_labels: ScanDuplicate[];
     standalone_violations: number;
     diagnostics: CoreDiagnostic[];
     has_errors: boolean;
@@ -307,6 +333,11 @@ export class ZooFlmCore {
      */
     truncate(text: string, origin: string, layout: FragmentLayoutName, options: TruncateOptions): TruncateOut;
     /**
+     * The versions of the module's build: `{ binding, flm_core }` (this
+     * crate's version and the `flm-core` version it was built against).
+     */
+    static version(): CoreVersion;
+    /**
      * A new handle for the fragment of `handle` with another layout: the
      * same tree, source and parse diagnostics, not parsed again.
      */
@@ -340,6 +371,7 @@ export interface InitOutput {
     readonly zooflmcore_set_external_index: (a: number, b: any) => [number, number, number];
     readonly zooflmcore_set_graphics: (a: number, b: any) => [number, number];
     readonly zooflmcore_truncate: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: any) => [number, number, number];
+    readonly zooflmcore_version: () => [number, number, number];
     readonly zooflmcore_with_layout: (a: number, b: number, c: number, d: number) => [number, number, number];
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

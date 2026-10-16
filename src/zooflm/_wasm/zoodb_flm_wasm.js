@@ -272,6 +272,18 @@ export class ZooFlmCore {
         return takeFromExternrefTable0(ret[0]);
     }
     /**
+     * The versions of the module's build: `{ binding, flm_core }` (this
+     * crate's version and the `flm-core` version it was built against).
+     * @returns {CoreVersion}
+     */
+    static version() {
+        const ret = wasm.zooflmcore_version();
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return takeFromExternrefTable0(ret[0]);
+    }
+    /**
      * A new handle for the fragment of `handle` with another layout: the
      * same tree, source and parse diagnostics, not parsed again.
      * @param {number} handle

@@ -25,7 +25,7 @@ use crate::zoodb_feature::{FIELD_ELEMENT, FIELD_NAME_ARG, PUBLISH_STAGE, STANDAL
 use flm_core::model::element::element_of;
 use flm_core::core::registry::{DefContent, FlmRegistry, RegistryBuilder, RegistryInputs};
 use flm_core::core::run::{Externals, Run, RunOptions};
-use flm_core::lang::{Flm, FlmDiagnostic, FlmOrigin, FlmParsing, FlmSource, ParseOptions, parse_fragment};
+use flm_core::lang::{Flm, FlmDiagnostic, FlmGroupType, FlmOrigin, FlmParsing, FlmSource, ParseOptions, parse_fragment};
 use flm_core::techy::core::node::{NodeKind, NodeRef};
 use flm_core::model::addr::TreeId;
 use flm_core::model::doc::{Doc, DocContent, Fragment, FragmentLayout};
@@ -45,9 +45,11 @@ use flm_core::core::lowering::chars_at_lowering;
 use flm_core::stdcore::features::graphics::{GraphicsImage, PATH_ARG};
 use flm_core::stdcore::features::index::ELEMENT_INDEX;
 use flm_core::stdcore::features::refs::{
-    EXTERNAL_INDEX, ExternalIndex, ExternalTarget, LABELS, REF_RESOLUTIONS, RefsRenderOptions, Resolution, UnresolvedRefs, value_of,
+    ANCHORS, EXTERNAL_INDEX, ExternalIndex, ExternalTarget, LABELS, REF_RESOLUTIONS, REF_TARGETS, RefsRenderOptions, Resolution, SiteId,
+    UnresolvedRefs, label_anchor, value_of,
 };
-use flm_core::model::aspects::Label;
+use flm_core::model::aspects::{Label, PointId, Referencing};
+use flm_core::techy::core::node::NodeTree;
 use flm_core::core::settings::PackageSettings;
 use flm_core::stdcore;
 use flm_core::lang::structural::PARBREAK;
@@ -273,11 +275,52 @@ pub struct GraphicsRefOut {
     pub origin: Option<String>,
 }
 
+/// A label a tree defines, as the scan found it: what the host needs to
+/// build the external index entry of the label (Q4).
+#[derive(Debug, Clone, Serialize)]
+pub struct ScanLabelOut {
+    /// The label, `type:label`.
+    pub label: String,
+    /// The anchor the scan run gave the point that keeps the label
+    /// (`flm.anchors`) when it is the anchor the label itself forms
+    /// (`label_anchor`: `type-label`, the same in any document); `None` for a
+    /// point anchored otherwise (on its number, as a float, an equation or a
+    /// theorem; on a title slug that was renumbered; after a collision) or
+    /// not at all, whose anchor depends on the document it is rendered in.
+    pub anchor: Option<String>,
+    /// The FLM source of the content the point shows (a heading's title):
+    /// the source text the copied content nodes span, without the braces
+    /// when it is one braced group. `None` for a point with no content (one
+    /// shown by its number alone).
+    pub display: Option<String>,
+}
+
+/// A reference site of a tree: the label it points at, and whether the scan
+/// resolved it (to a point of the scanned document; the scan installs no
+/// external index).
+#[derive(Debug, Clone, Serialize)]
+pub struct ScanRefOut {
+    pub label: String,
+    pub resolved: bool,
+}
+
+/// A label written for a second point: the label and where the later point
+/// is (the origin label of its source and the byte range of its node).
+#[derive(Debug, Clone, Serialize)]
+pub struct ScanDuplicateOut {
+    pub label: String,
+    pub origin: Option<String>,
+    pub start: usize,
+    pub end: usize,
+}
+
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct ScanTreeOut {
-    pub labels: Vec<String>,
-    pub refs_resolved: Vec<String>,
-    pub refs_unresolved: Vec<String>,
+    /// The labels the tree defines (those whose point the tree holds), in
+    /// the order of their points.
+    pub labels: Vec<ScanLabelOut>,
+    /// The reference sites of the tree, in tree order.
+    pub refs: Vec<ScanRefOut>,
     pub graphics: Vec<GraphicsRefOut>,
 }
 
@@ -287,7 +330,8 @@ pub struct ScanOut {
     pub trees: Vec<ScanTreeOut>,
     /// Cited keys in order of first citation, with the origin of that citation.
     pub cited: Vec<(String, Option<String>)>,
-    pub duplicate_labels: Vec<String>,
+    /// The labels written more than once, each with the later point.
+    pub duplicate_labels: Vec<ScanDuplicateOut>,
     /// The number of `zoodb.standalone.violation` diagnostics (Q5).
     pub standalone_violations: usize,
     pub diagnostics: Vec<DiagOut>,
@@ -430,6 +474,32 @@ fn field_of(node: &NodeRef<'_, Flm>, text: &str) -> Result<FieldOut, String> {
         .get(start..end)
         .ok_or_else(|| format!("the body of the field `{name}` (bytes {start}..{end}) is not in the text"))?;
     Ok(FieldOut { name, start, end, text: body.to_string() })
+}
+
+/// The FLM source of a point's display content (a synthesized value copied
+/// out of the document): the source text its root spans, from the first
+/// copied node to the last, or, when the content is one braced group (a
+/// caption argument), the text inside the braces; `None` when it spans
+/// nothing but whitespace.
+fn display_source(content: &NodeTree<Flm>) -> Option<String> {
+    let root = content.root();
+    let children: Vec<NodeRef<'_, Flm>> = root.children().iter().filter(|child| !is_blank(child)).collect();
+    let text = match children.as_slice() {
+        [only] => match only.kind() {
+            NodeKind::Group(data) if matches!(data.group_type, Some(FlmGroupType::Content)) => {
+                let source = only.span().source();
+                let braces = data.open.resolve(source) == "{" && data.close.resolve(source) == "}";
+                let whole = only.span().content();
+                match whole.strip_prefix('{').and_then(|t| t.strip_suffix('}')) {
+                    Some(inner) if braces => inner,
+                    _ => root.span().content(),
+                }
+            }
+            _ => root.span().content(),
+        },
+        _ => root.span().content(),
+    };
+    if text.trim().is_empty() { None } else { Some(text.to_string()) }
 }
 
 impl Engine {
@@ -920,6 +990,8 @@ impl Engine {
                 demands: vec![
                     "flm.citations.keys".into(),
                     "flm.labels".into(),
+                    "flm.anchors".into(),
+                    "flm.refs.targets".into(),
                     "flm.refs.resolutions".into(),
                     "flm.element-index".into(),
                     STANDALONE_CHECKED.into(),
@@ -939,27 +1011,50 @@ impl Engine {
         let index_of: BTreeMap<TreeId, usize> = ids.iter().enumerate().map(|(i, id)| (*id, i)).collect();
         let mut trees: Vec<ScanTreeOut> = ids.iter().map(|_| ScanTreeOut::default()).collect();
         let mut duplicate_labels = Vec::new();
+        let anchors = run.table(ANCHORS).map_err(|e| e.to_string())?;
+        let targets = run.table(REF_TARGETS).map_err(|e| e.to_string())?;
         if let Some(labels) = run.table(LABELS).map_err(|e| e.to_string())? {
+            let mut points: Vec<Vec<(PointId, ScanLabelOut)>> = ids.iter().map(|_| Vec::new()).collect();
             for (label, point) in &labels.by_label {
                 if let Some(&i) = index_of.get(&point.addr.tree) {
-                    trees[i].labels.push(label.to_string());
+                    // Only an anchor the label forms is the same in every
+                    // document (Q4): one formed from a number or a
+                    // renumbered title follows this document's content.
+                    let anchor = anchors
+                        .and_then(|a| a.id(*point))
+                        .filter(|anchor| *anchor == label_anchor(label))
+                        .map(str::to_owned);
+                    let display = targets
+                        .and_then(|t| t.by_label.get(label))
+                        .and_then(|t| t.display.content.as_deref())
+                        .and_then(display_source);
+                    points[i].push((*point, ScanLabelOut { label: label.to_string(), anchor, display }));
                 }
             }
-            duplicate_labels.extend(labels.duplicates.iter().map(|d| d.label.to_string()));
-        }
-        if let Some(resolutions) = run.table(REF_RESOLUTIONS).map_err(|e| e.to_string())? {
-            for (site, resolution) in &resolutions.sites {
-                if let Some(&i) = index_of.get(&site.addr.tree) {
-                    match resolution {
-                        Resolution::Resolved { href, .. } => trees[i].refs_resolved.push(href.clone()),
-                        Resolution::Unresolved { target } => trees[i].refs_unresolved.push(target.to_string()),
-                    }
-                }
+            for (tree, mut list) in trees.iter_mut().zip(points) {
+                list.sort_by(|(a, la), (b, lb)| a.cmp(b).then_with(|| la.label.cmp(&lb.label)));
+                tree.labels = list.into_iter().map(|(_, l)| l).collect();
             }
+            duplicate_labels.extend(labels.duplicates.iter().map(|d| ScanDuplicateOut {
+                label: d.label.to_string(),
+                origin: d.span.source().origin().label().map(|label| label.into_owned()),
+                start: d.span.start(),
+                end: d.span.end(),
+            }));
         }
+        let resolutions = run.table(REF_RESOLUTIONS).map_err(|e| e.to_string())?;
         if let Some(index) = run.table(ELEMENT_INDEX).map_err(|e| e.to_string())? {
             for (i, (&h, id)) in handles.iter().zip(ids.iter()).enumerate() {
                 let tree = self.fragment(h)?.tree();
+                // The sites as the resolve stage walks them (the nodes whose
+                // element declares reference sites), each with its target.
+                for (addr, node, referencing) in index.nodes_with::<dyn Referencing>(&self.registry, *id, tree) {
+                    for (k, site) in referencing.sites(&node).into_iter().enumerate() {
+                        let key = SiteId { addr, index: u32::try_from(k).unwrap_or(u32::MAX) };
+                        let resolved = matches!(resolutions.and_then(|r| r.site(key)), Some(Resolution::Resolved { .. }));
+                        trees[i].refs.push(ScanRefOut { label: site.target.to_string(), resolved });
+                    }
+                }
                 for (_, node, _) in index.values_of::<GraphicsImage>(*id, tree) {
                     // The path as written, when it is characters (as the
                     // inspect stage and the image rules read it).
@@ -1010,8 +1105,11 @@ mod tests {
         assert_eq!(scan.cited.len(), 1);
         let scan_ids: Vec<&str> = scan.diagnostics.iter().map(|d| d.identifier.as_str()).collect();
         assert!(!scan_ids.iter().any(|id| id.starts_with("flm.citations.")), "{scan_ids:?}");
-        assert_eq!(scan.trees[1].labels, vec!["figure:x"]);
-        assert_eq!(scan.trees[0].refs_unresolved, vec!["person:bob"]);
+        let labels: Vec<&str> = scan.trees[1].labels.iter().map(|l| l.label.as_str()).collect();
+        assert_eq!(labels, vec!["figure:x"]);
+        let refs = |i: usize| -> Vec<(String, bool)> { scan.trees[i].refs.iter().map(|r| (r.label.clone(), r.resolved)).collect() };
+        assert_eq!(refs(0), vec![(String::from("person:bob"), false)]);
+        assert_eq!(refs(1), vec![(String::from("figure:x"), true)]);
         assert_eq!(scan.trees[1].graphics.len(), 1);
         assert_eq!(scan.trees[1].graphics[0].path, "images/Smiley");
         assert_eq!(scan.trees[1].graphics[0].origin.as_deref(), Some("a.yml#biography"));
@@ -1292,6 +1390,49 @@ mod tests {
         // Not marked standalone: nothing reported.
         let scan2 = engine.scan(&[bad.handle], &[]).unwrap();
         assert_eq!(scan2.standalone_violations, 0);
+    }
+
+    /// Q4: per label, the anchor and the display source the external index
+    /// entries are built from; per tree, the references as labels; the
+    /// duplicate labels with the later point.
+    #[test]
+    fn the_scan_reports_labels_with_anchors_and_displays_and_references_as_labels() {
+        let mut engine = Engine::new(&EngineConfig::default()).unwrap();
+        let a = engine
+            .parse(
+                "\\section{Intro \\emph{x}}\\label{sec:intro}\n\nText \\begin{equation}x\\label{eq:x}\\end{equation}\n\n\\begin{figure}\\includegraphics{a}\\caption{Cap}\\label{figure:f}\\end{figure}",
+                "a.yml#d",
+                FragmentLayout::InlineOrBlocks,
+            )
+            .unwrap();
+        let b = engine
+            .parse(
+                "B \\begin{equation}y\\label{eq:x}\\end{equation} see \\ref{eq:x}, \\hyperref[sec:intro]{here} and \\ref{person:z}",
+                "b.yml#d",
+                FragmentLayout::InlineOrBlocks,
+            )
+            .unwrap();
+        let scan = engine.scan(&[a.handle, b.handle], &[]).unwrap();
+        let label = |l: &str| scan.trees[0].labels.iter().find(|x| x.label == l).cloned().unwrap();
+        let intro = label("sec:intro");
+        assert_eq!(intro.anchor.as_deref(), Some("sec-intro"));
+        assert_eq!(intro.display.as_deref(), Some("Intro \\emph{x}"));
+        let eq = label("eq:x");
+        assert_eq!(eq.anchor.as_deref(), Some("eq-x"));
+        assert_eq!(eq.display, None);
+        // A float is anchored on its number, which follows the scanned
+        // document's numbering: no anchor reported. Its display is its
+        // caption argument, without the braces.
+        let figure = label("figure:f");
+        assert_eq!(figure.anchor, None);
+        assert_eq!(figure.display.as_deref(), Some("Cap"));
+        assert!(scan.trees[1].labels.is_empty(), "{:?}", scan.trees[1].labels);
+        let refs: Vec<(&str, bool)> = scan.trees[1].refs.iter().map(|r| (r.label.as_str(), r.resolved)).collect();
+        assert_eq!(refs, vec![("eq:x", true), ("sec:intro", true), ("person:z", false)]);
+        assert_eq!(scan.duplicate_labels.len(), 1);
+        let dup = &scan.duplicate_labels[0];
+        assert_eq!((dup.label.as_str(), dup.origin.as_deref()), ("eq:x", Some("b.yml#d")));
+        assert!(dup.start < dup.end && dup.end <= "B \\begin{equation}y\\label{eq:x}\\end{equation}".len(), "{dup:?}");
     }
 
     /// Q16: the fields of an FLM data file, with their verbatim bodies.

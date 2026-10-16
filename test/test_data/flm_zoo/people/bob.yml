@@ -1,0 +1,14 @@
+person_id: bob
+
+name: 'Bob \(B_0\)'
+
+biography: |
+  Bob is a friend of \ref{person:alice}, whose early life is told in
+  \ref{sec:alice-early}.\footnote{Bob says so.}  He likes \ref{topic:drawing}
+  (\ref{sec:drawing-basics}) and cites \cite{custom:xyz}.
+
+  \begin{figure}
+    \includegraphics{images/dot}
+    \caption{Bob's dot, after \cite{custom:xyz}.}
+    \label{figure:bob-dot}
+  \end{figure}

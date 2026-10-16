@@ -55,6 +55,56 @@ function trim_text(text)
     return text.replace(/\n+$/, '');
 }
 
+/**
+ * A 64-bit hash of a string, as 16 hexadecimal digits: the two 32-bit lanes
+ * of cyrb53 over the string's UTF-16 code units. Not cryptographic; the engine
+ * uses it to tell configurations and sources apart (the ``settings_hash``, the
+ * sources of the dumped snippets).
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+export function text_hash(text)
+{
+    let h1 = 0xdeadbeef;
+    let h2 = 0x41c6ce57;
+    for (let i = 0; i < text.length; ++i) {
+        const c = text.charCodeAt(i);
+        h1 = Math.imul(h1 ^ c, 2654435761);
+        h2 = Math.imul(h2 ^ c, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    const hex = (h) => (h >>> 0).toString(16).padStart(8, '0');
+    return hex(h2) + hex(h1);
+}
+
+// JSON with the keys of every object sorted (`undefined` left out, as
+// JSON.stringify does), so that equal data gives equal text.
+function canonical_json(value)
+{
+    if (Array.isArray(value)) {
+        return '[' + value.map( (v) => (v === undefined) ? 'null' : canonical_json(v) ).join(',') + ']';
+    }
+    if (value !== null && typeof value === 'object') {
+        const keys = Object.keys(value).filter( (k) => value[k] !== undefined ).sort();
+        return '{' + keys.map( (k) => `${JSON.stringify(k)}:${canonical_json(value[k])}` ).join(',') + '}';
+    }
+    return JSON.stringify(value) ?? 'null';
+}
+
+// The core configuration with the defaults of its four keys filled in (`null`
+// and a missing key take the default, as the core reads them), `off` sorted.
+function normalized_core_config(core)
+{
+    const c = { ...(core ?? {}) };
+    c.dollar_math = Boolean(c.dollar_math ?? false);
+    c.srcset = c.srcset ?? null;
+    c.settings = c.settings ?? {};
+    c.off = [...(c.off ?? [])].sort();
+    return c;
+}
+
 // A label of the index: `TYPE:ID`, both parts non-empty once trimmed (as
 // flm-core's `Label::parse` reads it).
 function is_index_label(label)
@@ -114,6 +164,8 @@ export class ZooFlmEngine
         const ns = await ZooFlmEngine._load(load_wasm);
         const engine = new ZooFlmEngine({
             core: new ns.ZooFlmCore(core ?? {}),
+            core_config: core,
+            core_version: ns.ZooFlmCore.version(),
             error_policy, unresolved, render_value_options,
         });
         try {
@@ -155,10 +207,22 @@ export class ZooFlmEngine
      *
      * @param {object} options
      */
-    constructor({ core, error_policy = 'abort', unresolved = 'error', render_value_options = null })
+    constructor({
+        core, core_config = null, core_version = null, error_policy = 'abort', unresolved = 'error',
+        render_value_options = null,
+    })
     {
         this.__core = core;
         this._freed = false;
+        // The core configuration as given and the module's versions (for the
+        // settings hash).
+        this._core_config = normalized_core_config(core_config);
+        this._core_version = Object.freeze({ ...(core_version ?? {}) });
+        this._settings_hash = null;
+        // From a loaded dump: origin label -> the snippets of a standalone
+        // fragment (`{ layout, source_hash, html, requires, text }`), given
+        // to the fragments made later with that label, layout and source.
+        this._loaded_snippets = new Map();
         this._error_policy = check_error_policy(error_policy);
         this._unresolved = check_unresolved(unresolved);
         this._render_value_options = Object.freeze({
@@ -196,6 +260,36 @@ export class ZooFlmEngine
 
     /** The default render value options of :js:meth:`render_document`. */
     get render_value_options() { return this._render_value_options; }
+
+    /**
+     * The versions of the module the engine runs: ``{ binding, flm_core }``
+     * (``ZooFlmCore.version()``).
+     *
+     * @returns {object}
+     */
+    get core_version()
+    {
+        return this._core_version;
+    }
+
+    /**
+     * The hash of the core configuration the engine was created with
+     * (``dollar_math``, ``srcset``, ``settings``, ``off``; a missing key and
+     * ``null`` count as the default) and of the module's versions
+     * (:js:attr:`core_version`): two engines with the same hash read and
+     * render FLM alike. A dump (:js:meth:`dump`) carries it, and
+     * :js:meth:`load` refuses a dump made under another configuration or by
+     * another build of the module.
+     *
+     * @returns {string}
+     */
+    get settings_hash()
+    {
+        this._settings_hash ??= text_hash(canonical_json({
+            core: this._core_config, version: this._core_version,
+        }));
+        return this._settings_hash;
+    }
 
     /**
      * The wasm core (``ZooFlmCore``), for what the engine does not wrap
@@ -330,6 +424,9 @@ export class ZooFlmEngine
             handle: parsed.handle, diagnostics, empty: parsed.empty,
         });
         this._fragment_of_handle.set(fragment.handle, fragment);
+        if (standalone && this._loaded_snippets.size > 0) {
+            this._apply_loaded_snippets(fragment);
+        }
         const same_label = this._fragments_of_label.get(fragment_origin.label);
         if (same_label != null) {
             same_label.push(fragment);
@@ -382,6 +479,32 @@ export class ZooFlmEngine
     {
         this._live();
         return this._fragment_of_handle.get(handle) ?? null;
+    }
+
+    /**
+     * Whether ``text`` is valid FLM: it parses (inline) with no Error
+     * diagnostic. Nothing is kept. The citation compiler asks it of the
+     * chunks of text the CSL formatter produces
+     * (:js:func:`install_csl_flm_output_format`).
+     *
+     * @param {string} text
+     * @returns {boolean}
+     */
+    parses(text)
+    {
+        this._live();
+        if (typeof text !== 'string') {
+            throw new TypeError(`parses(): the text must be a string, not ${typeof text}`);
+        }
+        let parsed;
+        try {
+            parsed = this._core.parse(text, 'parses', 'inline');
+        } catch {
+            // the core refused the text (a parse that aborts)
+            return false;
+        }
+        this._core.release([parsed.handle]);
+        return !parsed.diagnostics.some( (d) => d.severity === 'error' );
     }
 
     /** The handle of ``f`` with the given layout: its own, or a sibling sharing the tree. */
@@ -1044,23 +1167,144 @@ export class ZooFlmEngine
         };
     }
 
+    // --- dump and load -----------------------------------------------------------------
+
+    /**
+     * The engine's data for a browser app (Q13): ``{ settings_hash, index: {
+     * CONTEXT: [{ label, href, display }] }, citations: [{ key, text }],
+     * graphics: [entry], snippets: [{ label, layout, source_hash, html,
+     * requires, text }] }``, plain data (JSON-serializable). An index
+     * display is its FLM source (a fragment's ``source``). ``snippets`` holds
+     * the cached snippets of the live standalone fragments, one per origin
+     * label (the oldest fragment with the label that is not a truncated
+     * preview and has a snippet cached), ``html`` and ``text`` ``null``
+     * when not cached, ``requires`` the html snippet's definitions;
+     * ``source_hash`` (:js:func:`text_hash` of the source) and ``layout``
+     * tell :js:meth:`load` which later fragments the snippets are valid for.
+     *
+     * @returns {object}
+     */
+    dump()
+    {
+        this._live();
+        const index = {};
+        for (const [context, { entries }] of this._index) {
+            index[context] = entries.map( (e) => ({
+                label: e.label, href: e.href, display: is_fragment(e.display) ? e.display.source : e.display,
+            }) );
+        }
+        const snippets = [];
+        for (const [label, fragments] of this._fragments_of_label) {
+            const f = fragments.find( (x) => x.standalone && x.origin.truncated !== true && x._snippets.size > 0 );
+            if (f == null) {
+                continue;
+            }
+            const html = f._snippets.get('html') ?? null;
+            const text = f._snippets.get('text') ?? null;
+            snippets.push({
+                label, layout: f.layout, source_hash: text_hash(f.source),
+                html: html?.value ?? null, requires: [...(html?.requires ?? [])], text: text?.value ?? null,
+            });
+        }
+        return {
+            settings_hash: this.settings_hash,
+            index,
+            citations: this._citations.map( (c) => ({ ...c }) ),
+            graphics: this._graphics.map( (g) => ({ ...g }) ),
+            snippets,
+        };
+    }
+
+    /**
+     * Installs the data of a dump (:js:meth:`dump`): the citations and
+     * graphics tables, the index of every context (``default`` installed
+     * last), and the snippets, which go to the cache of the standalone
+     * fragments made later (or held already) with the same origin label,
+     * layout and source. A dump made under another core configuration (its
+     * ``settings_hash`` differs from the engine's) is refused with a plain
+     * ``Error``.
+     *
+     * @param {object} dump
+     * @param {object} [options]
+     * @param {string} [options.error_policy] - applied to the diagnostics of
+     *     the index displays (:js:meth:`set_index`)
+     * @returns {{diagnostics: object[], has_errors: boolean}}
+     */
+    load(dump, { error_policy = null } = {})
+    {
+        this._live();
+        if (dump == null || typeof dump !== 'object') {
+            throw new TypeError(`load(): expected the object dump() returns, got ${(dump === null) ? 'null' : typeof dump}`);
+        }
+        if (dump.settings_hash !== this.settings_hash) {
+            throw new Error(`load(): the dump was made under another core configuration or by another build `
+                            + `of the module (settings hash ${dump.settings_hash} instead of this engine's `
+                            + `${this.settings_hash})`);
+        }
+        this.set_citations(dump.citations ?? []);
+        this.set_graphics(dump.graphics ?? []);
+        const contexts = Object.keys(dump.index ?? {});
+        contexts.sort( (a, b) => (a === DEFAULT_CONTEXT) - (b === DEFAULT_CONTEXT) );
+        const diagnostics = [];
+        for (const context of contexts) {
+            diagnostics.push(...this.set_index(dump.index[context], { context, error_policy }).diagnostics);
+        }
+        this._loaded_snippets = new Map((dump.snippets ?? []).map( (sn) => [sn.label, sn] ));
+        for (const [label, fragments] of this._fragments_of_label) {
+            if (this._loaded_snippets.has(label)) {
+                fragments.filter( (f) => f.standalone ).forEach( (f) => this._apply_loaded_snippets(f) );
+            }
+        }
+        return { diagnostics, has_errors: has_errors(diagnostics) };
+    }
+
+    // Fills the snippet cache of a standalone fragment from the loaded dump,
+    // when the dump holds snippets for its label, layout and source.
+    _apply_loaded_snippets(f)
+    {
+        const loaded = this._loaded_snippets.get(f.origin.label);
+        if (loaded == null || f.origin.truncated === true || loaded.layout !== f.layout
+            || loaded.source_hash !== text_hash(f.source)) {
+            return;
+        }
+        const entry = (output, value, requires) => Object.freeze({
+            output, value, requires: Object.freeze([...requires]), diagnostics: Object.freeze([]),
+        });
+        if (loaded.html != null) {
+            f._snippets.set('html', entry('html', loaded.html, loaded.requires ?? []));
+        }
+        if (loaded.text != null) {
+            f._snippets.set('text', entry('text', loaded.text, []));
+        }
+    }
+
     // --- scan and truncation -----------------------------------------------------------
 
     /**
      * Scans fragments as one document (no index installed, nothing retrieved,
-     * resolved or output): per fragment the labels, the references
-     * resolved (their hrefs) and unresolved (their labels), the images; the
-     * cited keys; the duplicate labels; the standalone check over the
-     * standalone fragments.
+     * resolved or output): per fragment the labels it defines, each with the
+     * anchor the scan gave its point and the FLM source of the content the
+     * point shows (``display``, ``null`` for a point shown by its number
+     * alone), the references it makes (their labels, and whether they
+     * resolved inside the scanned fragments), the images; the cited keys; the
+     * labels written more than once, each with the later point; the
+     * standalone check over the standalone fragments.
+     *
+     * An anchor is the scanned document's: one formed from a label
+     * (``sec-intro``, ``eq-x``) is the same in any document, one formed from
+     * a number (a float: ``figure-3``) follows the scanned document's
+     * numbering.
      *
      * @param {Iterable<ZooFlmFragment>} fragments
      * @param {object} [options]
      * @param {string} [options.error_policy]
-     * @returns {object} ``{ trees: [{ fragment, labels, refs_resolved,
-     *     refs_unresolved, graphics: [{ path, origin }] }], cited: [{ key,
-     *     origin, fragment }], duplicate_labels, standalone_violations,
+     * @returns {object} ``{ trees: [{ fragment, labels: [{ label, anchor,
+     *     display }], refs: [{ label, resolved }], graphics: [{ path, origin
+     *     }] }], cited: [{ key, origin, fragment }], duplicate_labels: [{
+     *     label, origin, fragment, start, end }], standalone_violations,
      *     diagnostics, has_errors }``, ``origin`` the canonical label (the
-     *     graphics table's key)
+     *     graphics table's key), ``start``/``end`` byte offsets into the
+     *     source of the later point
      */
     scan(fragments, { error_policy = null } = {})
     {
@@ -1073,12 +1317,11 @@ export class ZooFlmEngine
         const by_label = new Map(list.map( (f) => [f.origin.label, f] ));
         const diagnostics = this._map(out.diagnostics, list);
         const has_errors = apply_error_policy(diagnostics, policy);
+        const fragment_of = (origin) => (origin != null) ? (by_label.get(origin) ?? null) : null;
         return {
             trees: out.trees.map( (t, i) => ({ fragment: list[i], ...t }) ),
-            cited: out.cited.map( ([key, origin]) => ({
-                key, origin, fragment: (origin != null) ? (by_label.get(origin) ?? null) : null,
-            }) ),
-            duplicate_labels: out.duplicate_labels,
+            cited: out.cited.map( ([key, origin]) => ({ key, origin, fragment: fragment_of(origin) }) ),
+            duplicate_labels: out.duplicate_labels.map( (d) => ({ ...d, fragment: fragment_of(d.origin) }) ),
             standalone_violations: out.standalone_violations,
             diagnostics,
             has_errors,

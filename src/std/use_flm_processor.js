@@ -1,7 +1,7 @@
 // import debug_mod from 'debug';
 // const debug = debug_mod("eczoodbjs.use_flm_processor");
 
-import { ZooFLMProcessor } from '../dbprocessor/flmprocessor.js';
+import { ZooFlmProcessor } from '../dbprocessor/flmprocessor.js';
 
 import { CitationSourceArxiv } from '../citationmanager/source/arxiv.js';
 import { CitationSourceDoi } from '../citationmanager/source/doi.js';
@@ -41,10 +41,9 @@ const default_make_resource_retriever_graphics_path =
 ;
 
 const default_make_resource_processors_graphics_path =
-      (flm_options_resources, {fs, /*fs_data_dir,*/ _this}) => {
+      (flm_options_resources, {fs, /*fs_data_dir, _this*/}) => {
           return [
               new FLMGraphicsResourceProcessor({
-                  zoo_flm_environment: _this.zoo_flm_environment,
                   fs,
                   global_vector_scale: flm_options_resources?.global_vector_scale,
                   global_raster_scale: flm_options_resources?.global_raster_scale,
@@ -195,14 +194,29 @@ export function make_citation_sources(citations_options, { fs, fs_data_dir })
 
 
 /**
- * Factory function that creates and configures a :class:`ZooFLMProcessor` for
- * use with :func:`makeStandardZooDb`.
+ * Factory function that creates and configures a :class:`ZooFlmProcessor` for
+ * use with :func:`makeStandardZooDb`, over the zoo's FLM engine
+ * (`_this.zoo_flm_engine`, from :func:`use_flm_engine`).
+ *
+ * The processor's index has the context ``default``, whose object hrefs are
+ * the config's ``zoo_permalinks.object(object_type, object_id)``; the address
+ * of a collected image is ``zoo_permalinks.graphics_resource(resource_data)``
+ * (``resource_data.src_url`` is the target name the retriever gave the file;
+ * see :class:`ZooFlmProcessor`).
  *
  * Reads the following properties from `_this.config.flm_options` (the
  * `flm_options` key of the config passed to `makeStandardZooDb`):
  *
- * - `refs` — object forwarded to the :class:`ZooFLMProcessor` constructor's
- *   `refs` option.
+ * - `refs` — object forwarded to the :class:`ZooFlmProcessor` constructor's
+ *   `refs` option (per object type, ``formatted_ref_flm_text_fn(object_id,
+ *   object)`` returns the display of a reference to the object: a
+ *   standalone fragment or FLM text).
+ * - `refs_defaults` — forwarded as the processor's `refs_defaults` option.
+ * - `contexts` — further output contexts of the index, ``{ NAME: {
+ *   object_href(object_type, object_id) } }`` (``default`` is built from
+ *   ``zoo_permalinks.object`` unless given here).
+ * - `allow_unresolved_citations` — a cited key without a compiled citation
+ *   shows as verbatim text.
  * - `citations.csl_style` — CSL style XML string for the citation formatter.
  * - `citations.override_arxiv_dois_file` — path to a file that overrides
  *   arXiv-to-DOI mappings, relative to `fs_data_dir`.  Shortcut for
@@ -264,19 +278,27 @@ export function make_citation_sources(citations_options, { fs, fs_data_dir })
  *   graphics retriever factory.
  * - `resources.make_resource_processors_graphics_path` — override the entire
  *   graphics processor factory.
+ * - `resources.global_vector_scale` / `resources.global_raster_scale` — the
+ *   scale factors of the physical size of vector and raster images (see
+ *   :class:`FLMGraphicsResourceProcessor`).
  * - `skip_check_update_existing_citations` / `skip_check_update_existing_resources`
- *   — forwarded to the :class:`ZooFLMProcessor` constructor.
+ *   — forwarded to the :class:`ZooFlmProcessor` constructor.
  *
- * Requires `_this.zoo_flm_environment` to be already set (i.e.,
- * `use_flm_environment` must run before `use_flm_processor`).
+ * The error policy is `_this.flm_error_policy` (``continue_with_errors``).
+ *
+ * Requires `_this.zoo_flm_engine` to be already set (i.e., `use_flm_engine`
+ * must be configured).
  *
  * @param {Object} _this - The internal state object from `makeStandardZooDb`.
- * @returns {Promise<ZooFLMProcessor>} The configured FLM processor instance.
+ * @returns {Promise<ZooFlmProcessor>} The configured FLM processor instance.
  */
 export async function use_flm_processor(_this)
 {
-    if (_this.zoo_flm_environment == null) {
-        throw new Error(`Cannot use ‘use_flm_processor()’ with no zoo_flm_environment set.`);
+    if (_this.zoo_flm_engine == null) {
+        throw new Error(
+            `Cannot use ‘use_flm_processor()’ with no FLM engine (zoo_flm_engine) set; `
+            + `configure use_flm_engine.`
+        );
     }
 
     const flm_options = _this.config.flm_options ?? {};
@@ -304,10 +326,22 @@ export async function use_flm_processor(_this)
         { fs, fs_data_dir }
     );
 
+    // called as a method of the config's permalinks object
+    const permalinks = _this.config.zoo_permalinks;
+
     let flm_processor_config = {
-        zoo_flm_environment: _this.zoo_flm_environment,
-        flm_error_policy: _this.flm_error_policy,
+        engine: _this.zoo_flm_engine,
+        error_policy: _this.flm_error_policy,
         refs: flm_options.refs ?? {},
+        refs_defaults: flm_options.refs_defaults ?? {},
+        contexts: {
+            default: { object_href: _this.zoo_object_permalink },
+            ...(flm_options.contexts ?? {}),
+        },
+        graphics_address: (typeof permalinks?.graphics_resource === 'function')
+            ? (resource_data) => permalinks.graphics_resource(resource_data)
+            : null,
+        allow_unresolved_citations: flm_options.allow_unresolved_citations ?? false,
         citations: {
             sources: citation_sources,
             default_user_agent:
@@ -344,7 +378,7 @@ export async function use_flm_processor(_this)
             flm_options.skip_check_update_existing_resources,
     };
 
-    let zoo_flm_processor = new ZooFLMProcessor(flm_processor_config);
+    let zoo_flm_processor = new ZooFlmProcessor(flm_processor_config);
 
     return zoo_flm_processor;
 }
