@@ -78,13 +78,29 @@ and for the front matter's fields through the YAML document API. The fixtures of
 
 ## C. The `zoodb-example` port (06 L)
 
-`../zoodb-example` is read-only for this work (ruling). The port is therefore produced as
-a set of files in this repository, `dev-docs/initial-design/zoodb-example-port/`, mirroring
-the paths of the example (`peopledbjs/myzoodb.js`, `website/src/person/person.11ty.js`,
-`website/src/index.11ty.js`, `website/src/dynamic_style/flm.css.11ty.js`, `package.json`'s
-dependency line), with a `README.md` saying how to apply them, unless Philippe authorizes
-edits in `../zoodb-example` on a branch (open question for him, raised 2026-10-16). The
-port:
+Ruling (Philippe, 2026-10-17): the port is made in a clone of the example inside the
+worktree's scratch folder, on a branch of its own. `../zoodb-example` stays read-only.
+
+- Clone `git+ssh://github.com/phfaist/zoodb-example.git` into `scratch/zoodb-example/`
+  (the worktree's `scratch/.gitignore` gets the entry `zoodb-example/` first, so that the
+  nested repository never shows in this repository's status) and create the branch
+  `zoodb-flmrs` there from its default branch. All edits of the example go on that
+  branch; commit there with the same trailers as in this repository (Co-Authored-By and
+  Claude-Session lines); do not push.
+- The example's dependency on `@phfaist/zoodb` points at this worktree for the build
+  check (`yarn link`, or a `file:` or `portal:` dependency on the worktree path in the
+  clone's `package.json`, whichever the example's Yarn setup takes; the committed
+  `package.json` of the clone keeps the published dependency form, the local link is
+  applied only for the check and reverted, or done through `resolutions` in a way that
+  the Results document).
+- The verification of the port is the example's own build: `yarn install` in the clone,
+  then its site build (`website/`; read its `package.json` and README for the commands,
+  Eleventy with Parcel), writing into the clone's output folder. Every person page and
+  the index must build with no FLM diagnostic; the pages are checked against the counts of
+  07 milestone 1 (every marker substituted, the links, Alice's image present, the
+  bibliography on Bob's page) and the stylesheet page must hold the engine's CSS.
+
+The port itself:
 
 - `peopledbjs/myzoodb.js`: `use_flm_environment` → `use_flm_engine`; `flm_options.load_wasm:
   load_zoodb_flm_wasm_node` (from `@phfaist/zoodb/zooflm/wasm-node`); the commented
@@ -99,12 +115,10 @@ port:
 - `website/src/dynamic_style/flm.css.11ty.js`: `zoodb.zoo_flm_engine.html_stylesheet()`.
 - `website/src/dat/zoodbdata.11ty.js` (the dump: `data.zooflm` replaces `refs_data`; the
   file passes the dump through unchanged), `pic/pic.11ty.js`, the search index: unchanged.
-- Verification: a script `scratch/proto/js/build_example.mjs` that loads the example's zoo
-  through the ported `myzoodb.js` (copied into the scratch folder, pointed at the example's
-  data and schemas, read-only) with the worktree's `@phfaist/zoodb` and renders every
-  person page and the index through the ported templates' logic, writing the pages to an
-  ignored output folder; the pages are compared by eye and by the counts of 07
-  milestone 1 (every marker substituted, the links and the image present).
+- The example's `package.json`: the `@phfaist/zoodb` version range raised to the new
+  minor (`^0.3.0`, see 12) once the package version is bumped; Node 18 is no longer
+  enough for the FLM module loader if the example's README says so (check the README's
+  Node requirement against what the loaders need and adjust the README).
 
 ## Files
 
@@ -123,10 +137,12 @@ port:
 | `test/test_tools_reindent_yaml.js` | A.4 |
 | `test/test_zooflm_engine.js` | one diagnostic with `file_line` through a `literal` position and one `approx` |
 | `CLAUDE.md`, `doc/zoodb.dbdataloader.rst` | the loaders' paragraphs (`doc/` otherwise step 5) |
+| `scratch/.gitignore` | `zoodb-example/` (the clone) |
+| `scratch/zoodb-example/` (branch `zoodb-flmrs` of the clone) | the port, committed there |
 
 ## Checks before handing back
 
-`yarn test`, `yarn lint` (no new error), the example build script, `git status --short`.
+`yarn test`, `yarn lint` (no new error), the example's site build in the clone, `git status --short` here and in the clone.
 
 ## Results
 

@@ -108,7 +108,7 @@ marker composer (Q12), the code-graph dump and truncation (Q13, R18), the previe
 in-browser processor (R12), the `quote` feature (stdcore has one), the data re-indent
 (Q15), the three duplicate labels (Q12).
 
-## L. `zoodb-example` (read-only here; the first downstream port)
+## L. `zoodb-example` (the first downstream port; `../zoodb-example` is read-only, the port is made on the branch `zoodb-flmrs` of a clone under `scratch/zoodb-example/`, ruling of 2026-10-17)
 
 | file | change |
 |---|---|
