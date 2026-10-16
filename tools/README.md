@@ -1,7 +1,9 @@
 # Repository tools
 
-ESM scripts for Node.js (they import only `node:` builtins and files of this
-repository).
+ESM scripts for Node.js. They import `node:` builtins and files of this
+repository, and `reindent_yaml.mjs` also the package dependency `yaml`: in
+this repository (Yarn PnP), run that one through yarn (`yarn node
+tools/reindent_yaml.mjs ...`); the others also run as `node tools/<name>.mjs`.
 
 ## `build_wasm.mjs`
 
@@ -98,3 +100,37 @@ replaced atomically, and only if some entry was added or updated;
 single pass over each file, so caches of tens of thousands of entries merge in
 well under a second. Exit status: 0 on success, 1 on a usage error, 2 on an
 error reading or writing the cache.
+
+## `reindent_yaml.mjs`
+
+Usage: `zoodb-reindent-yaml <file-or-dir>... [--dry-run] [--indent N]`
+
+Re-indents the continuation lines of the quoted YAML values that YAML 1.2
+refuses and `js-yaml` (used by ZooDb before 0.3) accepted: a single- or
+double-quoted value continued on lines that are not indented more than its
+key (or than the `-` of its list item). The loaders of ZooDb (the `yaml`
+package since 0.3) refuse such a file with the message "a quoted value that
+continues on the next line must be indented more than the key; run
+`zoodb-reindent-yaml` on the file" at the value's opening quote; run e.g.
+`yarn zoodb-reindent-yaml codes/` once on the data (it is a package `bin`;
+in this repository, `yarn node tools/reindent_yaml.mjs ...`). Every `.yml`
+and `.yaml` file given or found in the directories given (hidden directories,
+`node_modules` and symbolic links to files or directories skipped while
+walking a directory; a link given on the command line is followed) is parsed
+with `yaml`; each value the parser refuses for this reason has its
+continuation lines that are indented no more than the key's column
+re-indented to `--indent` columns (default 2) beyond the key's column; nothing
+else changes (only those lines' leading whitespace).
+Each file changed is verified before it is written: the re-indented text must
+parse, and its data must equal that of the original in which each re-indented
+value is replaced by its lenient reading (the source between the quotes folded
+as YAML folds a quoted value, whatever the indentation: what `js-yaml` read,
+except a space ending a line before a fold, which `js-yaml` kept and the
+specification drops). The tool prints the files changed (with `--dry-run`,
+the files that would change, and nothing is written) and a summary line. A
+file with another YAML error, or whose value cannot be re-indented or
+verified, is reported and left unchanged. Checked on a copy of the EC zoo's
+data: 191 values in 127 files re-indented in under 2 seconds, after which all
+its files load. Exit status: 0 on success, 1 on a usage error, 2 when a file
+could not be fixed (or read or written); an unexpected exception (a bug) ends
+the tool with node's default status 1, the same as a usage error.

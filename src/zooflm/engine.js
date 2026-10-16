@@ -128,9 +128,9 @@ function is_index_label(label)
  * ``render_latex`` take both; ``make_fragment``, ``set_index``,
  * ``render_snippets``, ``scan`` and ``truncate`` take ``error_policy`` only;
  * ``snippet`` and ``snippet_of_text`` take neither (the engine's defaults
- * apply). A wrong argument, a released fragment, a freed engine or an error
- * of the core itself is thrown as a plain ``Error``, never returned as
- * content.
+ * apply); ``parse_fields`` returns its diagnostics and applies no policy. A
+ * wrong argument, a released fragment, a freed engine or an error of the
+ * core itself is thrown as a plain ``Error``, never returned as content.
  */
 export class ZooFlmEngine
 {
@@ -293,8 +293,8 @@ export class ZooFlmEngine
 
     /**
      * The wasm core (``ZooFlmCore``), for what the engine does not wrap
-     * (``parse_fields``, the counters). Handles the engine holds are not to be
-     * released through it.
+     * (the counters). Handles the engine holds are not to be released
+     * through it.
      */
     get core() { return this._core; }
 
@@ -505,6 +505,45 @@ export class ZooFlmEngine
         }
         this._core.release([parsed.handle]);
         return !parsed.diagnostics.some( (d) => d.severity === 'error' );
+    }
+
+    /**
+     * Reads the fields of an FLM data file (Q16): the ``\begin{field}{NAME}
+     * … \end{field}`` blocks of ``text``, parsed by the core with the
+     * registry's language, the bodies verbatim. Nothing is kept. Content
+     * outside the blocks other than whitespace and ``%%`` comments is the
+     * Error ``zoodb.fields.stray-content`` (one per line); an unclosed block
+     * is the parser's Error (``core.environments.missing-terminator``). The
+     * FLM-files loader (:js:class:`FlmFilesDbDataLoader`) calls it on the
+     * file's body.
+     *
+     * @param {string} text - the text holding the blocks (a file's body)
+     * @param {object} [options]
+     * @param {object|string} [options.origin] - as for :js:meth:`make_fragment`:
+     *     the diagnostics' origin; ``start_line`` and ``start_col`` say where
+     *     ``text`` starts in its file (the diagnostics then carry
+     *     ``file_line`` and ``file_col``)
+     * @returns {{fields: object[], diagnostics: object[]}} ``fields`` in the
+     *     text's order, each ``{ name, start, end, text }``: the field's name
+     *     (the block's argument), the UTF-8 byte range of its body in
+     *     ``text`` and the body itself; ``diagnostics`` in the engine's
+     *     shape, line and column in ``text``
+     */
+    parse_fields(text, { origin = null } = {})
+    {
+        this._live();
+        if (typeof text !== 'string') {
+            throw new TypeError(`parse_fields(): the text must be a string, not ${typeof text}`);
+        }
+        const fields_origin = make_origin(origin, () => `fields:${++this._anonymous}`);
+        const out = this._core.parse_fields(text, fields_origin.label);
+        const own = { origin: fields_origin, source: text };
+        return {
+            fields: out.fields.map( ({ name, start, end, text }) => ({ name, start, end, text }) ),
+            diagnostics: out.diagnostics.map(
+                (d) => map_core_diagnostic(d, (label) => (label === fields_origin.label) ? own : null)
+            ),
+        };
     }
 
     /** The handle of ``f`` with the given layout: its own, or a sibling sharing the tree. */

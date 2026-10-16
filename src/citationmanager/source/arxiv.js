@@ -1,4 +1,4 @@
-import jsyaml from 'js-yaml';
+import { parse as yaml_parse } from 'yaml';
 
 import debug_module from 'debug';
 const debug = debug_module('zoodb.citationmanager.source.arxiv');
@@ -130,7 +130,7 @@ export class CitationSourceArxiv extends CitationSourceBase
         if (this.override_arxiv_dois_file) {
             // should work with both YAML & JSON given that JSON is a YAML 1.2 subset
             const contents = await this.fetch_url(this.override_arxiv_dois_file);
-            add(jsyaml.load(contents), `file ‘${this.override_arxiv_dois_file}’`);
+            add(yaml_parse(contents), `file ‘${this.override_arxiv_dois_file}’`);
         }
         add(this.override_arxiv_dois, 'override_arxiv_dois option');
         return overrides;

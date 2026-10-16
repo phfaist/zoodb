@@ -1,0 +1,14 @@
+# A quoted value continued on lines indented no more than its key.
+code_id: pattern
+name: 'A name that continues
+on the next line at the key''s column'
+notes:
+  short: 'A note that continues
+  at the key''s column,
+
+  with an empty line inside.'
+  long: "Double quotes,
+  with an escape \u00e9 and an escaped line break \
+  and more."
+description: |
+  A literal block scalar, untouched.

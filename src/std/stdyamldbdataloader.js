@@ -32,7 +32,9 @@ import { debugconfig } from '../util/debugconfig.js';
  *   `zoodb.config.fs`.
  *
  * The `resource_file_extensions` option forwarded to the data loader is taken
- * from `zoodb.config.flm_options.resources.resource_file_extensions`.
+ * from `zoodb.config.flm_options.resources.resource_file_extensions`, and its
+ * `engine` option is the zoo's FLM engine, `zoodb.zoo_flm_engine` (which
+ * :class:`FlmFilesDbDataLoader` needs and :class:`YamlDbDataLoader` ignores).
  *
  * @param {ZooDb} zoodb - A ZooDb instance created with `makeStandardZooDb`.
  * @param {Object} [config={}] - Configuration options; see above.
@@ -58,6 +60,10 @@ export async function makeStandardYamlDbDataLoader(zoodb, config={})
         root_data_dir: config.fs_data_dir ?? zoo_config?.fs_data_dir,
 
         fs: config.fs ?? zoo_config.fs,
+
+        // the zoo's FLM engine: FlmFilesDbDataLoader reads the files' bodies
+        // with it; YamlDbDataLoader does not use it
+        engine: zoodb.zoo_flm_engine,
     };
 
     debug(`Creating a ${DbDataLoaderClass.name} instance with config`, debugconfig(debug, loader_config));

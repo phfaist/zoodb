@@ -72,8 +72,10 @@ export function origin_location(origin)
  * position is the one in the file (``file_line``, ``file_col``) when the
  * origin says where the field starts, else the one inside the fragment's
  * source (``line``, ``col``); it is left out when the diagnostic has none.
- * A diagnostic in a truncated preview (origin ``truncated: true``) has
- * `` (truncated)`` after the position.
+ * A file position that is approximate (``approx``: the field's value folds
+ * the lines of its file, as a folded, plain or quoted multi-line YAML value
+ * does) has `` (approx.)`` after it. A diagnostic in a truncated preview
+ * (origin ``truncated: true``) has `` (truncated)`` after the position.
  *
  * @param {object} d - a diagnostic of the engine
  * @returns {string}
@@ -83,7 +85,8 @@ export function format_diagnostic(d)
     const where = origin_location(d.origin);
     let position = '';
     if (d.file_line != null) {
-        position = `:${d.file_line}` + ((d.file_col != null) ? `:${d.file_col}` : '');
+        position = `:${d.file_line}` + ((d.file_col != null) ? `:${d.file_col}` : '')
+            + ((d.approx === true) ? ' (approx.)' : '');
     } else if (d.line != null) {
         position = `:${d.line}` + ((d.col != null) ? `:${d.col}` : '');
     }
@@ -180,6 +183,7 @@ export function make_diagnostic({ severity, identifier, message, origin = null }
         severity, identifier, message,
         origin: origin ?? { label: null },
         start: null, end: null, line: null, col: null, file_line: null, file_col: null,
+        approx: false,
     };
 }
 
@@ -244,7 +248,8 @@ export function line_col_at(text, byte)
  * ``line``/``col`` 1-based inside it; ``file_line``/``file_col`` when the
  * origin says where the source starts in its file (``start_line``,
  * ``start_col``, and ``indent``, the columns removed from each later line,
- * as in a YAML block scalar).
+ * as in a YAML block scalar); ``approx`` true when that file position is
+ * approximate (the origin's ``approx``: the source folds the file's lines).
  *
  * The core counts the column in bytes. The engine recomputes ``line`` and
  * ``col`` from the source, the column in characters (code points), only for
@@ -264,6 +269,7 @@ export function map_core_diagnostic(d, fragment_of)
     let col = d.col ?? null;
     let file_line = null;
     let file_col = null;
+    let approx = false;
     let origin;
     if (fragment != null) {
         origin = fragment.origin;
@@ -275,6 +281,7 @@ export function map_core_diagnostic(d, fragment_of)
             if (origin.start_col != null && col != null) {
                 file_col = (line === 1) ? origin.start_col + col - 1 : col + (origin.indent ?? 0);
             }
+            approx = (origin.approx === true);
         }
     } else {
         origin = { label: d.origin ?? null };
@@ -286,6 +293,6 @@ export function map_core_diagnostic(d, fragment_of)
         origin,
         start: d.start ?? null,
         end: d.end ?? null,
-        line, col, file_line, file_col,
+        line, col, file_line, file_col, approx,
     };
 }

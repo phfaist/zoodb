@@ -1,0 +1,18 @@
+# Valid YAML 1.2: zoodb-reindent-yaml leaves this file as it is.
+code_id: untouched
+name: 'A quoted name'
+description: |
+  A literal block scalar.
+    More indented line.
+
+  After a blank line.
+introduced: a plain value
+  continued on a more indented line
+relations:
+  parents:
+    - code_id: parent_a
+      detail: 'A quoted detail
+        continued on a line indented more than its key.'
+    - code_id: parent_b
+      detail: "A double-quoted detail
+        on two lines."

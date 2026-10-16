@@ -1,0 +1,14 @@
+utensil_id: spoon
+name: Spoon
+description: |
+  A spoon has a bowl.
+    This line is more indented.
+
+  And it has a handle.
+summary: >-
+  Folded over
+  two lines.
+relations:
+  goes_with:
+    - utensil_id: fork
+      detail: 'Often next to the fork.'

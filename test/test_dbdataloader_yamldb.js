@@ -265,6 +265,192 @@ describe('zoodb.dbdataloader.yamldb', function () {
             }, /Parse error/);
         });
 
+        it('parse_file_data reads YAML 1.2 (core schema)', async function () {
+            const loader = new YamlDbDataLoader({ root_data_dir: yaml_fixtures_dir, objects: {}, fs });
+            const parsed = await loader.parse_file_data(
+                Buffer.from('a: 2021-01-01\nb: yes\nc: true\nd: ~\ne: 0x10\n'), {}, '/data', 'types.yml'
+            );
+            assert.deepStrictEqual(parsed, { a: '2021-01-01', b: 'yes', c: true, d: null, e: 16 });
+        });
+
+        it('parse_file_data names the file, line and column of a YAML error', async function () {
+            const loader = new YamlDbDataLoader({ root_data_dir: yaml_fixtures_dir, objects: {}, fs });
+            await assert.rejects(
+                () => loader.parse_file_data('a: 1\na: 2\n', {}, '/data', 'dup.yml'),
+                (err) => {
+                    assert.strictEqual(
+                        err.message, 'Parse error in ‘/data/dup.yml’ at line 2, column 1: Map keys must be unique'
+                    );
+                    assert.deepStrictEqual([err.file, err.line, err.col], ['/data/dup.yml', 2, 1]);
+                    return true;
+                }
+            );
+        });
+
+        it('refuses a quoted value continued at its key\'s column, saying what to do', async function () {
+            const loader = new YamlDbDataLoader({ root_data_dir: yaml_fixtures_dir, objects: {}, fs });
+            const text = 'utensil_id: spoon\nrelations:\n  goes_with:\n    - utensil_id: fork\n'
+                  + '      detail: \'Often next to\n      the fork.\'\n';
+            await assert.rejects(
+                () => loader.parse_file_data(text, {}, '/data', 'spoon.yml'),
+                (err) => {
+                    assert.strictEqual(
+                        err.message,
+                        'Parse error in ‘/data/spoon.yml’ at line 5, column 15: a quoted value that '
+                        + 'continues on the next line must be indented more than the key; run '
+                        + '`zoodb-reindent-yaml` on the file'
+                    );
+                    return true;
+                }
+            );
+            // the pattern at the top level and in a bare list item, double quotes
+            for (const [bad, line, col] of [
+                [ 'name: "A name\non two lines"\n', 1, 7 ],
+                [ 'items:\n  - \'one\n  two\'\n', 2, 5 ],
+                [ 'a:\n  b: \'one\n\n  two\'\n', 2, 6 ],
+            ]) {
+                await assert.rejects(
+                    () => loader.parse_file_data(bad, {}, '/data', 'x.yml'),
+                    new RegExp(`Parse error in ‘/data/x\\.yml’ at line ${line}, column ${col}: `
+                               + 'a quoted value that continues on the next line must be indented')
+                );
+            }
+        });
+
+        it('does not take other errors or valid multi-line values for the refused pattern', async function () {
+            const loader = new YamlDbDataLoader({ root_data_dir: yaml_fixtures_dir, objects: {}, fs });
+            // a quote never closed
+            await assert.rejects(
+                () => loader.parse_file_data('a: \'never closed\nb: 1\n', {}, '/data', 'x.yml'),
+                /Parse error in ‘\/data\/x\.yml’ at line 3, column 1: Missing closing 'quote$/
+            );
+            // a forgotten closing quote, the next value quoted: yaml's own error, at the
+            // end of the line
+            await assert.rejects(
+                () => loader.parse_file_data('name: \'Some code\ndescription: \'Something\'\n',
+                                             {}, '/data', 'x.yml'),
+                /Parse error in ‘\/data\/x\.yml’ at line 1, column 17: Missing closing 'quote$/
+            );
+            // a quoted value continued more indented than its key, a plain value on two
+            // lines, a block scalar: all valid
+            const parsed = await loader.parse_file_data(
+                'a:\n  b: \'one\n    two\'\n  c: plain\n    on two lines\n  d: |\n    block\n',
+                {}, '/data', 'x.yml'
+            );
+            assert.deepStrictEqual(parsed, { a: { b: 'one two', c: 'plain on two lines', d: 'block\n' } });
+            // the fixtures of the re-indent tool: the untouched file loads
+            const untouched = fs.readFileSync(path.join(yaml_fixtures_dir, 'reindent', 'untouched.yml'));
+            const data = await loader.parse_file_data(untouched, {}, '/data', 'untouched.yml');
+            assert.strictEqual(data.relations.parents[1].detail, 'A double-quoted detail on two lines.');
+        });
+
+        describe('field positions', function () {
+
+            const utensil_schema = {
+                _zoo_primarykey: 'utensil_id',
+                type: 'object',
+                properties: {
+                    utensil_id: { type: 'string' },
+                    name: { type: 'string' },
+                    description: { type: 'string' },
+                    summary: { type: 'string' },
+                },
+            };
+
+            it('records the positions of the string values in obj._zoodb.flm_field_positions', async function () {
+                const loader = new YamlDbDataLoader({
+                    root_data_dir: yaml_fixtures_dir,
+                    objects: { utensil: { data_src_path: 'utensils' } },
+                    fs,
+                });
+                const dbdata = await loader.load({ schemas: { utensil: utensil_schema } });
+                const spoon = dbdata.objects.utensil.spoon;
+                const positions = spoon._zoodb.flm_field_positions;
+                // a literal block: the first line after the header, column indent + 1
+                assert.deepStrictEqual({ ...positions.description },
+                                       { line: 4, col: 3, style: 'literal', indent: 2 });
+                // a plain value on one line: exact
+                assert.deepStrictEqual({ ...positions.name }, { line: 2, col: 7, style: 'plain' });
+                // a folded block on two lines: approximate
+                assert.deepStrictEqual({ ...positions.summary },
+                                       { line: 9, col: 3, style: 'folded', indent: 2, approx: true });
+                // in a list, with the field compiler's dotted path; quoted: after the quote
+                assert.deepStrictEqual({ ...positions['relations.goes_with.0.detail'] },
+                                       { line: 14, col: 16, style: 'quoted' });
+                assert.deepStrictEqual({ ...positions['relations.goes_with.0.utensil_id'] },
+                                       { line: 13, col: 19, style: 'plain' });
+                // the literal value's line i is the file's line `line + i` at column indent + 1
+                const file_lines = fs.readFileSync(
+                    path.join(yaml_fixtures_dir, 'utensils', 'spoon.yml'), 'utf-8'
+                ).split('\n');
+                spoon.description.replace(/\n$/, '').split('\n').forEach( (l, i) => {
+                    const fl = file_lines[positions.description.line - 1 + i];
+                    assert.strictEqual(fl.slice(positions.description.col - 1), l);
+                } );
+            });
+
+            it('gives multi-line values and escaped quoted values approx, and JSON files no positions', async function () {
+                const loader = new YamlDbDataLoader({ root_data_dir: yaml_fixtures_dir, objects: {}, fs });
+                const { data, positions } = await loader.parse_file_data_with_positions(
+                    'a: plain\n  on two lines\nb: "quoted — on\n  two lines"\nc: 3\nd:\n  - é: \'x\'\n',
+                    {}, '/data', 'x.yml'
+                );
+                assert.deepStrictEqual(data.a, 'plain on two lines');
+                assert.deepStrictEqual({ ...positions.a }, { line: 1, col: 4, style: 'plain', approx: true });
+                assert.deepStrictEqual({ ...positions.b }, { line: 3, col: 5, style: 'quoted', approx: true });
+                assert.deepStrictEqual(Object.keys(positions), ['a', 'b', 'd.0.é']);
+                // a one-line quoted value with an escape: approx; without one: exact (a
+                // comment after the closing quote or not)
+                const escaped = await loader.parse_file_data_with_positions(
+                    'a: \'it\'\'s\'\nb: "one\\ntwo"  # a comment\nc: \'no escape\' # a comment\n'
+                    + 'd: "no escape either"\n',
+                    {}, '/data', 'x.yml'
+                );
+                assert.deepStrictEqual(escaped.data,
+                                       { a: 'it\'s', b: 'one\ntwo', c: 'no escape', d: 'no escape either' });
+                assert.deepStrictEqual({ ...escaped.positions.a }, { line: 1, col: 5, style: 'quoted', approx: true });
+                assert.deepStrictEqual({ ...escaped.positions.b }, { line: 2, col: 5, style: 'quoted', approx: true });
+                assert.deepStrictEqual({ ...escaped.positions.c }, { line: 3, col: 5, style: 'quoted' });
+                assert.deepStrictEqual({ ...escaped.positions.d }, { line: 4, col: 5, style: 'quoted' });
+                const json = await loader.parse_file_data_with_positions(
+                    '{"a": "b"}', {}, '/data', 'x.json'
+                );
+                assert.deepStrictEqual(json, { data: { a: 'b' }, positions: null });
+            });
+
+            it('records no positions when load_objects does not return the file\'s data', async function () {
+                const loader = new YamlDbDataLoader({
+                    root_data_dir: yaml_fixtures_dir,
+                    objects: { utensil: {
+                        data_src_path: 'utensils',
+                        load_objects: (d) => [ { ...d } ],
+                    } },
+                    fs,
+                });
+                const dbdata = await loader.load({ schemas: { utensil: utensil_schema } });
+                const spoon = dbdata.objects.utensil.spoon;
+                assert.strictEqual(spoon.name, 'Spoon');
+                assert.strictEqual(spoon._zoodb.flm_field_positions, undefined);
+            });
+
+            it('a subclass overriding parse_file_data only still loads', async function () {
+                class Upper extends YamlDbDataLoader {
+                    async parse_file_data(...args) {
+                        const d = await super.parse_file_data(...args);
+                        return { ...d, name: d.name.toUpperCase() };
+                    }
+                }
+                const loader = new Upper({
+                    root_data_dir: yaml_fixtures_dir,
+                    objects: { utensil: { data_src_path: 'utensils' } },
+                    fs,
+                });
+                const dbdata = await loader.load({ schemas: { utensil: utensil_schema } });
+                assert.strictEqual(dbdata.objects.utensil.spoon.name, 'SPOON');
+                assert.strictEqual(dbdata.objects.utensil.spoon._zoodb.flm_field_positions, undefined);
+            });
+        });
+
         it('resource_file_extensions are ignored by default', function () {
             const loader = new YamlDbDataLoader({
                 root_data_dir: yaml_fixtures_dir,

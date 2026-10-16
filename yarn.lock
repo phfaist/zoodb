@@ -200,17 +200,18 @@ __metadata:
     exif-parser: "npm:^0.1.12"
     glob: "npm:^11.0.0"
     hash.js: "npm:^1.1.7"
-    js-yaml: "npm:^4.1.0"
     jsonschema: "npm:^1.4.1"
     lodash: "npm:^4.17.21"
     mocha: "npm:11.0.2"
     sax: "npm:^1.4.1"
     stream-parser: "npm:^0.3.1"
     url: "npm:^0.11.4"
+    yaml: "npm:^2.9.1"
   bin:
     zoodb-extend-citations-ttl: ./tools/extend_citations_ttl.mjs
     zoodb-merge-citations-cache: ./tools/merge_citations_cache.mjs
     zoodb-migrate-citations-cache: ./tools/migrate_citations_cache.mjs
+    zoodb-reindent-yaml: ./tools/reindent_yaml.mjs
   languageName: unknown
   linkType: soft
 
@@ -2451,6 +2452,15 @@ __metadata:
   version: 4.0.0
   resolution: "yallist@npm:4.0.0"
   checksum: 10c0/2286b5e8dbfe22204ab66e2ef5cc9bbb1e55dfc873bbe0d568aa943eb255d131890dfd5bf243637273d31119b870f49c18fcde2c6ffbb7a7a092b870dc90625a
+  languageName: node
+  linkType: hard
+
+"yaml@npm:^2.9.1":
+  version: 2.9.1
+  resolution: "yaml@npm:2.9.1"
+  bin:
+    yaml: bin.mjs
+  checksum: 10c0/9d06676ef02b89559a8b10a71882bd2cdae81e8393dc8dbc871615c3259475d9609ad973d19cb3c9e71e72d6206e3d1e7aa241c7e55f3d16fd2e77db305827d6
   languageName: node
   linkType: hard
 

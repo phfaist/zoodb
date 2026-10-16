@@ -628,6 +628,77 @@ describe('ZooFlmEngine', function () {
             assert.match(format_diagnostic(h.diagnostics[0]), /^ad hoc:1:1: error: /);
             engine.release([f, g, h]);
         });
+
+        it('places a diagnostic in a literal block, and marks an approximate position', function () {
+            // A YAML literal block whose first content line is line 7 of the file,
+            // indented by 4 (the loader's position { line: 7, col: 5, indent: 4,
+            // style: 'literal' }, as the field compiler passes it on)
+            const f = engine.make_fragment('First line.\n  Indented — \\nosuch here.', {
+                origin: origin('frank', 'description', { start_line: 7, start_col: 5, indent: 4 }),
+                error_policy: 'continue',
+            });
+            const [d] = f.diagnostics;
+            assert.deepStrictEqual([d.line, d.col, d.file_line, d.file_col, d.approx], [2, 14, 8, 18, false]);
+            assert.ok(format_diagnostic(d).startsWith('people/frank.yml#description:8:18: error: '));
+            // a plain value folded from two lines: the position is approximate
+            const g = engine.make_fragment('A plain value \\nosuch', {
+                origin: origin('frank', 'name', { start_line: 3, start_col: 7, approx: true }),
+                error_policy: 'continue',
+            });
+            const [e] = g.diagnostics;
+            assert.deepStrictEqual([e.file_line, e.file_col, e.approx], [3, 21, true]);
+            assert.ok(format_diagnostic(e).startsWith('people/frank.yml#name:3:21 (approx.): error: '),
+                      format_diagnostic(e));
+            // without a file position, no approx
+            const h = engine.make_fragment('\\nosuch', {
+                origin: origin('frank', 'notes', { approx: true }), error_policy: 'continue',
+            });
+            assert.strictEqual(h.diagnostics[0].approx, false);
+            assert.ok(format_diagnostic(h.diagnostics[0]).startsWith('people/frank.yml#notes:1:1: error: '));
+            engine.release([f, g, h]);
+        });
+    });
+
+    describe('parse_fields', function () {
+
+        it('reads the fields of an FLM file\'s body with their byte ranges', function () {
+            const text = '%% a comment\n\\begin{field}{name}\nGrace — G.\n\\end{field}\n\n'
+                  + '\\begin{field}{a.b.[]} x \\end{field}\n';
+            const count = engine.core.fragment_count();
+            const out = engine.parse_fields(text, { origin: { source_path: 'people/grace.flm' } });
+            assert.deepStrictEqual(out.diagnostics, []);
+            assert.deepStrictEqual(out.fields.map( (f) => [f.name, f.text] ),
+                                   [['name', '\nGrace — G.\n'], ['a.b.[]', ' x ']]);
+            // byte offsets (the em dash is three bytes)
+            const bytes = Buffer.from(text, 'utf-8');
+            for (const f of out.fields) {
+                assert.strictEqual(bytes.subarray(f.start, f.end).toString('utf-8'), f.text);
+            }
+            // nothing is kept
+            assert.strictEqual(engine.core.fragment_count(), count);
+        });
+
+        it('maps the diagnostics, with the position in the file from the origin', function () {
+            const text = '\\begin{field}{name}\nHenry\n\\end{field}\nstray — text\n';
+            const out = engine.parse_fields(text, {
+                origin: { source_path: 'people/henry.flm', start_line: 5, start_col: 1 },
+            });
+            assert.deepStrictEqual(out.fields.map( (f) => f.name ), ['name']);
+            assert.strictEqual(out.diagnostics.length, 1);
+            const [d] = out.diagnostics;
+            assert.deepStrictEqual(
+                [d.severity, d.identifier, d.line, d.col, d.file_line, d.file_col],
+                ['error', 'zoodb.fields.stray-content', 4, 1, 8, 1],
+            );
+            assert.strictEqual(d.origin.label, 'people/henry.flm');
+            assert.ok(format_diagnostic(d).startsWith('people/henry.flm:8:1: error: '));
+            // an unclosed block
+            const u = engine.parse_fields('\\begin{field}{a}\nno end\n');
+            assert.deepStrictEqual(u.diagnostics.map( (x) => [x.identifier, x.line, x.col] ),
+                                   [['core.environments.missing-terminator', 1, 1]]);
+            assert.match(u.diagnostics[0].origin.label, /^fields:\d+$/);
+            assert.throws( () => engine.parse_fields(null), TypeError );
+        });
     });
 
     describe('parses, settings hash, dump and load', function () {

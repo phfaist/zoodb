@@ -14,18 +14,19 @@
         "exif-parser": "^0.1.12",
         "glob": "^11.0.0",
         "hash.js": "^1.1.7",
-        "js-yaml": "^4.1.0",
         "jsonschema": "^1.4.1",
         "lodash": "^4.17.21",
         "sax": "^1.4.1",
         "stream-parser": "^0.3.1",
-        "url": "^0.11.4"
+        "url": "^0.11.4",
+        "yaml": "^2.9.1"
     },
     "main": "./src/index.js",
     "bin": {
         "zoodb-extend-citations-ttl": "./tools/extend_citations_ttl.mjs",
         "zoodb-merge-citations-cache": "./tools/merge_citations_cache.mjs",
-        "zoodb-migrate-citations-cache": "./tools/migrate_citations_cache.mjs"
+        "zoodb-migrate-citations-cache": "./tools/migrate_citations_cache.mjs",
+        "zoodb-reindent-yaml": "./tools/reindent_yaml.mjs"
     },
     "engines": {
         "node": ">=18"

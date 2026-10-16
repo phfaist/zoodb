@@ -1,0 +1,11 @@
+---
+note_id: n1
+name: 'Note \nosuchname{one}'
+---
+
+%% The body's fields (the test checks the positions of its diagnostics).
+
+\begin{field}{text}
+First line.
+Second line with \nosuchmacro here.
+\end{field}
