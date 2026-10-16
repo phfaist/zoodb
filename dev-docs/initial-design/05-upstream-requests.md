@@ -32,6 +32,7 @@ to carry over to flm-rs, no change asked for here.
 
 | found | what | where |
 |---|---|---|
+| 2026-10-16, step 4 | A tie before a citation, `one~\cite{…}`, renders two no-break spaces in HTML (`one&nbsp;<span class="flm-citations-space flm-pres-span">&nbsp;</span>…`) and two spaces in text (`one  [1]`): the citations feature writes its own space before an attached mark and absorbs a source *space*, but not a tie; the recomposed LaTeX handles it (`\flmCitePreSpace` is `\unskip~`). Seen on `zoodb-example`'s data; the EC zoo data has 12 `~\cite` against about 9,000 `\cite` (counted in the review). Low impact; a question for flm-rs, no request. | `zoodb-example` port, 11 Results Part C |
 | 2026-10-16, step 1 | A `field` environment with no name argument (`\begin{field}\end{field}`) makes the parse abort with `core.hooks.hook-failed` ("the specification of the command 'end' must be one of the FLM specification types…") instead of reporting a missing argument at the environment. The crate turns it into a plain error. | `rust/zoodb-flm-wasm` `parse_fields`; 08 Results |
 
 ## Withdrawn or deferred candidates

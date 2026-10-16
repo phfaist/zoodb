@@ -18,7 +18,7 @@ import {
     ZooFlmError, apply_error_policy, check_error_policy, check_unresolved, has_errors, make_diagnostic,
     map_core_diagnostic,
 } from './diagnostics.js';
-import { ZooFlmComposition, DEFAULT_RENDER_VALUE_OPTIONS } from './compose.js';
+import { ZooFlmComposition, DEFAULT_RENDER_VALUE_OPTIONS, html_escape } from './compose.js';
 
 export * from './fragment.js';
 export * from './diagnostics.js';
@@ -752,6 +752,39 @@ export class ZooFlmEngine
             blocks.push((named ? '' : `/* ${d.id} (feature ${d.owner}) */\n`) + text.replace(/\n+$/, ''));
         }
         return blocks.join('\n\n') + '\n';
+    }
+
+    /**
+     * The script tags of FLM content, for a page's ``<head>``: every script
+     * definition (MathJax's: its configuration, then its loader), in the
+     * registry's order, each named by an HTML comment line
+     * (``<!-- ID (feature OWNER) -->``), its parts in their declared order:
+     * an inline part as ``<script>`` holding the text on its own lines, an
+     * address as ``<script src="…" async></script>`` (``async`` keeps the
+     * page from waiting on a large script; the inline parts before it run
+     * first all the same). A part delivered as a file or by a table gives no
+     * tag: the host serves the file itself.
+     *
+     * @returns {string} the tags, one per line and a final newline; ``''``
+     *     when no definition is a script
+     */
+    html_scripts()
+    {
+        const lines = [];
+        for (const d of this.html_definitions()) {
+            if (d.kind !== 'script') {
+                continue;
+            }
+            lines.push(`<!-- ${d.id} (feature ${d.owner}) -->`);
+            for (const p of d.parts) {
+                if (p.kind === 'inline') {
+                    lines.push(`<script>\n${p.text.replace(/\n+$/, '')}\n</script>`);
+                } else if (p.kind === 'url') {
+                    lines.push(`<script src="${html_escape(p.text)}" async></script>`);
+                }
+            }
+        }
+        return (lines.length > 0) ? lines.join('\n') + '\n' : '';
     }
 
     /** The given requirements in the registry's order (unknown ones last). */

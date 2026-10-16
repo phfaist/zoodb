@@ -72,6 +72,32 @@ html`), the docs are built and the warnings about missing directives resolved;
 otherwise the directives are checked by hand against the sources and the build is
 reported as not run.
 
+## From step 4 (to fold into the sections above before the handoff; found 2026-10-16)
+
+- `package.json`: a `files` list (or an `.npmignore`) so that the published archive holds
+  what the package needs (`src/`, `tools/`, `README.md`, the licence) and not `test/`,
+  `doc/`, `rust/`, `scratch/`, `dev-docs/`, `playground/`, `.claude/`, `example/`,
+  `CLAUDE.md`, `.eslintrc.json`, `.readthedocs.yaml` (the example's build check packed
+  361 files); `engines` at least `node >=20` (the dependency `glob` 11 declares `20 ||
+  >=22`; the example's own README asks for 20.19+ or 22+ because of its build tools).
+- Release notes for 0.3.0 (where the package records them): the strict `yaml` package
+  (YAML 1.2 core schema: dates stay strings, `<<` merge keys are not merged; a quoted
+  value continued at the key's column is refused, `zoodb-reindent-yaml` fixes the data
+  once); the clean break of the FLM API; the loaders need the engine for `.flm` files.
+- `CLAUDE.md`: the engine paragraph lists `html_scripts` (step 4) but not
+  `parse_fields`; the Data Loaders and Tools paragraphs are current.
+- `stdzoodb.js`: the one-line doc of `citations.skip_save_cache` says "skip writing";
+  it also skips reading the cache (the manager keeps it in memory only).
+- Decision for Philippe before the release: whether dumps drop
+  `_zoodb.flm_field_positions` by default (11, Results, Deferred (b); about half the
+  size of the EC zoo's data as JSON); if so, in `FLMSimpleContentCompiler.process_data_dump`
+  behind a switch like `flm_keep_zoodb_info_flm_fields`.
+- `doc/`: the loaders' paragraphs of `doc/zoodb.dbdataloader.rst` were rewritten in step
+  4 and the tool has its section in `tools/README.md`; the rest of the rewrite as planned
+  in D.
+- Optional: a guard for `</script` in the inline texts of `html_scripts()` (the texts are
+  the registry's own today).
+
 ## E. Checks before handing back
 
 `yarn test`, `yarn lint` (green), `yarn build:wasm` (both modules, path check green),

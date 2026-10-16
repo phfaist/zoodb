@@ -831,6 +831,34 @@ describe('ZooFlmEngine', function () {
             }
         });
 
+        it('html_scripts() gives the script definitions as tags: MathJax\'s configuration, then its loader', async function () {
+            const e = await ZooFlmEngine.create({ load_wasm }); // the default configuration
+            const defs = e.html_definitions();
+            const html = e.html_scripts();
+            e.free();
+            const scripts = defs.filter( (d) => d.kind === 'script' );
+            assert.deepStrictEqual(scripts.map( (d) => d.id ), ['flm.html.mathjax']);
+            const url = scripts[0].parts.find( (p) => p.kind === 'url' ).text;
+            assert.match(url, /mathjax@4/);
+            assert.ok(html.endsWith('</script>\n'));
+            assert.ok(html.startsWith('<!-- flm.html.mathjax (feature html) -->\n<script>\n'));
+            // One comment line, one inline script and one loader tag, in that order.
+            assert.strictEqual(html.match(/<!--/g).length, 1);
+            assert.strictEqual(html.match(/<script[ >]/g).length, 2);
+            const config = html.indexOf('<script>\n');
+            const src = html.indexOf(`<script src="${url}" async></script>`);
+            assert.ok(config >= 0 && src > config, 'the configuration before the loader');
+            const config_text = html.slice(config, src);
+            assert.match(config_text, /window\.MathJax = \{/);
+            assert.match(config_text, /startup: \{elements: \['\.flm-pres-math--passthrough'\]\}/);
+            assert.match(config_text, /\n<\/script>\n$/);
+            // No style definition shows.
+            for (const d of defs.filter( (d) => d.kind === 'style' )) {
+                assert.ok(!html.includes(d.id), d.id);
+            }
+            assert.doesNotMatch(html, /@layer|<style/);
+        });
+
         it('truncate() makes a shortened fragment that parses and renders', function () {
             const long = engine.make_fragment(
                 'A rather long description with \\emph{emphasized words inside} and more text after it.',

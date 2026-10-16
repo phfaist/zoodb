@@ -167,6 +167,19 @@ The port itself:
   the warning in the build log.
 - The example's 5 person files and the two `citations_info` files parse under the
   strict `yaml` package (checked 2026-10-15, 03 Q15).
+- `website/templates/useMathjaxScript.njk` and `website/templates/layout/base_page.njk`
+  (added after the review of part C, which found the formulas no longer typeset): the
+  site's MathJax 3 configuration (typesetting `.inline-math`/`.display-math`, the old
+  classes) and its loader tag are replaced by the engine's script definitions, per Q10
+  (3) and (4): the layout writes `{{ zoodb.zoo_flm_engine.html_scripts() | safe }}` (the
+  MathJax 4 configuration targeting `.flm-pres-math--passthrough`, then the `async`
+  loader); `html_scripts()` is the engine's new analogue of `html_stylesheet()`.
+- `website/src/person/person.11ty.js` also prints the warnings `render_document()`
+  returns (`format_diagnostic` from `@phfaist/zoodb/zooflm/engine`): the engine never
+  logs them, and a template that keeps only `.html` would lose them.
+- `website/templates/layout/base_page.njk`: the pre-existing empty `<title>` (`{{
+  page.title }}`, never set by Eleventy) becomes `{{ title }}` (decided after the review;
+  a deviation from "nothing else changes").
 
 ## Files
 
@@ -175,7 +188,7 @@ The port itself:
 | `package.json` | `yaml` in, `js-yaml` out; bin `zoodb-reindent-yaml` |
 | `src/dbdataloader/yamldb.js` | A.2, A.3 |
 | `src/dbdataloader/flmfilesdb.js` | B |
-| `src/zooflm/engine.js` | B (`parse_fields(text, { origin })` over the core) |
+| `src/zooflm/engine.js` | B (`parse_fields(text, { origin })` over the core); C (`html_scripts()`, the script tags of the script definitions) |
 | `src/citationmanager/source/arxiv.js` | the override file through `yaml` |
 | `src/dbprocessor/flmsimplecontent.js` | A.5 (origin positions) |
 | `src/zooflm/diagnostics.js` | A.5 (`approx`) |
@@ -507,4 +520,294 @@ lines); `yarn node tools/reindent_yaml.mjs --dry-run test/test_data/yaml_fixture
 
 ### Part C
 
-(to be filled in by the implementer of part C)
+Implementation, 2026-10-16 (node 23.7.0, yarn 4.6.0; the worktree at `19c428c`; nothing
+under `src/`, `rust/`, `test/` or `tools/` changed; in this repository only
+`scratch/.gitignore` is new and this subsection is written). Reviewed the same day; the
+fixes decided on the findings are under "Review fixes" and the points left for the main
+session under "Deferred / for the main session", at the end of this part. The fixes add
+`ZooFlmEngine.html_scripts()` to `src/zooflm/engine.js` (with a test and a clause of
+`CLAUDE.md`) and change some statements below, corrected in place (the person template's
+`render()`, the README, the srcset comment, the titles, "no bug of the package", the open
+questions on the title and the srcset comment); the numbers above "Review fixes" are those
+of the implementation.
+
+**The clone.** `scratch/.gitignore` (new): `zoodb-example/` and `*.tgz`; the worktree's
+`git status --short` shows only `?? scratch/.gitignore`, before and after the clone and the
+build. `git clone git@github.com:phfaist/zoodb-example.git scratch/zoodb-example` (ssh
+worked), branch `zoodb-flmrs` from `main` at `da07d8b` ("yarn lock"). The read-only
+`../zoodb-example` has one more local commit, `065f99c` "update zoodb", not on GitHub,
+which only moves `yarn.lock`'s pin of zoodb; the check replaces that lock entry anyway.
+Commits on `zoodb-flmrs` (not pushed): `bc0a6ce` (the port) and `5cc0c68` (the READMEs);
+after the review, `2242062` (the review fixes).
+`website/_zoodb_citations_cache/` was copied from `../zoodb-example` first. Left in place
+for a quick rebuild, all ignored: in the clone `node_modules/`, `.yarn/`, `.parcel-cache/`,
+`website/_site/`, the citations cache; in `scratch/` the tarball `zoodb-flmrs.tgz`. The
+clone's `git status --short` is empty after the commits.
+
+**The port, file by file.**
+
+- `peopledbjs/myzoodb.js`: `use_flm_engine` (from `@phfaist/zoodb/std/use_flm_engine`)
+  instead of `use_flm_environment`, in the import and the config;
+  `load_zoodb_flm_wasm_node` imported from `@phfaist/zoodb/zooflm/wasm-node` and set as
+  `flm_options.load_wasm`, with a comment (under Node the module is read from the package's
+  files; in a browser, leave it out and it is fetched). The `environment_options` entry
+  (an empty object holding comments, which the standard setup now refuses) became a comment
+  and a commented `engine: { dollar_math: true, settings: { userdefs: { macros: { zoo: {
+  content: 'People DB' } } } } }`; uncommented in a check script, it gives `Welcome to People
+  DB, where <span class="flm-pres-math--passthrough" data-flm-display="inline">\(a+b=c\)</span>.`
+  for `Welcome to \zoo{}, where $a+b=c$.`. `refs`, `citations` and `resources` unchanged
+  (`graphics_use_srcset_parceljs` stays enabled; after the review its comment says that the
+  new engine does not support it yet, Review fixes 4).
+- `website/src/person/person.11ty.js`: the `@phfaist/zoodb/zooflm` import is gone (`sqzhtml`
+  stays); `title` and `person_name` are `data.zoodb.zoo_flm_engine.snippet(data.person.name,
+  'text')`; the composer `compose = ({ ne, rdr, rdrblock, ref, endnotes }) => …` keeps the
+  template's body unchanged except `${ endnotes() }` where `<RENDER_ENDNOTES/>` stood (the
+  old `render_endnotes: { annotations: ['sectioncontent'] }` has no counterpart), and
+  `render()` returns the `html` of `zoo_flm_engine.render_document({ compose })` (after the
+  review it first prints the result's diagnostics, Review fixes 2). Two comments for the
+  readers (the title snippet, the helpers).
+- `website/src/index.11ty.js`: the import is gone; the names through
+  `zoodb.zoo_flm_engine.snippet(name, 'html')`; the comment that pointed to
+  `zooflm.make_and_render_document` points to `render_document()` and the person template.
+- `website/src/dynamic_style/flm.css.11ty.js`: the import and the old fragment renderer are
+  gone; `render(data)` returns `data.zoodb.zoo_flm_engine.html_stylesheet()` after a
+  `/* FLM stylesheet */` line; a header comment (the file is imported by
+  `stylesheets/mainstyle.js`).
+- `README.md`: one sentence: this branch (`zoodb-flmrs`) of the example uses the new FLM
+  engine of ZooDb and needs the `zoodb-flmrs` branch of ZooDb (the coming version 0.3.0);
+  after the review, extended by how to build against a local checkout until the merge
+  (Review fixes 3).
+- `website/README.md`: Node.js 20 (20.19 or later) or Node.js 22 or later, instead of "a
+  recent version"; Yarn 4 instead of Yarn 3 (the exact version in `packageManager`), set
+  up with `corepack enable`, and `npm install -g corepack` where Node.js does not include
+  Corepack.
+- Unchanged, as the brief says: `src/dat/zoodbdata.11ty.js`, `src/pic/pic.11ty.js`,
+  `src/dat/searchindex.11ty.js` and `javascripts/`, `permalinks.js`, `eleventy.config.js`,
+  the data and the schema; `website/package.json` and `yarn.lock` in their committed form
+  (zoodb by git URL).
+
+**The check**, as run (repeatable; `LOG` any folder for the logs):
+
+```sh
+W=/Users/philippe/Research/projects/zoodb/zoodb/.worktrees/zoodb-flmrs
+C=$W/scratch/zoodb-example
+# the archive: neither rust/target/ nor the clone, the FLM module in it
+cd $W && yarn pack --dry-run > $LOG/c-pack-dry.log 2>&1
+grep -c 'rust/target' $LOG/c-pack-dry.log              # 0
+grep -c 'scratch/zoodb-example' $LOG/c-pack-dry.log    # 0
+grep 'zoodb_flm_wasm_bg.wasm' $LOG/c-pack-dry.log      # src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm
+cd $W && yarn pack --out $W/scratch/zoodb-flmrs.tgz
+# the temporary dependency on the tarball
+sed -i '' "s|\"@phfaist/zoodb\": \"https://github.com/phfaist/zoodb.git\"|\"@phfaist/zoodb\": \"file:$W/scratch/zoodb-flmrs.tgz\"|" $C/website/package.json
+cd $C && yarn install > $LOG/c-install.log 2>&1        # at the clone's root (workspaces)
+cd $C/website && yarn build > $LOG/c-build.log 2>&1    # removes _site and .parcel-cache, DEBUG on
+# back to the committed form
+cd $C && git checkout -- website/package.json yarn.lock && git status --short
+```
+
+After a new pack, run the `sed`, `yarn install` and `yarn build` again (the lock entry of
+a `file:` tarball carries its hash). The site is checked with `grep` on `_site/` and a
+script in the session's scratchpad (`check_port.mjs`, not committed): it computes the
+stylesheet of an engine configured as the example's and looks for its class selectors in
+Parcel's bundle (Parcel replaces `dynamic_style/flm.css` by a bundle), prints the `title`
+snippets of the five people, and makes the zoo with the commented `engine` block above;
+it loads the zoo on a copy of the citations cache whose arXiv entry was extended by
+`zoodb-extend-citations-ttl --prefix arxiv --add 60d` (no network wait; the clone's cache
+untouched).
+
+**Numbers.**
+
+| | |
+|---|---|
+| pack | `yarn pack --dry-run` exit 0, 361 log lines, 0 under `rust/target/`, 0 under `scratch/zoodb-example/`, `src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` listed; the tarball 3,288,042 B |
+| install | `yarn install` exit 0, 8.1 s wall, "Done with warnings" (the example's own peer-dependency warnings: YN0002 `@mischnic/parcel-resolver-root`, YN0086); one `@phfaist/zoodb` in `node_modules` (0.2.1, from the tarball; the lock's git resolution `e2eef99` replaced) |
+| build | exit 0 twice (the second after a comment edit), Eleventy "Wrote 13 files" in 150.20 s and 85.60 s, of which the arXiv retries took 130.8 s and 80.6 s (HTTP 429 five times, then "using the expired cached entry": the copied cache's `arxiv:1902.07714` expired around 2026-10-09); the zoo's setup and load otherwise about 1.7 s and 0.6 s; in the second run, engine creation about 87 ms, FLM processing outside retrieval 0.13 s (fields 4 ms, scan 15 ms, citations compiled 43 ms, image 18 ms, snippets 26 ms); the five person pages render in 29 and 32 ms (Eleventy's benchmark); Parcel 13.7 s and 3.7 s |
+| diagnostics | none: no `flm.*` or `zoodb.*` diagnostic identifier in the log; the lines with "error" are config keys, the citation manager's 429 note and the image retriever's tried extensions (`Smiley`, `Smiley.svg` ENOENT before `Smiley.png`); the one "Warning" is Eleventy's (`@kitschpatrol/eleventy-plugin-parcel` asks for Eleventy `^2.0.0`; the example's own); the srcset/U2 warning once, on its two channels (the `zoodb.std.use_flm_engine` debug line and `console.warn`) |
+| pages | `index.html` and the five `person/*.html` exist; 0 `<flm:` in all pages, and no `flm:` followed by a digit anywhere in `_site/` |
+| links | 14 links to person pages, all with the person's name as text except `spouse`: 12 from `ref()` (`<a href=/person/bob class="href-ref ref-person">Bob Bibby</a>`; Parcel's minifier drops the quotes) and 2 in Bob's biography: `\ref{person:alice}` → `<a class=flm-pres-link href=/person/alice data-flm-kind=ref>Alice Aaliz</a>` (the form of 07 milestone 1) and `\hyperref[person:alice]{spouse}` to the same href; within pages `\ref{figure:AliceIsHappy}` → `#figure-1` "Fig. 1" and `\ref{table:BobsFavoriteFoods}` → `#table-1` "Tab. 1"; `index.html` links the five names (html snippets) |
+| image | Alice's page: `<img class="flm-pres-block flm-pres-image" src=/fig-Smiley.xej1.78fdc818.png style="--flm-element-width:159.84pt;…">` (the engine wrote `/pic/fig-Smiley.xej1.png`, as in the dump; Parcel points it to its hashed copy); no `srcset` on any page |
+| bibliography, footnotes | Bob's page: the bibliography, 4 entries (the arXiv entry chained to its DOI, Landauer, Bennett, the `manual:` entry), between the Children list and "Last modified", where `endnotes()` stands; marks `[1]` and `[2–4]`; no footnote list on any page (the data has no footnote) |
+| stylesheet | `html_stylesheet()` of an engine configured as the example's: 44,809 B, 1,038 lines, 15 style definitions (of the engine's 17), 38 distinct `.flm-` class selectors; Parcel bundles it with `main.scss` into `_site.85add435.css` (16,488 B, minified), which holds all 38 |
+| dump | `dat/zoodbdata.json` 9,409 B, parses; top-level keys `db` and `zooflm`, no `refs_data`; `zooflm`: `settings_hash`, `index` (`default`: 7 entries, the 5 people, `figure:AliceIsHappy` → `/person/alice`, `table:BobsFavoriteFoods` → `/person/bob`), `citations` (4), `graphics` (1), `snippets` (5); every object's `_zoodb` keeps `flm_field_positions` (1,308 B of the 9,409; Deferred (b) of parts A and B) |
+| search index | `dat/searchindex.json` 1,723 B, parses (`info`, `serialized_store`, `serialized_index`); the texts through the engine (Charlie's friend detail on Charlie's entry) |
+| titles | `snippet(name, 'text')`: `Alice Aaliz`, `Bob Bibby`, `Charlie Aaliz-Bibby`, `Danielle Aaliz-Bibby`, `Zaphod Ziffy` (the check script; the pages did not show them; after the review their `<title>` does, Review fixes 5) |
+
+Against 07 milestone 1: every marker substituted (0 left), `\ref{person:alice}` gives the
+same link with the same text, `\hyperref` resolves, `ref()` gives the same text, the
+bibliography is where the composer placed its marker (now with the 4 compiled entries in
+place of `flm.citations.no-entry` markup), and pages without footnotes have no footnote
+list. Against 10's table for `zoodb-example`: 12 fragments scanned, 2 labels, 4 cited keys,
+an index of 7 entries, no diagnostic.
+
+**Deviations from the brief.**
+
+- *Node requirement.* The brief expected Node 20.11 (`import.meta.dirname`); the README
+  says 20.19 or later on the 20 line, or 22 or later. The package needs nothing newer than
+  20.11 (no `import.meta.dirname`, `Promise.withResolvers`, `Object.groupBy`,
+  `Array.fromAsync` or `Iterator.from` in its hand-written sources), but the lock's
+  `sass` 1.101.0 (through `@parcel/transformer-sass`, for `main.scss`), `chokidar` 5.0.0
+  and `readdirp` 5.0.0 declare `node >=20.19.0`, and `glob` 11.0.0, a dependency of
+  `@phfaist/zoodb` itself (`^11.0.0`), declares `20 || >=22` (`engines` of the 318
+  installed packages that have one).
+- *Commit trailers in the clone.* `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
+  (the harness's attribution for commits this agent makes, and the model that wrote them)
+  instead of this repository's `Claude Fable 5.1`; the `Claude-Session` line is the same.
+  The branch is not pushed, so the main session can reword them (decided: left as is;
+  Deferred (a) below).
+- *Comments* added for the example's readers (the brief asked to keep the templates'
+  shape): on `load_wasm`, the `engine` block, the composer's helpers, the title snippet,
+  the stylesheet file.
+- *The dev-mode reload check* was skipped: every rebuild waits on the arXiv retries while
+  the cache's arXiv entry is expired (80 to 130 s here), and it needs a server and an edit
+  of a data file.
+
+**Found (for the main session).** The build showed no bug of the package, but the review
+found a gap: the engine listed its script definitions (`html_definitions()`) but had no
+counterpart of `html_stylesheet()` for them, and the ported pages kept the site's MathJax 3
+setup, whose `pageReady` typesets only `.display-math,
+.inline-math` (the old classes) and so nothing of the new output
+(`flm-pres-math--passthrough`), while Q10 had decided MathJax 4 and scripts delivered by
+the site. Fixed by `html_scripts()` (Review fixes 1). Nothing else of
+the package.
+
+- *`~\cite` gives two no-break spaces* (flm-rs). The data's `one~\cite{arXiv:1902.07714}`
+  and `this~\cite{…}` render `one&nbsp;<span class="flm-citations-space flm-pres-span">&nbsp;</span><span
+  class="flm-citations-mark …">[1]</span>`, and the searchable text reads `one  [1]`. flm-rs
+  documents the space before an attached mark as the feature's own (`docs/rendering.md`,
+  citations: `studied \cite{a,b}` → `studied<span class="flm-pres-span
+  flm-citations-space">&#xA0;</span>…`, the source's space absorbed), and its recomposed
+  LaTeX writes `\flmCitePreSpace`, `\unskip~`, which removes a preceding tie; the HTML and
+  text backends keep the tie's character. Not worked around; a question for flm-rs (an
+  upstream request?). How often the EC zoo writes `~\cite` was not counted.
+- *The packed archive carries more than the library.* Besides `src/`, `flm-js-src/`,
+  `tools/`, `package.json` and `README.md`, the 361 lines list `test/` (72), `doc/` (30),
+  `rust/` (24, sources only), `scratch/` (18: the design notes and the prototype scripts),
+  `dev-docs/` (17), `playground/` (6), `.claude/` (2), `example/` (1), `CLAUDE.md`,
+  `.eslintrc.json`, `.readthedocs.yaml`: `package.json` has no `files` and there is no
+  `.npmignore`. Harmless here; for the 0.3.0 release (step 5) a `files` list would keep the
+  archive to what the package needs.
+- *The package's `engines` (`node >=18`) understates what it needs*: its dependency `glob`
+  `^11.0.0` (11.0.0 installed) declares `node: 20 || >=22` (so did the zoodb commit
+  `e2eef99` that the example's committed lock pins). For 0.3.0 (step 5), `>=20` at least,
+  or the README's 20.19/22.
+- *`citations.skip_save_cache: true` also skips reading the cache* ("0 cached citation(s)"
+  with a cache on disk): the manager keeps the cache in memory only, as its option doc
+  says; the standard setup's one-line doc ("skip writing updated citation cache to disk")
+  could say that nothing is read either.
+- *The example's citations cache is expired* (its arXiv entry, around 2026-10-09), so each
+  build retries arXiv five times before using the expired entry (here arXiv answered 429,
+  80 to 130 s). Running `zoodb-extend-citations-ttl` on `../zoodb-example`'s cache, or a
+  rebuild once arXiv answers, removes the wait; nothing changed here.
+
+**Open questions.**
+
+- *Every page had an empty `<title>`*: `templates/layout/base_page.njk` wrote `{{
+  page.title }}`, which Eleventy never sets (the data is `title`); also on `index.html` and
+  `about.html`, so it predates the port. Decided: fixed on this branch, `{{ title }}`
+  (Review fixes 5; Deferred (d)).
+- *The srcset comment* in `myzoodb.js` said that the option enables `srcset=`; while U2 is
+  open it does not (the build's warning says so). Decided: the comment gains a sentence
+  (Review fixes 4).
+- *`javascripts/searchGenerateIndex.js`* keeps the commented line `//const
+  zoo_flm_environment = zoodb.zoo_flm_environment;` (the search index stays unchanged).
+- *Dev mode*: `eleventy.config.js` calls `load_zoodb()` on every rebuild, which makes a new
+  ZooDb and a new engine each time; the previous engine is never `free()`d. Whether its
+  wasm memory is reclaimed was not checked; worth a look for the EC zoo's dev mode
+  (step 6).
+
+**Review fixes** (2026-10-16, after the review; the worktree still at `19c428c`, its
+changes left uncommitted for the main session; in the clone one commit, `2242062` "Review
+fixes: MathJax 4 from the FLM engine, page warnings, titles, README", on `zoodb-flmrs`
+after `5cc0c68`, with this repository's trailers, `Co-Authored-By: Claude Fable 5.1`; not
+pushed; the clone's `git status --short` empty afterwards).
+
+1. *MathJax 4 from the engine* (the package and the example). `ZooFlmEngine.html_scripts()`
+   (`src/zooflm/engine.js`, next to `html_stylesheet()`): for every definition of kind
+   `script` of `html_definitions()`, in the registry's order, an HTML comment line
+   `<!-- ID (feature OWNER) -->`, then its parts in their declared order: an `inline` part
+   as `<script>` with the text on its own lines, a `url` part as `<script src="URL"
+   async></script>` (the URL HTML-escaped; `async` is safe since the inline configuration
+   comes first in document order), a `file` or `table` part no tag (the host serves files
+   itself; the JSDoc says so); the tags joined by newlines with a final newline, `''`
+   without a script definition. A probe of `html_definitions()` (default configuration,
+   and with `dollar_math`) found one script definition, `flm.html.mathjax` (feature
+   `html`), parts `inline` (the `window.MathJax = {…}` configuration with `startup:
+   {elements: ['.flm-pres-math--passthrough']}`, the click listener for links inside
+   formulas and the `flm:region-updated` code; 4,209 characters) and `url`
+   (`https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js`). Test (`test_zooflm_engine.js`,
+   "html_scripts() gives the script definitions as tags…", on an engine of the default
+   configuration): exactly one script definition, its URL `mathjax@4`; one comment, two
+   `<script` tags, the configuration before `<script src="URL" async></script>`, the
+   selector in the configuration, no style definition's id, no `@layer` or `<style`.
+   `CLAUDE.md`'s engine bullet: `html_definitions`/`html_stylesheet`/`html_scripts`. In
+   the example, `templates/useMathjaxScript.njk` is now a two-line Nunjucks comment and
+   `{{ zoodb.zoo_flm_engine.html_scripts() | safe }}` (the global data `zoodb` is
+   reachable in the layout and Nunjucks calls the method: the tags are in the pages), and
+   `base_page.njk` loses the `mathjax@3` loader tag.
+2. *Warnings* (`website/src/person/person.11ty.js`): `render()` keeps `render_document()`'s
+   result, prints each of its `diagnostics` with `console.warn(`${data.page.url}:
+   ${format_diagnostic(diagnostic)}`)` (`format_diagnostic` imported from
+   `@phfaist/zoodb/zooflm/engine`) and returns `result.html`; a two-line comment (an error
+   already throws under the default `abort` policy; the warnings are only returned).
+3. *README* (`README.md`): the sentence on the `zoodb-flmrs` branch goes on: until that
+   branch is merged into ZooDb's `main` and the example's `yarn.lock` refreshed, build
+   against a local checkout of ZooDb's `zoodb-flmrs` branch, e.g. packed (`yarn pack --out
+   zoodb.tgz`) with `website/package.json`'s `@phfaist/zoodb` pointing to `file:<path to
+   the tarball>` before `yarn install`; after the merge, refresh the lock with the `yarn
+   up` command given below in the README.
+4. *srcset comment* (`peopledbjs/myzoodb.js`): "Not yet supported by the new FLM engine:
+   for now images are published without srcset, and the build prints a warning."
+5. *Title* (`website/templates/layout/base_page.njk`): `<title>{{ title }}</title>`.
+
+*Checks after the fixes.* `yarn test` 487 passing (486 + the `html_scripts()` test);
+`yarn lint` the 18 pre-existing errors in the same 8 untouched files, none in
+`engine.js`. The clone's citations cache (ignored copy) had its arXiv entry extended
+first (`zoodb-extend-citations-ttl --prefix arxiv --add 60d`: 1 entry), so no arXiv
+retry. Then the commands of "The check" above: `yarn pack --dry-run` exit 0, 361 lines, 0
+under `rust/target/`, 0 under `scratch/zoodb-example/`, the `.wasm` listed; the tarball
+3,294,468 B (it holds `html_scripts()`); `yarn install` exit 0, 1.5 s wall, "Done with
+warnings" (the same YN0002/YN0086), one `@phfaist/zoodb` (0.2.1, from the tarball);
+`yarn build` exit 0, 8.1 s wall, Eleventy "Wrote 13 files in 3.97 seconds", "4 cached
+citation(s)", "Retrieved citations: 5 considered, 0 failed"; no `flm.*` or `zoodb.*`
+diagnostic identifier in the log (the `zoodb.*` names are debug namespaces only); no
+`console.warn` line from the person template (the pages have no diagnostic); the
+srcset/U2 warning once on its two channels; the five person pages render in 15 ms
+(Eleventy's benchmark). `website/package.json` and `yarn.lock` restored with `git
+checkout --` before the commit.
+
+*MathJax in the built pages* (`_site/`, after Parcel). All 8 pages (`index`, `about`,
+`search` and the five person pages) hold exactly one configuration script, minified by
+Parcel (`<script>window.MathJax={loader:{load:["[tex]/texhtml"]},…,startup:{elements:[".flm-pres-math--passthrough"]}},…</script>`;
+Parcel's HTML minifier drops the `<!-- flm.html.mathjax (feature html) -->` comment and
+the optional `<head>` tags), then `<script src=https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js
+async></script>`, both before `<body>`; no `mathjax@3`, `MathJax-script`,
+`typesetPageMathPromise` or `inline-math` anywhere in `_site/`. Bob's formula is still
+`<span class=flm-pres-math--passthrough data-flm-display=inline>\(\int f(x) dx = z\)</span>`.
+**No browser check was made**: whether MathJax 4 loads and typesets the formula (and the
+`[tex]/texhtml` extension loads from the CDN) is not verified.
+
+*Titles*: `index.html` "People DB home", `about.html` "About People DB", `search.html`
+"Search", and the person pages "Alice Aaliz", "Bob Bibby", "Charlie Aaliz-Bibby",
+"Danielle Aaliz-Bibby", "Zaphod Ziffy".
+
+*The rest as before*: 0 `<flm:`; 14 links to person pages from the person pages (Bob's
+`spouse` link included), 5 on `index.html`; Alice's `<img class="flm-pres-block
+flm-pres-image" src=/fig-Smiley.xej1.78fdc818.png …>`, no `srcset` on any page; Bob's
+bibliography (`role=doc-bibliography`) with 4 entries after the Children list, marks `[1]`
+and `[2–4]`; no footnote list; `_site.85add435.css` 16,488 B with the 38 `.flm-` class
+selectors; `dat/zoodbdata.json` 9,409 B, keys `db` and `zooflm` (`index.default` 7,
+`citations` 4, `graphics` 1, `snippets` 5); `dat/searchindex.json` 1,723 B (`info`,
+`serialized_store`, `serialized_index`).
+
+**Deferred / for the main session.**
+
+- (a) The clone's commits `bc0a6ce` and `5cc0c68` carry `Co-Authored-By: Claude Opus
+  5.5` (the model that wrote them); left as is (decided). `2242062` carries `Claude Fable
+  5.1`.
+- (b) After `zoodb-flmrs` merges into ZooDb's `main`, the example's `yarn.lock` must be
+  refreshed on its branch (the `yarn up` command of its README) and committed: the
+  committed lock pins zoodb's commit `e2eef99`, which lacks the new API.
+- (c) The dev-mode reload loop and the freeing of the replaced engines are checked on the
+  EC zoo in step 6.
+- (d) The empty `<title>` was a bug of the example before the port, fixed on this branch
+  (Review fixes 5): a deviation from "nothing else changes".

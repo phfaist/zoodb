@@ -116,6 +116,7 @@ in-browser processor (R12), the `quote` feature (stdcore has one), the data re-i
 | `website/src/person/person.11ty.js` | the composer: same `ne`, `rdr`, `rdrblock`, `ref` helpers, `make_and_render_document` becomes the engine's `render_document`, `<RENDER_ENDNOTES/>` becomes a piece helper, `render_text_standalone` becomes a snippet lookup. The shape of the template survives. |
 | `website/src/index.11ty.js` | `render_html_standalone` becomes a snippet lookup. |
 | `website/src/dynamic_style/flm.css.11ty.js` | the stylesheet from the engine instead of the fragment renderer. |
+| `website/templates/useMathjaxScript.njk`, `website/templates/layout/base_page.njk` | the site's MathJax 3 configuration and loader tag are replaced by the engine's script definitions (`html_scripts()`: the MathJax 4 configuration targeting `.flm-pres-math--passthrough`, then the loader), per Q10 (3) and (4); found missing in the review of step 4 (the formulas were no longer typeset). |
 | `website/src/dat/zoodbdata.11ty.js`, `website/src/pic/pic.11ty.js`, the search index | unchanged calls (`data_dump`, the collector's data, the searchable text fieldset). |
 | `data/` | the 9 YAML files parse under the strict `yaml` package (checked 2026-10-15). |
 
