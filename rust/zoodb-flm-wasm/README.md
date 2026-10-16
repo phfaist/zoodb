@@ -15,7 +15,8 @@ for the workspace, the prerequisites and the path dependency on flm-rs).
 
 ## Modules
 
-- `src/lib.rs` — the wasm-bindgen wrapper, the class `ZooFlm`;
+- `src/lib.rs` — the wasm-bindgen wrapper, the class `ZooFlmCore`, and the
+  TypeScript declarations of every shape that crosses to JavaScript;
   `#![forbid(unsafe_code)]`; `start()` marks the module's one thread as
   flm-core's worker thread.
 - `src/engine.rs` — the engine in plain Rust (no wasm types: it compiles and
@@ -28,32 +29,49 @@ for the workspace, the prerequisites and the path dependency on flm-rs).
 - `src/truncate.rs` — the truncation helper for previews.
 - `build.rs` — the stack link argument (see Invariants).
 
-## The `ZooFlm` surface
+## The `ZooFlmCore` surface
 
-Every value crosses as plain JSON-compatible data; an error is thrown as an
-`Error` with the message. A configuration, an options object or a table entry
-with a key the method does not know is refused, naming the key; a key left out,
-or set to `null` or `undefined`, takes its default (the feature settings under
-`settings` excepted, which reach flm-core as given). A diagnostic (`Diag`) is `{ identifier, severity:
-'error'|'warning'|'note', message, origin, start, end, line, col }`: `origin`
-is the fragment's origin (`path#field`), `start`/`end` are byte offsets into
-the fragment's text, `line`/`col` are within it. `free()` releases an engine.
+The core is driven by the engine of `src/zooflm/engine.js` (`ZooFlmEngine`),
+which owns one core per zoo; the core can be used directly too. Every value
+crosses as plain JSON-compatible data; the generated `.d.ts` declares each
+shape (`CoreConfig`, `ParsedOut`, `HtmlOut`, `TextOut`, `LatexOut`, `ScanOut`,
+`TruncateOut`, `FieldsOut`, `Definition`, `CoreDiagnostic`, …). An error (a
+wrong handle, a released one, a wrong option, a configuration refused) is
+thrown as an `Error` with the message, never returned as content. A
+configuration, an options object or a table entry with a key the method does
+not know is refused, naming the key; a key left out, or set to `null` or
+`undefined`, takes its default (the feature settings under `settings`
+excepted, which reach flm-core as given). A diagnostic (`CoreDiagnostic`) is
+`{ identifier, severity: 'error'|'warning'|'note', message, origin, start,
+end, line, col }`: `origin` is the label of the source it is in (a fragment's
+origin as given to `parse`, `path#field`, or the label of a source the library
+created, such as `index:person:alice` or `citation:arxiv:…`; `null` when it
+has neither), `start`/`end` are byte offsets into that source's text,
+`line`/`col` are 1-based within it (the column in bytes; the engine recomputes
+it in characters for the fragments it holds the source of). `free()` releases a
+core.
 
 | method | returns |
 |---|---|
-| `new ZooFlm(config)`, config `{ dollar_math?, settings?, off?, srcset? }`: `settings` one map per standard feature (`{ math: { … } }`, user definitions under `userdefs`: `macros`, `environments`, `specials`), `off` features switched off by name, `srcset` `{ pixel_density_list?, image_max_zoom_factor? }` | the engine; throws on an unknown feature or setting, naming the feature and the key |
-| `ZooFlm.features()` (static) | `[{ name, schema }]`, `schema` the JSON Schema of the feature's settings or `null` |
-| `build_diagnostics()` | `[Diag]` |
-| `parse(text, origin, layout)`, layout `'blocks'`, `'inline'` or `'auto'` | `{ handle, diagnostics }` |
-| `render_html(handles, { title?, unresolved_refs_warning? })` | `{ trees: [html], pieces: [{ name, place, html }], requires: [definition id], definitions: [{ id, kind: 'style'\|'script', owner, parts: [{ kind: 'inline'\|'file'\|'url'\|'host'\|'other', text }] }], diagnostics, has_errors }`, one tree per handle in order |
-| `render_text(handles, { width?, link_addresses?, unresolved_refs_warning?, per_tree?, pieces? })` | `{ text, trees, diagnostics, has_errors }`; `trees` only with `per_tree` (each tree rendered alone) |
+| `new ZooFlmCore(config)`, config `{ dollar_math?, settings?, off?, srcset? }`: `settings` one map per standard feature (`{ math: { … } }`, user definitions under `userdefs`: `macros`, `environments`, `specials`), `off` features switched off by name, `srcset` `{ pixel_density_list?, image_max_zoom_factor? }` | the core; throws on an unknown feature or setting, naming the feature and the key |
+| `ZooFlmCore.features()` (static) | `[{ name, schema }]`, `schema` the JSON Schema of the feature's settings or `null` |
+| `build_diagnostics()` | `[CoreDiagnostic]` |
+| `parse(text, origin, layout)`, layout `'blocks'`, `'inline'` or `'auto'` | `{ handle, empty, diagnostics }`; `empty`: the tree holds only whitespace, comments and paragraph breaks |
+| `with_layout(handle, layout)` | a new handle sharing the tree, source and parse diagnostics of `handle`, with another layout (not parsed again) |
+| `release(handles)` | nothing; every handle is checked first (unknown or already released: an error, nothing released), and a released handle used later is an error; handles are never reused |
+| `html_definitions()` | every style and script definition the registry declares, `[{ id, kind: 'style'\|'script', owner, parts: [{ kind: 'inline'\|'file'\|'url'\|'table', text }] }]`, the styles first, each in registration order (the order of a run's definitions table) |
+| `render_html(handles, { title?, unresolved_refs_warning? })` | `{ trees: [html], tree_requires: [[definition id]], pieces: [{ name, place: 'before-content'\|'after-content', html, requires }], requires, definitions: [Definition], diagnostics, has_errors }`, one tree per handle in order; `requires` the union of `tree_requires`; `definitions` what the run's document requires, resolved (parts `inline`, `file`, `url`, or `host` for a definition the host supplies), the backend's page style included |
+| `render_text(handles, { width?, link_addresses?, unresolved_refs_warning?, per_tree?, pieces? })` | `{ text, trees, tree_diagnostics, diagnostics, has_errors }`; with `per_tree`, `trees` and `tree_diagnostics` hold each tree rendered alone and that run's diagnostics (a reference to another tree does not resolve there) |
 | `render_latex(handles, { raw_label_types?, drop_comments?, unresolved_refs_warning? })` | `{ trees, style_name, style, document, diagnostics, has_errors }` |
 | `scan(handles, standalone_handles)` | `{ trees: [{ labels, refs_resolved: [href], refs_unresolved: [label], graphics: [{ path, origin }] }], cited: [[key, origin]], duplicate_labels, standalone_violations, diagnostics, has_errors }` |
 | `truncate(text, origin, layout, { chars, min_chars?, marker?, first_paragraph? })` | `{ source, truncated, cut_at, diagnostics }`: the shortened FLM source, to be parsed again |
 | `parse_fields(text, origin)` | `{ fields: [{ name, start, end, text }], diagnostics }`: the `\begin{field}{name} … \end{field}` of an FLM data file |
-| `set_external_index([{ label, href, display }])` | `[Diag]` of the display texts (FLM, parsed inline) |
+| `set_external_index([{ label, href, display }])` | `[CoreDiagnostic]` of the display texts (FLM, parsed inline; origin `index:LABEL`) |
 | `set_citations([{ key, text }])`, `set_graphics([GraphicsEntry])` | nothing (see Host tables) |
-| `fragment_count()`, `external_index_len()`, `citations_len()`, `graphics_len()` | numbers |
+| `fragment_count()` (live fragments), `external_index_len()`, `citations_len()`, `graphics_len()` | numbers |
+
+A run's diagnostics include the parse diagnostics of the fragments it places
+(flm-core's `Run::diagnostics`), as well as the stages'.
 
 `unresolved_refs_warning` defaults to `false` (an unresolved reference is an
 Error) for html and LaTeX, `true` for text. The scan is a bare plan request
@@ -118,7 +136,8 @@ module is loaded with `load_zoodb_flm_wasm(source)` of
 `source` is the bytes, a `WebAssembly.Module`, a `Response` or a URL; without
 it the browser fetches `wasm_url`) or `load_zoodb_flm_wasm_node()` of
 `src/zooflm/_load_wasm_node.js` (`@phfaist/zoodb/zooflm/wasm-node`). Both
-resolve to the glue's namespace (`ZooFlm`, …), instantiated once.
+resolve to the glue's namespace (`ZooFlmCore`, …), instantiated once;
+the engine `ZooFlmEngine.create({ load_wasm })` takes either.
 
 ## Checks
 
@@ -129,8 +148,9 @@ cargo clippy -p zoodb-flm-wasm --all-targets -- -D warnings
 cargo test -p zoodb-flm-wasm
 ```
 
-and the module through its loaders, from the repository root:
-`yarn mocha test/test_zooflm_wasm_module.js`.
+and the module through its loaders, and the engine over it, from the
+repository root: `yarn mocha test/test_zooflm_wasm_module.js
+test/test_zooflm_engine.js`.
 
 ## Invariants
 

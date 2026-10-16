@@ -39,11 +39,17 @@ Toolchain prerequisites for the Rust bindings only (not needed to use or test th
 - `yamldb.js` — `YamlDbDataLoader`: loads objects from YAML files on disk, validates against schemas.
 - `flmfilesdb.js` — Loads data from FLM-formatted files.
 
-**ZooFLM (`src/zooflm/`):** FLM (Flexible LaTeX-like Markup) integration layer. Wraps the transpiled Python FLM library (in `flm-js-src/flm-js/`). Key files:
+**ZooFLM (`src/zooflm/`):** FLM (Flexible LaTeX-like Markup) integration layer. Two layers side by side until step 5 of the redesign removes the old one (`dev-docs/initial-design/`). The old layer wraps the transpiled Python FLM library (in `flm-js-src/flm-js/`); package export `./zooflm`:
 - `_environment.js` — Creates and configures FLM environments with zoo-specific features.
 - `_fragmentrenderers.js` — HTML fragment renderers for FLM content.
 - `scanner.js` — Scans FLM content for references, citations, resources.
-- `citationcompiler.js` — Compiles citation information for rendering.
+- `citationcompiler.js` — Compiles citation information for rendering (kept by the new layer).
+
+The new engine over the wasm core `ZooFlmCore` (package export `./zooflm/engine`; environment-neutral: these four files import nothing but each other and `_load_wasm.js`):
+- `engine.js` — `ZooFlmEngine` (`ZooFlmEngine.create({ load_wasm, core, error_policy, unresolved, render_value_options })`): fragments over core handles, the index per context, the citations and graphics tables, `render_document` (the composer protocol), `render_fragment`, the snippet cache (`render_snippets`, `snippet`, `snippet_of_text`), `render_text`, `render_latex`, `scan`, `truncate`, `html_definitions`/`html_stylesheet`; re-exports the three modules below.
+- `fragment.js` — `ZooFlmFragment` (source, origin with its canonical `label`, layout, standalone, handle, diagnostics, empty) and the origin helpers.
+- `diagnostics.js` — the diagnostic shape, `format_diagnostic`, `ZooFlmError` (thrown under the `abort` policy), the policy helpers, byte offsets to lines and columns.
+- `compose.js` — `ZooFlmComposition`: the composer helpers (`ne`, `rdr`, `rdrblock`, `ref`, `refhref`, `endnotes`, `piece`, `escape`), the markers `<flm:K:tree:N/>`, `<flm:K:piece:NAME/>`, `<flm:K:endnotes/>` (`K` a token per call) and their substitution.
 
 **Standard Setup (`src/std/`):** High-level convenience layer. `stdzoodb.js` exports `makeStandardZooDb()` which wires up a ZooDb with common processors via config. Other `use_*.js` files are config helpers for individual processors.
 
@@ -51,7 +57,7 @@ Toolchain prerequisites for the Rust bindings only (not needed to use or test th
 
 **Resource Collector (`src/resourcecollector/`):** Handles external resources (images, files) referenced by zoo objects.
 
-**Rust bindings (`rust/`):** A cargo workspace (`rust/Cargo.toml`, `resolver = "3"`; one `Cargo.lock`, `rust-toolchain.toml` and release profile, all committed; `rust/target/` gitignored) of two crates compiled to WebAssembly via `wasm-bindgen`. `zoodb-autocitefetch-wasm/` wraps the crates.io crate `autocitefetch`; all host I/O is delegated to JavaScript callbacks; never enable `serde_json/std` for it. `zoodb-flm-wasm/` wraps `flm-core` (path dependency on the local flm-rs checkout, read-only; where flm-rs is referenced from is settled later) with the ZooDb feature (`field` element, standalone check, `srcset` stage behind U2); class `ZooFlm`; no I/O of its own; `build.rs` links a 64 MiB stack for wasm32. See `rust/README.md`, the crates' READMEs and `dev-docs/AutocitefetchImplementationPlan.md`.
+**Rust bindings (`rust/`):** A cargo workspace (`rust/Cargo.toml`, `resolver = "3"`; one `Cargo.lock`, `rust-toolchain.toml` and release profile, all committed; `rust/target/` gitignored) of two crates compiled to WebAssembly via `wasm-bindgen`. `zoodb-autocitefetch-wasm/` wraps the crates.io crate `autocitefetch`; all host I/O is delegated to JavaScript callbacks; never enable `serde_json/std` for it. `zoodb-flm-wasm/` wraps `flm-core` (path dependency on the local flm-rs checkout, read-only; where flm-rs is referenced from is settled later) with the ZooDb feature (`field` element, standalone check, `srcset` stage behind U2); class `ZooFlmCore` (typed in the generated `.d.ts`), driven by `src/zooflm/engine.js`; no I/O of its own; `build.rs` links a 64 MiB stack for wasm32. See `rust/README.md`, the crates' READMEs and `dev-docs/AutocitefetchImplementationPlan.md`.
 
 **Generated wasm modules (`src/citationmanager/_wasm/`, `src/zooflm/_wasm/`):** Output of `yarn build:wasm` (wasm-bindgen glue, `.d.ts`, `BUILD_INFO.json`, and the binary: inlined as base64 for the citation module, the `.wasm` file itself for the FLM module), committed to git. **Do not edit by hand**; regenerate with `yarn build:wasm`. The citation module is loaded through the hand-written, environment-neutral `src/citationmanager/_load_wasm.js` (async, memoized). The FLM module has a loader pair: the environment-neutral `src/zooflm/_load_wasm.js` (`wasm_url`, `load_zoodb_flm_wasm(source)`: bytes, a `WebAssembly.Module`, a `Response` or a URL; without a source the browser fetches `wasm_url`) and the Node-only `src/zooflm/_load_wasm_node.js` (`load_zoodb_flm_wasm_node()`, reads the file); package exports `./zooflm/wasm` and `./zooflm/wasm-node`. The generated glue and the two neutral loaders may not reference `import.meta`, `require(`, `process.`, `Buffer`, `__dirname`, `node:` or `fs`, except the one `new URL('./_wasm/zoodb_flm_wasm_bg.wasm', import.meta.url)` in `src/zooflm/_load_wasm.js`.
 

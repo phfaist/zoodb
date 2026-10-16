@@ -26,7 +26,7 @@ const YAML = await import(pathToFileURL(path.join(nodeModules, 'yaml/dist/index.
 const zoo = makeZooData({ YAML, kind: 'eczoo', dataDir: args.data, schemasDir: args.schemas });
 
 const loaded = await loadZooFlm();
-const engine = new loaded.ZooFlm({ dollar_math: false });
+const engine = new loaded.ZooFlmCore({ dollar_math: false });
 const timings = {};
 const time = (name, f) => { const t0 = performance.now(); const r = f(); timings[name] = Math.round((performance.now() - t0) * 10) / 10; return r; };
 

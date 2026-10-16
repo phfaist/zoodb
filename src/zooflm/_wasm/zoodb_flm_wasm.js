@@ -2,27 +2,31 @@
 /* @ts-self-types="./zoodb_flm_wasm.d.ts" */
 
 /**
- * The engine as a JavaScript class: one registry, the fragments parsed with
+ * The core as a JavaScript class: one registry, the fragments parsed with
  * it (addressed by handle), the cached plans and the host tables. Every
- * method returns plain JSON-compatible values; an error is thrown as a
- * JavaScript `Error` carrying the message.
+ * method returns plain JSON-compatible values; an error (a wrong handle, a
+ * wrong option, a configuration refused) is thrown as a JavaScript `Error`
+ * carrying the message, never returned as content. The engine of
+ * `src/zooflm/engine.js` drives it.
  */
-export class ZooFlm {
+export class ZooFlmCore {
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-        ZooFlmFinalization.unregister(this);
+        ZooFlmCoreFinalization.unregister(this);
         return ptr;
     }
     free() {
         const ptr = this.__destroy_into_raw();
-        wasm.__wbg_zooflm_free(ptr, 0);
+        wasm.__wbg_zooflmcore_free(ptr, 0);
     }
     /**
-     * @returns {any}
+     * The diagnostics of the registry build (a successful build can carry
+     * Errors).
+     * @returns {CoreDiagnostic[]}
      */
     build_diagnostics() {
-        const ret = wasm.zooflm_build_diagnostics(this.__wbg_ptr);
+        const ret = wasm.zooflmcore_build_diagnostics(this.__wbg_ptr);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
@@ -32,60 +36,75 @@ export class ZooFlm {
      * @returns {number}
      */
     citations_len() {
-        const ret = wasm.zooflm_citations_len(this.__wbg_ptr);
+        const ret = wasm.zooflmcore_citations_len(this.__wbg_ptr);
         return ret >>> 0;
     }
     /**
      * @returns {number}
      */
     external_index_len() {
-        const ret = wasm.zooflm_external_index_len(this.__wbg_ptr);
+        const ret = wasm.zooflmcore_external_index_len(this.__wbg_ptr);
         return ret >>> 0;
     }
     /**
      * The standard features and the JSON Schema of each one's settings (Q14).
-     * @returns {any}
+     * @returns {FeatureInfo[]}
      */
     static features() {
-        const ret = wasm.zooflm_features();
+        const ret = wasm.zooflmcore_features();
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
         return takeFromExternrefTable0(ret[0]);
     }
     /**
+     * The number of fragments held (released ones not counted).
      * @returns {number}
      */
     fragment_count() {
-        const ret = wasm.zooflm_fragment_count(this.__wbg_ptr);
+        const ret = wasm.zooflmcore_fragment_count(this.__wbg_ptr);
         return ret >>> 0;
     }
     /**
      * @returns {number}
      */
     graphics_len() {
-        const ret = wasm.zooflm_graphics_len(this.__wbg_ptr);
+        const ret = wasm.zooflmcore_graphics_len(this.__wbg_ptr);
         return ret >>> 0;
     }
     /**
-     * @param {any} config
+     * Every style and script definition the registry declares, the styles
+     * first, each in registration order, with the parts as declared (D8).
+     * @returns {Definition[]}
+     */
+    html_definitions() {
+        const ret = wasm.zooflmcore_html_definitions(this.__wbg_ptr);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return takeFromExternrefTable0(ret[0]);
+    }
+    /**
+     * Builds the registry from `config` (`CoreConfig`); throws on an unknown
+     * key, feature or setting, naming it.
+     * @param {CoreConfig | null | undefined} config
      */
     constructor(config) {
-        const ret = wasm.zooflm_new(config);
+        const ret = wasm.zooflmcore_new(config);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
         this.__wbg_ptr = ret[0];
-        ZooFlmFinalization.register(this, this.__wbg_ptr, this);
+        ZooFlmCoreFinalization.register(this, this.__wbg_ptr, this);
         return this;
     }
     /**
-     * Parses `text` as one fragment; `layout` is `blocks`, `inline` or `auto`.
-     * Returns `{ handle, diagnostics }`.
+     * Parses `text` as one fragment with the canonical origin `origin`
+     * (empty: none). Returns `{ handle, empty, diagnostics }`.
      * @param {string} text
      * @param {string} origin
-     * @param {string} layout
-     * @returns {any}
+     * @param {FragmentLayoutName} layout
+     * @returns {ParsedOut}
      */
     parse(text, origin, layout) {
         const ptr0 = passStringToWasm0(text, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -94,40 +113,52 @@ export class ZooFlm {
         const len1 = WASM_VECTOR_LEN;
         const ptr2 = passStringToWasm0(layout, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len2 = WASM_VECTOR_LEN;
-        const ret = wasm.zooflm_parse(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2);
+        const ret = wasm.zooflmcore_parse(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
         return takeFromExternrefTable0(ret[0]);
     }
     /**
-     * Reads the fields of an FLM data file (Q16): `{ fields: [{ name, start,
-     * end, text }], diagnostics }`.
+     * Reads the fields of an FLM data file (Q16).
      * @param {string} text
      * @param {string} origin
-     * @returns {any}
+     * @returns {FieldsOut}
      */
     parse_fields(text, origin) {
         const ptr0 = passStringToWasm0(text, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passStringToWasm0(origin, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.zooflm_parse_fields(this.__wbg_ptr, ptr0, len0, ptr1, len1);
+        const ret = wasm.zooflmcore_parse_fields(this.__wbg_ptr, ptr0, len0, ptr1, len1);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
         return takeFromExternrefTable0(ret[0]);
     }
     /**
+     * Frees the fragments of `handles`; every handle is checked first, and a
+     * released handle used later throws.
+     * @param {Uint32Array | number[]} handles
+     */
+    release(handles) {
+        const ptr0 = passArray32ToWasm0(handles, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.zooflmcore_release(this.__wbg_ptr, ptr0, len0);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
+    }
+    /**
      * Renders the given fragments as one document with the `html` workflow.
-     * @param {Uint32Array} handles
-     * @param {any} options
-     * @returns {any}
+     * @param {Uint32Array | number[]} handles
+     * @param {RenderHtmlOptions | null | undefined} options
+     * @returns {HtmlOut}
      */
     render_html(handles, options) {
         const ptr0 = passArray32ToWasm0(handles, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.zooflm_render_html(this.__wbg_ptr, ptr0, len0, options);
+        const ret = wasm.zooflmcore_render_html(this.__wbg_ptr, ptr0, len0, options);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
@@ -135,16 +166,15 @@ export class ZooFlm {
     }
     /**
      * Renders the given fragments as one document with the `latex-recomposed`
-     * workflow (Q12): `{ trees, style_name, style, document, diagnostics,
-     * has_errors }`.
-     * @param {Uint32Array} handles
-     * @param {any} options
-     * @returns {any}
+     * workflow (Q12).
+     * @param {Uint32Array | number[]} handles
+     * @param {RenderLatexOptions | null | undefined} options
+     * @returns {LatexOut}
      */
     render_latex(handles, options) {
         const ptr0 = passArray32ToWasm0(handles, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.zooflm_render_latex(this.__wbg_ptr, ptr0, len0, options);
+        const ret = wasm.zooflmcore_render_latex(this.__wbg_ptr, ptr0, len0, options);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
@@ -152,15 +182,16 @@ export class ZooFlm {
     }
     /**
      * Renders the given fragments as one document with the `text` workflow
-     * (Q11): `{ text, trees, diagnostics, has_errors }`.
-     * @param {Uint32Array} handles
-     * @param {any} options
-     * @returns {any}
+     * (Q11); with `per_tree`, also each tree alone, with that run's
+     * diagnostics.
+     * @param {Uint32Array | number[]} handles
+     * @param {RenderTextOptions | null | undefined} options
+     * @returns {TextOut}
      */
     render_text(handles, options) {
         const ptr0 = passArray32ToWasm0(handles, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.zooflm_render_text(this.__wbg_ptr, ptr0, len0, options);
+        const ret = wasm.zooflmcore_render_text(this.__wbg_ptr, ptr0, len0, options);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
@@ -168,18 +199,18 @@ export class ZooFlm {
     }
     /**
      * Runs the scan (a bare plan over the tables the host reads) over the
-     * given fragments as one document and returns the scan tables;
-     * `standalone` lists the handles of standalone fields (Q5).
-     * @param {Uint32Array} handles
-     * @param {Uint32Array} standalone
-     * @returns {any}
+     * given fragments as one document; `standalone` lists the handles of
+     * standalone fields (Q5).
+     * @param {Uint32Array | number[]} handles
+     * @param {Uint32Array | number[]} standalone
+     * @returns {ScanOut}
      */
     scan(handles, standalone) {
         const ptr0 = passArray32ToWasm0(handles, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passArray32ToWasm0(standalone, wasm.__wbindgen_malloc);
         const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.zooflm_scan(this.__wbg_ptr, ptr0, len0, ptr1, len1);
+        const ret = wasm.zooflmcore_scan(this.__wbg_ptr, ptr0, len0, ptr1, len1);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
@@ -187,47 +218,45 @@ export class ZooFlm {
     }
     /**
      * Replaces the citations table: `[{ key, text }]` (Q6).
-     * @param {any} entries
+     * @param {CitationEntry[]} entries
      */
     set_citations(entries) {
-        const ret = wasm.zooflm_set_citations(this.__wbg_ptr, entries);
+        const ret = wasm.zooflmcore_set_citations(this.__wbg_ptr, entries);
         if (ret[1]) {
             throw takeFromExternrefTable0(ret[0]);
         }
     }
     /**
      * Replaces the external index: `[{ label, href, display }]`, `display`
-     * being FLM text. Returns the parse diagnostics of the display texts.
-     * @param {any} entries
-     * @returns {any}
+     * being FLM text, parsed inline. Returns the parse diagnostics of the
+     * display texts (origin `index:LABEL`).
+     * @param {ExternalIndexEntry[]} entries
+     * @returns {CoreDiagnostic[]}
      */
     set_external_index(entries) {
-        const ret = wasm.zooflm_set_external_index(this.__wbg_ptr, entries);
+        const ret = wasm.zooflmcore_set_external_index(this.__wbg_ptr, entries);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
         return takeFromExternrefTable0(ret[0]);
     }
     /**
-     * Replaces the graphics table: `[{ origin, path, identity, media_type,
-     * address, kind, width_px, height_px, dpi, width_pt, height_pt }]` (Q7).
-     * @param {any} entries
+     * Replaces the graphics table (Q7).
+     * @param {GraphicsEntry[]} entries
      */
     set_graphics(entries) {
-        const ret = wasm.zooflm_set_graphics(this.__wbg_ptr, entries);
+        const ret = wasm.zooflmcore_set_graphics(this.__wbg_ptr, entries);
         if (ret[1]) {
             throw takeFromExternrefTable0(ret[0]);
         }
     }
     /**
-     * Truncates FLM source to about `options.chars` characters (R18):
-     * `{ source, truncated, cut_at, diagnostics }`; `options` also takes
-     * `min_chars`, `marker` and `first_paragraph`.
+     * Truncates FLM source to about `options.chars` characters (R18).
      * @param {string} text
      * @param {string} origin
-     * @param {string} layout
-     * @param {any} options
-     * @returns {any}
+     * @param {FragmentLayoutName} layout
+     * @param {TruncateOptions} options
+     * @returns {TruncateOut}
      */
     truncate(text, origin, layout, options) {
         const ptr0 = passStringToWasm0(text, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -236,14 +265,30 @@ export class ZooFlm {
         const len1 = WASM_VECTOR_LEN;
         const ptr2 = passStringToWasm0(layout, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len2 = WASM_VECTOR_LEN;
-        const ret = wasm.zooflm_truncate(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2, options);
+        const ret = wasm.zooflmcore_truncate(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2, options);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
         return takeFromExternrefTable0(ret[0]);
     }
+    /**
+     * A new handle for the fragment of `handle` with another layout: the
+     * same tree, source and parse diagnostics, not parsed again.
+     * @param {number} handle
+     * @param {FragmentLayoutName} layout
+     * @returns {number}
+     */
+    with_layout(handle, layout) {
+        const ptr0 = passStringToWasm0(layout, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.zooflmcore_with_layout(this.__wbg_ptr, handle, ptr0, len0);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return ret[0] >>> 0;
+    }
 }
-if (Symbol.dispose) ZooFlm.prototype[Symbol.dispose] = ZooFlm.prototype.free;
+if (Symbol.dispose) ZooFlmCore.prototype[Symbol.dispose] = ZooFlmCore.prototype.free;
 
 export function start() {
     wasm.start();
@@ -485,9 +530,9 @@ function __wbg_get_imports() {
     };
 }
 
-const ZooFlmFinalization = (typeof FinalizationRegistry === 'undefined')
+const ZooFlmCoreFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_zooflm_free(ptr, 1));
+    : new FinalizationRegistry(ptr => wasm.__wbg_zooflmcore_free(ptr, 1));
 
 function addToExternrefTable0(obj) {
     const idx = wasm.__externref_table_alloc();

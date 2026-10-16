@@ -8,8 +8,8 @@
 import assert from 'node:assert/strict';
 import { loadZooFlm } from './load.mjs';
 
-const { ZooFlm } = await loadZooFlm();
-const engine = new ZooFlm({ dollar_math: false });
+const { ZooFlmCore } = await loadZooFlm();
+const engine = new ZooFlmCore({ dollar_math: false });
 
 const trim = (x) => x.replace(/^[ \t]*\n?/, '').replace(/\n?[ \t]*$/, '');
 function setPath(obj, dotted, value) {

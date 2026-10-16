@@ -13,7 +13,7 @@ let ready = null;
 
 /**
  * Instantiates the module once and resolves to the glue's namespace
- * (`ZooFlm`, ...). `source` is anything wasm-bindgen's `init` accepts as
+ * (`ZooFlmCore`, ...). `source` is anything wasm-bindgen's `init` accepts as
  * `module_or_path`: the bytes, a `WebAssembly.Module`, a `Response` or a
  * promise of one, or a URL. Without it, `wasm_url` is fetched (the browser
  * default). Memoized: later calls return the same promise and ignore

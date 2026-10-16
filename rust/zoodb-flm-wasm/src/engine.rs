@@ -26,7 +26,7 @@ use flm_core::model::element::element_of;
 use flm_core::core::registry::{DefContent, FlmRegistry, RegistryBuilder, RegistryInputs};
 use flm_core::core::run::{Externals, Run, RunOptions};
 use flm_core::lang::{Flm, FlmDiagnostic, FlmOrigin, FlmParsing, FlmSource, ParseOptions, parse_fragment};
-use flm_core::techy::core::node::NodeRef;
+use flm_core::techy::core::node::{NodeKind, NodeRef};
 use flm_core::model::addr::TreeId;
 use flm_core::model::doc::{Doc, DocContent, Fragment, FragmentLayout};
 use flm_core::model::options::OptionValues;
@@ -50,8 +50,9 @@ use flm_core::stdcore::features::refs::{
 use flm_core::model::aspects::Label;
 use flm_core::core::settings::PackageSettings;
 use flm_core::stdcore;
+use flm_core::lang::structural::PARBREAK;
 use flm_core::techy::error::Severity;
-use flm_core::techy::source::LineIndexCache;
+use flm_core::techy::source::{LineIndexCache, SourceOrigin};
 
 // ---------------------------------------------------------------------------
 // Configuration and outputs (all serializable: they cross to JavaScript)
@@ -86,7 +87,10 @@ pub struct DiagOut {
     pub identifier: String,
     pub severity: &'static str,
     pub message: String,
-    /// The canonical path of the origin (the fragment's `path#field`), if any.
+    /// The label of the source the diagnostic is in: its canonical path (a
+    /// fragment's origin, `path#field`), or the label of a source the library
+    /// created (`index:person:alice`, `citation:arxiv:…`); `None` when it has
+    /// neither.
     pub origin: Option<String>,
     pub start: usize,
     pub end: usize,
@@ -108,6 +112,8 @@ pub struct ExternalEntry {
 #[derive(Debug, Clone, Serialize)]
 pub struct ParsedOut {
     pub handle: u32,
+    /// The tree holds only whitespace, comments and paragraph breaks.
+    pub empty: bool,
     pub diagnostics: Vec<DiagOut>,
 }
 
@@ -179,6 +185,12 @@ pub struct TextOut {
     /// With `per_tree`, the text of each handle given, in the same order,
     /// each tree rendered alone; empty otherwise.
     pub trees: Vec<String>,
+    /// With `per_tree`, the diagnostics of each tree's own run, in the same
+    /// order as `trees`; empty otherwise. A reference to another tree does
+    /// not resolve in a tree's own run, so these hold what `diagnostics`
+    /// holds for the tree and such references besides.
+    pub tree_diagnostics: Vec<Vec<DiagOut>>,
+    /// The diagnostics of the run over all the trees.
     pub diagnostics: Vec<DiagOut>,
     pub has_errors: bool,
 }
@@ -213,7 +225,11 @@ pub struct DefOut {
     pub id: String,
     pub kind: &'static str,
     pub owner: String,
-    /// Each part: `{ kind: inline|file|url|table|host, text }`.
+    /// Each part: `{ kind: inline|file|url|table|host, text }`: the text, a
+    /// file path, an address, the name of the table that supplies the text
+    /// per document (in the registry's list only: a run resolves it to
+    /// `inline`), or `host` (the host supplies the definition, in a run's
+    /// list only).
     pub parts: Vec<DefPartOut>,
 }
 
@@ -226,15 +242,22 @@ pub struct DefPartOut {
 #[derive(Debug, Clone, Serialize)]
 pub struct PieceOut {
     pub name: String,
-    pub place: String,
+    /// `before-content` or `after-content`.
+    pub place: &'static str,
     pub html: String,
+    /// The identifiers of the definitions the piece's HTML requires.
+    pub requires: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
 pub struct HtmlOut {
     /// One HTML string per handle given, in the same order.
     pub trees: Vec<String>,
+    /// The identifiers of the definitions each tree's HTML requires, in the
+    /// same order as `trees`.
+    pub tree_requires: Vec<Vec<String>>,
     pub pieces: Vec<PieceOut>,
+    /// The union of `tree_requires`.
     pub requires: Vec<String>,
     pub definitions: Vec<DefOut>,
     pub diagnostics: Vec<DiagOut>,
@@ -291,7 +314,9 @@ pub struct FieldsOut {
 
 pub struct Engine {
     registry: Arc<FlmRegistry>,
-    fragments: Vec<Arc<Fragment>>,
+    /// The fragments by handle (the index); a released handle keeps its
+    /// slot, empty, so that a handle is never given out twice.
+    fragments: Vec<Option<Arc<Fragment>>>,
     plans: BTreeMap<String, Arc<Plan>>,
     /// The external index installed in every render run (Q4): labels of zoo
     /// objects, with their link target and display content.
@@ -322,7 +347,7 @@ fn diag_out(diagnostic: &FlmDiagnostic, cache: &mut LineIndexCache<FlmOrigin>) -
         identifier: diagnostic.identifier().to_string(),
         severity: severity_word(diagnostic.severity()),
         message: diagnostic.message().to_string(),
-        origin: source.origin().canonical_path().map(str::to_owned),
+        origin: source.origin().label().map(|label| label.into_owned()),
         start: span.start(),
         end: span.end(),
         line: line_col.map(|(line, _)| line),
@@ -348,6 +373,32 @@ pub fn layout_of(name: &str) -> Result<FragmentLayout, String> {
         "inline" => Ok(FragmentLayout::Inline),
         "auto" | "" => Ok(FragmentLayout::InlineOrBlocks),
         other => Err(format!("unknown layout `{other}` (blocks, inline, auto)")),
+    }
+}
+
+/// Whether a node of a parsed tree contributes nothing: whitespace, a
+/// comment, a paragraph break, or a list of those.
+fn is_blank(node: &NodeRef<'_, Flm>) -> bool {
+    match node.kind() {
+        NodeKind::Chars { .. } => node.chars().is_none_or(|text| text.trim().is_empty()),
+        NodeKind::Comment(_) => true,
+        NodeKind::List => node.children().iter().all(|child| is_blank(&child)),
+        _ => element_of(node).name == PARBREAK,
+    }
+}
+
+/// Whether a fragment's tree holds only whitespace, comments and paragraph
+/// breaks.
+fn is_empty_fragment(fragment: &Fragment) -> bool {
+    fragment.tree().root().children().iter().all(|child| is_blank(&child))
+}
+
+fn def_part_out(part: &DefContent) -> DefPartOut {
+    match part {
+        DefContent::Inline(text) => DefPartOut { kind: "inline", text: text.clone() },
+        DefContent::File(path) => DefPartOut { kind: "file", text: path.clone() },
+        DefContent::Url(url) => DefPartOut { kind: "url", text: url.clone() },
+        DefContent::Table(table) => DefPartOut { kind: "table", text: table.to_string() },
     }
 }
 
@@ -459,8 +510,25 @@ impl Engine {
         diags_out(self.registry.build_diagnostics().iter())
     }
 
+    /// The number of fragments held (released ones not counted).
     pub fn fragment_count(&self) -> usize {
-        self.fragments.len()
+        self.fragments.iter().filter(|f| f.is_some()).count()
+    }
+
+    /// The fragment of `handle`; an error for a handle never given out or
+    /// released.
+    fn fragment(&self, handle: u32) -> Result<&Arc<Fragment>, String> {
+        match self.fragments.get(handle as usize) {
+            Some(Some(fragment)) => Ok(fragment),
+            Some(None) => Err(format!("the fragment handle {handle} was released")),
+            None => Err(format!("unknown fragment handle {handle}")),
+        }
+    }
+
+    fn keep(&mut self, fragment: Fragment) -> u32 {
+        let handle = self.fragments.len() as u32;
+        self.fragments.push(Some(Arc::new(fragment)));
+        handle
     }
 
     pub fn parse(&mut self, text: &str, origin: &str, layout: FragmentLayout) -> Result<ParsedOut, String> {
@@ -469,9 +537,50 @@ impl Engine {
         let fragment = parse_fragment(self.registry.lang(), source, layout, &ParseOptions::default())
             .map_err(|e| e.diagnostic().message().to_string())?;
         let diagnostics = diags_out(fragment.diags().iter());
-        let handle = self.fragments.len() as u32;
-        self.fragments.push(Arc::new(fragment));
-        Ok(ParsedOut { handle, diagnostics })
+        let empty = is_empty_fragment(&fragment);
+        let handle = self.keep(fragment);
+        Ok(ParsedOut { handle, empty, diagnostics })
+    }
+
+    /// A new handle for the fragment of `handle` with another layout: the
+    /// same tree, source and parse diagnostics, not parsed again.
+    pub fn with_layout(&mut self, handle: u32, layout: FragmentLayout) -> Result<u32, String> {
+        let fragment = self.fragment(handle)?;
+        let sibling = Fragment::new(Arc::clone(fragment.source()), Arc::clone(fragment.tree()), fragment.diags().clone(), layout);
+        Ok(self.keep(sibling))
+    }
+
+    /// Frees the fragments of `handles` (a sibling made by `with_layout`
+    /// shares the tree, which lives until its last handle is released).
+    /// Every handle is checked before any is released; a released handle
+    /// used later is an error.
+    pub fn release(&mut self, handles: &[u32]) -> Result<(), String> {
+        for &handle in handles {
+            self.fragment(handle)?;
+        }
+        for &handle in handles {
+            self.fragments[handle as usize] = None;
+        }
+        Ok(())
+    }
+
+    /// Every style and script definition the registry declares, the styles
+    /// first and then the scripts, each in the features' registration order
+    /// (the order of a run's definitions table), with the parts as declared.
+    pub fn html_definitions(&self) -> Vec<DefOut> {
+        let styles = self.registry.styles().iter().map(|(owner, def)| DefOut {
+            id: def.id.to_string(),
+            kind: "style",
+            owner: owner.to_string(),
+            parts: def.content.iter().map(def_part_out).collect(),
+        });
+        let scripts = self.registry.scripts().iter().map(|(owner, def)| DefOut {
+            id: def.id.to_string(),
+            kind: "script",
+            owner: owner.to_string(),
+            parts: def.content.iter().map(def_part_out).collect(),
+        });
+        styles.chain(scripts).collect()
     }
 
     /// Replaces the external index. Each display text is parsed inline with
@@ -513,7 +622,7 @@ impl Engine {
         let mut content = DocContent::new();
         let mut ids = Vec::with_capacity(handles.len());
         for &h in handles {
-            let fragment = self.fragments.get(h as usize).ok_or_else(|| format!("unknown fragment handle {h}"))?;
+            let fragment = self.fragment(h)?;
             ids.push(content.place(Arc::clone(fragment)));
         }
         Ok((Arc::new(Doc::with_options(content, self.document_options.clone())), ids))
@@ -561,14 +670,20 @@ impl Engine {
 
         let fragments = run.table(OUTPUT_TABLE).map_err(|e| e.to_string())?.ok_or("the html workflow wrote no output table")?;
         let mut requires = std::collections::BTreeSet::new();
+        let mut tree_requires = Vec::with_capacity(ids.len());
         let trees: Vec<String> = ids
             .iter()
             .map(|id| match fragments.trees.get(id) {
                 Some(f) => {
-                    requires.extend(f.requires.iter().map(|n| n.to_string()));
+                    let these: Vec<String> = f.requires.iter().map(|n| n.to_string()).collect();
+                    requires.extend(these.iter().cloned());
+                    tree_requires.push(these);
                     f.html()
                 }
-                None => String::new(),
+                None => {
+                    tree_requires.push(Vec::new());
+                    String::new()
+                }
             })
             .collect();
         let pieces = run
@@ -579,8 +694,9 @@ impl Engine {
                     .iter()
                     .map(|piece| PieceOut {
                         name: piece.name.to_string(),
-                        place: format!("{:?}", piece.place),
+                        place: piece.place.as_str(),
                         html: piece.fragment.html(),
+                        requires: piece.fragment.requires.iter().map(|n| n.to_string()).collect(),
                     })
                     .collect()
             })
@@ -600,15 +716,7 @@ impl Engine {
                         owner: d.owner.to_string(),
                         parts: match &d.delivery {
                             DefinitionOverride::ProvidedByHost => vec![DefPartOut { kind: "host", text: String::new() }],
-                            DefinitionOverride::Parts(parts) => parts
-                                .iter()
-                                .map(|p| match p {
-                                    DefContent::Inline(text) => DefPartOut { kind: "inline", text: text.clone() },
-                                    DefContent::File(path) => DefPartOut { kind: "file", text: path.clone() },
-                                    DefContent::Url(url) => DefPartOut { kind: "url", text: url.clone() },
-                                    other => DefPartOut { kind: "other", text: format!("{other:?}") },
-                                })
-                                .collect(),
+                            DefinitionOverride::Parts(parts) => parts.iter().map(def_part_out).collect(),
                         },
                     })
                     .collect()
@@ -617,6 +725,7 @@ impl Engine {
         let view = run.diagnostics();
         Ok(HtmlOut {
             trees,
+            tree_requires,
             pieces,
             requires: requires.into_iter().collect(),
             definitions,
@@ -738,11 +847,14 @@ impl Engine {
         let mut out = self.render_text_once(handles, options)?;
         if options.per_tree {
             let mut trees = Vec::with_capacity(handles.len());
+            let mut tree_diagnostics = Vec::with_capacity(handles.len());
             for &h in handles {
                 let one = self.render_text_once(&[h], options)?;
                 trees.push(one.text.trim_end_matches('\n').to_string());
+                tree_diagnostics.push(one.diagnostics);
             }
             out.trees = trees;
+            out.tree_diagnostics = tree_diagnostics;
         }
         Ok(out)
     }
@@ -773,7 +885,13 @@ impl Engine {
         run.execute(&RunOptions::sequential()).map_err(|e| e.to_string())?;
         let output = run.table(TEXT_OUTPUT).map_err(|e| e.to_string())?.ok_or("the text workflow wrote no output table")?;
         let view = run.diagnostics();
-        Ok(TextOut { text: output.text.clone(), trees: Vec::new(), has_errors: view.has_errors(), diagnostics: diags_out(view.iter()) })
+        Ok(TextOut {
+            text: output.text.clone(),
+            trees: Vec::new(),
+            tree_diagnostics: Vec::new(),
+            has_errors: view.has_errors(),
+            diagnostics: diags_out(view.iter()),
+        })
     }
 
     /// Truncates `text` (R18): parses it with the given layout and returns
@@ -841,7 +959,7 @@ impl Engine {
         }
         if let Some(index) = run.table(ELEMENT_INDEX).map_err(|e| e.to_string())? {
             for (i, (&h, id)) in handles.iter().zip(ids.iter()).enumerate() {
-                let tree = self.fragments[h as usize].tree();
+                let tree = self.fragment(h)?.tree();
                 for (_, node, _) in index.values_of::<GraphicsImage>(*id, tree) {
                     // The path as written, when it is characters (as the
                     // inspect stage and the image rules read it).
@@ -913,6 +1031,14 @@ mod tests {
             }])
             .unwrap();
         assert!(index_diags.is_empty(), "{index_diags:?}");
+        // A diagnostic in a source the library created names its label.
+        let bad = engine
+            .set_external_index(&[ExternalEntry { label: "person:zed".into(), href: "/z".into(), display: "Zed \\nosuchmacro".into() }])
+            .unwrap();
+        assert!(!bad.is_empty() && bad.iter().all(|d| d.origin.as_deref() == Some("index:person:zed")), "{bad:?}");
+        engine
+            .set_external_index(&[ExternalEntry { label: "person:bob".into(), href: "/person/bob".into(), display: "Bob \\emph{Bee}".into() }])
+            .unwrap();
         let out2 = engine.render_html(&[a.handle], &RenderOptions::default()).unwrap();
         assert!(out2.trees[0].contains("href=\"/person/bob\""), "{}", out2.trees[0]);
         assert!(out2.trees[0].contains("Bob <em"), "{}", out2.trees[0]);
@@ -956,6 +1082,68 @@ mod tests {
         assert!(out3.trees[1].contains("150pt") || out3.trees[1].contains("150"), "{}", out3.trees[1]);
     }
 
+    /// Step 2: a layout sibling shares the tree and is not parsed again;
+    /// released handles are refused; `empty` is reported.
+    #[test]
+    fn layout_siblings_release_and_empty() {
+        let mut engine = Engine::new(&EngineConfig::default()).unwrap();
+        let a = engine.parse("Some \\emph{text}", "a.yml#x", FragmentLayout::InlineOrBlocks).unwrap();
+        assert!(!a.empty);
+        let blocks = engine.with_layout(a.handle, FragmentLayout::Blocks).unwrap();
+        assert_ne!(blocks, a.handle);
+        let fa = Arc::clone(engine.fragment(a.handle).unwrap());
+        let fb = Arc::clone(engine.fragment(blocks).unwrap());
+        assert!(Arc::ptr_eq(fa.tree(), fb.tree()) && Arc::ptr_eq(fa.source(), fb.source()));
+        assert_eq!(fb.layout(), FragmentLayout::Blocks);
+        let out = engine.render_html(&[a.handle, blocks], &RenderOptions::default()).unwrap();
+        assert!(!out.trees[0].contains("<p") && out.trees[1].contains("<p"), "{:?}", out.trees);
+        assert_eq!(out.tree_requires.len(), 2);
+        assert!(out.tree_requires[1].iter().all(|r| out.requires.contains(r)));
+        assert_eq!(engine.fragment_count(), 2);
+
+        // Released: every later use is an error, and the handle is not reused.
+        engine.release(&[a.handle]).unwrap();
+        assert_eq!(engine.fragment_count(), 1);
+        for err in [
+            engine.render_html(&[a.handle], &RenderOptions::default()).map(|_| ()).unwrap_err(),
+            engine.with_layout(a.handle, FragmentLayout::Inline).map(|_| ()).unwrap_err(),
+            engine.release(&[a.handle]).unwrap_err(),
+            engine.release(&[blocks, 999]).unwrap_err(),
+        ] {
+            assert!(err.contains("released") || err.contains("unknown"), "{err}");
+        }
+        // The failed release of `[blocks, 999]` released nothing.
+        assert!(engine.render_html(&[blocks], &RenderOptions::default()).is_ok());
+        let c = engine.parse("x", "c", FragmentLayout::Inline).unwrap();
+        assert!(c.handle > blocks);
+
+        for (text, empty) in [("", true), ("  \n\t ", true), ("%% a comment\n\n  %% another\n", true), ("\n\n", true), ("~", false), ("\\(x\\)", false), ("%% c\nword", false)] {
+            let parsed = engine.parse(text, "e", FragmentLayout::InlineOrBlocks).unwrap();
+            assert_eq!(parsed.empty, empty, "{text:?}");
+        }
+    }
+
+    /// Step 2: the registry's definitions, styles first, the page style among
+    /// them; a run's pieces carry their requirements and place.
+    #[test]
+    fn definitions_of_the_registry() {
+        let mut engine = Engine::new(&EngineConfig::default()).unwrap();
+        let defs = engine.html_definitions();
+        let first_script = defs.iter().position(|d| d.kind == "script").expect("a script definition");
+        assert!(defs[..first_script].iter().all(|d| d.kind == "style") && defs[first_script..].iter().all(|d| d.kind == "script"));
+        let ids: Vec<&str> = defs.iter().map(|d| d.id.as_str()).collect();
+        assert!(ids.contains(&"flm.html.style.core") && ids.contains(&"flm.html.style.page") && ids.contains(&"flm.html.mathjax"), "{ids:?}");
+        let core = defs.iter().find(|d| d.id == "flm.html.style.core").unwrap();
+        assert_eq!(core.parts[0].kind, "inline");
+        assert!(core.parts[0].text.starts_with("/* flm.html.style.core */"));
+
+        let a = engine.parse("Text\\footnote{A note.}", "a.yml#x", FragmentLayout::InlineOrBlocks).unwrap();
+        let out = engine.render_html(&[a.handle], &RenderOptions::default()).unwrap();
+        let notes = out.pieces.iter().find(|p| p.name == "flm.xnotes.list.footnote").expect("footnote piece");
+        assert_eq!(notes.place, "after-content");
+        assert!(!notes.requires.is_empty(), "{notes:?}");
+    }
+
     /// Q11: the text output, one run, and each tree's text rendered alone.
     #[test]
     fn plain_text_per_tree() {
@@ -978,6 +1166,19 @@ mod tests {
         assert!(cited.trees[0].starts_with("Cited\u{a0}[1]") && !cited.text.contains("References"), "{:?}", cited);
         let with_pieces = engine.render_text(&[c.handle], &TextOptions { pieces: true, ..Default::default() }).unwrap();
         assert!(with_pieces.text.contains("References"), "{:?}", with_pieces.text);
+
+        // The per-tree runs' diagnostics: a reference to another tree
+        // resolves in the whole run only.
+        let d = engine.parse("An equation \\begin{equation}x\\label{eq:x}\\end{equation}", "d.yml#a", FragmentLayout::InlineOrBlocks).unwrap();
+        let e = engine.parse("See \\eqref{eq:x}.", "d.yml#b", FragmentLayout::InlineOrBlocks).unwrap();
+        let both = engine.render_text(&[d.handle, e.handle], &TextOptions { per_tree: true, ..Default::default() }).unwrap();
+        assert!(both.diagnostics.is_empty(), "{:?}", both.diagnostics);
+        assert_eq!(both.tree_diagnostics.len(), 2);
+        assert!(both.tree_diagnostics[0].is_empty(), "{:?}", both.tree_diagnostics[0]);
+        let ids: Vec<(&str, Option<&str>)> = both.tree_diagnostics[1].iter().map(|d| (d.identifier.as_str(), d.origin.as_deref())).collect();
+        assert_eq!(ids, vec![("flm.refs.unresolved", Some("d.yml#b"))]);
+        let whole = engine.render_text(&[d.handle, e.handle], &TextOptions::default()).unwrap();
+        assert!(whole.trees.is_empty() && whole.tree_diagnostics.is_empty());
     }
 
     /// R18: truncation at the node level, groups closed, parses again.

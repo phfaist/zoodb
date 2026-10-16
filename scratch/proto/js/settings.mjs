@@ -7,9 +7,9 @@
 
 import { loadZooFlm } from './load.mjs';
 
-const { ZooFlm } = await loadZooFlm();
+const { ZooFlmCore } = await loadZooFlm();
 
-const features = ZooFlm.features();
+const features = ZooFlmCore.features();
 const withSettings = features.filter((f) => f.schema).map((f) => ({
     name: f.name,
     keys: Object.keys(f.schema.properties ?? {}),
@@ -24,13 +24,13 @@ const settings = {
     },
 };
 let t0 = performance.now();
-const engine = new ZooFlm({ dollar_math: false, settings, off: ['annotations'] });
+const engine = new ZooFlmCore({ dollar_math: false, settings, off: ['annotations'] });
 const build_ms = Math.round((performance.now() - t0) * 10) / 10;
 const parsed = engine.parse('A \\kw{term} of \\zoo, \\(\\zoo\\).', 'a.yml#x', 'inline');
 const out = engine.render_html([parsed.handle], {});
 
 let refused = null;
-try { new ZooFlm({ settings: { math: { no_such_key: 1 } } }); } catch (e) { refused = e.message; }
+try { new ZooFlmCore({ settings: { math: { no_such_key: 1 } } }); } catch (e) { refused = e.message; }
 
 console.log(JSON.stringify({
     features: features.length,

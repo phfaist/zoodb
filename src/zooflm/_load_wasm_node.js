@@ -10,7 +10,7 @@ let ready = null;
 
 /**
  * Instantiates the module once and resolves to the glue's namespace
- * (`ZooFlm`, ...), the same one `load_zoodb_flm_wasm()` resolves to.
+ * (`ZooFlmCore`, ...), the same one `load_zoodb_flm_wasm()` resolves to.
  */
 export function load_zoodb_flm_wasm_node() {
     ready ??= readFile(wasm_url)

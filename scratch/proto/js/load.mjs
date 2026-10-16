@@ -16,7 +16,7 @@ export async function loadZooFlm() {
     // Once instantiated, the glue's init returns the instance's exports.
     const exports = await glue.default();
     return {
-        ZooFlm: glue.ZooFlm,
+        ZooFlmCore: glue.ZooFlmCore,
         wasm_size_bytes: bytes.length,
         instantiate_ms,
         memory_bytes_at_start: exports.memory.buffer.byteLength,

@@ -53,6 +53,7 @@
         "./resourcecollector/processor/*": "./src/resourcecollector/processor/*.js",
         "./zooflm": "./src/zooflm/index.js",
         "./zooflm/citationcompiler": "./src/zooflm/citationcompiler.js",
+        "./zooflm/engine": "./src/zooflm/engine.js",
         "./zooflm/scanner": "./src/zooflm/scanner.js",
         "./zooflm/wasm": "./src/zooflm/_load_wasm.js",
         "./zooflm/wasm-node": "./src/zooflm/_load_wasm_node.js",

@@ -142,11 +142,13 @@ The prototypes of `04-technical-risks.md` gate the steps they belong to.
    exist, one test loads the module.
 2. **Engine** (B): fragment handles, `render_document` with markers, `render_fragment`,
    the snippet cache, diagnostics mapping, the stylesheet call, the text backend.
-3. **Processor** (C, F, G): the field compiler, `scan()`, the index, citations and
-   graphics into the tables, the snippet run, dump and load.
-4. **Loaders and standard setup** (D, E): the `yaml` switch with positions and the
-   re-indent tool, `flmfilesdb` over the `field` element, the renamed config entries;
-   `zoodb-example` ported (L).
+3. **Processor and standard setup** (C, E, F, G): the field compiler, `scan()`, the
+   index, citations and graphics into the tables, the snippet run, dump and load; the
+   renamed config entries and the engine factory of `src/std/` (moved here from step 4
+   on 2026-10-16, see `10-step3-processor.md`: the setup and its tests go through the
+   processor, so the two cannot change in different steps with the tests green).
+4. **Loaders** (D): the `yaml` switch with positions and the re-indent tool,
+   `flmfilesdb` over the `field` element; `zoodb-example` ported (L).
 5. **Removal and documentation** (B first row, H, I, J): `flm-js-src` deleted, package
    exports and version, docs rewritten; the build machine's absolute paths remapped out
    of the two binaries before the package ships the FLM module (found in step 1, 08);

@@ -77,6 +77,18 @@ describe('FLM wasm module', function () {
             assert.strictEqual(typeof info.flm_core_source, 'string');
         });
 
+        it('the .d.ts declares the shapes of every method', function () {
+            const dts = fs.readFileSync(path.join(wasm_dir, 'zoodb_flm_wasm.d.ts'), 'utf-8');
+            for (const name of ['CoreDiagnostic', 'CoreConfig', 'ParsedOut', 'HtmlOut', 'TextOut', 'LatexOut',
+                                'ScanOut', 'TruncateOut', 'FieldsOut', 'Definition']) {
+                assert.match(dts, new RegExp(`export interface ${name} \\{`), name);
+            }
+            const methods = dts.slice(dts.indexOf('export class ZooFlmCore'), dts.indexOf('export function start'));
+            assert.match(methods, /parse\(text: string, origin: string, layout: FragmentLayoutName\): ParsedOut;/);
+            assert.match(methods, /render_html\(handles: Uint32Array \| number\[\], options: RenderHtmlOptions \| null \| undefined\): HtmlOut;/);
+            assert.doesNotMatch(methods, /\): any;|: any\b/);
+        });
+
         it('wasm_url points at the binary', function () {
             assert.strictEqual(fileURLToPath(wasm_url), wasm_file);
         });
@@ -95,7 +107,7 @@ describe('FLM wasm module', function () {
                 '--input-type=module', '-e',
                 `import { readFileSync } from 'fs';
                  import { load_zoodb_flm_wasm } from ${JSON.stringify(loader)};
-                 const outcome = (p) => p.then( (ns) => ({ resolved: typeof ns.ZooFlm }),
+                 const outcome = (p) => p.then( (ns) => ({ resolved: typeof ns.ZooFlmCore }),
                                                 (err) => ({ rejected: err.constructor.name, message: err.message }) );
                  const no_source = await outcome(load_zoodb_flm_wasm());
                  const bad_bytes = await outcome(load_zoodb_flm_wasm(new Uint8Array([0, 1, 2, 3])));
@@ -113,22 +125,22 @@ describe('FLM wasm module', function () {
         it('the neutral loader called with the bytes returns the same namespace', async function () {
             const ns = await load_zoodb_flm_wasm(fs.readFileSync(wasm_file));
             assert.strictEqual(ns, wasm);
-            assert.strictEqual(typeof ns.ZooFlm, 'function');
+            assert.strictEqual(typeof ns.ZooFlmCore, 'function');
         });
     });
 
-    describe('ZooFlm', function () {
+    describe('ZooFlmCore', function () {
 
         let engine;
         before(function () {
-            engine = new wasm.ZooFlm({});
+            engine = new wasm.ZooFlmCore({});
         });
         after(function () {
             engine.free();
         });
 
         it('features() lists the standard features with their settings schemas', function () {
-            const features = wasm.ZooFlm.features();
+            const features = wasm.ZooFlmCore.features();
             assert.ok(Array.isArray(features));
             assert.ok(features.length >= 30, `${features.length} features`);
             for (const f of features) {
@@ -160,10 +172,10 @@ describe('FLM wasm module', function () {
         });
 
         it('a misspelled key is refused with its name', function () {
-            assert.throws( () => new wasm.ZooFlm({ dolar_math: true }), /dolar_math/ );
+            assert.throws( () => new wasm.ZooFlmCore({ dolar_math: true }), /dolar_math/ );
             // A key set to undefined or null is a key left out.
-            new wasm.ZooFlm({ dollar_math: undefined, srcset: null }).free();
-            assert.throws( () => new wasm.ZooFlm({ srcset: { image_max_zoom: 2 } }), /image_max_zoom/ );
+            new wasm.ZooFlmCore({ dollar_math: undefined, srcset: null }).free();
+            assert.throws( () => new wasm.ZooFlmCore({ srcset: { image_max_zoom: 2 } }), /image_max_zoom/ );
             const parsed = engine.parse('x', 'test.yml#name', 'inline');
             assert.throws( () => engine.render_html([parsed.handle], { titel: 'x' }), /titel/ );
             assert.throws( () => engine.render_text([parsed.handle], { per_trees: true }), /per_trees/ );
@@ -172,7 +184,7 @@ describe('FLM wasm module', function () {
 
         it('a wrong setting throws, naming the feature and the key', function () {
             assert.throws(
-                () => new wasm.ZooFlm({ settings: { math: { no_such_key: 1 } } }),
+                () => new wasm.ZooFlmCore({ settings: { math: { no_such_key: 1 } } }),
                 (err) => {
                     assert.ok(err instanceof Error);
                     assert.match(err.message, /`math`/);

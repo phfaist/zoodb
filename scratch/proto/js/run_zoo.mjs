@@ -51,10 +51,10 @@ const tallyOut = (bucket) => Object.fromEntries([...bucket.entries()].sort((a, b
 // ---- run -----------------------------------------------------------------------------------
 
 const loaded = await loadZooFlm();
-const { ZooFlm } = loaded;
+const { ZooFlmCore } = loaded;
 
 let t0 = performance.now();
-const engine = new ZooFlm({ dollar_math: false, srcset: args.srcset ? { image_max_zoom_factor: Number(args.srcset) } : undefined });
+const engine = new ZooFlmCore({ dollar_math: false, srcset: args.srcset ? { image_max_zoom_factor: Number(args.srcset) } : undefined });
 const engine_ms = performance.now() - t0;
 const build_diagnostics = engine.build_diagnostics();
 

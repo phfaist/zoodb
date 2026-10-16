@@ -6,6 +6,6 @@
     "flm_core": "0.5.0",
     "flm_core_source": "path",
     "wasm_bindgen": "0.2.127",
-    "wasm_size_bytes": 5122806,
-    "build_date": "2026-10-16T07:32:39.266Z"
+    "wasm_size_bytes": 5128633,
+    "build_date": "2026-10-16T08:22:16.023Z"
 }

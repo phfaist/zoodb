@@ -18,8 +18,8 @@ if (!nodeModules || !args.kind || !args.data || !args.schemas) {
 }
 const YAML = await import(pathToFileURL(path.join(nodeModules, 'yaml/dist/index.js')));
 const zoo = makeZooData({ YAML, kind: args.kind, dataDir: args.data, schemasDir: args.schemas });
-const { ZooFlm } = await loadZooFlm();
-const engine = new ZooFlm({ dollar_math: false });
+const { ZooFlmCore } = await loadZooFlm();
+const engine = new ZooFlmCore({ dollar_math: false });
 
 const objects = zoo.loadObjects();
 for (const obj of objects) {
