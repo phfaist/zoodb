@@ -16,8 +16,8 @@ in `README.md` of this folder.
 - **Commits so far** (all with the trailers below): step zero `7960397`…`8b2c468`
   (prototype, 07); step 1 `e00e24a` (08); step 2 `98d8f40` (09); step 3 `6a545c9` (10);
   docs `41c673d`, `c435de5`; `053c8d6` (Philippe: the main checkout's `scratch/` moved
-  here); step 4 parts A and B `19c428c` (11); step 4 part C and these notes: the commit
-  after `19c428c`. Working tree clean at the time of writing.
+  here); step 4 parts A and B `19c428c` (11); step 4 part C and these notes `28df685`.
+  Working tree clean at the time of writing.
 - **What exists now.** `rust/` is a cargo workspace (`zoodb-autocitefetch-wasm`,
   `zoodb-flm-wasm`; flm-core by path from `/Users/philippe/projects/flm-rs/flm-core`);
   the FLM module is committed as `src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` (5.14 MB)
