@@ -28,6 +28,8 @@ use flm_core::stdcore::backends::html::{
 use flm_core::stdcore::backends::latex_recomposed::{
     self, DOCUMENT as LATEX_DOCUMENT, LatexRecomposedRenderOptions, OUTPUT_TABLE as LATEX_OUTPUT_TABLE, STYLE_FILE, style_artifact,
 };
+use flm_core::stdcore::backends::pieces::PiecesRenderOptions;
+use flm_core::stdcore::backends::text::{self, TEXT_OUTPUT, TextRenderOptions};
 use flm_core::stdcore::features::citations::KEYS;
 use flm_core::stdcore::features::refs::{RefsRecomposeOptions, SafeLabelMode};
 use flm_core::core::lowering::chars_at_lowering;
@@ -137,6 +139,70 @@ pub struct LatexOut {
     pub document: Option<String>,
     pub diagnostics: Vec<DiagOut>,
     pub has_errors: bool,
+}
+
+/// Options of a plain-text run (Q11).
+#[derive(Debug, Clone, Deserialize)]
+pub struct TextOptions {
+    /// The line width in columns; `None` never wraps.
+    #[serde(default)]
+    pub width: Option<u32>,
+    #[serde(default)]
+    pub link_addresses: bool,
+    #[serde(default)]
+    pub unresolved_refs_warning: bool,
+    /// Also render each tree alone, for its own text (`trees`). The marks
+    /// of the whole run's text cover only the lowered nodes that carry one
+    /// (emphasis, links, mathematics), not plain text, so a tree's text cannot
+    /// be cut out of the whole reliably.
+    #[serde(default)]
+    pub per_tree: bool,
+    /// Whether the pieces (the list of cited works, the notes) are placed in
+    /// the text; off, a citation is its mark alone, which is what a search
+    /// index and a snippet want (Q11).
+    #[serde(default)]
+    pub pieces: bool,
+}
+
+impl Default for TextOptions {
+    fn default() -> TextOptions {
+        TextOptions { width: None, link_addresses: false, unresolved_refs_warning: true, per_tree: false, pieces: false }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct TextOut {
+    /// The whole printed text of the run.
+    pub text: String,
+    /// The text of each handle given, cut out of the whole through the
+    /// position marks of its tree.
+    pub trees: Vec<String>,
+    pub diagnostics: Vec<DiagOut>,
+    pub has_errors: bool,
+}
+
+/// Options of the truncation helper (R18).
+#[derive(Debug, Clone, Deserialize)]
+pub struct TruncateOptions {
+    pub chars: usize,
+    #[serde(default)]
+    pub min_chars: Option<usize>,
+    #[serde(default = "default_marker")]
+    pub marker: String,
+    #[serde(default)]
+    pub first_paragraph: bool,
+}
+
+fn default_marker() -> String {
+    String::from(" …")
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct TruncateOut {
+    pub source: String,
+    pub truncated: bool,
+    pub cut_at: Option<usize>,
+    pub diagnostics: Vec<DiagOut>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -626,6 +692,64 @@ impl Engine {
         Ok(LatexOut { trees, style_name, style, document, has_errors: view.has_errors(), diagnostics: diags_out(view.iter()) })
     }
 
+    /// Renders the given fragments as one document with the `text` workflow
+    /// (Q11); with `per_tree`, each tree is also rendered alone for its own
+    /// text.
+    pub fn render_text(&mut self, handles: &[u32], options: &TextOptions) -> Result<TextOut, String> {
+        let mut out = self.render_text_once(handles, options)?;
+        if options.per_tree {
+            let mut trees = Vec::with_capacity(handles.len());
+            for &h in handles {
+                let one = self.render_text_once(&[h], options)?;
+                trees.push(one.text.trim_end_matches('\n').to_string());
+            }
+            out.trees = trees;
+        }
+        Ok(out)
+    }
+
+    fn render_text_once(&mut self, handles: &[u32], options: &TextOptions) -> Result<TextOut, String> {
+        let key = format!("text:{:?}:{}:{}:{}", options.width, options.link_addresses, options.unresolved_refs_warning, options.pieces);
+        let settings_render_options = self.render_options.clone();
+        let plan = self.plan(key, |registry| {
+            let text_options = TextRenderOptions { width: options.width, link_addresses: options.link_addresses, ..Default::default() };
+            let refs_options = RefsRenderOptions {
+                unresolved: if options.unresolved_refs_warning { UnresolvedRefs::Allow } else { UnresolvedRefs::Error },
+            };
+            let mut render_options = settings_render_options;
+            render_options.merge_from(&OptionValues::new().with(text_options).with(refs_options));
+            if !options.pieces {
+                // No piece may be placed on the text output: the host places none.
+                let mut pieces = PiecesRenderOptions::default();
+                pieces.backends.insert(BackendName::from(text::BACKEND), Default::default());
+                render_options.merge_from(&OptionValues::new().with(pieces));
+            }
+            let mut unsupported = BTreeMap::new();
+            unsupported.insert(BackendName::from(text::BACKEND), vec![ElementName::from(FIELD_ELEMENT)]);
+            let overrides = Overrides { render_options, unsupported, ..Overrides::none() };
+            Plan::for_workflow(registry, text::WORKFLOW, &overrides).map_err(|e| e.to_string())
+        })?;
+        let (doc, ids) = self.place(handles)?;
+        let mut run = Run::new(doc, plan, self.externals()).map_err(|e| e.to_string())?;
+        run.execute(&RunOptions::sequential()).map_err(|e| e.to_string())?;
+        let output = run.table(TEXT_OUTPUT).map_err(|e| e.to_string())?.ok_or("the text workflow wrote no output table")?;
+        let _ = ids;
+        let view = run.diagnostics();
+        Ok(TextOut { text: output.text.clone(), trees: Vec::new(), has_errors: view.has_errors(), diagnostics: diags_out(view.iter()) })
+    }
+
+    /// Truncates `text` (R18): parses it with the given layout and returns
+    /// the shortened source, to be parsed again as a preview fragment.
+    pub fn truncate(&self, text: &str, origin: &str, layout: FragmentLayout, options: &TruncateOptions) -> Result<TruncateOut, String> {
+        let origin = if origin.is_empty() { FlmOrigin::none() } else { FlmOrigin::new(origin) };
+        let source = Arc::new(FlmSource::new(text).with_origin(origin));
+        let fragment = parse_fragment(self.registry.lang(), source, layout, &ParseOptions::default())
+            .map_err(|e| e.diagnostic().message().to_string())?;
+        let diagnostics = diags_out(fragment.diags().iter());
+        let t = crate::truncate::truncate(text, &fragment, options.chars, options.min_chars, &options.marker, options.first_paragraph);
+        Ok(TruncateOut { source: t.source, truncated: t.truncated, cut_at: t.cut_at, diagnostics })
+    }
+
     pub fn scan(&mut self, handles: &[u32], standalone: &[u32]) -> Result<ScanOut, String> {
         // A bare plan request (no workflow, so no `flm.validated`): the scan
         // demands the tables it reads and nothing else, so that no citation is
@@ -789,6 +913,55 @@ mod tests {
         assert!(out3.trees[1].contains("src=\"/pic/Smiley-0123abcd.png\""), "{}", out3.trees[1]);
         // 400 px at 192 dpi = 150 pt wide.
         assert!(out3.trees[1].contains("150pt") || out3.trees[1].contains("150"), "{}", out3.trees[1]);
+    }
+
+    /// Q11: the text output, one run, each tree's text cut out through marks.
+    #[test]
+    fn plain_text_per_tree() {
+        let mut engine = Engine::new(&EngineConfig::default()).unwrap();
+        let a = engine.parse("A \\emph{name} with \\(x^2\\)", "a.yml#name", FragmentLayout::Inline).unwrap();
+        let long = "This is a long paragraph that would wrap at eighty columns if the width were set, with a \\href{https://example.org/}{link} inside it.";
+        let b = engine.parse(long, "a.yml#description", FragmentLayout::InlineOrBlocks).unwrap();
+        let out = engine.render_text(&[a.handle, b.handle], &TextOptions { per_tree: true, ..Default::default() }).unwrap();
+        // Mathematics passes through as its source (the math_passthrough package).
+        assert_eq!(out.trees[0], "A name with \\(x^2\\)", "{:?}", out);
+        assert!(out.trees[1].starts_with("This is a long paragraph") && out.trees[1].ends_with("link inside it."), "{:?}", out.trees[1]);
+        assert!(!out.trees[1].contains('\n') && !out.trees[1].contains("example.org"), "{:?}", out.trees[1]);
+        assert!(out.text.contains(&out.trees[1]) && out.text.contains(&out.trees[0]));
+        let wrapped = engine.render_text(&[b.handle], &TextOptions { width: Some(40), link_addresses: true, per_tree: true, ..Default::default() }).unwrap();
+        assert!(wrapped.trees[0].contains('\n') && wrapped.trees[0].contains("<https://example.org/>"), "{:?}", wrapped.trees[0]);
+        // A citation is its mark alone: no list of cited works in the text.
+        let c = engine.parse("Cited \\cite{arxiv:1}.", "a.yml#x", FragmentLayout::Inline).unwrap();
+        let cited = engine.render_text(&[c.handle], &TextOptions { per_tree: true, ..Default::default() }).unwrap();
+        // The citation feature writes a no-break space before the mark.
+        assert!(cited.trees[0].starts_with("Cited\u{a0}[1]") && !cited.text.contains("References"), "{:?}", cited);
+        let with_pieces = engine.render_text(&[c.handle], &TextOptions { pieces: true, ..Default::default() }).unwrap();
+        assert!(with_pieces.text.contains("References"), "{:?}", with_pieces.text);
+    }
+
+    /// R18: truncation at the node level, groups closed, parses again.
+    #[test]
+    fn truncation_cuts_at_a_word_boundary_and_closes_groups() {
+        let mut engine = Engine::new(&EngineConfig::default()).unwrap();
+        let text = "Hello \\emph{big wide} world, see \\(x^2+y^2\\) and \\cite{arxiv:1} at the end of the text.";
+        let t = engine.truncate(text, "a", FragmentLayout::Inline, &TruncateOptions { chars: 24, min_chars: None, marker: " …".into(), first_paragraph: false }).unwrap();
+        assert!(t.truncated && t.source.starts_with("Hello \\emph{big wide} world") && t.source.ends_with(" …"), "{:?}", t.source);
+        assert!(engine.parse(&t.source, "a", FragmentLayout::Inline).unwrap().diagnostics.is_empty());
+        // A cut inside a brace group closes it.
+        let t2 = engine.truncate("\\emph{a long emphasized sentence here} more", "a", FragmentLayout::Inline, &TruncateOptions { chars: 12, min_chars: None, marker: " …".into(), first_paragraph: false }).unwrap();
+        assert!(t2.source.starts_with("\\emph{a long") && t2.source.ends_with(" …}"), "{:?}", t2.source);
+        assert!(engine.parse(&t2.source, "a", FragmentLayout::Inline).unwrap().diagnostics.is_empty());
+        // Math and environments are kept whole or left out.
+        let t3 = engine.truncate("Short \\(a very long formula \\sum_{i=1}^{n} x_i\\) tail", "a", FragmentLayout::Inline, &TruncateOptions { chars: 10, min_chars: None, marker: "…".into(), first_paragraph: false }).unwrap();
+        assert_eq!(t3.source, "Short…", "{:?}", t3.source);
+        let t4 = engine.truncate("Intro \\begin{itemize}\\item one \\item two\\end{itemize} after", "a", FragmentLayout::InlineOrBlocks, &TruncateOptions { chars: 9, min_chars: None, marker: "…".into(), first_paragraph: false }).unwrap();
+        assert_eq!(t4.source, "Intro…", "{:?}", t4.source);
+        // Nothing to cut: the source comes back whole.
+        let t5 = engine.truncate("Short text.", "a", FragmentLayout::Inline, &TruncateOptions { chars: 100, min_chars: None, marker: "…".into(), first_paragraph: false }).unwrap();
+        assert!(!t5.truncated && t5.source == "Short text.");
+        // The first paragraph only.
+        let t6 = engine.truncate("Para one text.\n\nPara two text.", "a", FragmentLayout::InlineOrBlocks, &TruncateOptions { chars: 100, min_chars: None, marker: "…".into(), first_paragraph: true }).unwrap();
+        assert_eq!(t6.source.trim(), "Para one text.", "{:?}", t6.source);
     }
 
     /// Q12: one recomposed-LaTeX run over several fragments: safe labels

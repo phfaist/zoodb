@@ -3,12 +3,13 @@
 
 pub mod engine;
 pub mod host;
+pub mod truncate;
 pub mod zoodb_feature;
 
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
 
-use crate::engine::{Engine, EngineConfig, ExternalEntry, LatexOptions, RenderOptions};
+use crate::engine::{Engine, EngineConfig, ExternalEntry, LatexOptions, RenderOptions, TextOptions, TruncateOptions};
 use crate::host::{CitationEntry, GraphicsEntry};
 
 #[wasm_bindgen(start)]
@@ -109,6 +110,24 @@ impl ZooFlm {
     pub fn render_latex(&mut self, handles: Vec<u32>, options: JsValue) -> Result<JsValue, JsError> {
         let options: LatexOptions = if options.is_undefined() || options.is_null() { LatexOptions::default() } else { from_js(options)? };
         let out = self.engine.render_latex(&handles, &options).map_err(|e| JsError::new(&e))?;
+        to_js(&out)
+    }
+
+    /// Renders the given fragments as one document with the `text` workflow
+    /// (Q11): `{ text, trees, diagnostics }`.
+    pub fn render_text(&mut self, handles: Vec<u32>, options: JsValue) -> Result<JsValue, JsError> {
+        let options: TextOptions = if options.is_undefined() || options.is_null() { TextOptions::default() } else { from_js(options)? };
+        let out = self.engine.render_text(&handles, &options).map_err(|e| JsError::new(&e))?;
+        to_js(&out)
+    }
+
+    /// Truncates FLM source to about `options.chars` characters (R18):
+    /// `{ source, truncated, cut_at, diagnostics }`; `options` also takes
+    /// `min_chars`, `marker` and `first_paragraph`.
+    pub fn truncate(&self, text: &str, origin: &str, layout: &str, options: JsValue) -> Result<JsValue, JsError> {
+        let layout = engine::layout_of(layout).map_err(|e| JsError::new(&e))?;
+        let options: TruncateOptions = from_js(options)?;
+        let out = self.engine.truncate(text, origin, layout, &options).map_err(|e| JsError::new(&e))?;
         to_js(&out)
     }
 

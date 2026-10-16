@@ -398,5 +398,83 @@ in LaTeX. One full-size run over the whole zoo (R5) remains to be timed once the
 exist; the per-tree cost here (0.5 ms per tree) extrapolates to a few seconds.
 
 3. ~~Settings and user definitions as data~~ Done in milestone 4.
+## Milestone 6: plain text and the truncation helper (2026-10-16)
+
+**Plain text (Q11).** `render_text(handles, { width, link_addresses, pieces, per_tree,
+unresolved_refs_warning })` runs the `text` workflow: `width: null` never wraps,
+`link_addresses: false` prints a link's content alone, and `pieces: false` (the default)
+places no piece on the text output (`PiecesRenderOptions::backends[text] = {}`, the
+mechanism meant for a host that places pieces itself), so a citation is its mark alone
+(`NP-hard [1].`, a no-break space before the mark) and no list of cited works follows.
+One run per object over all its FLM fields gives the search document as today's
+assembler builds it. A finding corrected Q11's assumption: the position marks of
+`flm.output.text` cover only the lowered nodes that carry one (emphasis, links,
+mathematics), not plain text, so a field's text cannot be cut out of the whole run
+through them; `per_tree: true` renders each tree alone instead, which is what names and
+other snippets want (one run per standalone field, under a millisecond each).
+Mathematics passes through as its source (`\((n,2^k,d)\)`), as the `math_passthrough`
+package prints it.
+
+**The truncation helper (R18, Q13).** `truncate(text, origin, layout, { chars,
+min_chars, marker, first_paragraph })` parses the source and walks the tree as the old
+`_NodeListTruncator` did (`src/truncate.rs`): characters count their length; a command
+or a brace group counts what is inside it; a mathematics group, a special character
+sequence and an environment are kept whole or left out; comments count nothing; the cut
+falls inside a run of characters at the last non-alphabetic character once the budget is
+reached and `min_chars` are kept. The result is the shortened *source*: the marker
+(` …`) appended, each brace group open at the cut closed with its own delimiter, and
+the caller parses it again as the preview fragment (so the preview renders through the
+same pipeline, which the old node-list rebuild did in its own way). `first_paragraph`
+keeps what precedes the first paragraph break (`flm.parbreak`): the parsed tree is
+flat, paragraphs are only made by the block-structure rewrite of a run. Over the two
+data sets, every description's first paragraph truncated to 200 and to 500 characters
+parses again without a diagnostic; the sample cut (`binary_linear`, 701 characters, cut
+at byte 193) lands after `is also a` with the marker, mathematics groups intact.
+
+| | zoodb-example | eczoodb test_data |
+|---|---|---|
+| text: one run per object plus one per field | 11 fields, 835 chars, 32 ms | 109 fields, 17,950 chars, 105 ms |
+| truncation of every description's first paragraph (200 chars) | 2 cut, 3 whole, 1.1 ms | 6 cut, 6 whole, 2.3 ms |
+| parse again after the cut | no diagnostic | no diagnostic |
+
+Module size 5,106,186 B. The run exposes the expected diagnostics when the host tables
+are empty (`flm.citations.no-entry`, `flm.graphics.resolve-failed`), which the script
+does not fill; the text of a field is unaffected.
+
+## Step zero: what it established
+
+Every milestone of the brief ran on both data sets. The measurements and the findings
+that matter for the build are collected here; the design questions they touch are
+noted.
+
+- **The module** (R1, R2): 5.1 MB of wasm (1.2 MB brotli for the 4.9 MB of milestone 0;
+  to re-measure), instantiated in 35–60 ms, the registry built from settings in
+  170–190 ms, 68 MB of linear memory reserved by the 64 MiB linked stack (U1 stays the
+  one way to lower it). The browser fetches the `.wasm` (Q17).
+- **Composition** (Q4, Q8, Q9): markers substituted after one run per page, snippets
+  from one run over all standalone fields, the external index installed per run at no
+  measurable cost (R14, R16).
+- **Host data as tables** (Q6, Q7): the citations and graphics tables filled from the
+  scan's report, the services as lookups; a miss is a plain diagnostic. The scan lists
+  images from the element index so that it never asks the resolver.
+- **`srcset`** (R8): the plan preference between two writers of the published table
+  works; the table write needs one constructor in flm-core (U2, the one necessity found).
+- **The ZooDb feature** (Q5, Q16): the standalone check (no violation in the data), the
+  `field` element with the loader's fixtures reproduced exactly.
+- **Settings as data** (Q14): the factory route, user definitions, features off, the
+  schema per feature.
+- **The handbook** (Q12, R7): one run, safe labels unique over it, raw object keys in
+  the hook, the style file; the `[[` ligature stays the handbook's.
+- **Text and previews** (Q11, R18): text per object and per field, the truncation on
+  the source with a parse again.
+- **Data findings**: both data sets parse clean; one list option (`[{⇒}]`) in
+  `binary_linear.yml` is refused by flm-rs; `%%` starts a comment (the data obeys it);
+  `\includegraphics` lives inside floats only unless `graphics.global` is set.
+
+Remaining before the build: nothing in step zero. Open for Philippe: U2 (raise it in
+flm-rs, or accept no `srcset` from FLM until then). Next: build order step 1 of 06
+(the Rust workspace in `rust/`, the real crate from the prototype's engine, the loader
+and `tools/build_wasm.mjs`), then the engine (2) and the processor (3).
+
 4. ~~The handbook~~ Done in milestone 5 (the full-size run remains for R5).
-5. The truncation helper over the parsed tree (R18) and the text backend (Q11).
+5. ~~The truncation helper and the text backend~~ Done in milestone 6.
