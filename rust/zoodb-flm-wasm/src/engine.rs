@@ -1,6 +1,14 @@
-//! The prototype engine: flm-core driven from plain Rust, with no wasm types,
-//! so that it compiles and tests natively and is wrapped by `lib.rs` for
-//! WebAssembly.
+//! The engine: `flm-core` driven from plain Rust, with no wasm types, so that
+//! it compiles and tests natively and is wrapped by `lib.rs` for WebAssembly.
+//!
+//! One registry is built from the configuration (the standard package from
+//! its settings as data, `math_passthrough`, the ZooDb feature, and the
+//! services over the host tables); fragments are parsed with it and kept by
+//! handle; each call places the given handles in one document and runs a plan
+//! over it (cached per options key): the html, text or recomposed-LaTeX
+//! workflow, or the scan (a bare plan request for the tables the host reads).
+//! Diagnostics carry the origin (`path#field`), the byte range and the line
+//! and column within the fragment's text.
 
 use std::collections::BTreeMap;
 use std::sync::Arc;
@@ -13,11 +21,12 @@ use flm_core::stdcore::features::citations::{CitationProvider, PROVIDERS_SLOT};
 use flm_core::stdcore::features::graphics::{GraphicsInspector, GraphicsResolver, INSPECTOR_SLOT, RESOLVER_SLOT};
 
 use crate::host::{CitationEntry, GraphicsEntry, HostCitations, HostGraphics, HostTables};
-use crate::zoodb_feature::{FIELD_ELEMENT, FIELD_ENVIRONMENT, FIELD_NAME_ARG, PUBLISH_STAGE, STANDALONE_CHECKED, STANDALONE_TREES, SrcsetConfig, StandaloneTrees, ZoodbFeature};
+use crate::zoodb_feature::{FIELD_ELEMENT, FIELD_NAME_ARG, PUBLISH_STAGE, STANDALONE_CHECKED, STANDALONE_TREES, SrcsetConfig, StandaloneTrees, ZoodbFeature};
 use flm_core::model::element::element_of;
 use flm_core::core::registry::{DefContent, FlmRegistry, RegistryBuilder, RegistryInputs};
 use flm_core::core::run::{Externals, Run, RunOptions};
-use flm_core::lang::{FlmDiagnostic, FlmOrigin, FlmParsing, FlmSource, ParseOptions, parse_fragment};
+use flm_core::lang::{Flm, FlmDiagnostic, FlmOrigin, FlmParsing, FlmSource, ParseOptions, parse_fragment};
+use flm_core::techy::core::node::NodeRef;
 use flm_core::model::addr::TreeId;
 use flm_core::model::doc::{Doc, DocContent, Fragment, FragmentLayout};
 use flm_core::model::options::OptionValues;
@@ -48,22 +57,19 @@ use flm_core::techy::source::LineIndexCache;
 // Configuration and outputs (all serializable: they cross to JavaScript)
 
 #[derive(Debug, Clone, Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
 pub struct EngineConfig {
     /// Whether `$…$` delimits mathematics (the EC zoo writes `\(…\)`).
-    #[serde(default)]
     pub dollar_math: bool,
     /// Alternative image sources for the html output (Q7); none when absent.
     /// With it, the ZooDb publish stage is preferred over the standard one.
-    #[serde(default)]
     pub srcset: Option<SrcsetConfig>,
     /// The settings of the standard features as data (Q14): one map per
     /// feature, `{ feature: { key: value } }`, read through the feature's
     /// declaration (`stdcore::factory`). User definitions go under
     /// `userdefs` (`macros`, `environments`, `specials`).
-    #[serde(default)]
     pub settings: serde_json::Map<String, serde_json::Value>,
     /// Standard features switched off by name.
-    #[serde(default)]
     pub off: Vec<String>,
 }
 
@@ -92,6 +98,7 @@ pub struct DiagOut {
 /// object, `person:bob`), where a link to it leads, and the FLM text a
 /// reference to it shows.
 #[derive(Debug, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ExternalEntry {
     pub label: String,
     pub href: String,
@@ -105,25 +112,22 @@ pub struct ParsedOut {
 }
 
 #[derive(Debug, Clone, Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
 pub struct RenderOptions {
-    #[serde(default)]
     pub title: Option<String>,
     /// Unresolved references are Warnings instead of Errors.
-    #[serde(default)]
     pub unresolved_refs_warning: bool,
 }
 
 /// Options of a recomposed-LaTeX run (Q12).
 #[derive(Debug, Clone, Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
 pub struct LatexOptions {
     /// Label types written as the document spelled them (`code`, `domain`,
     /// `kingdom`: the handbook's aux definitions resolve them); every other
     /// type gets a safe label.
-    #[serde(default)]
     pub raw_label_types: Vec<String>,
-    #[serde(default)]
     pub drop_comments: bool,
-    #[serde(default)]
     pub unresolved_refs_warning: bool,
 }
 
@@ -143,24 +147,22 @@ pub struct LatexOut {
 
 /// Options of a plain-text run (Q11).
 #[derive(Debug, Clone, Deserialize)]
+#[serde(default, deny_unknown_fields)]
 pub struct TextOptions {
     /// The line width in columns; `None` never wraps.
-    #[serde(default)]
     pub width: Option<u32>,
-    #[serde(default)]
     pub link_addresses: bool,
-    #[serde(default)]
+    /// Unresolved references are Warnings instead of Errors (the default
+    /// for text, unlike html and LaTeX).
     pub unresolved_refs_warning: bool,
     /// Also render each tree alone, for its own text (`trees`). The marks
     /// of the whole run's text cover only the lowered nodes that carry one
     /// (emphasis, links, mathematics), not plain text, so a tree's text cannot
     /// be cut out of the whole reliably.
-    #[serde(default)]
     pub per_tree: bool,
     /// Whether the pieces (the list of cited works, the notes) are placed in
     /// the text; off, a citation is its mark alone, which is what a search
     /// index and a snippet want (Q11).
-    #[serde(default)]
     pub pieces: bool,
 }
 
@@ -174,8 +176,8 @@ impl Default for TextOptions {
 pub struct TextOut {
     /// The whole printed text of the run.
     pub text: String,
-    /// The text of each handle given, cut out of the whole through the
-    /// position marks of its tree.
+    /// With `per_tree`, the text of each handle given, in the same order,
+    /// each tree rendered alone; empty otherwise.
     pub trees: Vec<String>,
     pub diagnostics: Vec<DiagOut>,
     pub has_errors: bool,
@@ -183,6 +185,7 @@ pub struct TextOut {
 
 /// Options of the truncation helper (R18).
 #[derive(Debug, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct TruncateOptions {
     pub chars: usize,
     #[serde(default)]
@@ -333,7 +336,7 @@ fn diags_out<'a>(diagnostics: impl IntoIterator<Item = &'a FlmDiagnostic>) -> Ve
 }
 
 fn line_col(text: &str, at: usize) -> (usize, usize) {
-    let before = &text[..at.min(text.len())];
+    let before = text.get(..at.min(text.len())).unwrap_or(text);
     let line = before.matches('\n').count() + 1;
     let col = before.rsplit('\n').next().map(|l| l.chars().count()).unwrap_or(0) + 1;
     (line, col)
@@ -346,6 +349,36 @@ pub fn layout_of(name: &str) -> Result<FragmentLayout, String> {
         "auto" | "" => Ok(FragmentLayout::InlineOrBlocks),
         other => Err(format!("unknown layout `{other}` (blocks, inline, auto)")),
     }
+}
+
+/// One field of an FLM data file from its `zoodb.field` node: the name, and
+/// the body as the text between the name argument (its delimiters included)
+/// and the end of the verbatim body, that is `\\end` for a closed field and
+/// the end of the text for an unclosed one (which the parse reports). The
+/// verbatim body as parsed leaves out a newline right after the argument; the
+/// loader reads it from the text, as the old FLM did. An error is the reason
+/// the field cannot be read.
+fn field_of(node: &NodeRef<'_, Flm>, text: &str) -> Result<FieldOut, String> {
+    let name = match node.argument_content_nodes_named(FIELD_NAME_ARG) {
+        Ok(Some(nodes)) => match chars_at_lowering(nodes.iter()) {
+            Ok(Ok(name)) => name.trim().to_string(),
+            _ => return Err(String::from("the name of a field must be plain characters")),
+        },
+        _ => return Err(String::from("the field has no name")),
+    };
+    if name.is_empty() {
+        return Err(String::from("the field has an empty name"));
+    }
+    let start = match node.argument_nodes_named(FIELD_NAME_ARG) {
+        Ok(Some(nodes)) => nodes.span().map(|span| span.end()),
+        _ => None,
+    }
+    .ok_or_else(|| format!("the name of the field `{name}` has no position"))?;
+    let end = node.body().and_then(|body| body.span()).map_or(start, |span| span.end());
+    let body = text
+        .get(start..end)
+        .ok_or_else(|| format!("the body of the field `{name}` (bytes {start}..{end}) is not in the text"))?;
+    Ok(FieldOut { name, start, end, text: body.to_string() })
 }
 
 impl Engine {
@@ -379,7 +412,7 @@ impl Engine {
         builder.contribute_to(INSPECTOR_SLOT, Arc::new(HostGraphics(Arc::clone(&host))) as Arc<dyn GraphicsInspector>);
         let mut inputs = RegistryInputs::new();
         inputs.parsing = FlmParsing { dollar_math: config.dollar_math, ..FlmParsing::default() };
-        inputs.build_identity = Some(String::from("zoodb-flm-wasm-proto 0.0.1"));
+        inputs.build_identity = Some(String::from(concat!(env!("CARGO_PKG_NAME"), " ", env!("CARGO_PKG_VERSION"))));
         let registry = builder.build(&inputs).map_err(|e| e.render())?;
         Ok(Engine {
             registry,
@@ -456,7 +489,7 @@ impl Engine {
                 .map_err(|e| e.diagnostic().message().to_string())?;
             diagnostics.extend(diags_out(fragment.diags().iter()));
             let root = fragment.tree().root();
-            let children: Vec<_> = root.children().iter().map(|n| n.clone()).collect();
+            let children: Vec<_> = root.children().iter().collect();
             let display = value_of(&children, &root, guard).map_err(|e| format!("display of `{}`: {e:?}", entry.label))?;
             index = index.with(label, ExternalTarget { href: entry.href.clone(), display });
         }
@@ -595,32 +628,41 @@ impl Engine {
     /// Parses an FLM data file (Q16): returns every `\\begin{field}{name} …
     /// \\end{field}` with its name and the byte range of its body; content
     /// outside the fields other than whitespace and comments is a
-    /// diagnostic.
+    /// diagnostic, and so is a field whose name or body cannot be read
+    /// (`zoodb.fields.malformed`).
     pub fn parse_fields(&self, text: &str, origin: &str) -> Result<FieldsOut, String> {
         let origin = if origin.is_empty() { FlmOrigin::none() } else { FlmOrigin::new(origin) };
         let source = Arc::new(FlmSource::new(text).with_origin(origin));
         let fragment = parse_fragment(self.registry.lang(), source, FragmentLayout::Blocks, &ParseOptions::default())
             .map_err(|e| e.diagnostic().message().to_string())?;
         let mut diagnostics = diags_out(fragment.diags().iter());
-        let end_marker = format!("\\end{{{FIELD_ENVIRONMENT}}}");
+        let file_origin = fragment.tree().root().span().source().origin().canonical_path().map(str::to_owned);
         let mut fields = Vec::new();
         let mut covered: Vec<(usize, usize)> = Vec::new();
-        let mut stack: Vec<_> = fragment.tree().root().children().iter().map(|n| n.clone()).collect();
+        let mut stack: Vec<_> = fragment.tree().root().children().iter().collect();
         while let Some(node) = stack.pop() {
-            if element_of(&node).name.to_string() == FIELD_ELEMENT {
+            if element_of(&node).name == FIELD_ELEMENT {
                 let span = node.span();
-                let Ok(Some(name_nodes)) = node.argument_content_nodes_named(FIELD_NAME_ARG) else { continue };
-                let name = match chars_at_lowering(name_nodes.iter()) {
-                    Ok(Ok(name)) => name.trim().to_string(),
-                    _ => continue,
-                };
-                let arg_end = name_nodes.iter().map(|n| n.span().end()).max().unwrap_or(span.start()) + 1;
-                let body_end = span.end().saturating_sub(end_marker.len()).max(arg_end);
-                fields.push(FieldOut { name, start: arg_end, end: body_end, text: text[arg_end..body_end].to_string() });
                 covered.push((span.start(), span.end()));
+                match field_of(&node, text) {
+                    Ok(field) => fields.push(field),
+                    Err(why) => {
+                        let (l, c) = line_col(text, span.start());
+                        diagnostics.push(DiagOut {
+                            identifier: String::from("zoodb.fields.malformed"),
+                            severity: "error",
+                            message: why,
+                            origin: file_origin.clone(),
+                            start: span.start(),
+                            end: span.end(),
+                            line: Some(l),
+                            col: Some(c),
+                        });
+                    }
+                }
                 continue;
             }
-            stack.extend(node.children().iter().map(|n| n.clone()));
+            stack.extend(node.children().iter());
         }
         fields.sort_by_key(|f| f.start);
         covered.sort();
@@ -629,7 +671,7 @@ impl Engine {
         let mut ranges = covered.clone();
         ranges.push((text.len(), text.len()));
         for (start, end) in ranges {
-            let gap = &text[pos..start.max(pos)];
+            let gap = text.get(pos..start.max(pos)).unwrap_or_default();
             for (i, line) in gap.split_inclusive('\n').enumerate() {
                 let trimmed = line.trim();
                 if !trimmed.is_empty() && !trimmed.starts_with('%') {
@@ -639,7 +681,7 @@ impl Engine {
                         identifier: String::from("zoodb.fields.stray-content"),
                         severity: "error",
                         message: format!("content outside any field: `{}`", trimmed.chars().take(40).collect::<String>()),
-                        origin: fragment.tree().root().span().source().origin().canonical_path().map(str::to_owned),
+                        origin: file_origin.clone(),
                         start: at,
                         end: at + line.len(),
                         line: Some(l),
@@ -652,9 +694,6 @@ impl Engine {
         Ok(FieldsOut { fields, diagnostics })
     }
 
-    /// Runs the scan over `handles` as one document; `standalone` names the
-    /// handles parsed from standalone fields, which the check stage of Q5
-    /// verifies.
     /// Renders the given fragments as one document with the
     /// `latex-recomposed` workflow (Q12): the handbook composes the LaTeX
     /// around the per-tree texts.
@@ -729,11 +768,10 @@ impl Engine {
             let overrides = Overrides { render_options, unsupported, ..Overrides::none() };
             Plan::for_workflow(registry, text::WORKFLOW, &overrides).map_err(|e| e.to_string())
         })?;
-        let (doc, ids) = self.place(handles)?;
+        let (doc, _) = self.place(handles)?;
         let mut run = Run::new(doc, plan, self.externals()).map_err(|e| e.to_string())?;
         run.execute(&RunOptions::sequential()).map_err(|e| e.to_string())?;
         let output = run.table(TEXT_OUTPUT).map_err(|e| e.to_string())?.ok_or("the text workflow wrote no output table")?;
-        let _ = ids;
         let view = run.diagnostics();
         Ok(TextOut { text: output.text.clone(), trees: Vec::new(), has_errors: view.has_errors(), diagnostics: diags_out(view.iter()) })
     }
@@ -750,6 +788,9 @@ impl Engine {
         Ok(TruncateOut { source: t.source, truncated: t.truncated, cut_at: t.cut_at, diagnostics })
     }
 
+    /// Runs the scan over `handles` as one document; `standalone` names the
+    /// handles parsed from standalone fields, which the check stage of Q5
+    /// verifies.
     pub fn scan(&mut self, handles: &[u32], standalone: &[u32]) -> Result<ScanOut, String> {
         // A bare plan request (no workflow, so no `flm.validated`): the scan
         // demands the tables it reads and nothing else, so that no citation is
@@ -915,7 +956,7 @@ mod tests {
         assert!(out3.trees[1].contains("150pt") || out3.trees[1].contains("150"), "{}", out3.trees[1]);
     }
 
-    /// Q11: the text output, one run, each tree's text cut out through marks.
+    /// Q11: the text output, one run, and each tree's text rendered alone.
     #[test]
     fn plain_text_per_tree() {
         let mut engine = Engine::new(&EngineConfig::default()).unwrap();
@@ -1069,6 +1110,86 @@ mod tests {
         assert!(stray.diagnostics.iter().any(|d| d.identifier == "zoodb.fields.stray-content"), "{:?}", stray.diagnostics);
     }
 
+    /// A field whose name is not braced, whose body holds non-ASCII text, that
+    /// is not closed, or whose name cannot be read is a diagnostic, never a
+    /// panic; every body range lies in the text.
+    #[test]
+    fn malformed_fields_are_diagnostics() {
+        let engine = Engine::new(&EngineConfig::default()).unwrap();
+        let check_ranges = |text: &str, out: &FieldsOut| {
+            for f in &out.fields {
+                assert_eq!(text.get(f.start..f.end), Some(f.text.as_str()), "{f:?}");
+            }
+        };
+        // An unbraced one-character name followed by a non-ASCII character.
+        let text = "\\begin{field}x\u{e9} body\\end{field}";
+        let out = engine.parse_fields(text, "f.flm").unwrap();
+        assert!(out.diagnostics.is_empty(), "{:?}", out.diagnostics);
+        let got: Vec<(&str, &str)> = out.fields.iter().map(|f| (f.name.as_str(), f.text.as_str())).collect();
+        assert_eq!(got, vec![("x", "\u{e9} body")]);
+        check_ranges(text, &out);
+        // `\end {field}` does not close the field: the parse says so, and the
+        // body runs to the end of the text (no byte arithmetic on the marker).
+        let text = "\\begin{field}{a}body\\end {field}";
+        let out = engine.parse_fields(text, "f.flm").unwrap();
+        assert!(out.diagnostics.iter().any(|d| d.identifier == "core.environments.missing-terminator"), "{:?}", out.diagnostics);
+        assert_eq!(out.fields.len(), 1);
+        assert_eq!(out.fields[0].text, "body\\end {field}");
+        check_ranges(text, &out);
+        // An empty body.
+        let out = engine.parse_fields("\\begin{field}{a}\\end{field}", "f.flm").unwrap();
+        assert!(out.diagnostics.is_empty(), "{:?}", out.diagnostics);
+        assert_eq!((out.fields[0].name.as_str(), out.fields[0].text.as_str()), ("a", ""));
+        // A name that is not plain characters, and an empty name.
+        for text in ["\\begin{field}{\\emph{x}}b\\end{field}", "\\begin{field}{ }b\\end{field}"] {
+            let out = engine.parse_fields(text, "f.flm").unwrap();
+            assert!(out.fields.is_empty(), "{:?}", out.fields);
+            let malformed: Vec<&DiagOut> = out.diagnostics.iter().filter(|d| d.identifier == "zoodb.fields.malformed").collect();
+            assert_eq!(malformed.len(), 1, "{:?}", out.diagnostics);
+            assert_eq!(malformed[0].origin.as_deref(), Some("f.flm"));
+        }
+    }
+
+    /// An options object read from JavaScript gives the struct's `Default`
+    /// for every key it leaves out (a field-level default never disagrees with
+    /// it), and an unknown key is refused with its name.
+    #[test]
+    fn options_default_like_their_structs_and_refuse_unknown_keys() {
+        use serde_json::json;
+        let text: TextOptions = serde_json::from_value(json!({})).unwrap();
+        assert!(text.unresolved_refs_warning);
+        assert_eq!(format!("{text:?}"), format!("{:?}", TextOptions::default()));
+        let render: RenderOptions = serde_json::from_value(json!({})).unwrap();
+        assert_eq!(format!("{render:?}"), format!("{:?}", RenderOptions::default()));
+        let latex: LatexOptions = serde_json::from_value(json!({})).unwrap();
+        assert_eq!(format!("{latex:?}"), format!("{:?}", LatexOptions::default()));
+        let config: EngineConfig = serde_json::from_value(json!({})).unwrap();
+        assert_eq!(format!("{config:?}"), format!("{:?}", EngineConfig::default()));
+        let srcset: SrcsetConfig = serde_json::from_value(json!({})).unwrap();
+        assert_eq!(format!("{srcset:?}"), format!("{:?}", SrcsetConfig::default()));
+        let truncate: TruncateOptions = serde_json::from_value(json!({ "chars": 10 })).unwrap();
+        assert_eq!((truncate.marker.as_str(), truncate.min_chars, truncate.first_paragraph), (" \u{2026}", None, false));
+
+        fn refused<T: serde::de::DeserializeOwned>(value: serde_json::Value, key: &str) {
+            match serde_json::from_value::<T>(value) {
+                Ok(_) => panic!("`{key}` accepted"),
+                Err(e) => assert!(e.to_string().contains(key), "{e}"),
+            }
+        }
+        refused::<EngineConfig>(json!({ "dolar_math": true }), "dolar_math");
+        refused::<EngineConfig>(json!({ "srcset": { "image_max_zoom": 2 } }), "image_max_zoom");
+        refused::<RenderOptions>(json!({ "titel": "x" }), "titel");
+        refused::<LatexOptions>(json!({ "drop_comment": true }), "drop_comment");
+        refused::<TextOptions>(json!({ "per_trees": true }), "per_trees");
+        refused::<TruncateOptions>(json!({ "chars": 10, "min_char": 2 }), "min_char");
+        refused::<ExternalEntry>(json!({ "label": "a:b", "href": "/", "display": "B", "x": 1 }), "`x`");
+        refused::<CitationEntry>(json!({ "key": "a:b", "text": "T", "txt": "T" }), "txt");
+        refused::<GraphicsEntry>(
+            json!({ "origin": "o", "path": "p", "identity": "i", "media_type": "image/png", "address": "/a", "kind": "raster", "width": 3 }),
+            "width",
+        );
+    }
+
     /// R8: with the srcset configuration, the html plan prefers the ZooDb
     /// publish stage over the standard one (two writers of one table), and
     /// the stage runs. The table write itself is blocked (U2).
@@ -1103,4 +1224,5 @@ mod tests {
         let err = engine.render_html(&[b.handle], &RenderOptions::default()).unwrap_err();
         assert!(err.contains("zoodb.graphics.publish.html") && err.contains("flm.graphics.publish.html"), "{err}");
     }
+
 }

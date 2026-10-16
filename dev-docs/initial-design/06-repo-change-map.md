@@ -148,5 +148,8 @@ The prototypes of `04-technical-risks.md` gate the steps they belong to.
    re-indent tool, `flmfilesdb` over the `field` element, the renamed config entries;
    `zoodb-example` ported (L).
 5. **Removal and documentation** (B first row, H, I, J): `flm-js-src` deleted, package
-   exports and version, docs rewritten.
+   exports and version, docs rewritten; the build machine's absolute paths remapped out
+   of the two binaries before the package ships the FLM module (found in step 1, 08);
+   the 20 lint errors that predate the branch cleared (9 files, 5 of them the old FLM
+   layer that goes here).
 6. **EC zoo** (M): outside this repository.

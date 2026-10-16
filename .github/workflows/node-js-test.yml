@@ -80,10 +80,20 @@ jobs:
         working-directory: ./zoodb-example/website
 
 
-  # Build and check the Rust binding of the autocitefetch citation retriever
-  # (rust/).  The generated module in src/citationmanager/_wasm/ is committed
-  # and is not compared with this build's output (wasm-opt is not
-  # byte-reproducible across versions).
+  # Build and check the Rust bindings of the cargo workspace in rust/: the
+  # citation retriever (zoodb-autocitefetch-wasm) and the FLM engine
+  # (zoodb-flm-wasm).  The generated modules in src/citationmanager/_wasm/ and
+  # src/zooflm/_wasm/ are committed and are not compared with this build's
+  # output (wasm-opt is not byte-reproducible across versions).
+  #
+  # Each crate is checked in its own cargo invocation: one invocation over both
+  # would unify serde_json's features and compile the citation crate with
+  # `serde_json/std`, which it must never be built with (see rust/README.md).
+  #
+  # zoodb-flm-wasm depends on flm-core through a path to a local checkout of
+  # flm-rs, which this runner does not have; cargo cannot load the workspace
+  # without it, so this job fails at its first cargo command until flm-rs is
+  # referenced from a location CI can reach (to be settled).
   rust:
 
     runs-on: ubuntu-latest
@@ -117,10 +127,16 @@ jobs:
         run: 'command -v wasm-pack || cargo install wasm-pack --locked'
 
       - name: 'cargo clippy'
-        run: 'cargo clippy --all-targets -- -D warnings'
+        run: |
+          cargo clippy -p zoodb-autocitefetch-wasm --all-targets -- -D warnings
+          cargo clippy -p zoodb-flm-wasm --all-targets -- -D warnings
 
       - name: 'cargo test'
-        run: 'cargo test'
+        run: |
+          cargo test -p zoodb-autocitefetch-wasm
+          cargo test -p zoodb-flm-wasm
 
-      - name: 'Build the wasm module (build only)'
-        run: 'wasm-pack build --release --target web --out-dir target/pkg --out-name autocitefetch_wasm'
+      - name: 'Build the wasm modules (build only)'
+        run: |
+          wasm-pack build zoodb-autocitefetch-wasm --release --target web --out-dir ../target/pkg/zoodb-autocitefetch-wasm --out-name autocitefetch_wasm
+          wasm-pack build zoodb-flm-wasm --release --target web --out-dir ../target/pkg/zoodb-flm-wasm --out-name zoodb_flm_wasm

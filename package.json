@@ -54,6 +54,8 @@
         "./zooflm": "./src/zooflm/index.js",
         "./zooflm/citationcompiler": "./src/zooflm/citationcompiler.js",
         "./zooflm/scanner": "./src/zooflm/scanner.js",
+        "./zooflm/wasm": "./src/zooflm/_load_wasm.js",
+        "./zooflm/wasm-node": "./src/zooflm/_load_wasm_node.js",
         "./util": "./src/util/index.js",
         "./util/*": "./src/util/*.js",
         "./std": "./src/std/index.js",

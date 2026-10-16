@@ -5,16 +5,32 @@ repository).
 
 ## `build_wasm.mjs`
 
-Usage: `yarn build:wasm`
+Usage: `yarn build:wasm [citations|flm]...` (no name: both)
 
-Builds the Rust binding of the `autocitefetch` citation retriever in `rust/`
-with `wasm-pack` and regenerates the committed, environment-neutral module in
-`src/citationmanager/_wasm/` (wasm-bindgen glue, the `.wasm` binary inlined as
-base64, type declarations and `BUILD_INFO.json`). Only needed after changing
-`rust/`; users of the package never run it. Requires Rust stable with the
-`wasm32-unknown-unknown` target (`rustup target add wasm32-unknown-unknown`)
-and `wasm-pack` (`cargo install wasm-pack`). Never edit the files in
-`src/citationmanager/_wasm/` by hand.
+Builds the Rust bindings of the cargo workspace in `rust/` with `wasm-pack`
+and regenerates the committed, environment-neutral modules (see
+`rust/README.md`):
+
+| name | crate | output | the binary |
+|---|---|---|---|
+| `citations` | `rust/zoodb-autocitefetch-wasm/` | `src/citationmanager/_wasm/` | inlined as base64 (`autocitefetch_wasm_bg.b64.js`) |
+| `flm` | `rust/zoodb-flm-wasm/` | `src/zooflm/_wasm/` | the file `zoodb_flm_wasm_bg.wasm` |
+
+For each: `wasm-pack build <crate> --release --target web` into
+`rust/target/pkg/<crate>/`; the wasm-bindgen glue and type declarations copied
+with a "generated file" banner (the default-path fallback stripped if present);
+the binary written as in the table; the glue (and the base64 module) checked
+free of `import.meta`, `require(`, `process.`, `Buffer`, `__dirname`, `node:`
+and `fs`; and `BUILD_INFO.json` written from `rust/Cargo.lock` (the binding's
+name and version, the `autocitefetch` version or the `flm-core` version with
+its source, `"path"` for a path dependency, the `wasm-bindgen` version, the
+sizes and the build date). Only needed after changing `rust/`; users of the
+package never run it. Requires Rust stable with the `wasm32-unknown-unknown`
+target (`rustup target add wasm32-unknown-unknown`), `wasm-pack` (`cargo
+install wasm-pack`) and, for the workspace to load at all, the local flm-rs
+checkout that `zoodb-flm-wasm` depends on. Exit status: 0 on success, 1 on any
+error (a missing tool, a failed build, a forbidden token, an unknown name).
+Never edit the generated modules by hand.
 
 ## `migrate_citations_cache.mjs`
 

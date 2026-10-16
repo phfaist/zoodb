@@ -78,12 +78,11 @@ pub struct FieldElement;
 /// How alternative sources are produced: the `graphics_use_srcset_parceljs`
 /// option of ZooDb today.
 #[derive(Debug, Clone, Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
 pub struct SrcsetConfig {
     /// The pixel densities to offer (`[1, 2]`); `1..=image_max_zoom_factor`
     /// when absent.
-    #[serde(default)]
     pub pixel_density_list: Option<Vec<u32>>,
-    #[serde(default)]
     pub image_max_zoom_factor: Option<u32>,
 }
 
@@ -102,7 +101,7 @@ pub struct ZoodbFeature {
 
 impl FlmFeature for ZoodbFeature {
     fn info(&self) -> FeatureInfo {
-        FeatureInfo::new(FEATURE, "ZooDb").docs("What ZooDb adds beside the standard features: the srcset publish stage.")
+        FeatureInfo::new(FEATURE, "ZooDb").docs("What ZooDb adds beside the standard features: the `field` element, the standalone check and the srcset publish stage.")
     }
 
     fn register(&self, b: &mut FeatureBuilder<'_>) -> Result<(), BuildError> {

@@ -5,7 +5,7 @@
     },
     "autocitefetch": "0.1.1",
     "wasm_bindgen": "0.2.127",
-    "wasm_size_bytes": 631327,
-    "b64_module_size_bytes": 841846,
-    "build_date": "2026-09-29T08:49:04.024Z"
+    "wasm_size_bytes": 631462,
+    "b64_module_size_bytes": 842026,
+    "build_date": "2026-10-16T07:12:39.637Z"
 }

@@ -35,6 +35,7 @@ use flm_core::stdcore::features::graphics::{
 
 /// One compiled citation, as the host's citation manager produces it.
 #[derive(Debug, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CitationEntry {
     /// `prefix:key`, the prefix in any letter case (`arXiv:1902.07714`).
     pub key: String,
@@ -44,6 +45,7 @@ pub struct CitationEntry {
 
 /// One image the host has collected and inspected.
 #[derive(Debug, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct GraphicsEntry {
     /// The canonical path of the source the image is written in, as the scan
     /// reported it (`people/Alice.yml#biography`).

@@ -1,4 +1,0 @@
-# The recursion guard of flm-core assumes a worker thread with 64 MiB of stack
-# (WORKER_STACK_SIZE); a wasm module has one thread, sized at link time (R1, U1).
-[target.wasm32-unknown-unknown]
-rustflags = ["-C", "link-arg=-zstack-size=67108864"]

@@ -8,6 +8,14 @@ worktree `.worktrees/zoodb-flmrs` (branch `zoodb-flmrs`); no sweep of the EC zoo
 now (the FLM syntax is the same or nearly so, and agents fix discrepancies during the
 switch); the test data are `zoodb-example/data` and `eczoo_sitegen/eczoodb/test_data`.
 
+> **Since step 1 (2026-10-16, `08-step1-rust-workspace.md`):** the crate moved from
+> `scratch/proto/zoodb-flm-wasm/` (deleted; the history keeps it) to
+> `rust/zoodb-flm-wasm/`, a member of the `rust/` workspace, renamed `zoodb-flm-wasm`
+> with the same `ZooFlm` surface. The runners in `scratch/proto/js/` now load the
+> module that `yarn build:wasm flm` writes to `src/zooflm/_wasm/`, through
+> `src/zooflm/_load_wasm_node.js` (`js/load.mjs`); the build commands below are
+> those of step zero.
+
 ## What the prototype is
 
 `scratch/proto/` (not part of the package, ignored by git through its own `.gitignore`
@@ -471,8 +479,9 @@ noted.
   `binary_linear.yml` is refused by flm-rs; `%%` starts a comment (the data obeys it);
   `\includegraphics` lives inside floats only unless `graphics.global` is set.
 
-Remaining before the build: nothing in step zero. Open for Philippe: U2 (raise it in
-flm-rs, or accept no `srcset` from FLM until then). Next: build order step 1 of 06
+Remaining before the build: nothing in step zero. U2 was ruled medium-low priority
+(Philippe, 2026-10-16): kept in 05, not raised yet; no `srcset` from FLM until it
+lands. Next: build order step 1 of 06
 (the Rust workspace in `rust/`, the real crate from the prototype's engine, the loader
 and `tools/build_wasm.mjs`), then the engine (2) and the processor (3).
 

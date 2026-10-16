@@ -151,7 +151,7 @@ pub fn truncate(text: &str, fragment: &Fragment, chars: usize, min_chars: Option
     let mut walk = Walk { text, chars, min_chars: min_chars.unwrap_or(0), count: 0, closers: Vec::new() };
     let children: Vec<_> = root.children().iter().collect();
     let (step, range_end) = if first_paragraph {
-        let is_break = |n: &NodeRef<'_, Flm>| flm_core::model::element::element_of(n).name.to_string() == flm_core::lang::structural::PARBREAK;
+        let is_break = |n: &NodeRef<'_, Flm>| flm_core::model::element::element_of(n).name == flm_core::lang::structural::PARBREAK;
         match children.iter().position(is_break) {
             Some(i) => (walk.nodes(&children[..i]), children[i].span().start()),
             None => (walk.nodes(&children), text.len()),
