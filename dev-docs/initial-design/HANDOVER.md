@@ -1,8 +1,8 @@
-# Handover note for continuing the build (written 2026-10-17, updated 2026-10-16 after step 4)
+# Handover note for continuing the build (written 2026-10-17, updated 2026-10-17 after step 5)
 
 Read this first when continuing the ZooDb FLM redesign around flm-rs in a fresh session.
 It says where things are, how each build step is run, the rules that bind, and what comes
-next. The design itself is in `01`–`07`; the build briefs are `08`–`12`; the status log is
+next. The design itself is in `01`–`07`; the build briefs are `08`–`13`; the status log is
 in `README.md` of this folder.
 
 ## Where things are
@@ -16,8 +16,9 @@ in `README.md` of this folder.
 - **Commits so far** (all with the trailers below): step zero `7960397`…`8b2c468`
   (prototype, 07); step 1 `e00e24a` (08); step 2 `98d8f40` (09); step 3 `6a545c9` (10);
   docs `41c673d`, `c435de5`; `053c8d6` (Philippe: the main checkout's `scratch/` moved
-  here); step 4 parts A and B `19c428c` (11); step 4 part C and these notes `28df685`.
-  Working tree clean at the time of writing.
+  here); step 4 parts A and B `19c428c` (11); step 4 part C and these notes `28df685`
+  (its hash added in `7d5f273`); step 5 `e8f7c00` (12). The tree was clean at
+  `e8f7c00`; this update and brief 13 came after it.
 - **What exists now.** `rust/` is a cargo workspace (`zoodb-autocitefetch-wasm`,
   `zoodb-flm-wasm`; flm-core by path from `/Users/philippe/projects/flm-rs/flm-core`);
   the FLM module is committed as `src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` (5.14 MB)
@@ -31,10 +32,15 @@ in `README.md` of this folder.
   `yaml` package (`js-yaml` gone), `src/dbdataloader/_yamlparse.js` (shared), the YAML
   loader with `obj._zoodb.flm_field_positions`, the FLM-files loader over the engine,
   the tool `tools/reindent_yaml.mjs` (bin `zoodb-reindent-yaml`); the test zoos
-  `test/test_data/flm_zoo/`, `yaml_fixtures/`, `flm_files/`. The old transpiled layer
-  (`flm-js-src/`, `src/zooflm/_environment.js` and friends, their tests) is still present
-  and removed in step 5; nothing under `src/dbdataloader/`, `src/dbprocessor/`,
-  `src/std/`, `src/resourcecollector/` imports it.
+  `test/test_data/flm_zoo/`, `yaml_fixtures/`, `flm_files/`. Since step 5 the old
+  transpiled layer is gone (`flm-js-src/`, the six old `src/zooflm/` modules, their
+  tests, the old playground); `./zooflm` re-exports the engine, the citation compiler
+  and the neutral loader (not the Node one); package `0.3.0` with `CHANGELOG.md` (new),
+  `engines` `node >=20` and a `files` list (75 packed files); the API sample
+  `playground/play_example.mjs`; `tools/build_wasm.mjs` remaps the build machine's
+  paths, byte-checks the binaries and records `paths_remapped` and
+  `flm_core_git: { commit, dirty }` (flm-rs `2c219ec3`) in `BUILD_INFO.json`; `doc/`
+  rewritten.
 - **The `zoodb-example` port** lives in a clone at `scratch/zoodb-example/` (ignored
   through `scratch/.gitignore`, with `*.tgz`), branch `zoodb-flmrs` there, commits
   `bc0a6ce`, `5cc0c68`, `2242062`, never pushed; its `website/_site/`, `node_modules/`
@@ -53,9 +59,9 @@ Since step 4 the steps run in **ultracode mode** (the Workflow tool) with few ag
 on the **Opus model**, each dimensioned to stay well under about 500k tokens of context
 (one part of a step per agent; long outputs to log files in the session's scratchpad).
 
-1. The brief for the step is in this folder (`12-step5-removal-docs.md` is next); adjust
-   it to the previous step's Results before handing it off (each brief has a "Results"
-   section the implementer fills in; 12 has a "From step 4" list to fold in).
+1. The brief for the step is in this folder (`13-step6-eczoo.md` is next, being drafted
+   by another agent at the time of writing); adjust it to the previous step's Results
+   before handing it off (each brief has a "Results" section the implementer fills in).
 2. One workflow: an **implementer agent** (`model: 'opus'`) with the brief's path, the
    worktree path and the commit it starts from, the hard rules (below), the context files
    to read, the environment facts, the checks to run, what to put in the Results, the
@@ -66,7 +72,11 @@ on the **Opus model**, each dimensioned to stay well under about 500k tokens of 
 3. The main session reads both reports, decides on every finding (and on the questions
    left to Philippe: ask him in prose, or defer and record), and runs a second workflow
    with one **fixer agent** (Opus) carrying the fix list and the decisions; it applies
-   them, re-runs the checks and adds a "Review fixes" paragraph to the Results.
+   them, re-runs the checks and adds a "Review fixes" paragraph to the Results. Step 5
+   added two variants worth keeping: when a step has independent parts, the implementer
+   may be several agents on disjoint files (one for the code, two for the docs, each side
+   with its own reviewer), and a read-only **verifier agent** after the fixer, in the
+   same workflow, paid off.
 4. The main session runs the checks itself, reads the substance of the diff, commits on
    the branch with the two trailers, adds a line to this folder's `README.md` status log,
    updates the memory file. Agents never commit in this repository; in the example's
@@ -75,7 +85,7 @@ on the **Opus model**, each dimensioned to stay well under about 500k tokens of 
    `resumeFromRunId`.
 
 Commit trailers: `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>` and
-`Claude-Session: https://claude.ai/code/session_01M8stUK6fLR9cvYh32nU9rh`.
+`Claude-Session: https://claude.ai/code/session_014E8o5tjoMsVYDAGRKzyvwU`.
 
 ## Rules that bind (from Philippe; see also the memory files)
 
@@ -107,10 +117,17 @@ worktree; scripts run with `yarn node`). Rust checks per crate (feature unificat
 give the citation crate `serde_json/std`): `cd …/rust && cargo clippy -p zoodb-flm-wasm
 --all-targets -- -D warnings && cargo test -p zoodb-flm-wasm` (and the same with `-p
 zoodb-autocitefetch-wasm`). Module rebuild: `yarn build:wasm flm` (about 15 s warm, up
-to 2 min cold); the committed module must match the crate (step 4 changed neither).
-`yarn test` (487 passing after step 4), `yarn lint` (18 errors that predate the branch in
-8 untouched files, cleared in step 5; new files must add none). The example's build
-check: 11, Results, Part C (about 10 s once the clone's citations cache is fresh).
+to 2 min cold; the first build with the remapping flags recompiles everything); the
+committed module must match the crate (step 5 rebuilt both). The build reads the flm-rs
+checkout's git state only for `BUILD_INFO.json` (read-only, `git --no-optional-locks`).
+`yarn test` (460 passing after step 5), `yarn lint` (green since step 5 and run by the CI
+test job; keep it at zero errors), the sample `yarn node playground/play_example.mjs`.
+Docs: the worktree's `doc/` poetry environment has no packages installed, so step 5 ran
+the main checkout's `~/Library/Caches/pypoetry/virtualenvs/zoodb-doc-oZT3q19H-py3.13/bin/sphinx-build`
+(Sphinx 8.1.3) read-only from the worktree's `doc/`, output in the scratchpad (no warning;
+the details in 12, Results, Part D); `cd doc && poetry install` would populate the
+worktree's own, in poetry's cache outside the worktree. The example's build check: 11,
+Results, Part C (about 10 s once the clone's citations cache is fresh).
 
 ## Decisions taken during the build (beyond 03)
 
@@ -152,29 +169,30 @@ check: 11, Results, Part C (about 10 s once the clone's citations cache is fresh
   warnings `render_document()` returns. The example's committed dependency stays the git
   URL (its lock pins an old zoodb commit: refresh after the merge); the pre-existing
   empty `<title>` fixed on the example's branch.
+- Step 5: `./zooflm` environment-neutral (the Node loader only as `./zooflm/wasm-node`);
+  the `files` entries `/README.md`, `/CHANGELOG.md` with a leading slash (else yarn packs
+  every nested README); Node 18 out of the CI matrix (`engines` `node >=20`); rustflags
+  in a cargo configuration file refused by `tools/build_wasm.mjs` (the encoded flags
+  would replace them; no TOML parser), flags from the environment merged;
+  `BUILD_INFO.json` records `<dep>_git: { commit, dirty }` per path dependency in a git
+  checkout, `dirty` for the dependency's own directory; `use_flm_engine` refuses unknown
+  keys of `flm_options.engine`; `CHANGELOG.md` is the release notes; the CI example-build
+  steps kept, marked pending by a comment (not disabled) until the example's port reaches
+  its default branch.
 
 ## Next
 
-- **Step 5** = brief 12 (removal of the old layer and `flm-js-src`, exports and version
-  0.3.0, path remapping of the binaries in `tools/build_wasm.mjs`, the old lint errors,
-  the `doc/` rewrite, `CLAUDE.md`, `README.md`, the playground sample). Fold in its "From
-  step 4" list first (a `files` list for the package, `engines` ≥ 20, the YAML 1.2
-  release note, `parse_fields`/`html_scripts` in the docs, the positions-in-dumps
-  decision, the `skip_save_cache` doc nuance). Ask Philippe for the go if he asked for a
-  checkpoint; otherwise his instruction of 2026-10-16 ("continue the build") stands.
-- **Step 6** = the EC zoo, outside this repository (no brief yet; write
-  `13-step6-eczoo.md` from 01 and the findings): `eczoo_sitegen` and `eczoo_handbook`
-  ports; code reading `zoo_flm_processor.scanner.get_encountered(...)` moves to
-  `processor.scan_results`; the 127 YAML files re-indented with `zoodb-reindent-yaml`
-  (191 values; verified on a copy); the three duplicate labels (`eq:parity`,
-  `figure:toric-code-operators`, `eq:gb_gv`); the list option `[{⇒}]` in
-  `binary_linear.yml`; `%%` comments; `\includegraphics` inside floats only unless
-  `graphics.global`; the handbook over `render_latex` (07 milestone 5); the browser apps
-  at level 1 through `engine.load(data.zooflm)`; the site's MathJax 3 setup and the SCSS
-  targeting the old math classes (`jscomponents/mathjax/setup.js`,
-  `site/stylesheets/flm-formatting.scss`) replaced by `html_scripts()` and the new
-  classes (the gap found in step 4's review); dev mode: a new engine per rebuild is never
-  `free()`d (measure); 12 `~\cite` in the data render two no-break spaces (05 findings).
+- **Step 5** done (12, `e8f7c00`).
+- **Step 6** = brief 13 (`13-step6-eczoo.md`, being drafted at the time of writing): the
+  EC zoo, outside this repository: the `eczoo_sitegen` and `eczoo_handbook` ports (scan
+  results through `processor.scan_results`, the browser apps over
+  `engine.load(data.zooflm)`, the MathJax 3 setup and the old math classes' SCSS replaced
+  by `html_scripts()` and the new classes, the handbook over `render_latex`, a dev-mode
+  engine per rebuild never `free()`d) and the data fixes found (the 127 files to
+  re-indent, the three duplicate labels, `[{⇒}]`, `%%` comments, `\includegraphics`
+  outside floats, the `~\cite` ties); the brief holds the detail. Those folders are
+  read-only under the rules above, so the ports need Philippe's ruling on where they are
+  made (the example's went to a clone) before the step starts.
 - Later for Philippe: U2 in flm-rs when he wants `srcset`; the float-anchor policy option
   (05, not raised); the flm-core finding on a `field` environment without a name (05);
   the `~\cite` tie (05); whether dumps drop the positions (11 Deferred (b)); the example's
