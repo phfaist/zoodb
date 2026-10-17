@@ -13,9 +13,27 @@
 // wasm-pack (which fetches a matching wasm-bindgen-cli and wasm-opt itself).
 // See rust/README.md, and dev-docs/AutocitefetchImplementationPlan.md,
 // section 7.2.
+//
+// The build machine's paths: rustc writes source paths into the binaries
+// (panic locations). Each build passes `--remap-path-prefix` flags, computed
+// here and never committed, through CARGO_ENCODED_RUSTFLAGS: the workspace
+// root becomes `zoodb-rust`, the root of each path dependency its package's
+// name, cargo's registry sources `cargo-registry` (git checkouts `cargo-git`),
+// the toolchain's sysroot `rust-sysroot`. Rust flags already given through
+// CARGO_ENCODED_RUSTFLAGS, RUSTFLAGS or cargo's configuration environment
+// variables are kept; rustflags in a cargo configuration file are refused
+// (CARGO_ENCODED_RUSTFLAGS would silently replace them). Each binary is then
+// checked: no `/Users/`, `/home/` or `C:\` left. Changing the flags makes
+// cargo rebuild from scratch once.
+//
+// BUILD_INFO.json records, for each path dependency of the crate whose root is
+// in a git checkout, the checkout's commit and whether the dependency's own
+// directory had uncommitted changes (`<name>_git: { commit, dirty }`), since the
+// version alone does not say which sources were built.
 
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -30,6 +48,9 @@ const BANNER = '// GENERATED FILE — do not edit; run yarn build:wasm\n';
 // as a whole word (the Node global): the wasm-bindgen glue legitimately calls
 // the Fetch API's `Response.arrayBuffer()`.
 const FORBIDDEN = /import\.meta|require\(|process\.|\bBuffer\b|__dirname|node:|\bfs\b/;
+
+// Byte strings that betray an absolute path of the build machine in a binary.
+const BUILD_PATH_MARKERS = ['/Users/', '/home/', 'C:\\'];
 
 // One entry per crate of the workspace: the crate's directory under rust/
 // (also its package name), wasm-pack's output name, the output directory of
@@ -125,6 +146,215 @@ function lock_source(lock, name) {
     }
 }
 
+// --- the build machine's paths -------------------------------------------------
+
+/** Runs a command in rust/ and returns its standard output; fails on any error. */
+function run_capture(cmd, cmd_args, what) {
+    const r = spawnSync(cmd, cmd_args, {
+        cwd: rust_dir, encoding: 'utf-8', maxBuffer: 256 * 1024 * 1024,
+    });
+    if (r.error || r.status !== 0) {
+        fail(`${what} failed${r.error ? `: ${r.error.message}` : ''}`
+             + `${r.stderr ? `\n${r.stderr.trim()}` : ''}`);
+    }
+    return r.stdout;
+}
+
+function cargo_home() {
+    return process.env.CARGO_HOME || path.join(os.homedir(), '.cargo');
+}
+
+/** The output of `cargo metadata` for the workspace, for the wasm target. */
+function cargo_metadata() {
+    return JSON.parse(run_capture(
+        'cargo', ['metadata', '--format-version', '1', '--filter-platform', 'wasm32-unknown-unknown'],
+        '`cargo metadata`'
+    ));
+}
+
+/**
+ * The `[from, to]` pairs of the `--remap-path-prefix` flags, sorted so that
+ * the more specific (longer) prefixes come last: rustc applies the last
+ * remapping that matches.
+ */
+function compute_remappings(meta) {
+    const remap = new Map();
+    remap.set(meta.workspace_root, 'zoodb-rust');
+    const members = new Set(meta.workspace_members);
+    const registry_src = path.join(cargo_home(), 'registry', 'src');
+    for (const pkg of meta.packages) {
+        const pkg_dir = path.dirname(pkg.manifest_path);
+        if (pkg.source == null) {
+            // a path dependency (the members are under the workspace root)
+            if (!members.has(pkg.id)) {
+                remap.set(pkg_dir, pkg.name);
+            }
+        } else if (/^(registry|sparse)\+/.test(pkg.source)) {
+            // $CARGO_HOME/registry/src/<index>/<name>-<version>/
+            remap.set(path.dirname(pkg_dir), 'cargo-registry');
+        }
+    }
+    // the registry's source directories already on this machine
+    if (fs.existsSync(registry_src)) {
+        for (const ent of fs.readdirSync(registry_src, { withFileTypes: true })) {
+            if (ent.isDirectory()) {
+                remap.set(path.join(registry_src, ent.name), 'cargo-registry');
+            }
+        }
+    }
+    remap.set(path.join(cargo_home(), 'git', 'checkouts'), 'cargo-git');
+    const sysroot = run_capture('rustc', ['--print', 'sysroot'], '`rustc --print sysroot`').trim();
+    if (!sysroot) {
+        fail('`rustc --print sysroot` printed nothing.');
+    }
+    remap.set(sysroot, 'rust-sysroot');
+    return [...remap].sort( ([a], [b]) => a.length - b.length );
+}
+
+/**
+ * The path dependencies (packages without a `source` that are not workspace
+ * members) that the workspace member `crate` builds with, directly or not,
+ * dev-dependencies left out: `[{ name, root }]`, sorted by name.
+ */
+function path_dependencies(meta, crate) {
+    const members = new Set(meta.workspace_members);
+    const packages = new Map(meta.packages.map( (p) => [p.id, p] ));
+    const nodes = new Map((meta.resolve?.nodes ?? []).map( (n) => [n.id, n] ));
+    const start = meta.packages.find( (p) => p.name === crate && members.has(p.id) );
+    if (start == null) {
+        fail(`\`cargo metadata\` does not list the workspace member ${crate}.`);
+    }
+    const found = [];
+    const seen = new Set();
+    const stack = [start.id];
+    while (stack.length) {
+        const id = stack.pop();
+        if (seen.has(id)) {
+            continue;
+        }
+        seen.add(id);
+        const pkg = packages.get(id);
+        if (pkg.source == null && !members.has(id)) {
+            found.push({ name: pkg.name, root: path.dirname(pkg.manifest_path) });
+        }
+        for (const dep of nodes.get(id)?.deps ?? []) {
+            if (dep.dep_kinds.some( (k) => k.kind !== 'dev' )) {
+                stack.push(dep.pkg);
+            }
+        }
+    }
+    return found.sort( (a, b) => a.name.localeCompare(b.name) );
+}
+
+/**
+ * The git state of `dir` in the checkout that holds it: `{ commit, dirty }`
+ * (`commit` the checkout's `HEAD`; `dirty` when `git status --porcelain -- dir`
+ * lists anything, that is, when a file under `dir` differs from the commit), or
+ * `null` when `dir` is not in a git checkout. Read-only: `--no-optional-locks`
+ * keeps `git status` from refreshing the checkout's index.
+ */
+function git_state(dir) {
+    const git = (git_args) => spawnSync('git', ['--no-optional-locks', '-C', dir, ...git_args],
+                                        { encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024 });
+    const head = git(['rev-parse', '--verify', 'HEAD']);
+    if (head.error || head.status !== 0) {
+        return null;
+    }
+    const status = git(['status', '--porcelain', '--', dir]);
+    if (status.error || status.status !== 0) {
+        fail(`\`git status\` failed in ${dir}${status.stderr ? `:\n${status.stderr.trim()}` : ''}`);
+    }
+    return { commit: head.stdout.trim(), dirty: status.stdout.trim() !== '' };
+}
+
+/** The BUILD_INFO.json entries `<name>_git` of the crate's path dependencies. */
+function path_dependencies_git_info(meta, crate) {
+    const info = {};
+    for (const { name, root } of path_dependencies(meta, crate)) {
+        const state = git_state(root);
+        if (state != null) {
+            info[`${name.replace(/-/g, '_')}_git`] = state;
+        }
+    }
+    return info;
+}
+
+/** The cargo configuration files that cargo would read for a build in `dir`. */
+function cargo_config_files(dir) {
+    const files = [];
+    for (let d = path.resolve(dir); ; d = path.dirname(d)) {
+        files.push(path.join(d, '.cargo', 'config.toml'), path.join(d, '.cargo', 'config'));
+        if (path.dirname(d) === d) {
+            break;
+        }
+    }
+    files.push(path.join(cargo_home(), 'config.toml'), path.join(cargo_home(), 'config'));
+    return [...new Set(files)];
+}
+
+/**
+ * The Rust flags the builds get otherwise, which CARGO_ENCODED_RUSTFLAGS would
+ * replace: kept in front of the remapping flags. Cargo's order of precedence:
+ * CARGO_ENCODED_RUSTFLAGS, RUSTFLAGS, then its configuration (target rustflags
+ * before build rustflags). Rustflags in a configuration file are refused.
+ */
+function existing_rustflags(crate_dirs) {
+    const env = process.env;
+    if (env.CARGO_ENCODED_RUSTFLAGS != null) {
+        return env.CARGO_ENCODED_RUSTFLAGS === '' ? [] : env.CARGO_ENCODED_RUSTFLAGS.split('\x1f');
+    }
+    if (env.RUSTFLAGS != null) {
+        return env.RUSTFLAGS.split(/\s+/).filter(Boolean);
+    }
+    const with_rustflags = new Set();
+    for (const dir of crate_dirs) {
+        for (const f of cargo_config_files(dir)) {
+            let text;
+            try {
+                text = fs.readFileSync(f, 'utf-8');
+            } catch {
+                continue;
+            }
+            if (text.split('\n').some( (line) => /\brustflags\b/.test(line.replace(/#.*/, '')) )) {
+                with_rustflags.add(f);
+            }
+        }
+    }
+    if (with_rustflags.size) {
+        fail(`rustflags are set in ${[...with_rustflags].join(', ')}; the build passes its `
+             + 'path remapping through CARGO_ENCODED_RUSTFLAGS, which would replace them. '
+             + 'Give them in RUSTFLAGS instead (they are then kept).');
+    }
+    const from_config = env.CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS ?? env.CARGO_BUILD_RUSTFLAGS;
+    return (from_config ?? '').split(/\s+/).filter(Boolean);
+}
+
+/** Fails when `bytes` (a binary about to be committed) holds a build machine path. */
+function check_build_paths(bytes, what) {
+    const found = [];
+    for (const marker of BUILD_PATH_MARKERS) {
+        const examples = [];
+        let count = 0;
+        for (let i = bytes.indexOf(marker); i !== -1; i = bytes.indexOf(marker, i + 1)) {
+            count += 1;
+            if (examples.length < 3) {
+                let end = i;
+                while (end < bytes.length && end - i < 160 && bytes[end] >= 0x20 && bytes[end] < 0x7f) {
+                    end += 1;
+                }
+                examples.push(bytes.toString('latin1', i, end));
+            }
+        }
+        if (count) {
+            found.push(`  ${count} × \`${marker}\`, e.g. ${examples.map( (e) => `\`${e}\`` ).join(', ')}`);
+        }
+    }
+    if (found.length) {
+        fail(`${what} still holds absolute paths of the build machine (add a remapping to `
+             + `tools/build_wasm.mjs):\n${found.join('\n')}`);
+    }
+}
+
 // --- one module -------------------------------------------------------------------
 
 function check_forbidden(files) {
@@ -143,7 +373,7 @@ function check_forbidden(files) {
     }
 }
 
-function build(key) {
+function build(key, rustflags, meta) {
     const { crate, out_name, out_dir, ships, crate_info } = TARGETS[key];
     const crate_dir = path.join(rust_dir, crate);
     const pkg_dir = path.join(rust_dir, 'target', 'pkg', crate);
@@ -154,7 +384,10 @@ function build(key) {
     const r = spawnSync('wasm-pack', [
         'build', crate_dir, '--release', '--target', 'web',
         '--out-dir', pkg_dir, '--out-name', out_name,
-    ], { cwd: rust_dir, stdio: 'inherit' });
+    ], {
+        cwd: rust_dir, stdio: 'inherit',
+        env: { ...process.env, CARGO_ENCODED_RUSTFLAGS: rustflags.join('\x1f') },
+    });
     if (r.error || r.status !== 0) {
         fail(`wasm-pack build of rust/${crate} failed${r.error ? `: ${r.error.message}` : ''}.`);
     }
@@ -169,6 +402,10 @@ function build(key) {
             fail(`expected wasm-pack output ${path.relative(repo_root, f)} is missing.`);
         }
     }
+
+    // the binary, checked before anything is written to src/
+    const wasm_bytes = fs.readFileSync(wasm_src);
+    check_build_paths(wasm_bytes, `the ${key} binary ${path.relative(repo_root, wasm_src)}`);
 
     let glue = fs.readFileSync(glue_src, 'utf-8');
     // Strip the default-path fallback if wasm-pack left it in.
@@ -186,7 +423,6 @@ function build(key) {
     fs.writeFileSync(dts_out, BANNER + fs.readFileSync(dts_src, 'utf-8'));
 
     // 3. the binary
-    const wasm_bytes = fs.readFileSync(wasm_src);
     const checked = [glue_out];
     let b64_out = null;
     if (ships === 'base64') {
@@ -213,7 +449,9 @@ function build(key) {
     const build_info = {
         binding: { name: crate, version: lock_version(lock, crate) },
         ...crate_info(lock),
+        ...path_dependencies_git_info(meta, crate),
         wasm_bindgen: lock_version(lock, 'wasm-bindgen'),
+        paths_remapped: true,
         wasm_size_bytes: wasm_bytes.length,
         ...(b64_out ? { b64_module_size_bytes: fs.statSync(b64_out).size } : {}),
         build_date: new Date().toISOString(),
@@ -233,6 +471,18 @@ function build(key) {
                 + `) in ${seconds} s`);
 }
 
+// --- the builds ----------------------------------------------------------------------
+
+const meta = cargo_metadata();
+const remappings = compute_remappings(meta);
+for (const [from, to] of remappings) {
+    console.log(`build_wasm: remapping ${from} -> ${to}`);
+}
+const rustflags = [
+    ...existing_rustflags(selected.map( (key) => path.join(rust_dir, TARGETS[key].crate) )),
+    ...remappings.map( ([from, to]) => `--remap-path-prefix=${from}=${to}` ),
+];
+
 for (const key of selected) {
-    build(key);
+    build(key, rustflags, meta);
 }

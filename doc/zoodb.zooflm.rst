@@ -1,324 +1,567 @@
 FLM content compiling and rendering
 ===================================
 
-Provides an interface to the python-based FLM library.  The library is
-transpiled to Javascript using Transcrypt and some important entry points are
-exposed in the modules described here.
+ZooDb processes FLM content (see :ref:`zoodb-flm` for the markup) with flm-rs,
+the Rust implementation of FLM, compiled to WebAssembly together with a feature
+of ZooDb's own.  The compiled module is part of the package
+(``src/zooflm/_wasm/``), so using ZooDb needs no Rust toolchain.
+
+On the JavaScript side, the module is driven by the *engine*,
+:js:class:`ZooFlmEngine`: one object per zoo that holds the parsed fragments
+and the tables that rendering reads (the index of cross-references, the
+compiled citations, the images), and that renders pages, single fragments and
+snippets to HTML, plain text and LaTeX.
+
+The engine knows nothing about files, the network, the zoo's objects or its
+schemas.  That is the job of the FLM processor (see
+:doc:`zoodb.dbprocessor-flm`), which compiles the objects' FLM fields into
+fragments of the engine, scans them, and fills the engine's tables.  Under the
+standard setup (see :ref:`zoodb-std`) the zoo's engine is
+``zoodb.zoo_flm_engine``, and its tables are filled by the time the zoo is
+loaded: a site's templates only render with it.
+
+This API replaces the JavaScript transpilation of the Python FLM library that
+ZooDb used up to version 0.2 (see the 0.3.0 entry of ``CHANGELOG.md``).
 
 
-
-The python-transpiled interface
--------------------------------
-
-This part of the ZooDb library incorporates the `FLM python sources
-<https://github.com/phfaist/flm>`_ transpiled into JavaScript using `Transcrypt
-<https://transcrypt.org/>`_.  While this detail shouldn't matter for most uses,
-there are some important differences to keep in mind:
-
-- You can't use JavaScript class (prototype) inheritance with the python-based
-  classes.  (Callbacks won't work, the parent class won't call the child method,
-  etc.)  If you really need to subclass one of the classes from python's
-  interface (or further derived classes like :class:`ZooFLMEnvironment`), you
-  need to do it `the Transcrypt way
-  <https://www.transcrypt.org/docs/html/what_why.html#id2>`_.
-
-- To pass keyword arguments, use the syntax ``function(arg1, arg2, $$kw( {
-  keyword_arg1: ..., keyword_arg2: ... } ))``.  The ``$$kw(...)`` argument should
-  be the last argument in the call.
-
-- You cannot use the JS syntax ``x instanceof y`` with python-transcrypted
-  classes.  Instead, you can import the ``isinstance()`` utility to check
-  instances the python way, ``isinstance(x, y)``.  To check whether an object is
-  a FLM fragment instance, use :func:`is_flm_fragment()`.
-
-- You can convert objects to some representative string using the `repr()`
-  function.
-
-The relevant functions can be imported as follows:
+Modules
+-------
 
 .. code::
 
+   // the engine, fragments, diagnostics and the composer's helpers
    import {
-       $$kw, repr, __class__, __super__, __get__, isinstance
-   } from '@phfaist/zoodb/zooflm';
+       ZooFlmEngine, ZooFlmFragment, ZooFlmError, format_diagnostic, value_not_empty,
+   } from '@phfaist/zoodb/zooflm/engine';
 
+   // the loader of the wasm module, for any environment ...
+   import { load_zoodb_flm_wasm, wasm_url } from '@phfaist/zoodb/zooflm/wasm';
+   // ... and the loader for Node, which reads the module's file
+   import { load_zoodb_flm_wasm_node } from '@phfaist/zoodb/zooflm/wasm-node';
 
-
-Overview of FLM-related definitions
------------------------------------
-
-ZooDb exposes a variety of classes, functions, and objects that enable you to
-interact with FLM-related features.  We'll try to go over most of them in
-the following sections.
-
-Here are the main symbols you can expect to import from `@phfaist/zoodb/zooflm`:
-
-.. code::
-
+   // the citation compiler (CSL into FLM text)
    import {
-       ZooFLMResourceInfo,
-       FeatureZooGraphicsCollection,
-
-       ZooFLMEnvironment,
-       zooflm_default_environment_options,
-
-       is_flm_fragment,
-
-       RefResolver,
-       CitationsProvider,
-       
-       // expose FLM classes
-       FLMParsingState, // flm.flmenvironment.FLMParsingState
-       ParsingStateDelta, // pylatexenc.latexnodes.ParsingStateDelta
-       FLMParsingStateDeltaSetBlockLevel,
-       SectionCommandInfo, // flm.feature.headings.FeatureHeadings.SectionCommandInfo
-       EndnoteCategory, // flm.feature.endnotes.EndnoteCategory
-       ReferenceableInfo, // flm.feature.refs.ReferenceableInfo
-       RefInstance, // flm.feature.refs.RefInstance
-       FloatType, // flm.feature.floats.FloatType
-       GraphicsResource, // flm.feature.graphics.GraphicsResource
-
-   } from '@phfaist/zoodb/zooflm';
-
-
-
-FLM environment
----------------
-
-The `FLMEnvironment` is one of the central classes in the FLM package—it provides
-access to features, creates FLM fragments, defines parsing options, etc.
-
-In `ZooDb`, we have our own class :js:class:`ZooFLMEnvironment`, a
-`FLMEnvironment` subclass, that is capable of defining a standard environment with
-most features that you'd expect working out-of-the-box.
-
-
-.. js:class:: ZooFLMEnvironment(environment_options)
-
-   The `ZooFLMEnvironment` class is the main FLM environment class in the
-   context of the ZooDb library.
-   
-   Rather than directly instantiating this object, consider using the
-   “standard” zoodb interface
-   to create an environment instance, as this is likely to be simpler and more
-   features will be handled under the hood (see :ref:`zoodb-std`).
-
-   The options are pretty rich!  The following can appear as properties
-   of the `environment_options` object, with corresponding values to
-   adjust various configuration items:
-
-   - `parsing: { (...object...) }` — options to provide to FLM's
-     `standard_parsing_state()`, and which define options related to parsing
-     of FLM code.  Possible properties include `force_block_level`,
-     `enable_comments`, `comment_start`, `extra_forbidden_characters`, and
-     `dollar_inline_math_mode`.
-
-   - `flm_environment_options: { (...object...) }` — additional
-     keyword options to specify
-     to `FLMEnvironment`'s constructor, including `tolerant_parsing`
-     and `parsing_mode_deltas`.  (It is strongly discouraged to set
-     `tolerant_parsing` to true!)  Do not use this option to set
-     `features`, `parsing_state`, and `latex_context`; we already
-     provide these arguments and you can customize these objects
-     with other options above and below.
-
-   - `enable_features: { (...object...) }` — By default, `ZooFLMEnvironment`
-     provides a set of FLM features with default settings without you
-     explicitly asking for them.  This enables features like basic
-     formatting (``\textbf{}``, ``\emph{}``, etc.), hyperlinks (``\url{...}``,
-     …), math, etc. to work without too much effort on your end.  The
-     configuration option `enable_features` gives you fine-grained control
-     over which features to enable: Properties correspond to feature names
-     and the corresponding value is a boolean indicating whether to enable
-     that feature.  By default, all features are enabled.  The possible
-     feature names are: ``baseformatting``, ``href``, ``verbatim``, ``math``,
-     ``enumeration``, ``headings``, ``refs``, ``endnotes``, ``citations``,
-     ``floats``, ``defterm``, and ``graphics_collection``.  In addition,
-     you may specify the additional property ``default: true | false``,
-     fixing the default value for any feature name not explicitly given.
-     By default, ``default`` is set to ``true``, enabling all features
-     by default.  If you prefer to selectively enable features and ensure
-     that no other feature than the one(s) you selected are enabled, then
-     you can set ``default: false`` and can be reassured that if new features
-     are included in the future, they will not be enabled until you explicitly
-     request them.
-
-   In addition, a number of possible options directly influence settings
-   for individual features:
-
-   - `enumeration_environments` — will be passed on to
-     `flm.feature.enumeration.FeatureEnumeration`;
-
-   - `heading_section_commands_by_level` — will be passed on to
-     `flm.feature.headings.FeatureHeadings`;
-
-   - `ref_resolver` — will be used as an external reference resolver and
-     passed on to `flm.feature.refs.FeatureRefs`.  If you don't specify such an
-     object, a good default object will be automatically instantiated and
-     provided to the refs feature;
-
-   - `ref_resolver_options` — if `ref_resolver` is null (which typically is
-     the case), a standard ref resolver object is instantiated (cf.
-     :js:class:`RefResolver`).  Here, you can specify options to this class
-     constructor;
-
-   - `endnote_categories` — will be passed on to
-     `flm.feature.endnotes.FeatureEndnotes`;
-
-   - `citations_provider` — will be used as a provider for citations for the
-     `flm.feature.cite.FeatureExternalPrefixedCitations` feature.
-     If you don't specify such an object,
-     a good default object will be automatically instantiated and provided to
-     the cite feature.
-
-   - `citations_options` — an object whose keyword arguments will be passed on
-     directly to `flm.feature.cite.FeatureExternalPrefixedCitations`.  You can
-     specify citations format with `counter_formatter`, delimiters with
-     `citation_delimiters`, etc.;
-
-   - `float_types` — will be passed on to
-     `flm.feature.floats.FeatureFloats`.  Use this to define custom floats
-     beyond figures and tables;
-
-   - `defterm_options` — keyword arguments to pass on to
-     `flm.feature.defterm.FeatureDefTerm`.
-
-
-.. js:class:: FeatureZooGraphicsCollection()
-
-   Implements a graphics resource provider feature for FLM, enabling the use of
-   ``\includegraphics{}``.
-
-   The graphics resources must have been detected (e.g., using a
-   :class:`ZooFLMScanner`, perhaps handled via a :class:`ZooFLMProcessor`), and
-   the relevant graphics resource objects must have been compiled/fetched (see
-   `flm.feature.graphics.GraphicsResource`).  You then set those graphics
-   resource instances here to make them visible to the FLM renderers.
-
-   You may set the `src_url_resolver` property to a function/lambda with
-   signature `callback(graphics_resource, render_context)` and returning a URL
-   specifying where the graphics resource should be linked to in the rendered
-   output.  (This property is set e.g. in :func:`use_flm_environment()`.)
-
-   You typically do not have to instantiate this object directly, as one is
-   instantiated for you automatically if you construct a `ZooFLMEnvironment`
-   (unless you've passed on options that disable this feature) or if one
-   is constructed using the `zoodb.std` helpers.
-
-   .. js:function:: add_graphics(source_path, graphics_resource)
-
-      Register the given `graphics_resource` object associated with the given
-      `source_path`.
-
-   .. js:function:: set_collection(collection)
-
-      Combines multiple calls to `add_graphics()`.  The `collection` is an array
-      of pairs `[source_path, graphics_resource]`.  The `add_graphics()` method
-      will be called for each pair.
-
-
-.. js:autoclass:: src/zooflm/_resourceinfo.ZooFLMResourceInfo
-   :short-name:
-   :members:
-
-
-.. js:autofunction:: src/zooflm/_environment.is_flm_fragment
-   :short-name:
-
-.. js:autofunction:: src/zooflm/_environment.zooflm_default_environment_options
-   :short-name:
-
-
-
-.. js:autoclass:: src/zooflm/_environment.RefResolver
-   :short-name:
-   :members:
-
-.. js:autoclass:: src/zooflm/_environment.CitationsProvider
-   :short-name:
-   :members:
-
-
-
-
-
-
-Rendering content
------------------
-
-.. code::
-
-   import {
-       // FLM fragment renderers & related tools
-       ZooHtmlFragmentRenderer,
-       ZooTextFragmentRenderer,
-       html_fragmentrenderer_get_style_information,
-       render_html_standalone,
-       render_text_standalone,
-       // render utilities
-       make_render_shorthands,
-       render_value,
-       value_not_empty,
-       make_and_render_document,
-   } from '@phfaist/zoodb/zooflm';
-
-
-.. class:: ZooHtmlFragmentRenderer()
-
-   Subclass of FLM's `flm.fragmentrenderer.html.HtmlRenderer` with some options
-   tweaked.
-
-
-.. js:autofunction:: src/zooflm/_fragmentrenderers.html_fragmentrenderer_get_style_information
-   :short-name:
-
-
-.. class:: ZooTextFragmentRenderer()
-
-   Subclass of FLM's `flm.fragmentrenderer.text.TextRenderer` with some options
-   tweaked.
-
-
-.. js:autofunction:: src/zooflm/_fragmentrenderers.render_html_standalone
-   :short-name:
-
-.. js:autofunction:: src/zooflm/_fragmentrenderers.render_text_standalone
-   :short-name:
-
-
-.. js:autofunction:: src/zooflm/_renderutils.make_render_shorthands
-   :short-name:
-
-.. js:autofunction:: src/zooflm/_renderutils.render_value
-   :short-name:
-
-.. js:autofunction:: src/zooflm/_renderutils.value_not_empty
-   :short-name:
-
-.. js:autofunction:: src/zooflm/_renderutils.make_and_render_document
-   :short-name:
-
-
-Scanning fragments
+       CitationCompiler, install_csl_flm_output_format,
+   } from '@phfaist/zoodb/zooflm/citationcompiler';
+
+``@phfaist/zoodb/zooflm`` re-exports all of the above except the Node loader,
+which imports ``node:fs/promises``: it imports no ``node:`` module, so code
+meant for a browser may import it as well as the modules above (the citation
+compiler still reaches the ``path`` builtin through the atomic file writer, as
+before, so a bundler must provide it).  Under Node,
+import :js:func:`load_zoodb_flm_wasm_node` from
+``@phfaist/zoodb/zooflm/wasm-node``.  The engine's modules import nothing
+environment-specific and run in browsers as they are.
+
+
+Creating an engine
 ------------------
 
 .. code::
 
-   import {
-       ZooFLMScanner, visitor_scan_object, visitor_scan_zoo,
-   } from '@phfaist/zoodb/zooflm/scanner';
+   import { ZooFlmEngine } from '@phfaist/zoodb/zooflm/engine';
+   import { load_zoodb_flm_wasm_node } from '@phfaist/zoodb/zooflm/wasm-node';
+
+   const engine = await ZooFlmEngine.create({
+       load_wasm: load_zoodb_flm_wasm_node,   // under Node; leave out in a browser
+       core: {
+           settings: {
+               userdefs: { macros: { zoo: { content: 'the Zoo' } } },
+               graphics: { global: true },
+           },
+           off: [ 'annotations' ],
+       },
+       error_policy: 'abort',     // the default of every call
+       unresolved: 'error',       // how references that resolve to nothing are reported
+   });
+
+:js:meth:`ZooFlmEngine.create` loads the module through ``load_wasm()`` and
+builds the core's registry (the language and the processing, fixed for the
+engine's life) from the core configuration.  Its options:
+
+- ``load_wasm`` -- a function returning a promise of the module's namespace
+  (see `The wasm module and its loaders`_).  The default is the
+  environment-neutral loader, which fetches the module (a browser); under
+  Node, pass :js:func:`load_zoodb_flm_wasm_node`.
+
+- ``core`` -- the core's configuration, as data (next section).
+
+- ``error_policy`` (``'abort'`` or ``'continue'``) and ``unresolved``
+  (``'error'`` or ``'warn'``) -- the defaults of the calls that take these
+  options (see `Diagnostics and the error policy`_).
+
+- ``render_value_options`` -- how the composer's ``rdr()`` renders an array:
+  ``list_joiner`` (default ``''``), ``list_item_wrapper`` (default: each item
+  in ``<span class="paragraph-in-list">``) and ``list_full_wrapper``.
+
+The standard setup creates the zoo's engine with ``use_flm_engine``, from
+``flm_options.load_wasm``, ``flm_options.engine`` (the core configuration
+below, and ``render_value_options``), ``allow_unresolved_references``
+(``unresolved: 'warn'``) and ``continue_with_errors`` (``error_policy:
+'continue'``).
+
+An engine holds wasm memory: :js:meth:`ZooFlmEngine.free` releases it, after
+which every call throws.
 
 
-.. js:autoclass:: src/zooflm/scanner.ZooFLMScanner
-   :short-name:
-   :members:
+The core's settings as data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. js:autofunction:: src/zooflm/scanner.visitor_scan_object
-   :short-name:
+The core configuration has four keys; a key left out, or ``null``, takes its
+default:
 
-.. js:autofunction:: src/zooflm/scanner.visitor_scan_zoo
-   :short-name:
+- ``settings`` -- the settings of flm-rs's standard features, one map per
+  feature, keyed by the feature's name, with the keys flm-rs defines for that
+  feature.  For instance ``{ graphics: { global: true } }`` makes
+  ``\includegraphics`` usable outside floats, ``{ cells: { global: true } }``
+  does the same for the ``cells`` environment, and ``{ userdefs: { macros: {
+  ... }, environments: { ... } } }`` declares user definitions (macros and
+  environments defined by substitution; content cannot define its own).
 
+- ``off`` -- the names of standard features to switch off, such as
+  ``['annotations', 'theorems']``.
+
+- ``dollar_math`` -- whether ``$...$`` and ``$$...$$`` delimit mathematics
+  (default ``false``: a ``$`` in content is reported as ambiguous, and
+  ``\$`` writes a dollar sign).
+
+- ``srcset`` -- alternative image sources for raster images.  Leave it unset
+  (the standard setup does not pass it): the ZooDb stage that writes them
+  needs a change in flm-rs that is not available yet, and under this option
+  every image is the Error ``zoodb.graphics.publish-failed``.
+
+The standard features are ``textstyles``, ``literals``, ``blocks``,
+``index``, ``refpoints``, ``numbering``, ``math``, ``refs``, ``headings``,
+``verbatim``, ``lists``, ``xnotes``, ``href``, ``defterm``, ``theorems``,
+``quote``, ``annotations``, ``graphics``, ``floats``, ``cells``,
+``citations``, ``input``, ``userdefs``, ``lowering``, ``meta``, ``toc`` and
+``pieces``, then those of the outputs and workflows (``text``, ``latex``,
+``latex-recomposed``, ``latex-rendered``, ``html``, ``check``).
+:js:meth:`ZooFlmEngine.features` lists them with the JSON Schema of each
+one's settings.  An unknown key, feature or setting makes ``create()`` throw a
+plain ``Error`` that names it.
+
+:js:attr:`ZooFlmEngine.settings_hash` is a hash of the core configuration and
+of the module's versions (:js:attr:`ZooFlmEngine.core_version`, ``{ binding,
+flm_core }``): two engines with the same hash read and render FLM alike.
+:js:attr:`ZooFlmEngine.build_diagnostics` holds the diagnostics of the
+registry build.
+
+
+The wasm module and its loaders
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The module is ``src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm`` (about 5.1 MB, 1.8
+MB gzipped), beside its JavaScript glue, its TypeScript declarations and
+``BUILD_INFO.json`` (the versions it was built from).  These files are
+generated by ``yarn build:wasm`` from the crate ``rust/zoodb-flm-wasm/`` and
+committed; only a change to the crate needs the Rust toolchain.
+
+Two loaders instantiate the module.  Both instantiate it once and resolve to
+the same namespace, and both can be passed as ``load_wasm``:
+
+- :js:func:`load_zoodb_flm_wasm` (``@phfaist/zoodb/zooflm/wasm``) takes the
+  module's source: its bytes, a ``WebAssembly.Module``, a ``Response`` (or a
+  promise of one), or a URL.  Without one, it fetches ``wasm_url``, the URL of
+  the module file written as ``new URL('./_wasm/zoodb_flm_wasm_bg.wasm',
+  import.meta.url)``, the form that bundlers resolve as an asset.  Under Node,
+  where that URL is a ``file:`` URL that ``fetch`` cannot load, it refuses
+  with a message pointing to the Node loader.
+
+- :js:func:`load_zoodb_flm_wasm_node` (``@phfaist/zoodb/zooflm/wasm-node``)
+  reads the file and hands its bytes to the first loader.
+
+
+Fragments
+---------
+
+A fragment (:js:class:`ZooFlmFragment`) is a piece of FLM source parsed by the
+core, which keeps the parsed tree and refers to it by a handle.  A fragment is
+parsed once and can be placed in any number of renders.  The FLM processor
+makes one fragment per FLM field of every object; other code makes fragments
+with :js:meth:`ZooFlmEngine.make_fragment`:
+
+.. code::
+
+   const f = engine.make_fragment('Bob is a friend of \\ref{person:alice}.', {
+       origin: {
+           object_type: 'person', object_id: 'bob', field: 'biography',
+           source_path: 'people/bob.yml',
+       },
+       standalone: false,
+   });
+
+The options:
+
+- ``origin`` -- where the source comes from: ``object_type``, ``object_id``,
+  ``field``, ``source_path``, ``label``, all optional (a string is taken as the
+  label).  The fragment's *canonical label* is the label given, else
+  ``source_path#field``, else ``object_type:object_id#field``, else an
+  anonymous ``fragment:N``.  The core, the scan's results and the graphics
+  table refer to a fragment by this label, and diagnostics name it.  The keys
+  ``start_line``, ``start_col``, ``indent`` and ``approx`` say where the source
+  starts in its file (see `Diagnostics and the error policy`_).
+
+- ``layout`` -- how the top level is laid out: ``'auto'`` (inline, unless the
+  source holds a paragraph break or a block), ``'inline'`` (no paragraphs; a
+  blank line or a block is reported) or ``'blocks'`` (paragraphs are built).
+  The default is ``'inline'`` for a standalone fragment and ``'auto'``
+  otherwise.
+
+- ``standalone`` -- a standalone fragment holds nothing that belongs to a
+  document as a whole: no label, no reference, no citation, no footnote,
+  nothing numbered.  It renders the same in every document and on its own, so
+  it is rendered through the snippet cache (see `Snippets`_).  Names and
+  titles are standalone fields (the schema annotation ``_flm: standalone``).
+  The scan checks it: a construct of that kind in a standalone fragment is the
+  Error ``zoodb.standalone.violation``.
+
+- ``error_policy`` -- applied to the parse diagnostics: under ``'abort'``, a
+  parse Error throws a :js:class:`ZooFlmError` and no fragment is kept.
+
+A fragment is read-only.  Its properties are ``source``, ``origin`` (with
+``label`` always set), ``layout``, ``standalone``, ``handle``,
+``diagnostics`` (those of the parse), ``empty`` (the source holds only
+whitespace, comments and paragraph breaks) and ``released``.
+
+:js:meth:`ZooFlmEngine.release` frees fragments (their handles and their
+snippets; the FLM processor releases the fragments of replaced objects after a
+reload); a released fragment used again is a plain ``Error``.
+:js:meth:`ZooFlmEngine.parses` tells whether a text is valid FLM, keeping
+nothing, and :js:func:`value_not_empty` whether a value (a fragment included)
+holds anything.
+
+:js:meth:`ZooFlmEngine.parse_fields` reads the fields of an FLM data file (its
+``\begin{field}{NAME} ... \end{field}`` blocks) with their byte ranges; the
+FLM-files data loader calls it.
+
+
+Rendering a page: the composer protocol
+---------------------------------------
+
+A page is rendered by :js:meth:`ZooFlmEngine.render_document` with a
+*composer*: a plain, synchronous JavaScript function that receives helpers and
+returns the page's HTML as a string.  The FLM content the composer places is
+rendered as one FLM document, so that across the page the footnotes and the
+citations are numbered and listed together, equations and figures are
+numbered, and references between the placed fragments resolve.  This is the
+person page of the `zoodb-example <https://github.com/phfaist/zoodb-example>`_
+site, shortened:
+
+.. code::
+
+   const { html, diagnostics } = zoodb.zoo_flm_engine.render_document({
+       compose: ({ ne, rdr, rdrblock, ref, endnotes }) => {
+           let s = `<h1>${ rdr(person.name) }</h1>`;
+           s += `<div>${ rdrblock(person.biography) }</div>`;
+           if (ne(person.relations?.spouse)) {
+               s += `<p>Spouse: ${ ref('person', person.relations.spouse) }</p>`;
+           }
+           for (const friend of person.relations?.friends ?? []) {
+               s += `<p>${ ref('person', friend.person_id) } ${ rdr(friend.friend_detail) }</p>`;
+           }
+           s += endnotes();
+           return s;
+       },
+   });
+   // under the 'abort' policy an Error has thrown; print the warnings
+   for (const d of diagnostics) {
+       console.warn(format_diagnostic(d));
+   }
+
+The engine calls the composer once.  ``rdr()`` of a fragment that is not
+standalone *places* it as a tree of the document and returns a marker, an
+empty tag of the form ``<flm:K:tree:N/>``; ``endnotes()`` and ``piece()``
+return markers too, and every other helper returns its real string.  The
+engine then renders the placed fragments as one document, in the order in
+which they were first placed, with the index of the call's context, and
+replaces each marker in the composer's string by the HTML of its tree or
+piece.  ``K`` is a token of the call: a marker produced by another call is
+never substituted, and any marker that the call did not produce is the Error
+``zoodb.compose.stray-marker``.
+
+The composer may therefore branch on data (``ne()``, relations, names), but
+the HTML of a placed fragment is never in its hands: the strings that hold
+markers are meant to be concatenated, not cut, measured or rewritten.  A
+marker that appears twice is substituted at both places.
+
+The helpers:
+
+- ``ne(x)`` -- :js:func:`value_not_empty`: ``false`` for ``null``,
+  ``undefined``, ``''``, an empty array and an empty fragment, ``true``
+  otherwise (numbers and booleans included).
+
+- ``rdr(x)`` -- ``null`` and ``undefined`` give ``''``; a string is
+  HTML-escaped; a number or a boolean gives its text; an array gives its items
+  through ``rdr()``, wrapped and joined per the render value options; a
+  standalone fragment gives its HTML snippet; any other fragment is placed and
+  gives its marker (placed once: a later ``rdr()`` of it returns the same
+  marker).  Anything else, such as a zoo object, throws a ``TypeError`` naming
+  what it got.
+
+- ``rdrblock(x)`` -- as ``rdr()``, a fragment placed with its paragraphs built
+  (the ``'blocks'`` layout), standalone or not.  A fragment given to both
+  ``rdr()`` and ``rdrblock()`` on one page is placed twice, so a label in it
+  is reported as a duplicate.
+
+- ``ref(object_type, object_id, { display_flm })`` -- a link to a zoo object
+  through the context's index, built by ZooDb:
+  ``<a href="HREF" class="href-ref ref-TYPE">DISPLAY</a>``, the display being
+  the HTML snippet of the index entry's display, or of ``display_flm`` (FLM
+  text or a standalone fragment).  A missing entry is the diagnostic
+  ``zoodb.ref.unresolved``: under ``unresolved: 'error'`` an Error and the
+  label written as text, under ``'warn'`` a Warning and
+  ``<span class="href-ref ref-unresolved">TYPE:ID</span>``.
+
+- ``refhref(object_type, object_id)`` -- the address alone, or ``null`` with
+  the same diagnostic.
+
+- ``endnotes()`` -- a marker for the pieces placed after the content, in the
+  document's order: the list of footnotes, then the bibliography.
+
+- ``piece(name)`` -- a marker for one piece by its name
+  (``flm.xnotes.list.footnote``, ``flm.citations.bibliography``), replaced by
+  nothing when the page has no such piece.  ``endnotes()`` leaves out the
+  pieces placed by ``piece()``, and a piece with content that no marker places
+  is the Warning ``zoodb.compose.piece-not-placed``.
+
+- ``escape(s)`` -- HTML escaping.
+
+The result is ``{ html, definitions, requires, diagnostics, has_errors }``:
+``requires`` lists the identifiers of the style and script definitions that
+the page's content needs and ``definitions`` those definitions (see `The
+stylesheet and the scripts`_).  ``render_document()`` also takes
+``context`` (default ``'default'``), ``unresolved``, ``error_policy`` and
+``render_value_options`` (over the engine's).
+
+:js:meth:`ZooFlmEngine.render_fragment` renders one fragment alone, as one
+tree, without a composer and without placing the pieces: ``{ html | text,
+definitions, requires, diagnostics, has_errors }`` for ``output: 'html'`` (the
+default) or ``'text'``.
+
+
+Snippets
+--------
+
+A standalone fragment renders the same everywhere, so it is rendered once per
+output and kept: this is the snippet cache, which serves the names in lists,
+the titles of pages, the displays of ``ref()`` and the labels of graphs.
+
+- :js:meth:`ZooFlmEngine.render_snippets` fills the cache for many fragments
+  at once (for ``html``, one run over all of them; for ``text``, one run per
+  fragment).  The FLM processor calls it for every standalone field of the zoo
+  after its scan.
+
+- :js:meth:`ZooFlmEngine.snippet` gives the ``'html'`` or ``'text'`` snippet
+  of a standalone fragment, from the cache, rendering and caching it on a miss.
+  A fragment that is not standalone is the Error
+  ``zoodb.snippet.not-standalone``.  For instance, a page title:
+  ``engine.snippet(person.name, 'text')``.
+
+- :js:meth:`ZooFlmEngine.snippet_of_text` gives the snippet of ad hoc FLM
+  text, checked to be standalone and cached by the text.
+
+- :js:meth:`ZooFlmEngine.snippet_entry` reads a cache entry without rendering.
+
+A snippet with an Error is never cached.
+
+
+The index per context
+---------------------
+
+The engine resolves references to other zoo objects, and to labels defined in
+other objects' fields, through an *index*: entries ``{ label, href, display
+}``, ``label`` of the form ``TYPE:ID`` (``person:alice``, ``sec:intro``),
+``href`` the address the link points to, and ``display`` what the link shows,
+a standalone fragment or FLM text.  The index serves both ``\ref{...}`` written
+in content (for any label that no fragment of the page defines) and the
+composer's ``ref()`` and ``refhref()``.
+
+The addresses depend on where the output goes (the site, a printed handbook, a
+browser preview), so the engine keeps one index per *output context*:
+:js:meth:`ZooFlmEngine.set_index` sets the index of one context (default
+``'default'``), and every render takes a ``context``.  The FLM processor builds
+the index of every context it is configured with: one entry per object (its
+display defaults to the object's ``name`` field when that field is
+standalone) and one per label defined in a field.  Installing a context's
+index takes time in proportion to its size, and a render whose context
+differs from the last one installs its index again, so render the pages of
+one context together.
+
+A display given as a fragment must be standalone: one that is not is the
+Error ``zoodb.index.display-not-standalone``.  Under ``'continue'``,
+``set_index()`` leaves that entry out and installs the others.  Only an entry
+refused with a thrown ``Error`` (not an object, a label not of the form
+``TYPE:ID``, a display neither a fragment nor text, a released fragment), or a
+:js:class:`ZooFlmError` under ``'abort'``, leaves the engine as it was (its
+kept tables, and the index installed in the core).
+
+A reference that resolves to nothing is reported according to ``unresolved``:
+``'error'`` (the default) makes it an Error, and ``'warn'`` a Warning, the
+label being shown, which suits previews.
+
+
+Citations and graphics
+----------------------
+
+Two more tables hold what a render needs from outside FLM.  They are filled
+before rendering, from what the scan found, because a render runs synchronously
+inside the wasm module and cannot wait for a download:
+
+- :js:meth:`ZooFlmEngine.set_citations` -- ``[{ key, text }]``, ``key`` the
+  citation key ``prefix:key`` (the prefix in any letter case), ``text`` the
+  formatted citation as FLM inline text (the output of the citation compiler,
+  see `Compiling citations`_).  A cited key without an entry is the Error
+  ``flm.citations.no-entry``.
+
+- :js:meth:`ZooFlmEngine.set_graphics` -- one entry per image, keyed by
+  ``origin`` (the canonical label of the fragment the image is written in) and
+  ``path`` (as written in ``\includegraphics``), with the file's ``identity``,
+  ``media_type`` and ``address`` (what the HTML's ``src`` holds), its ``kind``
+  (``'raster'`` or ``'vector'``) and its sizes (``width_px``, ``height_px``,
+  ``dpi``, ``width_pt``, ``height_pt``).  The FLM processor builds these
+  entries from the resource collector (see :doc:`zoodb.resourcecollector`).
+  An image without an entry is the Error ``flm.graphics.resolve-failed``.
+
+:js:attr:`ZooFlmEngine.tables` gives the three tables as they were set.
+
+
+Data for browser applications
+-----------------------------
+
+A browser application can render zoo content without running the FLM
+processor: :js:meth:`ZooFlmEngine.dump` gives the engine's data as plain,
+JSON-serializable data (the index of every context, the citations, the
+graphics, and the cached snippets of the standalone fragments), and
+:js:meth:`ZooFlmEngine.load` installs it in another engine.  Fragments made
+afterwards with the same origin label, layout and source get their snippets
+from the dump, so names and titles need no rendering at all.  The dump carries
+the :js:attr:`ZooFlmEngine.settings_hash`, and ``load()`` refuses a dump made
+under another core configuration or by another build of the module.  The FLM
+processor writes the dump into the zoo's data dump as ``zooflm`` (unless the
+data dump option ``flm_include_zooflm_data`` is ``false``).
+
+
+The stylesheet and the scripts
+------------------------------
+
+FLM's HTML needs a stylesheet, and its mathematics needs MathJax 4 in the
+browser.  The engine provides both from the definitions that the registry
+declares:
+
+- :js:meth:`ZooFlmEngine.html_stylesheet` gives the CSS of FLM content, to be
+  served once per site (``zoodb-example`` writes it as
+  ``/dynamic_style/flm.css``).
+
+- :js:meth:`ZooFlmEngine.html_scripts` gives the script tags for a page's
+  ``<head>``: the MathJax configuration that FLM's HTML needs, then the tag
+  that loads MathJax 4 (``async``).
+
+- :js:meth:`ZooFlmEngine.html_definitions` lists every style and script
+  definition (``{ id, kind, owner, parts }``), for a site that delivers them
+  its own way.
+
+The result of a render lists the definitions its content requires
+(``requires``, ``definitions``).
+
+
+Text and LaTeX output
+---------------------
+
+:js:meth:`ZooFlmEngine.render_text` renders fragments as plain text: ``text``,
+one run over all of them, in which references between them resolve; and, with
+``per_fragment`` (the default), ``trees``, each fragment rendered alone, in
+which a reference to another fragment shows its label.  Pieces are left out,
+so a citation is its mark alone.  The options are ``width`` (``null``, the
+default, never wraps), ``link_addresses`` (print the address after a link's
+text), ``context``, ``unresolved`` and ``error_policy``.  The searchable-text
+processor uses it for the search index.
+
+:js:meth:`ZooFlmEngine.render_latex` renders fragments as one document of
+recomposed LaTeX, LaTeX code written back from the FLM content for a printed
+document: one text per fragment (``trees``), the name and content of the style
+file that the LaTeX needs (``style_name``, ``style``) and a complete
+``document``.  Labels of the types listed in ``raw_label_types`` are written as
+the content spells them; every other label gets a safe label, numbered across
+the run.  ``drop_comments`` leaves out the comments.
+
+
+Scanning
+--------
+
+:js:meth:`ZooFlmEngine.scan` reads fragments as one document without
+rendering them, and reports, per fragment, the labels it defines (each with
+its anchor, when the label forms it, and the FLM source of what the labeled
+point shows), the references it makes (and whether they resolve among the
+scanned fragments) and the images it shows; then the cited keys, the labels
+defined more than once, and the standalone check of the standalone
+fragments.  The FLM processor scans the whole zoo with it, to build the index,
+to find the citations to retrieve and the images to collect, and to check that
+labels are unique across the zoo; its results per object are available from
+the processor.
+
+
+Truncation
+----------
+
+:js:meth:`ZooFlmEngine.truncate` makes a shortened copy of a fragment for a
+preview: the source is cut to about ``chars`` characters (at a word boundary;
+mathematics and environments are kept whole or left out, groups open at the
+cut are closed), ``marker`` (default ``' …'``) is appended, and the result is
+parsed as a new fragment.  It keeps the original's layout, standalone flag and
+canonical label, so its images and citations still match the tables, and its
+origin carries ``truncated: true``.  ``first_paragraph: true`` keeps only what
+precedes the first paragraph break.  The result is ``{ fragment, truncated,
+cut_at }``.
+
+
+Diagnostics and the error policy
+--------------------------------
+
+Every problem found in content is reported as a *diagnostic*; whether a call
+then throws is decided by its error policy (below).  A diagnostic is a plain
+object ``{ severity, identifier, message, origin, start, end, line, col,
+file_line, file_col, approx }``:
+
+- ``severity`` is ``'error'``, ``'warning'`` or ``'note'``, and ``identifier``
+  a stable name such as ``core.specs.unresolvable-command`` or
+  ``flm.refs.unresolved`` (from flm-rs) or ``zoodb.ref.unresolved`` (from
+  ZooDb);
+- ``origin`` is the origin of the fragment the problem is in (or ``{ label
+  }``);
+- ``start`` and ``end`` are byte offsets into the fragment's source, and
+  ``line`` and ``col`` the position inside it, 1-based, the column counted in
+  characters;
+- ``file_line`` and ``file_col`` are the position in the data file, when the
+  fragment's origin says where its source starts (``start_line``,
+  ``start_col``, and ``indent``, the indentation removed from every later
+  line, as in a YAML block scalar).  The YAML data loader records the
+  position of every field it reads, and the field compiler passes it on.
+  ``approx`` is ``true`` when that position is approximate (a folded, plain
+  or quoted YAML value spanning several lines).
+
+:js:func:`format_diagnostic` writes a diagnostic on one line:
+
+.. code-block:: text
+
+   people/dave.yml#biography:12:5: error: cannot resolve command ‘\nosuchmacro’ [core.specs.unresolvable-command]
+
+Each call that reads or renders content applies an *error policy* to its
+diagnostics: under ``'abort'`` (the engine's default) it throws a
+:js:class:`ZooFlmError` when any of them is an Error (its message holds the
+formatted errors, its ``diagnostics`` property all of them); under
+``'continue'`` it returns its output as the backend produced it, with markup
+that shows the problem in place, together with the diagnostics and
+``has_errors``.  Warnings never throw: a caller prints them, as the example
+above does.  ``render_document()``, ``render_fragment()``, ``render_text()``
+and ``render_latex()`` take ``error_policy`` and ``unresolved``;
+``make_fragment()``, ``set_index()``, ``render_snippets()``, ``scan()`` and
+``truncate()`` take ``error_policy``; ``snippet()`` and ``snippet_of_text()``
+apply the engine's defaults; ``parse_fields()`` returns its diagnostics and
+applies no policy.  A browser preview typically uses ``'continue'``.
+
+A mistake of the calling code (a wrong argument, a released fragment, a freed
+engine) is thrown as a plain ``Error``, never returned as a diagnostic.
 
 
 Compiling citations
@@ -330,7 +573,130 @@ Compiling citations
        CitationCompiler, install_csl_flm_output_format,
    } from '@phfaist/zoodb/zooflm/citationcompiler';
 
+The citation compiler formats the citations that the citation manager (see
+:doc:`zoodb.citationmanager`) retrieved into the text of the engine's
+citations table, with the citeproc-js CSL processor and a CSL style.  The FLM
+processor runs it for the keys its scan found, caches the result in
+``cache_compiled_citations.json`` in the citation cache directory, and
+installs it with :js:meth:`ZooFlmEngine.set_citations`.  A citation that the
+citation source provides already formatted (``_ready_formatted.flm``) is taken
+as it is.
 
+The compiler writes FLM through the citeproc-js output format ``'flm'``, which
+:js:func:`install_csl_flm_output_format` installs.  The format keeps a chunk of
+text that citeproc-js produces as it is when the chunk is valid FLM, and
+escapes the characters FLM reads specially otherwise.  Whether a chunk is valid
+FLM is asked of the function the call gives, such as ``(text) =>
+engine.parses(text)``.  The format is installed once in citeproc-js's global
+object and each call replaces the function, so install it again before
+compiling with another engine (the FLM processor does so before each
+compilation).
+
+
+API reference
+-------------
+
+The engine
+~~~~~~~~~~
+
+.. js:autoclass:: src/zooflm/engine.ZooFlmEngine
+   :short-name:
+   :members:
+   :exclude-members: _definitions_for, _layout_handle, _map, _ordered_requires, _render_one, _snippet_entry
+
+.. js:autofunction:: src/zooflm/engine.text_hash
+   :short-name:
+
+
+The loaders of the wasm module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. js:autofunction:: src/zooflm/_load_wasm.load_zoodb_flm_wasm
+   :short-name:
+
+.. js:autofunction:: src/zooflm/_load_wasm_node.load_zoodb_flm_wasm_node
+   :short-name:
+
+
+Fragments and origins
+~~~~~~~~~~~~~~~~~~~~~
+
+.. js:autoclass:: src/zooflm/fragment.ZooFlmFragment
+   :short-name:
+   :members:
+
+.. js:autofunction:: src/zooflm/fragment.is_fragment
+   :short-name:
+
+.. js:autofunction:: src/zooflm/fragment.origin_label
+   :short-name:
+
+.. js:autofunction:: src/zooflm/fragment.make_origin
+   :short-name:
+
+
+The composer protocol
+~~~~~~~~~~~~~~~~~~~~~
+
+.. js:autoclass:: src/zooflm/compose.ZooFlmComposition
+   :short-name:
+   :members:
+
+.. js:autofunction:: src/zooflm/compose.value_not_empty
+   :short-name:
+
+.. js:autofunction:: src/zooflm/compose.html_escape
+   :short-name:
+
+.. js:autofunction:: src/zooflm/compose.tree_marker
+   :short-name:
+
+.. js:autofunction:: src/zooflm/compose.piece_marker
+   :short-name:
+
+.. js:autofunction:: src/zooflm/compose.endnotes_marker
+   :short-name:
+
+
+Diagnostics
+~~~~~~~~~~~
+
+.. js:autoclass:: src/zooflm/diagnostics.ZooFlmError
+   :short-name:
+
+.. js:autofunction:: src/zooflm/diagnostics.format_diagnostic
+   :short-name:
+
+.. js:autofunction:: src/zooflm/diagnostics.origin_location
+   :short-name:
+
+.. js:autofunction:: src/zooflm/diagnostics.has_errors
+   :short-name:
+
+.. js:autofunction:: src/zooflm/diagnostics.apply_error_policy
+   :short-name:
+
+.. js:autofunction:: src/zooflm/diagnostics.check_error_policy
+   :short-name:
+
+.. js:autofunction:: src/zooflm/diagnostics.check_unresolved
+   :short-name:
+
+.. js:autofunction:: src/zooflm/diagnostics.make_diagnostic
+   :short-name:
+
+.. js:autofunction:: src/zooflm/diagnostics.map_core_diagnostic
+   :short-name:
+
+.. js:autofunction:: src/zooflm/diagnostics.line_col_at
+   :short-name:
+
+.. js:autofunction:: src/zooflm/diagnostics.utf8_offset_to_index
+   :short-name:
+
+
+The citation compiler
+~~~~~~~~~~~~~~~~~~~~~
 
 .. js:autoclass:: src/zooflm/citationcompiler.CitationCompiler
    :short-name:
@@ -338,5 +704,3 @@ Compiling citations
 
 .. js:autofunction:: src/zooflm/citationcompiler.install_csl_flm_output_format
    :short-name:
-
-

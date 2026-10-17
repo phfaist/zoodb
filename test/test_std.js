@@ -312,4 +312,27 @@ describe('zoodb.test_std', function() {
         );
     });
 
+    it('refuses unknown keys of flm_options.engine', async function () {
+        this.timeout(5000);
+
+        const flm_options = {
+            load_wasm: load_zoodb_flm_wasm_node,
+            citations: { cache_dir: '_zoodb_TEST_citation_info_cache', cache_dir_create: false },
+        };
+        await assert.rejects(
+            createMyZooDb({ flm_options: { ...flm_options, engine: { dolar_math: true } } }),
+            {
+                message: 'use_flm_engine: unknown key ‘dolar_math’ in flm_options.engine, '
+                    + 'expected one of dollar_math, settings, off, render_value_options',
+            },
+        );
+        // no engine options at all, or a key set to null: the defaults
+        const zoodb = await createMyZooDb({ flm_options: { ...flm_options, engine: null } });
+        assert.ok(zoodb.zoo_flm_engine);
+        const zoodb2 = await createMyZooDb({
+            flm_options: { ...flm_options, engine: { dollar_math: null, off: undefined } },
+        });
+        assert.ok(zoodb2.zoo_flm_engine);
+    });
+
 });

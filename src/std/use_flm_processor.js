@@ -230,8 +230,9 @@ export function make_citation_sources(citations_options, { fs, fs_data_dir })
  *   `'_zoodb_citations_cache'`; see :ref:`citations-cache`).  Created
  *   automatically unless `citations.cache_dir_create` is `false`.
  * - `citations.cache_entry_default_duration_ms` — cache TTL in milliseconds.
- * - `citations.skip_save_cache` — set to `true` to skip writing the updated
- *   cache to disk.
+ * - `citations.skip_save_cache` — keep the citation database in memory only:
+ *   `citations.jsonl` is neither read nor written (the compiled citations'
+ *   cache is still read when present, never written).
  * - `citations.sources` — object mapping citation prefixes to source
  *   settings.  The built-in sources are `'arxiv'`, `'doi'`, `'manual'`, and
  *   `'preset'` (see :doc:`zoodb.citationmanager`).  Each value is one of:

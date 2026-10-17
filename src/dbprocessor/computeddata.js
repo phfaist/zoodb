@@ -171,13 +171,11 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
                 for (const computed_property_name of Object.keys(computed_object_spec)) {
                     let accessor_function = null;
                     if (!this.config.lazy) {
-                        accessor_function = (obj) =>
-                                this.zoodb
-                                .scratch[computed_data_fieldset_name]
-                                [object_type]
-                                [obj._zoodb.id]
-                                [computed_property_name]
-                            ;
+                        accessor_function = (obj) => {
+                            const type_values =
+                                this.zoodb.scratch[computed_data_fieldset_name][object_type];
+                            return type_values[obj._zoodb.id][computed_property_name];
+                        };
                     } else {
                         const self = this;
                         accessor_function = (obj) => self._access_lazy_property(
@@ -256,10 +254,8 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
                     continue;
                 }
                 for (let [obj_id, obj] of Object.entries(objects)) {
-                    let computed_data_values = this.zoodb
-                        .scratch[computed_data_fieldset_name]
-                        [object_type]
-                        [obj_id] ;
+                    let computed_data_values =
+                        this.zoodb.scratch[computed_data_fieldset_name][object_type][obj_id];
                     // if we want to keep the computed data, set the computed fields
                     // as proper field in the data dump.
                     for (const computed_property_name of Object.keys(computed_object_spec)) {
@@ -281,10 +277,9 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
         object_type, obj, computed_property_name
     )
     {
-        let obj_computed_data =
-            this.zoodb.scratch[this.config.computed_data_fieldset_name]
-            [object_type][obj._zoodb.id]
-            ;
+        const type_computed_data =
+            this.zoodb.scratch[this.config.computed_data_fieldset_name][object_type];
+        let obj_computed_data = type_computed_data[obj._zoodb.id];
         
         if (Object.hasOwn(obj_computed_data, computed_property_name)) {
             return obj_computed_data[computed_property_name];
@@ -315,7 +310,7 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
         if (computed_property_spec.fn_bulk != null) {
             debug(`Processing computed property ... is bulk!`);
             const value_db = await computed_property_spec.fn_bulk.call(this.zoodb, obj_db);
-            for (const [obj_id, obj] of Object.entries(obj_db)) {
+            for (const obj_id of Object.keys(obj_db)) {
                 const value = value_db[obj_id];
                 obj_computed_data[obj_id][computed_property_name] = value;
             }
@@ -348,7 +343,7 @@ export class ComputedDataProcessor extends ZooDbProcessorBase
             this.zoodb.scratch[computed_data_fieldset_name][object_type]
                 = obj_type_computed_data_values;
         }
-        for (const [obj_id, obj_] of Object.entries(obj_db)) {
+        for (const obj_id of Object.keys(obj_db)) {
             obj_type_computed_data_values[obj_id] = Object.create(null);
         }
 

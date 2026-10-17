@@ -132,14 +132,18 @@ yarn build:wasm flm
 builds into `rust/target/pkg/zoodb-flm-wasm/` and regenerates
 `src/zooflm/_wasm/`: `zoodb_flm_wasm.js` (glue), `zoodb_flm_wasm.d.ts`,
 `zoodb_flm_wasm_bg.wasm` and `BUILD_INFO.json` (`binding`, `flm_core` and
-`flm_core_source`, `wasm_bindgen`, `wasm_size_bytes`, `build_date`). The
-module is loaded with `load_zoodb_flm_wasm(source)` of
-`src/zooflm/_load_wasm.js` (package export `@phfaist/zoodb/zooflm/wasm`;
-`source` is the bytes, a `WebAssembly.Module`, a `Response` or a URL; without
-it the browser fetches `wasm_url`) or `load_zoodb_flm_wasm_node()` of
-`src/zooflm/_load_wasm_node.js` (`@phfaist/zoodb/zooflm/wasm-node`). Both
-resolve to the glue's namespace (`ZooFlmCore`, …), instantiated once;
-the engine `ZooFlmEngine.create({ load_wasm })` takes either.
+`flm_core_source`, `flm_core_git` when the flm-core directory is in a git
+checkout: `{ commit, dirty }`, the checkout's `HEAD` and whether `git status
+--porcelain` listed anything under the flm-core directory, `wasm_bindgen`,
+`paths_remapped`, `wasm_size_bytes`, `build_date`; the build machine's paths
+are remapped, see `../README.md`). The module is loaded with
+`load_zoodb_flm_wasm(source)` of `src/zooflm/_load_wasm.js` (package export
+`@phfaist/zoodb/zooflm/wasm`; `source` is the bytes, a `WebAssembly.Module`, a
+`Response` or a URL; without it the browser fetches `wasm_url`) or
+`load_zoodb_flm_wasm_node()` of `src/zooflm/_load_wasm_node.js`
+(`@phfaist/zoodb/zooflm/wasm-node`). Both resolve to the glue's namespace
+(`ZooFlmCore`, …), instantiated once; the engine
+`ZooFlmEngine.create({ load_wasm })` takes either.
 
 ## Checks
 

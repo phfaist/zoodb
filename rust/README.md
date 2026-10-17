@@ -45,6 +45,25 @@ edit the generated modules by hand. A release build of `zoodb-flm-wasm` takes
 one to three minutes; rebuilt binaries are committed at milestones only, so
 that the history does not grow at every edit.
 
+The binaries carry no path of the build machine. rustc writes source paths
+into them (panic locations), so `tools/build_wasm.mjs` passes
+`--remap-path-prefix` flags through `CARGO_ENCODED_RUSTFLAGS`, computed at
+each build and never committed: this workspace's root becomes `zoodb-rust`,
+the root of each path dependency (today the flm-core checkout) its package
+name, cargo's registry sources `cargo-registry` (git checkouts `cargo-git`),
+and the toolchain's sysroot (`rustc --print sysroot`) `rust-sysroot`. Flags
+already given in `CARGO_ENCODED_RUSTFLAGS` or `RUSTFLAGS` (or cargo's
+`CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS`, `CARGO_BUILD_RUSTFLAGS`) are
+kept; rustflags in a cargo configuration file are refused, since
+`CARGO_ENCODED_RUSTFLAGS` would replace them. The tool fails if `/Users/`,
+`/home/` or `C:\` is left in a binary, and `BUILD_INFO.json` records
+`"paths_remapped": true`. The flags are part of cargo's fingerprint: the first
+build with them, and the first build after they change (the workspace, the
+flm-rs checkout or the toolchain moved), rebuilds everything from scratch,
+once per machine. Cargo's own `trim-paths` is unstable and not used. Plain
+`cargo` and `wasm-pack` commands (the checks below, the CI job) run without
+these flags; their output is never committed.
+
 ## Checks
 
 One crate at a time, from this directory:

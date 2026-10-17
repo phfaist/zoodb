@@ -462,8 +462,9 @@ export class CitationCompiler
      *
      * @param {Array<{cite_prefix: string, cite_key: string}>|null} compile_citations
      *     The list of citations to compile.  Each element must provide
-     *     `cite_prefix` and `cite_key` string properties (as returned by
-     *     :class:`ZooFLMScanner` via `scanner.get_encountered('citations')`).
+     *     `cite_prefix` and `cite_key` string properties (the cited keys of
+     *     a scan, ``engine.scan().cited``, split at their prefix, as the FLM
+     *     processor collects them).
      *     If `null`, all citations in the citation manager are compiled.  An
      *     empty array compiles nothing.
      */

@@ -480,3 +480,8 @@ the settings hash).
   1,273,701; `yarn test` 460 passing; `yarn lint` the 18 pre-existing errors only;
   timings unchanged within noise (test zoo `process_zoo` 60–63 ms, `zoodb-example`
   64–68 ms).
+
+*Correction* (2026-10-17, step 5): item 3 of "What the processor does" counts an equation
+line among the number-anchored points; it is not one: its anchor is formed from its label
+(`eq-x`, in `align` and `equation` alike), so its index href keeps `#eq-x`. Numbered floats
+and theorems link to the object's page.

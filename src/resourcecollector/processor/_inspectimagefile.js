@@ -403,7 +403,7 @@ export async function parse_image_metadata(filename, stream)
     } finally {
         try {
             stream.close();
-        } catch (err) {
+        } catch {
             console.warn(`Failed to close stream while parsing image meta data !?`);
         }
     }

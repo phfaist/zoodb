@@ -164,7 +164,7 @@ export class FlmFilesDbDataLoader extends YamlDbDataLoader
     /**
      * Parses an FLM file into its object data: the front matter (YAML) and
      * the body's fields. The positions of the fields are kept for
-     * :js:meth:`parse_file_data_with_positions`.
+     * :js:meth:`~YamlDbDataLoader.parse_file_data_with_positions`.
      *
      * @param {string|Uint8Array} file_content - the file's content (bytes
      *     are decoded as UTF-8)

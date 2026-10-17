@@ -122,7 +122,8 @@ check: 11, Results, Part C (about 10 s once the clone's citations cache is fresh
   per-call token; `truncate()` keeps the origin label; `ne()` true for numbers and
   booleans; `rdr()` throws on plain objects (step 2).
 - Index: a label entry's href carries `#anchor` only when the anchor is label-derived
-  (floats, equation lines, theorems link to the object's page); its display is the
+  (numbered floats and theorems link to the object's page; sections and equation lines
+  keep `#sec-…`, `#eq-…`, corrected in step 5); its display is the
   point's source only when label-derived and standalone, else the object's display;
   the default object display is `name` only when standalone, else the id (step 3).
 - Reload releases replaced fragments only after a successful re-processing (step 3).
@@ -178,4 +179,15 @@ check: 11, Results, Part C (about 10 s once the clone's citations cache is fresh
   (05, not raised); the flm-core finding on a `field` environment without a name (05);
   the `~\cite` tie (05); whether dumps drop the positions (11 Deferred (b)); the example's
   lock refresh and merge to its `main` once zoodb's `zoodb-flmrs` is merged; a guard for
-  `</script` in `html_scripts()` if hosts ever register script definitions.
+  `</script` in `html_scripts()` if hosts ever register script definitions; the URL of
+  flm-rs's language reference, to give in `doc/flm.rst` and `README.md` once flm-rs is
+  public; a `LICENSE` file (MIT) for the package, not added since the copyright line is
+  his (yarn and npm pack a root `LICENSE` without a `files` entry);
+  `allow_unresolved_citations` does not cover a `\cite` whose prefix has no source (the
+  processor throws), and `CitationCompiler` requires `citations.csl_style` even when every
+  citation comes ready-formatted (both predate step 5); the image inspector chooses its
+  parser by the case-sensitive extension (`.PNG`, `.tif` refused); `flmprocessor.js`
+  imports the `path` builtin (as does `citationcompiler.js`, through
+  `src/util/atomicfilewrite.js`, and with it `./zooflm`), so the standard setup reaches a
+  Node builtin indirectly; the example's `zoodb-flmrs` branch and `doc/website11ty.rst`
+  (which takes the port as its worked example) go live together, zoodb first.

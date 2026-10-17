@@ -34,6 +34,9 @@ export function srcset_core_config(option)
     return { image_max_zoom_factor: Math.floor(option.image_max_zoom_factor ?? 1) };
 }
 
+// the keys of `flm_options.engine` that use_flm_engine() reads
+const ENGINE_OPTION_KEYS = ['dollar_math', 'settings', 'off', 'render_value_options'];
+
 
 /**
  * Factory function that creates the zoo's FLM engine
@@ -52,7 +55,9 @@ export function srcset_core_config(option)
  *   ``settings`` (the settings of the standard features, one map per
  *   feature, user definitions under ``userdefs``), ``off`` (standard
  *   features switched off by name), and ``render_value_options`` (how the
- *   composer's ``rdr()`` renders arrays).
+ *   composer's ``rdr()`` renders arrays).  Any other key throws an ``Error``
+ *   naming it; a key set to `null` or `undefined` takes its default, as does
+ *   the whole object.
  * - `_this.config.flm_options.resources.graphics_use_srcset_parceljs` —
  *   ``{ enabled: true, ... }`` asks for a ``srcset`` of Parcel-compatible
  *   image-resize URLs on raster images (:func:`srcset_core_config`).  The
@@ -61,7 +66,7 @@ export function srcset_core_config(option)
  *   the constructor of upstream request U2, and configured with them it would
  *   fail on every image.  Images are published without ``srcset``, and the
  *   engine's creation warns once (the ``debug`` logger and ``console.warn``,
- *   :data:`SRCSET_U2_WARNING`).
+ *   ``SRCSET_U2_WARNING``).
  * - `_this.config.flm_options.allow_unresolved_references` — if `true`,
  *   references that resolve to nothing are Warnings (the label shown)
  *   instead of Errors.
@@ -75,6 +80,14 @@ export async function use_flm_engine(_this)
 {
     const flm_options = _this.config.flm_options ?? {};
     const engine_options = flm_options.engine ?? {};
+    for (const key of Object.keys(engine_options)) {
+        if (!ENGINE_OPTION_KEYS.includes(key)) {
+            throw new Error(
+                `use_flm_engine: unknown key ‘${key}’ in flm_options.engine, expected one of `
+                + ENGINE_OPTION_KEYS.join(', ')
+            );
+        }
+    }
 
     // The srcset option is accepted, but not given to the core while U2 is
     // open (the core's publish stage would fail on every image).

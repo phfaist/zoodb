@@ -111,7 +111,8 @@ const dbdata = zoodbdataloader.load();
  * schema), see :js:meth:`parse_file_data`. The positions of the string values
  * of a YAML file are recorded on its object as
  * ``obj._zoodb.flm_field_positions`` (field path → ``{ line, col, style,
- * indent, approx }``, see :js:meth:`parse_file_data_with_positions`) when
+ * indent, approx }``, see
+ * :js:meth:`~YamlDbDataLoader.parse_file_data_with_positions`) when
  * the file's data is the object itself (the default ``load_objects``; a
  * custom ``load_objects`` that returns other objects gets no positions): the
  * FLM field compiler places its diagnostics in the file with them. JSON
@@ -293,7 +294,8 @@ export class YamlDbDataLoader
      * ``.yaml`` file with the ``yaml`` package (YAML 1.2, core schema: a
      * date stays a string, a duplicate key is an error), a ``.json`` file
      * with ``JSON.parse``. The positions of a YAML file's string values are
-     * kept for :js:meth:`parse_file_data_with_positions` (see there).
+     * kept for :js:meth:`~YamlDbDataLoader.parse_file_data_with_positions`
+     * (see there).
      *
      * A parse error throws an ``Error`` whose message names the file, the
      * line and the column (``Parse error in ‘FILE’ at line L, column C:
@@ -344,7 +346,7 @@ export class YamlDbDataLoader
 
     /**
      * Parses the content of a data file into its data and the positions of
-     * its string values: ``{ data, positions }``. :js:meth:`parse_file_into_objects`
+     * its string values: ``{ data, positions }``. ``parse_file_into_objects()``
      * calls it; it calls :js:meth:`parse_file_data`, so that a subclass that
      * overrides only that one still loads (its files then have no positions,
      * unless it returns the data its ``super.parse_file_data()`` returned).

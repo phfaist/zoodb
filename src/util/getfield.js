@@ -124,7 +124,7 @@ export function getfield(obj, field)
         }
         try {
             obj = obj[part];
-        } catch (e) {
+        } catch {
             throw new Error(
                 `Property ‘${part}’ cannot be accessed on ${obj} in call `
                 + `to getfield(‘${field}’)`

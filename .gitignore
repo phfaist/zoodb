@@ -17,26 +17,12 @@ node_modules-*
 doc/_build
 
 
-# playground test files
-zoo_dbdata_output*.json
-
-_output_resource_graphics_files/
-out_test.html
-out_test_2.html
-
-
 # created by test load peopledb in 'yarn test'
 _zoodb_citations_cache
 
 
-# my handy symbolic link to the flm sources' location
-flm-src
-
-
 .11ty-parcel-temp
 .parcel-cache
-
-COPY_IN_FLM_JS_SOURCES.txt
 
 
 # Rust binding build output (rust/), and throwaway autocitefetch cache files

@@ -76,7 +76,7 @@ String values can be marked to be parsed as Flexible Latex-like Markup (FLM)
 content.  Use the schema field `_flm:` to indicate that this is the case.
 
 The database processor :js:class:`FLMSimpleContentCompiler` (which can be
-installed via a :js:class:`ZooFLMProcessor` instance) will then detect which
+installed via a :js:class:`ZooFlmProcessor` instance) will then detect which
 fields are FLM markup and compile them accordingly into FLM fragment objects.
 
 If the field `_flm:` is absent, if `_flm: false`, or if `_flm: null`, then FLM

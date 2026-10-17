@@ -34,6 +34,7 @@ import loMerge from 'lodash/merge.js';
  *   (see below).
  * 
  * The `zoo_permalinks` object should expose the following methods:
+ *
  * - `object(object_type, object_id) → string` — builds a URL for a zoo
  *   object.
  * - `graphics_resource(resource_data) → string` — builds a URL for a
@@ -96,7 +97,9 @@ import loMerge from 'lodash/merge.js';
  *   `true`).  Consumed by `use_flm_processor.js`.
  * - `citations.cache_entry_default_duration_ms` — cache TTL in milliseconds.
  *   Consumed by `use_flm_processor.js`.
- * - `citations.skip_save_cache` — skip writing updated citation cache to disk.
+ * - `citations.skip_save_cache` — keep the citation database in memory only:
+ *   `citations.jsonl` is neither read nor written (the compiled citations'
+ *   cache is still read when present, never written).
  *   Consumed by `use_flm_processor.js`.
  * - `citations.sources` — object mapping source names to source instances or
  *   `true`/`false`/`null` to enable or disable defaults.
@@ -319,9 +322,9 @@ export async function makeStandardZooDb(config)
         && Object.keys(_this.config.extra_db_processors).length > 0) {
         let extra_db_processors_entries =
             Object.entries(_this.config.extra_db_processors)
-            .filter( ([k,v]) => (v != null) ) ;
+            .filter( ([, v]) => (v != null) ) ;
         extra_db_processors_entries.sort(
-            ([ak,av],[bk,bv]) => (av?.priority ?? 50) - (bv?.priority ?? 50)
+            ([, av], [, bv]) => (av?.priority ?? 50) - (bv?.priority ?? 50)
         );
         for (const [db_processor_key, db_processor_spec] of extra_db_processors_entries) {
             const db_processor_instance = db_processor_spec.instance;

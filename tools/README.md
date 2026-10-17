@@ -19,20 +19,44 @@ and regenerates the committed, environment-neutral modules (see
 | `flm` | `rust/zoodb-flm-wasm/` | `src/zooflm/_wasm/` | the file `zoodb_flm_wasm_bg.wasm` |
 
 For each: `wasm-pack build <crate> --release --target web` into
-`rust/target/pkg/<crate>/`; the wasm-bindgen glue and type declarations copied
-with a "generated file" banner (the default-path fallback stripped if present);
-the binary written as in the table; the glue (and the base64 module) checked
-free of `import.meta`, `require(`, `process.`, `Buffer`, `__dirname`, `node:`
-and `fs`; and `BUILD_INFO.json` written from `rust/Cargo.lock` (the binding's
-name and version, the `autocitefetch` version or the `flm-core` version with
-its source, `"path"` for a path dependency, the `wasm-bindgen` version, the
-sizes and the build date). Only needed after changing `rust/`; users of the
-package never run it. Requires Rust stable with the `wasm32-unknown-unknown`
-target (`rustup target add wasm32-unknown-unknown`), `wasm-pack` (`cargo
-install wasm-pack`) and, for the workspace to load at all, the local flm-rs
-checkout that `zoodb-flm-wasm` depends on. Exit status: 0 on success, 1 on any
-error (a missing tool, a failed build, a forbidden token, an unknown name).
-Never edit the generated modules by hand.
+`rust/target/pkg/<crate>/`, with the path remapping below; the binary checked
+free of the build machine's paths before anything is written to `src/`; the
+wasm-bindgen glue and type declarations copied with a "generated file" banner
+(the default-path fallback stripped if present); the binary written as in the
+table; the glue (and the base64 module) checked free of `import.meta`,
+`require(`, `process.`, `Buffer`, `__dirname`, `node:` and `fs`; and
+`BUILD_INFO.json` written from `rust/Cargo.lock` (the binding's name and
+version, the `autocitefetch` version or the `flm-core` version with its
+source, `"path"` for a path dependency, the `wasm-bindgen` version,
+`"paths_remapped": true`, the sizes and the build date), plus, for each path
+dependency of the crate whose directory is in a git checkout (today flm-core),
+`<name>_git: { commit, dirty }`: the checkout's `HEAD` and whether `git status
+--porcelain` listed anything under the dependency's own directory, the one of
+its `Cargo.toml` (read with `--no-optional-locks`, so the checkout is not
+written). Only needed after changing `rust/`; users of the package never run
+it. Requires Rust stable with the `wasm32-unknown-unknown` target
+(`rustup target add wasm32-unknown-unknown`), `wasm-pack` (`cargo install
+wasm-pack`) and, for the
+workspace to load at all, the local flm-rs checkout that `zoodb-flm-wasm`
+depends on. Exit status: 0 on success, 1 on any error (a missing tool, a
+failed build, a build machine path left in a binary, rustflags in a cargo
+configuration file, a forbidden token, an unknown name). Never edit the
+generated modules by hand.
+
+The path remapping: rustc writes source paths into the binaries (panic
+locations), so the tool passes `--remap-path-prefix` flags to rustc through
+`CARGO_ENCODED_RUSTFLAGS`, computed at each build from `cargo metadata` and
+`rustc --print sysroot` (and printed): the workspace root to `zoodb-rust`, the
+root of each path dependency to its package name, cargo's registry sources to
+`cargo-registry` (git checkouts to `cargo-git`), the sysroot to
+`rust-sysroot`. Flags already given in `CARGO_ENCODED_RUSTFLAGS`, `RUSTFLAGS`,
+`CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS` or `CARGO_BUILD_RUSTFLAGS` are
+kept (in cargo's order of precedence); rustflags in a cargo configuration file
+make the tool fail, since `CARGO_ENCODED_RUSTFLAGS` would replace them. After
+the build, a byte search of each binary (the citation module's before it is
+inlined as base64) for `/Users/`, `/home/` and `C:\` must find nothing. The
+flags are part of cargo's fingerprint, so the first build with them (and the
+first after they change) rebuilds everything from scratch, once per machine.
 
 ## `migrate_citations_cache.mjs`
 

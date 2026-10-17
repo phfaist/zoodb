@@ -5,7 +5,12 @@
     },
     "flm_core": "0.5.0",
     "flm_core_source": "path",
+    "flm_core_git": {
+        "commit": "2c219ec3c13c477debbbbbb697fe06fc13dc8a0a",
+        "dirty": false
+    },
     "wasm_bindgen": "0.2.127",
-    "wasm_size_bytes": 5143637,
-    "build_date": "2026-10-16T11:29:54.488Z"
+    "paths_remapped": true,
+    "wasm_size_bytes": 5139198,
+    "build_date": "2026-10-17T01:23:23.529Z"
 }

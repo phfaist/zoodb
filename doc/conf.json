@@ -3,8 +3,8 @@
     "source": {
         "include": [],
         "includePattern": ".+\\.js(x?)$",
-        "exclude": [],
-        "excludePattern": "(./flm-src/.*|/rust/target/.*|/src/citationmanager/_wasm/.*)"
+        "exclude": [ "../scratch", "../.yarn", "_build" ],
+        "excludePattern": "(/rust/target/.*|/src/citationmanager/_wasm/.*|/src/zooflm/_wasm/.*)"
     },
     "plugins": [ ],
     "opts": {

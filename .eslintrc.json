@@ -1,8 +1,6 @@
 {
     "root": true,
     "ignorePatterns": [
-        "src/zooflm/_flm-js/*.js",
-        "flm-js-src/flm-js/**/*.js",
         "src/citationmanager/_wasm/",
         "src/zooflm/_wasm/"
     ],
