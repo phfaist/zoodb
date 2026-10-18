@@ -116,7 +116,14 @@ default:
   ``\includegraphics`` usable outside floats, ``{ cells: { global: true } }``
   does the same for the ``cells`` environment, and ``{ userdefs: { macros: {
   ... }, environments: { ... } } }`` declares user definitions (macros and
-  environments defined by substitution; content cannot define its own).
+  environments defined by substitution; content cannot define its own).  The
+  keys a feature binds to the render request (``html.heading_tags``,
+  ``text.root_heading_level``, ``latex-recomposed.style_stem``, ...) apply to
+  every run.  The keys that a run's own options set (``refs.unresolved`` by
+  ``unresolved``, and ``text.width``, ``text.link_addresses`` and
+  ``latex-recomposed.drop_comments`` by ``width``, ``link_addresses`` and
+  ``drop_comments`` of the text and LaTeX runs) are refused in the settings,
+  each named with the option that sets it.
 
 - ``off`` -- the names of standard features to switch off, such as
   ``['annotations', 'theorems']``.
@@ -331,13 +338,37 @@ The result is ``{ html, definitions, requires, diagnostics, has_errors }``:
 ``requires`` lists the identifiers of the style and script definitions that
 the page's content needs and ``definitions`` those definitions (see `The
 stylesheet and the scripts`_).  ``render_document()`` also takes
-``context`` (default ``'default'``), ``unresolved``, ``error_policy`` and
-``render_value_options`` (over the engine's).
+``context`` (default ``'default'``), ``unresolved``, ``error_policy``,
+``render_value_options`` (over the engine's) and ``render_options``.
+
+``render_options`` are flm-rs's render options for this run only, in the
+shape of the core's ``settings`` (one object per feature), limited to the
+keys a feature binds to the render request; they are set over the settings'
+keys one by one.  A key that is unknown, that is fixed when the engine is
+created (such as ``citations.placement``), or that a call's own option sets
+(``refs.unresolved``: use ``unresolved``) throws a plain ``Error`` that names
+it.  For instance, a preview that places no endnotes can leave out the lists
+it would not place, which then are not built and draw no
+``zoodb.compose.piece-not-placed``:
+
+.. code::
+
+   engine.render_document({
+       compose: ({ rdrblock }) => rdrblock(preview),
+       render_options: {
+           pieces: { exclude: ['flm.xnotes.list.footnote', 'flm.citations.bibliography'] },
+       },
+   });
+
+The footnote and citation marks stay, linking to notes that are not on the
+page: flm-rs has no render option that leaves them out.
 
 :js:meth:`ZooFlmEngine.render_fragment` renders one fragment alone, as one
 tree, without a composer and without placing the pieces: ``{ html | text,
 definitions, requires, diagnostics, has_errors }`` for ``output: 'html'`` (the
-default) or ``'text'``.
+default) or ``'text'``.  It takes ``render_options`` as ``render_document()``
+does (for text, ``text.width`` and ``text.link_addresses`` are refused as
+well).
 
 
 Snippets
@@ -490,15 +521,39 @@ Scanning
 --------
 
 :js:meth:`ZooFlmEngine.scan` reads fragments as one document without
-rendering them, and reports, per fragment, the labels it defines (each with
-its anchor, when the label forms it, and the FLM source of what the labeled
-point shows), the references it makes (and whether they resolve among the
-scanned fragments) and the images it shows; then the cited keys, the labels
-defined more than once, and the standalone check of the standalone
-fragments.  The FLM processor scans the whole zoo with it, to build the index,
-to find the citations to retrieve and the images to collect, and to check that
-labels are unique across the zoo; its results per object are available from
-the processor.
+rendering them, and reports, per fragment (``trees``, one entry per fragment
+given):
+
+- ``labels`` -- the labels it defines, each with the anchor of its point,
+  when one of the labels of its point forms it, and the FLM source of what
+  the labeled point shows;
+- ``refs`` -- the references it makes, and whether they resolve among the
+  scanned fragments;
+- ``graphics`` -- the images it shows;
+- ``terms`` -- its term definitions (``\begin{defterm}{TERM} ...
+  \end{defterm}``), each ``{ labels, anchor, display, body, body_origin,
+  body_start, body_end }``: the labels of the definition (the one computed from the term,
+  ``defterm:TERM``, which a term link ``\term{TERM}`` targets; one per alias
+  written with ``\aliasterm``; then those written with ``\label``), the
+  anchor when one of them forms it, the source of the term, and the source of
+  the body, without the ``\label`` and ``\aliasterm`` fields (``body_start``
+  and ``body_end`` are its UTF-8 byte offsets in the fragment's source;
+  ``null`` for an empty body or one written through a user definition).  A
+  glossary makes a fragment of ``body`` with the origin ``body_origin``:
+  the fragment's origin (its canonical label kept, so that the body's images
+  match the graphics table), with ``term`` (the term's first label) and the
+  file position moved to where the body starts (:js:func:`range_origin`),
+  so that the body's diagnostics give the lines of the file;
+- ``cited`` -- the keys it cites, each once, in order of first citation in
+  the fragment.
+
+Over all the fragments, it reports the cited keys (``cited``, each key once,
+with the fragment of its first citation: what the citations are retrieved
+for), the labels defined more than once, and the standalone check of the
+standalone fragments.  The FLM processor scans the whole zoo with it, to build
+the index, to find the citations to retrieve and the images to collect, and to
+check that labels are unique across the zoo; its results per object are
+available from the processor.
 
 
 Truncation
@@ -511,8 +566,10 @@ cut are closed), ``marker`` (default ``' …'``) is appended, and the result is
 parsed as a new fragment.  It keeps the original's layout, standalone flag and
 canonical label, so its images and citations still match the tables, and its
 origin carries ``truncated: true``.  ``first_paragraph: true`` keeps only what
-precedes the first paragraph break.  The result is ``{ fragment, truncated,
-cut_at }``.
+precedes the first paragraph break (a blank line): a float written after it is
+left out, but one written in the first paragraph, with no blank line before
+it, is kept when it fits, as are the footnotes and the citations.  The result
+is ``{ fragment, truncated, cut_at }``.
 
 
 Diagnostics and the error policy
@@ -632,6 +689,9 @@ Fragments and origins
    :short-name:
 
 .. js:autofunction:: src/zooflm/fragment.make_origin
+   :short-name:
+
+.. js:autofunction:: src/zooflm/fragment.range_origin
    :short-name:
 
 

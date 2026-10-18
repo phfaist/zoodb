@@ -27,8 +27,9 @@ When the zoo is loaded (``process_zoo()``), the processor runs six steps:
 
 2. **Scan.**  One ``engine.scan()`` over all the fragments of the zoo finds, per
    object, the labels it defines (with their anchors and the source of what
-   each label's point displays), the references it makes, the keys it cites and
-   the images it shows (:js:meth:`~ZooFlmProcessor.object_scan`).  Labels are
+   each label's point displays), the references it makes, the images it
+   shows, the term definitions it holds (with their bodies) and the keys each
+   of its fields cites (:js:meth:`~ZooFlmProcessor.object_scan`).  Labels are
    unique in the whole zoo: a label defined a second time is the Error
    ``zoodb.labels.duplicate``, on the object that defines it the second time.
    A standalone field that holds a reference, a citation, a label or a note is
@@ -40,12 +41,13 @@ When the zoo is loaded (``process_zoo()``), the processor runs six steps:
    result of ``refs[TYPE].formatted_ref_flm_text_fn(ID, object)`` (a standalone
    fragment or FLM text); by default the object's ``name`` when it is a
    standalone fragment, else its ID.  A label's entry links to the page of the
-   object that defines it, with ``#`` and the anchor when the anchor is derived
-   from the label (``sec-…``, ``eq-…``: the same anchor in every document).  A
-   point anchored on its number (a figure, a table, a theorem) links to the
-   object's page alone, since each page numbers its own content.  The label's
-   display is the source of the content its point shows (a section title, for
-   instance) when the anchor is derived from the label and that source is
+   object that defines it, with ``#`` and the anchor when one of the labels of
+   its point forms it (``sec-…``, ``eq-…``: an anchor derived from a label, the
+   same in every document, which every label of the point gets).  A point
+   anchored on its number (a figure, a table, a theorem) links to the object's
+   page alone, since each page numbers its own content.  The label's display
+   is the source of the content its point shows (a section title, for
+   instance) when the anchor is derived from a label and that source is
    standalone; otherwise it is the object's display.  The ``default`` context
    is installed last.  A reference that resolves neither in the zoo nor
    through the index is the Warning ``zoodb.refs.unresolved`` on its object.
@@ -68,6 +70,43 @@ When the zoo is loaded (``process_zoo()``), the processor runs six steps:
 What the last scan found stays on the processor, as ``scan_results`` and
 through :js:meth:`~ZooFlmProcessor.object_scan`.  The fragments of all objects,
 in order, are :js:meth:`~ZooFlmProcessor.zoo_fragments`.
+
+``object_scan(TYPE, ID)`` gives ``{ object_type, object_id, labels, refs,
+cited, graphics, terms }``, each entry with the ``fragment`` (the field) it
+was found in:
+
+- ``cited`` holds every key the object cites, one entry ``{ key, cite_prefix,
+  cite_key, origin, fragment }`` per key and field, so that two objects that
+  cite a key both list it (the backreferences of a bibliography page);
+  ``cite_prefix`` (lowercase) and ``cite_key`` name the key as the citation
+  manager and the citation compiler do.  ``scan_results.cited`` lists each
+  key of the zoo once, with its first citation: the keys whose citations are
+  retrieved.
+
+- ``terms`` holds the term definitions of the object's fields, as
+  :js:meth:`ZooFlmEngine.scan` reports them (``labels``, ``anchor``,
+  ``display``, ``body``, ``body_origin``).  A glossary lists each with the
+  term, a link to the object's page (with ``#`` and the anchor when there is
+  one), a fragment made from ``body`` with the origin ``body_origin`` (the
+  field's, with the file position of the body, so that the body's
+  diagnostics give the file's lines and its images are found), and the
+  objects whose ``refs`` hold one of the term's ``labels``:
+
+.. code::
+
+   for (const entry of processor.scan_results.objects.values()) {
+       for (const term of entry.terms) {
+           const href = zoodb.zoo_object_permalink(entry.object_type, entry.object_id)
+               + ((term.anchor != null) ? `#${term.anchor}` : '');
+           const body = (term.body != null)
+               ? engine.make_fragment(term.body, { origin: term.body_origin, layout: 'blocks' })
+               : null;
+           const referenced_in = [...processor.scan_results.objects.values()].filter(
+               (o) => o.refs.some( (r) => term.labels.includes(r.label) ) );
+           // ... place term.display, href, body and referenced_in on the page;
+           // release the body fragment when the page is done
+       }
+   }
 
 
 Options

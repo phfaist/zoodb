@@ -98,7 +98,8 @@ function object_key(object_type, object_id)
  * 2. **Scan.** One `engine.scan()` over every fragment of the zoo (and the
  *    ad hoc fragments of :meth:`compile_flm_fragment`): per object the labels
  *    it defines (with their anchors and display sources), the references it
- *    makes, the keys it cites, the images it shows (:meth:`object_scan`).
+ *    makes, the images it shows, the term definitions it holds (with their
+ *    bodies), the keys each of its fields cites (:meth:`object_scan`).
  *    Labels are unique zoo-wide: a label defined twice is the Error
  *    ``zoodb.labels.duplicate``; a standalone field that holds a reference, a
  *    citation, a label or a note is the Error ``zoodb.standalone.violation``.
@@ -108,15 +109,15 @@ function object_key(object_type, object_id)
  *    object (label ``TYPE:ID``, href ``object_href(TYPE, ID)``, display the
  *    per-type display, default the object's ``name`` when it is a standalone
  *    fragment) and one per label defined in a field (href the object's href,
- *    with ``#`` and the anchor when the label forms the anchor, ``type-label``,
- *    the same in every document: a point anchored on its number, a float or a
- *    theorem, gets the object's href alone; display the source of the content
- *    the label's point shows when the label forms the anchor and that source
- *    is standalone, else the object's display), installed by
- *    `engine.set_index()`, the ``default`` context last.  A label in an ad hoc
- *    fragment gets an entry under its origin's ``href``.  A reference that
- *    resolves neither in the zoo nor through the index is the Warning
- *    ``zoodb.refs.unresolved`` on its object.
+ *    with ``#`` and the anchor when one of the labels of its point forms it,
+ *    ``type-label``, the same in every document: a point anchored on its
+ *    number, a float or a theorem, gets the object's href alone; display the
+ *    source of the content the label's point shows when the anchor is
+ *    label-derived and that source is standalone, else the object's
+ *    display), installed by `engine.set_index()`, the ``default`` context
+ *    last.  A label in an ad hoc fragment gets an entry under its origin's
+ *    ``href``.  A reference that resolves neither in the zoo nor through the
+ *    index is the Warning ``zoodb.refs.unresolved`` on its object.
  * 4. **Citations.** The cited keys are retrieved by the citation manager and
  *    compiled by the citation compiler (CSL into FLM text, cached in
  *    ``cache_compiled_citations.json``), then installed by
@@ -296,8 +297,13 @@ export class ZooFlmProcessor extends ZooDbProcessorBase
         /**
          * What the last scan found (:meth:`process_auxiliary_resources`):
          * ``{ objects: Map('TYPE:ID' → { object_type, object_id, labels,
-         * refs, cited, graphics }), labels: Map(label → { label, anchor,
-         * display, fragment }), cited, duplicate_labels }``, or ``null``.
+         * refs, cited, graphics, terms }), labels: Map(label → { label,
+         * anchor, display, fragment }), cited, duplicate_labels, trees }``, or
+         * ``null``. An object's entry is :meth:`object_scan`'s; ``cited``
+         * lists each key cited in the zoo once, with its first citation (``{
+         * key, cite_prefix, cite_key, origin, fragment }``), the keys the
+         * citations are retrieved for; ``trees`` the engine's scan per
+         * fragment (the ad hoc ones included).
          */
         this.scan_results = null;
 
@@ -482,8 +488,23 @@ export class ZooFlmProcessor extends ZooDbProcessorBase
     /**
      * What the last scan found in an object: ``{ object_type, object_id,
      * labels: [{ label, anchor, display, fragment }], refs: [{ label,
-     * resolved, fragment }], cited: [{ key, origin, fragment }], graphics:
-     * [{ path, origin, fragment }] }``, or ``null``.
+     * resolved, fragment }], cited: [{ key, cite_prefix, cite_key, origin,
+     * fragment }], graphics: [{ path, origin, fragment }], terms: [{ labels,
+     * anchor, display, body, body_origin, body_start, body_end, fragment }]
+     * }``, or ``null``.
+     *
+     * ``cited`` holds every key the object cites: one entry per key and
+     * field (``fragment``, ``origin`` its label), in the order of the fields
+     * and of the first citation in each; ``cite_prefix`` (lowercase) and
+     * ``cite_key`` are the key as the citation manager and the citation
+     * compiler name it (``cite_prefix`` ``null`` for a key without a
+     * prefix). ``terms`` holds the term definitions of the object's fields
+     * (:js:meth:`ZooFlmEngine.scan`): a glossary entry is the term
+     * (``display``), its link (the object's href, with ``#`` and
+     * ``anchor`` when there is one), the body (a fragment made from
+     * ``body``, the FLM source of the body, with the origin ``body_origin``,
+     * whose file position is the body's), and the objects whose ``refs``
+     * hold one of its ``labels``.
      *
      * @param {string} object_type
      * @param {string} object_id
@@ -577,10 +598,14 @@ export class ZooFlmProcessor extends ZooDbProcessorBase
             const key = object_key(object_type, object_id);
             let entry = objects.get(key);
             if (entry == null) {
-                entry = { object_type, object_id, labels: [], refs: [], cited: [], graphics: [] };
+                entry = { object_type, object_id, labels: [], refs: [], cited: [], graphics: [], terms: [] };
                 objects.set(key, entry);
             }
             return entry;
+        };
+        const cited_entry = (key, origin, fragment) => {
+            const { cite_prefix, cite_key } = normalize_cite_key(key);
+            return { key, cite_prefix, cite_key, origin, fragment };
         };
         const labels = new Map();
         for (const tree of scan.trees) {
@@ -592,11 +617,13 @@ export class ZooFlmProcessor extends ZooDbProcessorBase
             }
             entry?.refs.push(...tree.refs.map( (r) => ({ ...r, fragment: tree.fragment }) ));
             entry?.graphics.push(...tree.graphics.map( (g) => ({ ...g, fragment: tree.fragment }) ));
+            entry?.terms.push(...tree.terms.map( (t) => ({ ...t, fragment: tree.fragment }) ));
+            // every key each field cites (the scan's own list has the first
+            // citation of each key only)
+            entry?.cited.push(...tree.cited.map( (key) => cited_entry(key, tree.fragment.origin.label, tree.fragment) ));
         }
-        for (const c of scan.cited) {
-            object_entry(c.fragment)?.cited.push(c);
-        }
-        this.scan_results = { objects, labels, cited: scan.cited, duplicate_labels: scan.duplicate_labels, trees: scan.trees };
+        const cited = scan.cited.map( (c) => cited_entry(c.key, c.origin, c.fragment) );
+        this.scan_results = { objects, labels, cited, duplicate_labels: scan.duplicate_labels, trees: scan.trees };
 
         const errors = [];
         // Labels are unique zoo-wide (Q12).
@@ -617,7 +644,7 @@ export class ZooFlmProcessor extends ZooDbProcessorBase
                 errors.push({ ...d, severity: 'error' });
             }
         }
-        debug(`Scan: ${labels.size} label(s), ${scan.cited.length} cited key(s), `
+        debug(`Scan: ${labels.size} label(s), ${cited.length} cited key(s), `
               + `${scan.duplicate_labels.length} duplicate label(s), `
               + `${scan.standalone_violations} standalone violation(s)`);
         return errors;
@@ -668,11 +695,11 @@ export class ZooFlmProcessor extends ZooDbProcessorBase
      * origin has an ``href``.
      *
      * The display is the source of the content the label's point shows when
-     * the label forms the anchor (``anchor`` not null) and that source passes
-     * the standalone check (one scan over all the candidate displays, each a
-     * standalone fragment, released after); otherwise the display of the
-     * object (the object's own entry's), or for an ad hoc fragment its origin
-     * label as text.  A candidate that is not standalone is the Warning
+     * one of the labels of its point forms the anchor (``anchor`` not null)
+     * and that source passes the standalone check (one scan over all the
+     * candidate displays, each a standalone fragment, released after);
+     * otherwise the display of the object (the object's own entry's), or for
+     * an ad hoc fragment its origin label as text.  A candidate that is not standalone is the Warning
      * ``zoodb.index.display-not-standalone``; a label of an ad hoc fragment
      * with no object and no ``href`` is the Warning ``zoodb.labels.no-href``
      * and gets no entry; a label that is an object's label is the Warning
@@ -773,7 +800,7 @@ export class ZooFlmProcessor extends ZooDbProcessorBase
     /**
      * The index entries of a context: one per object, and one per label
      * entry (:meth:`_label_entries`) with the href of its object (and ``#``
-     * and the anchor when the label forms it).
+     * and the anchor when one of the labels of its point forms it).
      */
     _index_entries(context_name, label_entries)
     {

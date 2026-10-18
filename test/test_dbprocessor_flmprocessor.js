@@ -553,6 +553,88 @@ describe('ZooFlmProcessor', function () {
         });
     });
 
+    describe('the scan results of the objects', function () {
+
+        let zoodb;
+
+        before(async function () {
+            zoodb = await make_zoo();
+            await zoodb.load_data({ objects: {
+                person: {
+                    carol: carol({
+                        biography: 'Carol defines.\n\n\\begin{defterm}{Dot}\\label{topic:dot}\n'
+                            + '  A small round mark \\cite{custom:xyz}.\n\\end{defterm}',
+                        topics: [{ topic_id: 'drawing', detail: 'With a \\term{Dot}, after \\cite{custom:xyz} and \\cite{custom:abc}.' }],
+                    }),
+                    dave: {
+                        person_id: 'dave', name: 'Dave', biography: 'Dave draws a \\term{Dot} too \\cite{custom:xyz}.',
+                        _zoodb: { source_file_path: 'people/dave.yml' },
+                    },
+                },
+                topic: { drawing: { topic_id: 'drawing', name: 'Drawing' } },
+            } });
+        });
+
+        after(function () {
+            zoodb?.zoo_flm_engine.free();
+        });
+
+        it('lists every key an object cites, per field, so that two objects citing a key both list it', function () {
+            const processor = zoodb.zoo_flm_processor;
+            const cited = (id) => processor.object_scan('person', id).cited.map(
+                ({ key, cite_prefix, cite_key, origin }) => [key, cite_prefix, cite_key, origin] );
+            assert.deepStrictEqual(cited('carol'), [
+                ['custom:xyz', 'custom', 'xyz', 'people/carol.yml#biography'],
+                ['custom:xyz', 'custom', 'xyz', 'people/carol.yml#topics.0.detail'],
+                ['custom:abc', 'custom', 'abc', 'people/carol.yml#topics.0.detail'],
+            ]);
+            assert.deepStrictEqual(cited('dave'), [['custom:xyz', 'custom', 'xyz', 'people/dave.yml#biography']]);
+            assert.ok(processor.object_scan('person', 'dave').cited[0].fragment === zoodb.objects.person.dave.biography);
+            // The zoo's list keeps each key once, with its first citation:
+            // what the citations are retrieved for.
+            assert.deepStrictEqual(processor.scan_results.cited.map( (c) => [c.key, c.cite_prefix, c.origin] ), [
+                ['custom:xyz', 'custom', 'people/carol.yml#biography'],
+                ['custom:abc', 'custom', 'people/carol.yml#topics.0.detail'],
+            ]);
+            assert.deepStrictEqual(zoodb.zoo_flm_engine.tables.citations.map( (c) => c.key ), ['custom:xyz', 'custom:abc']);
+        });
+
+        it('gives each term definition with its labels, anchor and body, for a glossary', function () {
+            const processor = zoodb.zoo_flm_processor;
+            const engine = zoodb.zoo_flm_engine;
+            const [term] = processor.object_scan('person', 'carol').terms;
+            assert.deepStrictEqual([term.labels, term.anchor, term.display, term.body.trim()], [
+                ['defterm:Dot', 'topic:dot'], 'defterm-Dot', 'Dot', 'A small round mark \\cite{custom:xyz}.',
+            ]);
+            assert.strictEqual(term.fragment, zoodb.objects.person.carol.biography);
+            assert.deepStrictEqual(processor.object_scan('person', 'dave').terms, []);
+            // The objects referring to the term, through their refs.
+            const referring = [...processor.scan_results.objects.values()]
+                .filter( (o) => o.refs.some( (r) => term.labels.includes(r.label) ) )
+                .map( (o) => o.object_id );
+            assert.deepStrictEqual(referring, ['carol', 'dave']);
+            // The term's link: its computed label forms the anchor, which
+            // the point's other label gets too, with the same display.
+            const index_entry = (label) => engine.tables.index.default.find( (e) => e.label === label );
+            assert.strictEqual(index_entry('defterm:Dot').href, '/person/carol#defterm-Dot');
+            assert.strictEqual(index_entry('topic:dot').href, '/person/carol#defterm-Dot');
+            assert.strictEqual(index_entry('topic:dot').display, index_entry('defterm:Dot').display);
+            assert.strictEqual(index_entry('defterm:Dot').display, 'Dot');
+            // A glossary page renders the body as a fragment of its own, with
+            // the field's origin naming the term.
+            assert.strictEqual(term.body_origin.label, term.fragment.origin.label);
+            assert.strictEqual(term.body_origin.term, 'defterm:Dot');
+            const body = engine.make_fragment(term.body, { origin: term.body_origin, layout: 'blocks' });
+            const page = engine.render_document({
+                compose: ({ rdrblock, endnotes }) => `<dt>${engine.snippet_of_text(term.display)}</dt><dd>${rdrblock(body)}</dd>${endnotes()}`,
+            });
+            assert.deepStrictEqual(page.diagnostics, []);
+            assert.match(page.html, /^<dt>Dot<\/dt><dd><p class="flm-pres-par">A small round mark/);
+            assert.match(page.html, /Custom reference <em[^>]*>xyz<\/em>/);
+            engine.release(body);
+        });
+    });
+
     describe('errors and warnings', function () {
 
         const zoos = [];

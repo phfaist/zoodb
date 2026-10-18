@@ -10,7 +10,7 @@
 //! Diagnostics carry the origin (`path#field`), the byte range and the line
 //! and column within the fragment's text.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
@@ -39,7 +39,8 @@ use flm_core::stdcore::backends::latex_recomposed::{
 };
 use flm_core::stdcore::backends::pieces::PiecesRenderOptions;
 use flm_core::stdcore::backends::text::{self, TEXT_OUTPUT, TextRenderOptions};
-use flm_core::stdcore::features::citations::KEYS;
+use flm_core::stdcore::features::citations::{CitationElement, KEYS, Reading, read_chunk};
+use flm_core::stdcore::features::defterm::{DeftermElement, TERM_ARG};
 use flm_core::stdcore::features::refs::{RefsRecomposeOptions, SafeLabelMode};
 use flm_core::core::lowering::chars_at_lowering;
 use flm_core::stdcore::features::graphics::{GraphicsImage, PATH_ARG};
@@ -48,7 +49,9 @@ use flm_core::stdcore::features::refs::{
     ANCHORS, EXTERNAL_INDEX, ExternalIndex, ExternalTarget, LABELS, REF_RESOLUTIONS, REF_TARGETS, RefsRenderOptions, Resolution, SiteId,
     UnresolvedRefs, label_anchor, value_of,
 };
-use flm_core::model::aspects::{Label, PointId, Referencing};
+use flm_core::model::aspects::{Label, PointId, Referenceable, Referencing};
+use flm_core::model::options::{Bind, Options};
+use flm_core::core::registry::PackageFactory;
 use flm_core::techy::core::node::NodeTree;
 use flm_core::core::settings::PackageSettings;
 use flm_core::stdcore;
@@ -125,6 +128,10 @@ pub struct RenderOptions {
     pub title: Option<String>,
     /// Unresolved references are Warnings instead of Errors.
     pub unresolved_refs_warning: bool,
+    /// Render options of this run only, as data (`{ feature: { key: value
+    /// } }`, the shape of the settings): over the settings' render options,
+    /// key by key ([`Engine::run_render_options`]).
+    pub render_options: serde_json::Map<String, serde_json::Value>,
 }
 
 /// Options of a recomposed-LaTeX run (Q12).
@@ -172,11 +179,20 @@ pub struct TextOptions {
     /// the text; off, a citation is its mark alone, which is what a search
     /// index and a snippet want (Q11).
     pub pieces: bool,
+    /// Render options of this run only, as for html ([`RenderOptions`]).
+    pub render_options: serde_json::Map<String, serde_json::Value>,
 }
 
 impl Default for TextOptions {
     fn default() -> TextOptions {
-        TextOptions { width: None, link_addresses: false, unresolved_refs_warning: true, per_tree: false, pieces: false }
+        TextOptions {
+            width: None,
+            link_addresses: false,
+            unresolved_refs_warning: true,
+            per_tree: false,
+            pieces: false,
+            render_options: serde_json::Map::new(),
+        }
     }
 }
 
@@ -282,11 +298,12 @@ pub struct ScanLabelOut {
     /// The label, `type:label`.
     pub label: String,
     /// The anchor the scan run gave the point that keeps the label
-    /// (`flm.anchors`) when it is the anchor the label itself forms
-    /// (`label_anchor`: `type-label`, the same in any document); `None` for a
-    /// point anchored otherwise (on its number, as a float, an equation or a
-    /// theorem; on a title slug that was renumbered; after a collision) or
-    /// not at all, whose anchor depends on the document it is rendered in.
+    /// (`flm.anchors`) when one of the labels of its point forms it
+    /// (`label_anchor`: `type-label`, the same in any document), so that all
+    /// the labels of a point get its anchor; `None` for a point anchored
+    /// otherwise (on its number, as a float, an equation or a theorem; on a
+    /// title slug that was renumbered; after a collision) or not at all,
+    /// whose anchor depends on the document it is rendered in.
     pub anchor: Option<String>,
     /// The FLM source of the content the point shows (a heading's title):
     /// the source text the copied content nodes span, without the braces
@@ -314,6 +331,29 @@ pub struct ScanDuplicateOut {
     pub end: usize,
 }
 
+/// A term definition of a tree (`\begin{defterm}{term} … \end{defterm}`),
+/// as the scan found it: what a glossary needs to list the term with its
+/// body, its link and the references to it.
+#[derive(Debug, Clone, Serialize)]
+pub struct ScanTermOut {
+    /// The labels of the term definition's point, in its order: the one
+    /// computed from the term (`defterm:<term>`, which a term link targets),
+    /// one per alias (`\aliasterm{…}`), then those written with `\label`.
+    pub labels: Vec<String>,
+    /// The point's anchor when one of its labels forms it (`type-label`,
+    /// the same in every document), as for [`ScanLabelOut::anchor`].
+    pub anchor: Option<String>,
+    /// The FLM source of the term (the environment's argument, without its
+    /// braces); `None` when it is blank or not in the tree's own source.
+    pub display: Option<String>,
+    /// The byte range of the body in the tree's source (the content after
+    /// the term and the `\label` and `\aliasterm` fields, up to
+    /// `\end{defterm}`); `None` for an empty body, or one not written in the
+    /// tree's own source (through a user definition's template).
+    pub body_start: Option<usize>,
+    pub body_end: Option<usize>,
+}
+
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct ScanTreeOut {
     /// The labels the tree defines (those whose point the tree holds), in
@@ -322,13 +362,21 @@ pub struct ScanTreeOut {
     /// The reference sites of the tree, in tree order.
     pub refs: Vec<ScanRefOut>,
     pub graphics: Vec<GraphicsRefOut>,
+    /// The term definitions of the tree, in tree order.
+    pub terms: Vec<ScanTermOut>,
+    /// The citation keys the tree cites, each once, in order of first
+    /// citation in the tree (read from its `\cite` and `\R` nodes as the
+    /// collect stage of `flm.citations.keys` reads them).
+    pub cited: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ScanOut {
     /// One entry per handle given, in the same order.
     pub trees: Vec<ScanTreeOut>,
-    /// Cited keys in order of first citation, with the origin of that citation.
+    /// The cited keys of all the trees (`flm.citations.keys`), each once, in
+    /// order of first citation, with the origin of that first citation; every
+    /// tree that cites a key lists it in its own `cited`.
     pub cited: Vec<(String, Option<String>)>,
     /// The labels written more than once, each with the later point.
     pub duplicate_labels: Vec<ScanDuplicateOut>,
@@ -373,7 +421,36 @@ pub struct Engine {
     /// merged into every plan's render options, before the per-call ones.
     document_options: OptionValues,
     render_options: OptionValues,
+    /// The settings' keys bound to the render request, as data per feature:
+    /// the base of a run's render options given per call (G3).
+    render_settings: serde_json::Map<String, serde_json::Value>,
+    /// The standard package's factory, whose declarations read the settings
+    /// and the per-call render options.
+    factory: PackageFactory,
 }
+
+/// The value of the render option type `T` in `values`, or its default: the
+/// base that a run sets its own fields on, so that the settings' other
+/// fields of that type reach the run.
+fn option_or_default<T: Options + Clone>(values: &OptionValues) -> T {
+    values.get::<T>().cloned().unwrap_or_default()
+}
+
+/// The keys of the render options that a run sets through the call's own
+/// options, as `(feature, key, the option that sets it)`: refused per call
+/// ([`Engine::run_render_options`]) and in the settings ([`Engine::new`]),
+/// so that a value never silently loses to the call's. A LaTeX run takes
+/// no per-call render options: its list is checked against the settings.
+const HTML_RESERVED: &[(&str, &str, &str)] = &[("refs", "unresolved", "the call's `unresolved`")];
+const TEXT_RESERVED: &[(&str, &str, &str)] = &[
+    ("refs", "unresolved", "the call's `unresolved`"),
+    ("text", "width", "the call's `width`"),
+    ("text", "link_addresses", "the call's `link_addresses`"),
+];
+const LATEX_RESERVED: &[(&str, &str, &str)] = &[
+    ("refs", "unresolved", "the call's `unresolved`"),
+    ("latex-recomposed", "drop_comments", "the call's `drop_comments`"),
+];
 
 fn severity_word(severity: Severity) -> &'static str {
     match severity {
@@ -510,6 +587,19 @@ impl Engine {
         let mut package_settings = PackageSettings::new();
         let mut document_options = OptionValues::new();
         let mut render_options = OptionValues::new();
+        let mut render_settings = serde_json::Map::new();
+        // The keys every run sets itself are refused by name.
+        let mut refused: Vec<String> = Vec::new();
+        for (feature, key, by) in HTML_RESERVED.iter().chain(TEXT_RESERVED).chain(LATEX_RESERVED) {
+            let given = config.settings.get(*feature).and_then(|values| values.as_object()).is_some_and(|values| values.contains_key(*key));
+            let message = format!("the setting `{feature}.{key}` is set by every run, from {by}, not by the settings");
+            if given && !refused.contains(&message) {
+                refused.push(message);
+            }
+        }
+        if !refused.is_empty() {
+            return Err(refused.join("; "));
+        }
         for (feature, values) in &config.settings {
             let decl = factory.settings(feature).ok_or_else(|| format!("the feature `{feature}` takes no settings (or does not exist)"))?;
             let values = values.as_object().ok_or_else(|| format!("the settings of `{feature}` must be a map"))?;
@@ -519,6 +609,14 @@ impl Engine {
             document_options.merge_from(read.document_options());
             render_options.merge_from(read.render_options());
             package_settings.insert(read);
+            let render: serde_json::Map<String, serde_json::Value> = values
+                .iter()
+                .filter(|(key, _)| decl.key(key).is_some_and(|k| k.bind == Bind::Render))
+                .map(|(key, value)| (key.clone(), value.clone()))
+                .collect();
+            if !render.is_empty() {
+                render_settings.insert(feature.clone(), serde_json::Value::Object(render));
+            }
         }
         for feature in &config.off {
             package_settings.switch_off(feature.as_str());
@@ -544,7 +642,72 @@ impl Engine {
             prefer_zoodb_publish: config.srcset.is_some(),
             document_options,
             render_options,
+            render_settings,
+            factory,
         })
+    }
+
+    /// The render options of one run (G3): the settings' render options, or,
+    /// with render options given for the call (`{ feature: { key: value }
+    /// }`), the settings' render-bound keys with the call's over them key by
+    /// key, read through each feature's settings declaration. A key of the
+    /// call must be one its feature binds to the render request; `reserved`
+    /// lists those the call sets through its own options. Every problem is
+    /// named in the error.
+    fn run_render_options(
+        &self,
+        per_call: &serde_json::Map<String, serde_json::Value>,
+        reserved: &[(&str, &str, &str)],
+    ) -> Result<OptionValues, String> {
+        if per_call.is_empty() {
+            return Ok(self.render_options.clone());
+        }
+        let mut errors = Vec::new();
+        let mut data = self.render_settings.clone();
+        for (feature, values) in per_call {
+            let Some(decl) = self.factory.settings(feature) else {
+                errors.push(format!("the feature `{feature}` takes no settings (or does not exist)"));
+                continue;
+            };
+            let Some(values) = values.as_object() else {
+                errors.push(format!("the render options of `{feature}` must be a map"));
+                continue;
+            };
+            for (key, value) in values {
+                if let Some((_, _, by)) = reserved.iter().find(|(f, k, _)| f == feature && k == key) {
+                    errors.push(format!("the render option `{feature}.{key}` is set by {by}, not per call"));
+                    continue;
+                }
+                match decl.key(key) {
+                    None => errors.push(format!("the feature `{feature}` has no setting `{key}`")),
+                    Some(k) if k.bind != Bind::Render => errors.push(format!(
+                        "the setting `{feature}.{key}` is not a render option: it is fixed when the engine is created (its settings)"
+                    )),
+                    Some(_) => {
+                        let entry = data.entry(feature.clone()).or_insert_with(|| serde_json::Value::Object(serde_json::Map::new()));
+                        if let Some(map) = entry.as_object_mut() {
+                            map.insert(key.clone(), value.clone());
+                        }
+                    }
+                }
+            }
+        }
+        let mut options = self.render_options.clone();
+        if errors.is_empty() {
+            for (feature, values) in &data {
+                // Only the features the call names: the others keep the
+                // settings' values, already in `options`.
+                if !per_call.contains_key(feature) {
+                    continue;
+                }
+                let (Some(decl), Some(values)) = (self.factory.settings(feature), values.as_object()) else { continue };
+                match decl.read(values) {
+                    Ok(read) => options.merge_from(read.render_options()),
+                    Err(problems) => errors.extend(problems.iter().map(|e| e.to_string())),
+                }
+            }
+        }
+        if errors.is_empty() { Ok(options) } else { Err(format!("the render options: {}", errors.join("; "))) }
     }
 
     /// The standard features and, for each that takes settings, the JSON
@@ -708,11 +871,20 @@ impl Engine {
     }
 
     pub fn render_html(&mut self, handles: &[u32], options: &RenderOptions) -> Result<HtmlOut, String> {
-        let key = format!("html:{}:{}", options.unresolved_refs_warning, options.title.as_deref().unwrap_or(""));
+        // The per-call render options are part of the plan's key (the JSON
+        // of a map with sorted keys).
+        let key = format!(
+            "html:{}:{}:{}",
+            options.unresolved_refs_warning,
+            options.title.as_deref().unwrap_or(""),
+            serde_json::Value::Object(options.render_options.clone()),
+        );
         let prefer_zoodb_publish = self.prefer_zoodb_publish;
-        let settings_render_options = self.render_options.clone();
+        let run_render_options = self.run_render_options(&options.render_options, HTML_RESERVED)?;
         let plan = self.plan(key, |registry| {
-            let mut html_options = HtmlRenderOptions::default();
+            // The call's own fields over the settings' (and the per-call)
+            // values of the same option types, whose other fields are kept.
+            let mut html_options: HtmlRenderOptions = option_or_default(&run_render_options);
             if let Some(title) = &options.title {
                 html_options.title = title.clone();
             }
@@ -724,7 +896,7 @@ impl Engine {
             let mut unsupported = BTreeMap::new();
             unsupported.insert(BackendName::from(html::BACKEND), vec![ElementName::from(FIELD_ELEMENT)]);
             // The settings' render options first, the per-call ones over them.
-            let mut render_options = settings_render_options;
+            let mut render_options = run_render_options;
             render_options.merge_from(&OptionValues::new().with(html_options).with(refs_options));
             let overrides = Overrides {
                 render_options,
@@ -880,11 +1052,14 @@ impl Engine {
         let key = format!("latex:{}:{}:{}", options.unresolved_refs_warning, options.drop_comments, options.raw_label_types.join(","));
         let settings_render_options = self.render_options.clone();
         let plan = self.plan(key, |registry| {
-            let latex_options = LatexRecomposedRenderOptions { drop_comments: options.drop_comments, ..Default::default() };
-            let recompose = RefsRecomposeOptions {
-                safe_label_types: options.raw_label_types.iter().map(|t| (t.clone(), SafeLabelMode::Raw)).collect(),
-                ..Default::default()
-            };
+            // The call's own fields over the settings' values of the same
+            // option types, whose other fields are kept.
+            let mut latex_options: LatexRecomposedRenderOptions = option_or_default(&settings_render_options);
+            latex_options.drop_comments = options.drop_comments;
+            let mut recompose: RefsRecomposeOptions = option_or_default(&settings_render_options);
+            recompose
+                .safe_label_types
+                .extend(options.raw_label_types.iter().map(|t| (t.clone(), SafeLabelMode::Raw)));
             let refs_options = RefsRenderOptions {
                 unresolved: if options.unresolved_refs_warning { UnresolvedRefs::Allow } else { UnresolvedRefs::Error },
             };
@@ -930,18 +1105,29 @@ impl Engine {
     }
 
     fn render_text_once(&mut self, handles: &[u32], options: &TextOptions) -> Result<TextOut, String> {
-        let key = format!("text:{:?}:{}:{}:{}", options.width, options.link_addresses, options.unresolved_refs_warning, options.pieces);
-        let settings_render_options = self.render_options.clone();
+        let key = format!(
+            "text:{:?}:{}:{}:{}:{}",
+            options.width,
+            options.link_addresses,
+            options.unresolved_refs_warning,
+            options.pieces,
+            serde_json::Value::Object(options.render_options.clone()),
+        );
+        let run_render_options = self.run_render_options(&options.render_options, TEXT_RESERVED)?;
         let plan = self.plan(key, |registry| {
-            let text_options = TextRenderOptions { width: options.width, link_addresses: options.link_addresses, ..Default::default() };
+            // The call's own fields over the settings' (and the per-call)
+            // values of the same option types, whose other fields are kept.
+            let mut text_options: TextRenderOptions = option_or_default(&run_render_options);
+            text_options.width = options.width;
+            text_options.link_addresses = options.link_addresses;
             let refs_options = RefsRenderOptions {
                 unresolved: if options.unresolved_refs_warning { UnresolvedRefs::Allow } else { UnresolvedRefs::Error },
             };
-            let mut render_options = settings_render_options;
+            let mut render_options = run_render_options;
             render_options.merge_from(&OptionValues::new().with(text_options).with(refs_options));
             if !options.pieces {
                 // No piece may be placed on the text output: the host places none.
-                let mut pieces = PiecesRenderOptions::default();
+                let mut pieces: PiecesRenderOptions = option_or_default(&render_options);
                 pieces.backends.insert(BackendName::from(text::BACKEND), Default::default());
                 render_options.merge_from(&OptionValues::new().with(pieces));
             }
@@ -1014,15 +1200,20 @@ impl Engine {
         let anchors = run.table(ANCHORS).map_err(|e| e.to_string())?;
         let targets = run.table(REF_TARGETS).map_err(|e| e.to_string())?;
         if let Some(labels) = run.table(LABELS).map_err(|e| e.to_string())? {
+            // Only an anchor a label forms is the same in every document
+            // (Q4): one formed from a number or a renumbered title follows
+            // this document's content. Every label of a point keeps the
+            // point's anchor when one of the point's labels forms it.
+            let mut formed: BTreeMap<PointId, BTreeSet<String>> = BTreeMap::new();
+            for (label, point) in &labels.by_label {
+                formed.entry(*point).or_default().insert(label_anchor(label));
+            }
             let mut points: Vec<Vec<(PointId, ScanLabelOut)>> = ids.iter().map(|_| Vec::new()).collect();
             for (label, point) in &labels.by_label {
                 if let Some(&i) = index_of.get(&point.addr.tree) {
-                    // Only an anchor the label forms is the same in every
-                    // document (Q4): one formed from a number or a
-                    // renumbered title follows this document's content.
                     let anchor = anchors
                         .and_then(|a| a.id(*point))
-                        .filter(|anchor| *anchor == label_anchor(label))
+                        .filter(|anchor| formed.get(point).is_some_and(|set| set.contains(*anchor)))
                         .map(str::to_owned);
                     let display = targets
                         .and_then(|t| t.by_label.get(label))
@@ -1062,6 +1253,45 @@ impl Engine {
                     let Ok(Ok(path)) = chars_at_lowering(content.iter()) else { continue };
                     let origin = node.span().source().origin().canonical_path().map(str::to_owned);
                     trees[i].graphics.push(GraphicsRefOut { path, origin });
+                }
+                // The term definitions (G1), with the byte range of their
+                // body in the tree's source, which the host cuts out of the
+                // fragment's source.
+                let own_source = tree.root().span().source();
+                for (addr, node, defterm) in index.values_of::<DeftermElement>(*id, tree) {
+                    let Some(point) = defterm.points(&node).into_iter().next() else { continue };
+                    let point_id = PointId { addr, index: 0 };
+                    let anchor = anchors
+                        .and_then(|a| a.id(point_id))
+                        .filter(|anchor| point.labels.iter().any(|label| *anchor == label_anchor(label)))
+                        .map(str::to_owned);
+                    let display = match node.argument_content_nodes_named(TERM_ARG) {
+                        Ok(Some(term)) => term
+                            .span()
+                            .filter(|span| Arc::ptr_eq(span.source(), own_source))
+                            .and_then(|_| term.source_text())
+                            .filter(|text| !text.trim().is_empty())
+                            .map(str::to_owned),
+                        _ => None,
+                    };
+                    let body = node.body().and_then(|body| body.span()).filter(|span| Arc::ptr_eq(span.source(), own_source));
+                    trees[i].terms.push(ScanTermOut {
+                        labels: point.labels.iter().map(|label| label.to_string()).collect(),
+                        anchor,
+                        display,
+                        body_start: body.as_ref().map(|span| span.start()),
+                        body_end: body.as_ref().map(|span| span.end()),
+                    });
+                }
+                // The citation keys of the tree (G2), read from its citation
+                // chunks as the collect stage reads the document's.
+                for (_, node, _) in index.values_of::<CitationElement>(*id, tree) {
+                    let Ok(chunk) = read_chunk(&node, Reading::InStage) else { continue };
+                    for item in chunk.items {
+                        if !trees[i].cited.contains(&item.key) {
+                            trees[i].cited.push(item.key);
+                        }
+                    }
                 }
             }
         }
@@ -1400,7 +1630,7 @@ mod tests {
         let mut engine = Engine::new(&EngineConfig::default()).unwrap();
         let a = engine
             .parse(
-                "\\section{Intro \\emph{x}}\\label{sec:intro}\n\nText \\begin{equation}x\\label{eq:x}\\end{equation}\n\n\\begin{figure}\\includegraphics{a}\\caption{Cap}\\label{figure:f}\\end{figure}",
+                "\\section{Intro \\emph{x}}\\label{sec:intro}\\label{sec:other}\n\nText \\begin{equation}x\\label{eq:x}\\label{eq:y}\\end{equation}\n\n\\begin{figure}\\includegraphics{a}\\caption{Cap}\\label{figure:f}\\label{figure:g}\\end{figure}",
                 "a.yml#d",
                 FragmentLayout::InlineOrBlocks,
             )
@@ -1426,6 +1656,13 @@ mod tests {
         let figure = label("figure:f");
         assert_eq!(figure.anchor, None);
         assert_eq!(figure.display.as_deref(), Some("Cap"));
+        // A later label of a point gets the point's anchor when one of the
+        // point's labels forms it, and the point's display.
+        let other = label("sec:other");
+        assert_eq!(other.anchor.as_deref(), Some("sec-intro"));
+        assert_eq!(other.display.as_deref(), Some("Intro \\emph{x}"));
+        assert_eq!(label("eq:y").anchor.as_deref(), Some("eq-x"));
+        assert_eq!(label("figure:g").anchor, None);
         assert!(scan.trees[1].labels.is_empty(), "{:?}", scan.trees[1].labels);
         let refs: Vec<(&str, bool)> = scan.trees[1].refs.iter().map(|r| (r.label.as_str(), r.resolved)).collect();
         assert_eq!(refs, vec![("eq:x", true), ("sec:intro", true), ("person:z", false)]);
@@ -1565,6 +1802,153 @@ mod tests {
         engine.plans.clear();
         let err = engine.render_html(&[b.handle], &RenderOptions::default()).unwrap_err();
         assert!(err.contains("zoodb.graphics.publish.html") && err.contains("flm.graphics.publish.html"), "{err}");
+    }
+
+    /// G1: per tree, the term definitions with their labels (the computed
+    /// ones first), the anchor the first label forms, the term and the byte
+    /// range of the body, which leaves out the `\label` and `\aliasterm`
+    /// fields written after the term.
+    #[test]
+    fn the_scan_reports_term_definitions_with_their_bodies() {
+        let mut engine = Engine::new(&EngineConfig::default()).unwrap();
+        let text_a = "Intro.\n\n\\begin{defterm}{Markov chain}\\label{topic:markov}\\aliasterm{Markov chains}\n  A random process \\emph{without} memory, as \\term{Markov chains} are.\n\\end{defterm}\n\nAfter.";
+        let a = engine.parse(text_a, "a.yml#d", FragmentLayout::InlineOrBlocks).unwrap();
+        let text_b = "See \\term{Markov chain}, \\ref{topic:markov} and \\begin{defterm}{Café \\(\\alpha\\)}\\end{defterm}.";
+        let b = engine.parse(text_b, "b.yml#d", FragmentLayout::InlineOrBlocks).unwrap();
+        assert!(a.diagnostics.is_empty() && b.diagnostics.is_empty(), "{:?} {:?}", a.diagnostics, b.diagnostics);
+        let scan = engine.scan(&[a.handle, b.handle], &[]).unwrap();
+        assert_eq!(scan.trees[0].terms.len(), 1, "{:?}", scan.trees[0].terms);
+        let term = &scan.trees[0].terms[0];
+        assert_eq!(term.labels, vec!["defterm:Markov chain", "defterm:Markov chains", "topic:markov"]);
+        assert_eq!(term.anchor.as_deref(), Some(label_anchor(&Label::new("defterm", "Markov chain")).as_str()));
+        assert_eq!(term.display.as_deref(), Some("Markov chain"));
+        let body = &text_a[term.body_start.unwrap()..term.body_end.unwrap()];
+        assert_eq!(body.trim(), "A random process \\emph{without} memory, as \\term{Markov chains} are.");
+        // Every label of the point is a label of the tree, as before, and
+        // each has the point's anchor (the one the computed label forms).
+        let labels: Vec<&str> = scan.trees[0].labels.iter().map(|l| l.label.as_str()).collect();
+        assert!(labels.contains(&"defterm:Markov chain") && labels.contains(&"topic:markov"), "{labels:?}");
+        let markov = label_anchor(&Label::new("defterm", "Markov chain"));
+        assert!(scan.trees[0].labels.iter().all(|l| l.anchor.as_deref() == Some(markov.as_str())), "{:?}", scan.trees[0].labels);
+        // A term with markup and a multibyte character, and an empty body.
+        let empty = &scan.trees[1].terms[0];
+        assert_eq!(empty.display.as_deref(), Some("Café \\(\\alpha\\)"));
+        assert_eq!((empty.body_start, empty.body_end), (None, None));
+        // The term links and the reference resolve to the definition.
+        let refs: Vec<(&str, bool)> = scan.trees[1].refs.iter().map(|r| (r.label.as_str(), r.resolved)).collect();
+        assert_eq!(refs, vec![("defterm:Markov chain", true), ("topic:markov", true)]);
+        assert!(scan.trees[0].cited.is_empty() && scan.trees[1].terms.len() == 1);
+    }
+
+    /// G2: every tree lists the citation keys it cites, each once, in order
+    /// of first citation in the tree (a chunk, further calls, `\R`); the
+    /// document's list keeps one entry per key with its first citation.
+    #[test]
+    fn the_scan_reports_the_cited_keys_of_every_tree() {
+        let mut engine = Engine::new(&EngineConfig::default()).unwrap();
+        let a = engine.parse("A \\cite{arxiv:1,doi:2}\\cite[p.~3]{arxiv:1} and \\R\\cite{arxiv:3}.", "a.yml#d", FragmentLayout::Inline).unwrap();
+        let b = engine.parse("B cites \\cite{doi:2} again\\footnote{And \\cite{arxiv:4}.}.", "b.yml#d", FragmentLayout::Inline).unwrap();
+        let c = engine.parse("C cites nothing.", "c.yml#d", FragmentLayout::Inline).unwrap();
+        let scan = engine.scan(&[a.handle, b.handle, c.handle], &[]).unwrap();
+        assert_eq!(scan.trees[0].cited, vec!["arxiv:1", "doi:2", "arxiv:3"]);
+        assert_eq!(scan.trees[1].cited, vec!["doi:2", "arxiv:4"]);
+        assert!(scan.trees[2].cited.is_empty());
+        let first: Vec<(&str, Option<&str>)> = scan.cited.iter().map(|(k, o)| (k.as_str(), o.as_deref())).collect();
+        assert_eq!(first, vec![("arxiv:1", Some("a.yml#d")), ("doi:2", Some("a.yml#d")), ("arxiv:3", Some("a.yml#d")), ("arxiv:4", Some("b.yml#d"))]);
+    }
+
+    fn per_call(value: serde_json::Value) -> serde_json::Map<String, serde_json::Value> {
+        value.as_object().cloned().unwrap()
+    }
+
+    /// G3: render options given for one html or text run, over the
+    /// settings' key by key; the settings' render options of the types the
+    /// engine sets fields of reach every run (they were replaced by the
+    /// types' defaults before); unknown, registry-bound and reserved keys
+    /// are refused with their names.
+    #[test]
+    fn render_options_per_call_over_the_settings() {
+        let config: EngineConfig = serde_json::from_value(serde_json::json!({
+            "settings": {
+                "html": { "heading_tags": { "section": "h5" } },
+                "text": { "root_heading_level": 3 },
+                "latex-recomposed": { "style_stem": "zoostyle" }
+            }
+        }))
+        .unwrap();
+        let mut engine = Engine::new(&config).unwrap();
+        let a = engine.parse("\\section{Sec}\nText\\footnote{N.} \\cite{arxiv:1}.\n\n\\paragraph{Run} In.", "a.yml#d", FragmentLayout::InlineOrBlocks).unwrap();
+        let out = engine.render_html(&[a.handle], &RenderOptions::default()).unwrap();
+        assert!(out.trees[0].starts_with("<h5 "), "{}", out.trees[0]);
+        let pieces: Vec<&str> = out.pieces.iter().map(|p| p.name.as_str()).collect();
+        assert!(pieces.contains(&"flm.citations.bibliography") && pieces.contains(&"flm.xnotes.list.footnote"), "{pieces:?}");
+        // Per call: the pieces left out, the tag of the settings kept.
+        let options = RenderOptions {
+            render_options: per_call(serde_json::json!({
+                "pieces": { "exclude": ["flm.citations.bibliography", "flm.xnotes.list.footnote"] },
+                "html": { "root_heading_level": 0 }
+            })),
+            ..RenderOptions::default()
+        };
+        let out = engine.render_html(&[a.handle], &options).unwrap();
+        assert!(out.pieces.is_empty(), "{:?}", out.pieces.iter().map(|p| &p.name).collect::<Vec<_>>());
+        assert!(out.trees[0].starts_with("<h5 "), "{}", out.trees[0]);
+        // The marks stay: no render option drops them.
+        assert!(out.trees[0].contains("href=\"#fn-1\"") && out.trees[0].contains("href=\"#citation-1\""), "{}", out.trees[0]);
+        assert!(!out.diagnostics.iter().any(|d| d.severity == "error" && !d.identifier.starts_with("flm.citations.")), "{:?}", out.diagnostics);
+        // The next call without them places the pieces again.
+        let out = engine.render_html(&[a.handle], &RenderOptions::default()).unwrap();
+        assert_eq!(out.pieces.len(), 2);
+        // Text: the settings' root heading level reaches the run (a
+        // paragraph heading, level 4, is the second level under a root of 3).
+        let p = engine.parse("\\paragraph{Note} Some content.", "a.yml#p", FragmentLayout::InlineOrBlocks).unwrap();
+        let text = engine.render_text(&[p.handle], &TextOptions::default()).unwrap();
+        assert!(text.text.starts_with("Note\n----\n"), "{:?}", text.text);
+        let text = engine
+            .render_text(&[p.handle], &TextOptions { render_options: per_call(serde_json::json!({ "text": { "root_heading_level": 4 } })), ..TextOptions::default() })
+            .unwrap();
+        assert!(text.text.starts_with("Note\n====\n"), "{:?}", text.text);
+        // LaTeX: the settings' style stem reaches the run.
+        let latex = engine.render_latex(&[a.handle], &LatexOptions::default()).unwrap();
+        assert!(latex.style_name.as_deref().is_some_and(|n| n.starts_with("zoostyle.")), "{:?}", latex.style_name);
+        // Refused, each named.
+        let refused = |engine: &mut Engine, value: serde_json::Value, needle: &str| {
+            let err = engine.render_html(&[a.handle], &RenderOptions { render_options: per_call(value), ..RenderOptions::default() }).unwrap_err();
+            assert!(err.contains(needle), "{err}");
+        };
+        refused(&mut engine, serde_json::json!({ "nosuchfeature": { "x": 1 } }), "`nosuchfeature`");
+        refused(&mut engine, serde_json::json!({ "html": { "no_such_key": 1 } }), "`no_such_key`");
+        refused(&mut engine, serde_json::json!({ "citations": { "placement": "in-place" } }), "`citations.placement` is not a render option");
+        refused(&mut engine, serde_json::json!({ "refs": { "unresolved": "allow" } }), "`refs.unresolved` is set by");
+        refused(&mut engine, serde_json::json!({ "pieces": { "exclude": 3 } }), "pieces.exclude");
+        refused(&mut engine, serde_json::json!({ "html": [] }), "must be a map");
+        let err = engine
+            .render_text(&[p.handle], &TextOptions { render_options: per_call(serde_json::json!({ "text": { "width": 20 } })), ..TextOptions::default() })
+            .unwrap_err();
+        assert!(err.contains("`text.width` is set by"), "{err}");
+    }
+
+    /// The settings keys a run always sets itself are refused when the
+    /// engine is created, each named with the call's option that sets it.
+    #[test]
+    fn the_settings_refuse_the_keys_a_run_sets() {
+        for (settings, needles) in [
+            (serde_json::json!({ "refs": { "unresolved": "allow" } }), vec!["`refs.unresolved`", "`unresolved`"]),
+            (serde_json::json!({ "text": { "width": 40 } }), vec!["`text.width`", "`width`"]),
+            (serde_json::json!({ "text": { "link_addresses": true } }), vec!["`text.link_addresses`", "`link_addresses`"]),
+            (serde_json::json!({ "latex-recomposed": { "drop_comments": true } }), vec!["`latex-recomposed.drop_comments`", "`drop_comments`"]),
+        ] {
+            let config: EngineConfig = serde_json::from_value(serde_json::json!({ "settings": settings })).unwrap();
+            let err = Engine::new(&config).err().expect("the setting is refused");
+            assert!(needles.iter().all(|needle| err.contains(needle)), "{err}");
+            assert_eq!(err.matches("is set by every run").count(), 1, "{err}");
+        }
+        // The other keys of the same features are taken.
+        let config: EngineConfig = serde_json::from_value(serde_json::json!({
+            "settings": { "text": { "tab_width": 2 }, "latex-recomposed": { "style_stem": "s" } }
+        }))
+        .unwrap();
+        assert!(Engine::new(&config).is_ok());
     }
 
 }

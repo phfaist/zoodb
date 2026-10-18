@@ -4,7 +4,9 @@
 // `ZooFlmEngine.make_fragment()` and rendered by the engine; it carries no
 // rendering of its own.
 //
-// Environment-neutral: imports nothing, runs in browsers as it is.
+// Environment-neutral: imports only diagnostics.js, runs in browsers as it is.
+
+import { line_col_at } from './diagnostics.js';
 
 
 /**
@@ -67,6 +69,42 @@ export function make_origin(origin, fallback_label)
     }
     const label = origin_label(origin) ?? fallback_label();
     return Object.freeze({ ...origin, label });
+}
+
+
+/**
+ * The origin of a source cut out of a fragment's source from the UTF-8 byte
+ * offset ``start`` on (a term's body, from ``body_start``): the fragment's
+ * origin with ``keys`` over it and its file position moved to where the cut
+ * starts, so that the diagnostics of a fragment made from the cut text give
+ * the file's lines and columns. ``start_line`` and ``start_col`` are moved by
+ * the line and column of ``start`` in the source, as a diagnostic's are;
+ * ``indent`` is kept, the cut's later lines being lines of the source.
+ * ``approx: true`` is set when the fragment's positions are approximate or
+ * absent. The label stays the fragment's unless ``keys`` gives one: the
+ * graphics table is keyed by the canonical label, so the cut still finds the
+ * images written in it.
+ *
+ * @param {ZooFlmFragment} fragment
+ * @param {number} start - a UTF-8 byte offset into ``fragment.source``
+ * @param {object} [keys] - keys set over the fragment's origin
+ * @returns {object} an origin for :js:meth:`ZooFlmEngine.make_fragment`
+ */
+export function range_origin(fragment, start, keys = {})
+{
+    const { start_line, start_col, indent, approx } = fragment.origin;
+    const origin = { ...fragment.origin, ...keys };
+    if (start_line != null) {
+        const { line, col } = line_col_at(fragment.source, start);
+        origin.start_line = start_line + line - 1;
+        if (start_col != null) {
+            origin.start_col = (line === 1) ? start_col + col - 1 : col + (indent ?? 0);
+        }
+    }
+    if (start_line == null || approx === true) {
+        origin.approx = true;
+    }
+    return origin;
 }
 
 

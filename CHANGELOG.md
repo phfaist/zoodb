@@ -16,6 +16,15 @@ ported.
   `ZooFLMScanner`, `ZooFLMResourceInfo`, the render utilities). In the
   standard setup, `use_flm_environment` is replaced by `use_flm_engine` and
   `flm_options.environment_options` by `flm_options.engine`.
+- **Scan results and render options per run.** `engine.scan()` and
+  `processor.object_scan()` report each fragment's term definitions with their
+  bodies (for a glossary; `body_origin`, from the new `range_origin()`, gives a
+  body's fragment the file position of the body) and every key it cites (with
+  `cite_prefix` and `cite_key` in `object_scan()`); `render_document()` and
+  `render_fragment()` take `render_options`, flm-rs render options for that
+  run only. The core settings refuse the keys a run sets itself
+  (`refs.unresolved`, `text.width`, `text.link_addresses`,
+  `latex-recomposed.drop_comments`).
 - **Package exports of the FLM layer.** `./zooflm` (environment-neutral: the
   engine, the citation compiler and the environment-neutral loader, for Node
   and browsers alike; it imports no `node:` module, though the citation

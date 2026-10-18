@@ -431,3 +431,318 @@ status --short` empty and no file newer than the start of the part
    screenshots of E are for his review.
 
 ## Results
+
+### Part 0. The package
+
+Done 2026-10-17 by part 0's agent (Opus; the worktree at `1f1f0f8`, uncommitted),
+reviewed (Opus, read-only), review fixes applied 2026-10-18. Logs and probes, beside
+`partA/`: `part0/`, `review_part0/`, `fix_part0/`.
+
+- **G1, term bodies.** The crate's scan reports per tree `terms`, one entry per
+  `defterm`: `{ labels, anchor, display, body_start, body_end }`; the engine adds `body`
+  (cut out of `fragment.source`, the UTF-8 offsets converted) and, since the review
+  fixes, `body_origin`. A list of terms beside `labels`, because one `defterm` point
+  carries several labels (`defterm:<term>`, one per `\aliasterm`, then the written
+  `\label`s) and a glossary lists points. `labels` are the point's own, `anchor` the
+  point's when one of its labels forms it, `display` the term's source; the body range is
+  `node.body()`'s span without the `\label`/`\aliasterm` fields, `null` when empty or
+  written through a user definition. `object_scan(type, id).terms` carries them with
+  their `fragment`; a glossary takes the objects whose `refs` hold one of the labels
+  (tested end to end, a citation in the body resolved).
+- **G2, every object that cites a key.** The crate's scan reports per tree `cited`, each
+  key once in order of first citation, read from the element index's `cite`/`refcite`
+  nodes through flm-core's `read_chunk`. The zoo-wide `cited` (`flm.citations.keys`, the
+  first citation per key) is unchanged and drives the retrieval. `object_scan().cited`
+  holds one entry `{ key, cite_prefix, cite_key, origin, fragment }` per key and field;
+  `scan_results.cited` has `cite_prefix`/`cite_key` too. The processor's doc ("the keys
+  it cites") is now right.
+- **G3, marks and floats in previews.** (a) `truncate({ first_paragraph: true })` keeps
+  what precedes the first blank line: a float after it is left out, one written in the
+  first paragraph is kept when it fits, and so are footnotes and citations; the EC zoo
+  writes floats as separate paragraphs, so its previews lose them. (b) flm-rs has no
+  render option that drops citation or footnote marks or floats (citation placement and
+  xnotes are registry configuration), but `pieces.include`/`exclude` is bound to the
+  render request: a run that excludes `flm.xnotes.list.footnote` and
+  `flm.citations.bibliography` builds no endnotes and draws no
+  `zoodb.compose.piece-not-placed`, the marks staying as links to notes not on the page.
+  So `render_document({ render_options })` and `render_fragment(f, { render_options })`
+  take flm-rs render options for that run only (`{ feature: { key: value } }` over the
+  settings' render-bound keys, key by key); an unknown feature or key, a key fixed at
+  build (`citations.placement`) or one the call sets itself throws a plain `Error`
+  naming it. Dropping the marks stays a question for flm-rs (no request).
+- **The settings layering bug, fixed.** Every html, text and LaTeX run replaced the
+  settings' `HtmlRenderOptions`, `TextRenderOptions`, `LatexRecomposedRenderOptions` and
+  `RefsRecomposeOptions` (and the text run's `pieces`) by the types' defaults, so
+  `settings: { html: { heading_tags, root_heading_level, run_in_stop, … } }` never
+  reached a page. Each run now starts from the settings' value of each type and sets
+  only its own fields (tested for html, text and LaTeX).
+- **Deviations.** G3's per-call options went in although no option drops the marks
+  (the brief's alternative, rendering without endnotes, exists); the layering fix, in
+  the same code; the per-tree `cited` is a list of keys in the crate and the engine (the
+  processor adds origin, fragment, `cite_prefix`, `cite_key`); the binding's
+  `drop_nulls` hands `render_options` to flm-core as it is, as it does `settings`.
+- **Checks.** Rust: `zoodb-flm-wasm` clippy clean, 18 tests (3 new);
+  `zoodb-autocitefetch-wasm` clippy clean, 40 tests. `yarn build:wasm flm`: path check
+  green, module 5,148,202 bytes (+9,004), `flm_core_git` `2c219ec3`, not dirty. `yarn
+  test` 466 passing (+6), `yarn lint` green, `playground/play_example.mjs` exit 0, the
+  docs build without warning.
+
+**Review fixes.** The review found three must-fix and two should-fix items; all are
+applied.
+
+- (must) A label entry got its point's anchor only when that same label formed it, so
+  a point's later labels had `anchor: null`, and a defterm's `\label{topic:x}` got an
+  index entry without `#defterm-…`. `Engine::scan` now groups `by_label` by point (the
+  anchors its labels form), and every label keeps its point's anchor when one of the
+  point's labels forms it. The display and the processor's display rule are unchanged:
+  a later label's index entry gets the point's display, and a float stays `null`.
+- (must) Tests. Rust: every label of a defterm point has `defterm-Markov_chain`, and a
+  second label on a section, an equation and a figure gives `sec-intro` (with the
+  display), `eq-x` and `null`. Processor: the index entry of `topic:dot` has
+  `/person/carol#defterm-Dot` and the display of `defterm:Dot`.
+- (must) The wording "the anchor when one of the labels of its point forms it", in
+  `engine.rs`, `lib.rs` (and so the `.d.ts`), `engine.js`, `flmprocessor.js`, both doc
+  pages, `CLAUDE.md` and HANDOVER's decision list. Also the crate's `README.md` (whose
+  scan row also gained `terms` and the per-tree `cited`) and the ZooDb-side rule in 05.
+  The `engine.js` paragraph that implied a float's `figure-3` was reported now says it
+  is `null`.
+- (should) A term's body fragment gets the field's file lines. `range_origin(fragment,
+  start, keys)` (`src/zooflm/fragment.js`) gives the origin of a cut of a fragment's
+  source: `start_line`/`start_col` moved by the cut's line and column, as a
+  diagnostic's are, `indent` kept, and `approx: true` when the fragment's positions are
+  approximate or absent. The scan's terms carry `body_origin = range_origin(f,
+  body_start, { term: labels[0] })`, which the glossary example of
+  `doc/zoodb.dbprocessor-flm.rst` uses. Done differently from the decision: the label
+  stays the field's and `term` names the term. The graphics table is keyed by the
+  canonical label, so a body under another label does not find its images
+  (`flm.graphics.resolve-failed`, an Error; `fix_part0/p_body_label.mjs`); truncation
+  keeps the label for the same reason. Engine test: the body's diagnostic is at the
+  file line and column the field's own render gives (23:17), its image is found, and
+  the approximate and absent cases are covered.
+- (should) `Engine::new` refuses by name the settings keys that a run always sets:
+  `refs.unresolved`, `text.width`, `text.link_addresses` and
+  `latex-recomposed.drop_comments`. It reuses the reserved lists of the per-call options
+  plus a new LaTeX list, and each error names the call's option that sets the key.
+  `doc/zoodb.zooflm.rst` says so; Rust test added.
+- Checks after the fixes. Rust: `zoodb-flm-wasm` clippy clean, 19 tests;
+  `zoodb-autocitefetch-wasm` clippy clean, 40 tests. `yarn build:wasm flm` in 85 s:
+  path check green, module 5,153,150 bytes (+4,948), and the new `flm_core_git`
+  `5de1c198`, not dirty (flm-rs's HEAD; since `2c219ec3`, flm-core's `src` changed only
+  the LaTeX file `flmx-headings.sty`, the rest being goldens and tests). `yarn test` 467
+  passing, `yarn lint` green, the sample exit 0, the docs build without warning.
+  `CHANGELOG.md`'s part-0 bullet names `body_origin`, `range_origin()` and the refused
+  keys.
+
+**Findings for later parts.**
+
+- The scan does not see what user definitions write. A `\cite` in a macro is in neither
+  the tree's nor the zoo's `cited`, so it is not retrieved and the render reports
+  `flm.citations.no-entry`. Labels and term definitions in a template are not reported
+  either (`review_part0/p6_userdefs_render.mjs`). The EC zoo defines none; recorded in
+  HANDOVER.
+- `html_definitions()`, and from it `html_scripts()` and `html_stylesheet()`, list the
+  parts the features declare, while the runs honor the settings' `html.definitions`
+  overrides. B2's MathJax setup must keep both consistent (recorded in HANDOVER).
+- For B1 to check: the computed term labels (`defterm:<term>`) are labels like any
+  other, so two objects defining one term are `zoodb.labels.duplicate` (the 61 EC zoo
+  defterms); and a body's labels and citations are numbered in the glossary page that
+  renders it.
+
+### Setup
+
+Done 2026-10-17 by A's agent (Opus; node 23.7, the worktree at `1f1f0f8`), steps 1 and
+2 of the setup block; step 3 (the pack) and the sitegen clone's `yarn install` are left
+to B1's agent, after part 0 is committed. Logs and scripts of this part:
+`/private/tmp/claude-501/-Users-philippe-Research-projects-zoodb-zoodb/a1dd88e1-7168-44e0-92fc-0b56c08d4645/scratchpad/step6/partA/` (below `partA/`).
+
+- `scratch/.gitignore` gained the line `eczoo/` before anything was cloned (`git
+  check-ignore` names it for `scratch/eczoo/…`).
+- The three clones were made as the setup block says (`git clone --no-local --branch
+  main`, push URL `no-push-from-this-clone`, `git switch -c zoodb-flmrs`). The fetch URL
+  of `origin` is the local path of the original. Each clone has `main` and `zoodb-flmrs`
+  as local branches; the originals' other branches are only `origin/*` refs. The branches
+  start at `a2ad583` (sitegen), `7ade20a2f` (data) and `c73b681` (handbook), the
+  originals' `main`.
+- What was copied (`cp -R`, each copy under 0.2 s): `_TEST_zoodb_citations_cache/`, both
+  `.yarn/cache/` folders (1,183 and 520 archives, the same counts as the originals),
+  and the tracked `_zoodb_citations_cache/` into `_zoodb_citations_cache_LOCAL/`. The
+  clone's `.git/info/exclude` gained `_zoodb_citations_cache_LOCAL/`. The tracked
+  `citations.jsonl` of the clone is byte-identical to the original's (`cmp`).
+- The LOCAL cache's TTL, extended by `yarn node tools/extend_citations_ttl.mjs
+  --cache-dir …/_zoodb_citations_cache_LOCAL --prefix arxiv --prefix doi --add 60d`
+  ("extended 6874 entries by 60 day(s) (arxiv: 3306, doi: 3568)"). Counts made
+  by `partA/cache_counts.mjs` at 2026-10-17 02:03 UTC (stale: `stale_after` passed and
+  `expires` not):
+
+  | prefix | entries | before: stale, expired | after: stale, expired | earliest `stale_after` after |
+  |---|---|---|---|---|
+  | `arxiv` | 3,306 | 0, 3 | 0, 0 | 2026-12-05 |
+  | `doi` | 3,568 | 17, 1 | 0, 0 | 2026-12-11 |
+  | `preset` | 130 | 0, 130 | 0, 130 (not extended; the preset source reads a file of the data, no network) | — |
+
+  The survey counted 21 stale `doi` entries; this count gives 17 stale and 1 expired.
+  The test cache was copied as it is: 56 `doi` entries, none stale before 2027-02-02.
+- Times and sizes (`du -sh`, each path measured alone):
+
+  | | clone time (wall) | size | of which |
+  |---|---|---|---|
+  | `eczoo_sitegen` | 29.4 s | 379 MB | `.git` 97 MB, `.yarn/cache` 170 MB, `_zoodb_citations_cache` 28 MB, `_zoodb_citations_cache_LOCAL` 28 MB, `_TEST_zoodb_citations_cache` 428 KB |
+  | `eczoo_data` | 1.3 s | 26 MB | `.git` 14 MB (the original's is 60 MB) |
+  | `eczoo_handbook` | 1.5 s | 80 MB | `.git` 20 MB, `.yarn/cache` 49 MB |
+  | `scratch/eczoo/` in all | | 484 MB | |
+
+- State after the setup: `git status --short` empty in the three clones;
+  `--ignored` lists `.yarn/cache/`, `_TEST_zoodb_citations_cache/` and
+  `_zoodb_citations_cache_LOCAL/` (sitegen) and `.yarn/` (handbook).
+
+### A. The data
+
+Done 2026-10-17 by A's agent (Opus). Three commits in the clones, with the two trailers;
+nothing pushed (`git log origin/main..` lists only these commits; the push URLs are
+the disabled one).
+
+| clone | commit | subject | files | values |
+|---|---|---|---|---|
+| `eczoo_data` | `fd2a8d992` | Re-indent quoted values continued at their key's column (YAML 1.2) | 127 | 191 values; 283 lines gain leading spaces, nothing else changes |
+| `eczoo_data` | `60bbc93ae` | Rename the eq:parity labels of the two subsystem CSS codes | 2 | `codes/quantum/qubits/subsystem/qubit_subsystem_css.yml`: `eq:parity` → `eq:paritys`; `codes/quantum/qudits/subsystem/qudit_subsystem_css.yml`: `eq:parity` → `eq:parityqs` (field `description`) |
+| `eczoo_sitegen` | `8634846` | Test data: write the custom bullet of binary_linear.yml as label={⇒} | 1 | `eczoodb/test_data/codes/binary_linear.yml` line 40 (field `protection`): `\begin{itemize}[{⇒}]` → `\begin{itemize}[label={⇒}]` |
+
+The data changes and their reasons, for the table of part A: the re-indent (the strict
+loader refuses the pattern), the two labels (a label is zoo-wide, and `eq:parity` had
+three definitions; `qubit_css.yml` keeps it and its `\eqref`), the list option (flm-rs
+refuses `[{⇒}]`). The names follow the data's suffix per variant (`eq:parityq` for
+modular qudits, `eq:parityg` for Galois qudits): `s` for subsystem, after `q` for the
+qudit one. Neither renamed label is referred to in the data, the sitegen or the
+handbook (grep). The handbook clone has no commit. On the data clone's branch, 127
+files differ from `main`: the two renamed files are among the re-indented ones.
+
+**Verification numbers.**
+
+- *The tool* (`cd $W && yarn node tools/reindent_yaml.mjs $E/eczoo_data`; a dry run
+  first gave the same numbers): "191 value(s) in 127 file(s) re-indented, 1250 file(s)
+  checked", 1.2 s wall, exit 0, nothing on stderr (every verification passed); the 3
+  files under `.github/` are skipped as hidden (1,253 YAML files in all). The diff:
+  283 lines in 197 hunks, each line differing from the original only by added leading
+  spaces (`git diff -w` empty, and a line-by-line check). Logs: `partA/reindent.log`,
+  `partA/reindent.diff`.
+- *The strict load* (`partA/strict_load_compare.mjs`, run with `cd $W && yarn node`:
+  `parse_yaml_text` of the worktree with positions, the bytes through `decode_text`, as
+  the loader reads them): all 1,253 files load, at the re-indent commit and at the
+  branch head; 27,236 string positions (as in 11); 0.77 s for the 1,253 files, with the
+  two `js-yaml` readings below.
+- *The comparison with `js-yaml`* (4.1.0, resolved from the worktree through mocha's
+  dependency; `jsyaml.load(bytes)` as zoodb 0.2.1 calls it; the originals are the
+  clone's `main`, exported with `git archive`). At the re-indent commit, the strict data
+  equals `js-yaml`'s reading of the originals for 1,251 files. The 2 differences are
+  confirmed, one space each: `codes/quantum/properties/approximate_qecc.yml`
+  (`features.decoders.6`) and `codes/quantum/qubits/qubits_into_qubits.yml`
+  (`features.decoders.2`). There a quoted line ends with a space before a line break:
+  `js-yaml` keeps that space and adds the folded one (two spaces), YAML 1.2 keeps one.
+  This corrects 11: `qubits_into_qubits.yml` is not re-indented (its continuation lines
+  were already indented past the `-`), so this is the YAML 1.2 reading, not the tool.
+  `approximate_qecc.yml` is re-indented, and the value that differs is one of its three
+  values. At the branch head the only other differences are the two renamed labels.
+  Results: `partA/strict_load_compare_reindent.json`, `partA/strict_load_compare_final.json`.
+- *Labels* (grep over the non-comment lines of the data clone, after the rename): 112
+  `\label{…}`, all distinct; `figure:toric-code-operators` once (`toric.yml`),
+  `eq:gb_gv` once (`generalized_bicycle.yml`), as the survey says. B1's zoo-wide scan
+  stays the authority (it also sees the term labels flm-rs derives from `defterm`s).
+- *The list option* (`partA/list_option_check.mjs`, the worktree's engine under
+  `'continue'`): the `protection` field of the original renders with one Error, `‘⇒’ is
+  not an option of ‘itemize’ … [flm.lists.unknown-key]`, and the default bullet. After
+  the fix it renders with no diagnostic and the bullet `⇒`. The field's other option,
+  `\begin{enumerate}[{(I]))}]`, is a short form (labels `(I]))`, `(II]))`) and stays
+  as it is. Logs: `partA/list_option_check_before.txt`, `partA/list_option_check_after.txt`.
+- *Clean state*: `git -C <clone> status --short` is empty in the three clones (ignored
+  files only, as after the setup). `git -C <clone> log --stat zoodb-flmrs ^main` is saved
+  as `partA/logstat_<clone>.txt`. The originals' `git status --short` (read with
+  `--no-optional-locks`) and their branch heads are the same as before the part, and
+  `find … -newer` finds no file newer than the part's start in any of the three.
+
+**Is the data clone's branch safe for the current production build?** Yes, as far as
+checked here: the data could be merged before the sitegen. The production build (the
+sitegen's `main`, zoodb 0.2.1 at `bb94f3e`) reads YAML with `js-yaml` 4.1.0, the copy
+hoisted in the sitegen's `node_modules` (no nested copy under `@phfaist/zoodb`). That
+reader gives the same data for all 1,253 files after the re-indent (127 of them
+re-indented) as for the originals, so the old FLM receives the same field values. The
+renames change only the label text in two `description` fields. In the baseline pages
+(`site/_site/c/qubit_subsystem_css.html`, `qudit_subsystem_css.html` of the read-only
+checkout), the old FLM writes the label only inside the math handed to MathJax
+(`\label{eq:parity} \tag*{(1)}`), and the equation's anchor is `id="equation-1"`. The
+code pages therefore look the same. For these two codes, three things change by the
+label name: the id MathJax 3 derives from the label (`tags: 'ams'`), the `description`
+text in the search index (`dat/searchindex.json`) and the field's source text in the
+dump (`dat/eczoodata.json`). The baseline index and dump each hold `\label{eq:parity}`
+three times, for `qubit_css` and the two subsystem codes. Nothing in the zoo links to
+the MathJax id. The search page shows raw excerpts of the index text (200 characters
+around a match), so an excerpt that cuts the equation can show the new name; nothing
+else visible or linked changes. Not done: a run of the old FLM itself. Its only
+installed copy is in the read-only sitegen's `node_modules`, which this part does not
+run.
+
+**Deviations.** None from the brief's table. Two choices the brief left open: the
+label names (above), and the trailers, which are the brief's (`Claude Fable 5.1`)
+although the agent that wrote the commits is Opus.
+
+**Open questions.**
+
+- The names `eq:paritys` and `eq:parityqs`: Philippe (or the data's editors) may
+  prefer others; a rename is a one-line commit.
+- The two one-space differences of the YAML 1.2 reading need no data change: two
+  spaces display as one in HTML. The text output (the search index) was not checked
+  here. B2's comparison with the baseline's index diffs the texts of three codes only,
+  so it checks these two values only if one of the three is `approximate_qecc` or
+  `qubits_into_qubits` (the main session may ask B2 to take one of them).
+
+**Review fixes.** The review (Opus, read-only) found no must-fix item and two should-fix
+items, both about these Results; the three commits stand as they are.
+
+- The editors' FLM guide of the sitegen, `flm_howto.md` line 82 (the clone's copy, the
+  same as `main`), still teaches `\begin{itemize}[{⇒}]`, the form flm-rs refuses with
+  `flm.lists.unknown-key` (the default bullet is drawn). The data's `README.md` (line
+  87) and `CONTRIBUTING.md` (line 73) link to that guide. A finding for the sitegen
+  port (B2, the site's documentation): line 82 becomes `\begin{itemize}[label={⇒}]`.
+  Part A leaves the file as it is, since it is not data. The guide's three other list
+  examples render as it says with the worktree's engine (`[(a)]`: `(a)`, `(b)`;
+  `[i)]`: `i)`, `ii)`; `[{1]}]`: `1]`, `2]`; no diagnostic), and `[label={⇒}]` gives
+  the bullet `⇒` with no diagnostic (`fix_A/howto_lists_label.mjs`, the reviewer's
+  `review_A/howto_lists.mjs` with the `label=` form added; output
+  `fix_A/howto_lists_label.txt`; `fix_A/` and `review_A/` are beside `partA/`).
+- The second open question said that B2's comparison covers the two one-space values;
+  it covers them only if B2 picks one of the two codes, and the question now says so.
+- Two notes of the review, recorded and not acted on. The message of `fd2a8d992` puts
+  "(not re-indented)" after both file names, although only `qubits_into_qubits.yml`
+  is not re-indented; the commit is not amended (the rules), and these Results give
+  the right reading. For question 3: if the data merges before the sitegen, later edits
+  on `eczoo_data`'s `main` can bring the refused pattern back, since `js-yaml` accepts
+  it; `zoodb-reindent-yaml --dry-run` on the data before the sitegen moves to 0.3.0
+  finds them (on the clone's branch now: 0 values, 1,250 files checked).
+
+**Review fixes, second round.** A second review (Opus, read-only, 2026-10-18; its
+scripts in `review_A2/`) found no must-fix item and two should-fix items, both in the
+safety paragraph above; the three commits stand as they are, and the verdict "safe"
+stands. The scripts and outputs of this round are in `fix_A2/`.
+
+- The paragraph said that only the id MathJax derives from the label changes. The
+  baseline's search index and dump also carry the label text: `fix_A2/find_labels.mjs`
+  finds `\label{eq:parity}` in three `description` strings of each, those of
+  `qubit_css`, `qubit_subsystem_css` and `qudit_subsystem_css` (output
+  `fix_A2/find_labels.txt`), so the two renamed codes change there by the label name.
+  The search widget of the production site (`@phfaist/zoodbtools_search`, with
+  `context_length: 200` in the sitegen's `jscomponents/search/setup.js`) shows raw
+  substrings of that text around each match and has MathJax typeset them when there
+  are fewer than 100 results, so an excerpt cut inside the equation can show the label
+  name. The paragraph now says all of this.
+- "the same data for all 1,253 re-indented files" now reads "for all 1,253 files after
+  the re-indent (127 of them re-indented)".
+- Three notes of the review, recorded and not acted on. For question 3: the code pages
+  take `page.date` from `git log -1 --format=%at` of their file (zoodb 0.2.1's git
+  last-modified processor, `site/src/c/c.11ty.js` line 150), and `sitemap.xml` writes it
+  as `<lastmod>`; merging the data branch therefore moves the `<lastmod>` of the 127
+  re-indented code pages to the commit's date, and no page displays that date (grep of
+  `site/src`). The survey's "21 stale `doi`" and the setup's "17 stale and 1 expired"
+  are both right: 21 `doi` entries have `stale_after` on or before 2026-10-17 UTC (the
+  expired one included), and the setup counted at 02:03 UTC that day (rechecked on the
+  tracked cache, `fix_A2/doi_stale_count.txt`). For B1: `scratch/zoodb-flmrs.tgz`
+  already exists as a stale pack of 0.2.1 (360 files, from step 4's example check), so
+  setup step 3 must overwrite it before the install.

@@ -13,10 +13,10 @@
 
 import { load_zoodb_flm_wasm } from './_load_wasm.js';
 
-import { ZooFlmFragment, LAYOUTS, make_origin, is_fragment } from './fragment.js';
+import { ZooFlmFragment, LAYOUTS, make_origin, is_fragment, range_origin } from './fragment.js';
 import {
     ZooFlmError, apply_error_policy, check_error_policy, check_unresolved, has_errors, make_diagnostic,
-    map_core_diagnostic,
+    map_core_diagnostic, utf8_offset_to_index,
 } from './diagnostics.js';
 import { ZooFlmComposition, DEFAULT_RENDER_VALUE_OPTIONS, html_escape } from './compose.js';
 
@@ -42,6 +42,21 @@ function check_output(output)
                         + SNIPPET_OUTPUTS.map( (o) => `'${o}'` ).join(', '));
     }
     return output;
+}
+
+// The render options of one run as the core takes them (`{ feature: { key:
+// value } }`), checked for their shape here; the core refuses what is not a
+// render option, naming it.
+function check_render_options(render_options, what)
+{
+    if (render_options == null) {
+        return null;
+    }
+    if (typeof render_options !== 'object' || Array.isArray(render_options)) {
+        throw new TypeError(`${what}: \`render_options\` must be an object `
+                            + '({ feature: { key: value } }), or null');
+    }
+    return render_options;
 }
 
 function excerpt(text, n = 40)
@@ -813,14 +828,15 @@ export class ZooFlmEngine
 
     /**
      * One fragment rendered alone, as one tree: ``{ output, value, requires,
-     * diagnostics, definitions }``.
+     * diagnostics, definitions }``; ``render_options`` those of this run only
+     * (``null`` for the snippets).
      */
-    _render_one(f, output, unresolved)
+    _render_one(f, output, unresolved, render_options = null)
     {
         const handle = f.handle;
         if (output === 'html') {
             const out = this._core.render_html([handle], {
-                unresolved_refs_warning: unresolved === 'warn',
+                unresolved_refs_warning: unresolved === 'warn', render_options,
             });
             const requires = out.tree_requires[0] ?? [];
             return {
@@ -832,7 +848,7 @@ export class ZooFlmEngine
             };
         }
         const out = this._core.render_text([handle], {
-            unresolved_refs_warning: unresolved === 'warn', per_tree: false, pieces: false,
+            unresolved_refs_warning: unresolved === 'warn', per_tree: false, pieces: false, render_options,
         });
         return {
             output,
@@ -852,19 +868,24 @@ export class ZooFlmEngine
      * @param {string} [options.context='default'] - the index of the run
      * @param {string} [options.unresolved]
      * @param {string} [options.error_policy]
+     * @param {object} [options.render_options] - the core's render options
+     *     of this run only, as for :js:meth:`render_document` (for text,
+     *     ``text.width`` and ``text.link_addresses`` are refused as well)
      * @returns {object} ``{ html | text, definitions, requires, diagnostics,
      *     has_errors }`` (``definitions`` and ``requires`` empty for text)
      */
     render_fragment(f, {
         output = 'html', context = DEFAULT_CONTEXT, unresolved = null, error_policy = null,
+        render_options = null,
     } = {})
     {
         this._check_fragment(f);
         check_output(output);
+        render_options = check_render_options(render_options, 'render_fragment()');
         const policy = this._policy(error_policy);
         unresolved = this._unresolved_of(unresolved);
         this._ensure_context(context);
-        const one = this._render_one(f, output, unresolved);
+        const one = this._render_one(f, output, unresolved, render_options);
         const has_errors = apply_error_policy(one.diagnostics, policy);
         return {
             [output]: one.value,
@@ -1120,6 +1141,16 @@ export class ZooFlmEngine
      * @param {string} [options.unresolved]
      * @param {string} [options.error_policy]
      * @param {object} [options.render_value_options] - over the engine's
+     *     (how ``rdr()`` renders an array)
+     * @param {object} [options.render_options] - the core's render options
+     *     of this run only, in the shape of the core's settings: one object
+     *     per feature, of the keys the feature binds to the render request
+     *     (``{ pieces: { exclude: ['flm.citations.bibliography',
+     *     'flm.xnotes.list.footnote'] } }`` builds no list of cited works and
+     *     no footnote list; the marks stay), set over the settings' keys one
+     *     by one; a key that is unknown, fixed when the engine is created, or
+     *     ``refs.unresolved`` (``unresolved`` sets it) throws a plain
+     *     ``Error`` naming it
      * @returns {object} ``{ html, definitions, requires, diagnostics,
      *     has_errors }``: ``requires`` what the page's content requires (the
      *     substituted trees and pieces and the snippets), ``definitions``
@@ -1127,13 +1158,14 @@ export class ZooFlmEngine
      */
     render_document({
         compose, context = DEFAULT_CONTEXT, unresolved = null, error_policy = null,
-        render_value_options = null,
+        render_value_options = null, render_options = null,
     } = {})
     {
         this._live();
         if (typeof compose !== 'function') {
             throw new TypeError('render_document(): `compose` must be a function');
         }
+        render_options = check_render_options(render_options, 'render_document()');
         const policy = this._policy(error_policy);
         unresolved = this._unresolved_of(unresolved);
         const composition = new ZooFlmComposition(this, {
@@ -1147,7 +1179,9 @@ export class ZooFlmEngine
         let out = null;
         if (composition.handles.length > 0) {
             this._ensure_context(context);
-            out = this._core.render_html(composition.handles, { unresolved_refs_warning: unresolved === 'warn' });
+            out = this._core.render_html(composition.handles, {
+                unresolved_refs_warning: unresolved === 'warn', render_options,
+            });
         }
         const { html, requires, diagnostics: composer_diagnostics } = composition.substitute(composed, out);
         const diagnostics = [
@@ -1355,28 +1389,50 @@ export class ZooFlmEngine
     /**
      * Scans fragments as one document (no index installed, nothing retrieved,
      * resolved or output): per fragment the labels it defines, each with the
-     * anchor the scan gave its point and the FLM source of the content the
+     * anchor of its point (below) and the FLM source of the content the
      * point shows (``display``, ``null`` for a point shown by its number
      * alone), the references it makes (their labels, and whether they
-     * resolved inside the scanned fragments), the images; the cited keys; the
-     * labels written more than once, each with the later point; the
-     * standalone check over the standalone fragments.
+     * resolved inside the scanned fragments), the images, the term
+     * definitions (``\begin{defterm}{term} … \end{defterm}``) with their
+     * bodies, and the keys it cites; over all of them, the cited keys with
+     * their first citation; the labels written more than once, each with the
+     * later point; the standalone check over the standalone fragments.
      *
-     * An anchor is the scanned document's: one formed from a label
-     * (``sec-intro``, ``eq-x``) is the same in any document, one formed from
-     * a number (a float: ``figure-3``) follows the scanned document's
-     * numbering.
+     * A label's ``anchor`` is the anchor the scan gave its point when one of
+     * the labels of its point forms it (``sec-intro``, ``eq-x``: the same in
+     * any document), so that every label of the point has it; it is ``null``
+     * for a point anchored otherwise, as on its number (a float:
+     * ``figure-3``, which follows the scanned document's numbering).
+     *
+     * A term's ``labels`` are those of its point: the one computed from the
+     * term (``defterm:<term>``, the target of a term link ``\term{…}``), one
+     * per alias (``\aliasterm{…}``), then those written with ``\label``;
+     * ``anchor`` is the point's when one of these labels forms it; ``display``
+     * is the source of the term (``null`` when blank); ``body`` is the source
+     * of the body, cut out of the fragment's source (``body_start`` and
+     * ``body_end`` are its byte offsets there), without the ``\label`` and
+     * ``\aliasterm`` fields, ``null`` for an empty body or one written
+     * through a user definition; ``body_origin`` is the origin to make the
+     * body's fragment with (:js:func:`range_origin`: the fragment's, with
+     * ``term``, the term's first label, and the file position moved to where
+     * the body starts), ``null`` with ``body``. A glossary makes the body's
+     * fragment from ``body`` and ``body_origin``.
+     *
+     * A fragment's ``cited`` lists each key it cites once, in order of first
+     * citation in the fragment; the scan's ``cited`` lists each key once over
+     * all the fragments, with the fragment of its first citation.
      *
      * @param {Iterable<ZooFlmFragment>} fragments
      * @param {object} [options]
      * @param {string} [options.error_policy]
      * @returns {object} ``{ trees: [{ fragment, labels: [{ label, anchor,
      *     display }], refs: [{ label, resolved }], graphics: [{ path, origin
-     *     }] }], cited: [{ key, origin, fragment }], duplicate_labels: [{
-     *     label, origin, fragment, start, end }], standalone_violations,
-     *     diagnostics, has_errors }``, ``origin`` the canonical label (the
-     *     graphics table's key), ``start``/``end`` byte offsets into the
-     *     source of the later point
+     *     }], terms: [{ labels, anchor, display, body, body_origin,
+     *     body_start, body_end }], cited: [key] }], cited: [{ key, origin, fragment }],
+     *     duplicate_labels: [{ label, origin, fragment, start, end }],
+     *     standalone_violations, diagnostics, has_errors }``, ``origin`` the
+     *     canonical label (the graphics table's key), ``start``/``end`` byte
+     *     offsets into the source of the later point
      */
     scan(fragments, { error_policy = null } = {})
     {
@@ -1390,8 +1446,20 @@ export class ZooFlmEngine
         const diagnostics = this._map(out.diagnostics, list);
         const has_errors = apply_error_policy(diagnostics, policy);
         const fragment_of = (origin) => (origin != null) ? (by_label.get(origin) ?? null) : null;
+        const term_of = (f, t) => {
+            const cut = (t.body_start != null && t.body_end != null);
+            return {
+                ...t,
+                body: cut
+                    ? f.source.slice(utf8_offset_to_index(f.source, t.body_start), utf8_offset_to_index(f.source, t.body_end))
+                    : null,
+                body_origin: cut ? range_origin(f, t.body_start, { term: t.labels[0] ?? null }) : null,
+            };
+        };
         return {
-            trees: out.trees.map( (t, i) => ({ fragment: list[i], ...t }) ),
+            trees: out.trees.map( (t, i) => ({
+                fragment: list[i], ...t, terms: t.terms.map( (term) => term_of(list[i], term) ),
+            }) ),
             cited: out.cited.map( ([key, origin]) => ({ key, origin, fragment: fragment_of(origin) }) ),
             duplicate_labels: out.duplicate_labels.map( (d) => ({ ...d, fragment: fragment_of(d.origin) }) ),
             standalone_violations: out.standalone_violations,

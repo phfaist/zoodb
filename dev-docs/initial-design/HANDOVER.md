@@ -140,7 +140,8 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
   booleans; `rdr()` throws on plain objects (step 2).
 - Index: a label entry's href carries `#anchor` only when the anchor is label-derived
   (numbered floats and theorems link to the object's page; sections and equation lines
-  keep `#sec-…`, `#eq-…`, corrected in step 5); its display is the
+  keep `#sec-…`, `#eq-…`, corrected in step 5), that is when one of the labels of its
+  point forms it, so that every label of a point gets it (step 6); its display is the
   point's source only when label-derived and standalone, else the object's display;
   the default object display is `name` only when standalone, else the id (step 3).
 - Reload releases replaced fragments only after a successful re-processing (step 3).
@@ -208,4 +209,9 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
   imports the `path` builtin (as does `citationcompiler.js`, through
   `src/util/atomicfilewrite.js`, and with it `./zooflm`), so the standard setup reaches a
   Node builtin indirectly; the example's `zoodb-flmrs` branch and `doc/website11ty.rst`
-  (which takes the port as its worked example) go live together, zoodb first.
+  (which takes the port as its worked example) go live together, zoodb first; the scan
+  does not see the citations, labels and term definitions that user definitions write
+  (so such a citation is not retrieved; the EC zoo defines none; 13, Part 0);
+  `html_definitions()`, `html_scripts()` and `html_stylesheet()` list the parts the
+  features declare while the runs honor the settings' `html.definitions` overrides (13,
+  Part 0).

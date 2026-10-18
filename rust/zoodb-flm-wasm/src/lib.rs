@@ -66,14 +66,15 @@ fn from_js<T: serde::de::DeserializeOwned>(value: JsValue, what: &str) -> Result
 
 /// Leaves out of every object the keys whose value is `null` or `undefined`
 /// (which arrives as `null`), so that they take their default as a key left
-/// out does. The feature settings under `settings` are handed to flm-core as
+/// out does. The feature settings under `settings` and the per-call render
+/// options under `render_options` (the same shape) are handed to flm-core as
 /// they are.
 fn drop_nulls(value: &mut serde_json::Value) {
     match value {
         serde_json::Value::Object(map) => {
             map.retain(|_, v| !v.is_null());
             for (key, v) in map.iter_mut() {
-                if key != "settings" {
+                if key != "settings" && key != "render_options" {
                     drop_nulls(v);
                 }
             }
@@ -172,10 +173,15 @@ export interface GraphicsEntry {
     height_pt?: number | null;
 }
 
+/** Render options of one run, as data in the shape of the settings: one map per feature, of the keys it binds to the render request (`{ pieces: { exclude: ['flm.citations.bibliography'] } }`), over the settings' keys one by one. A key that is unknown, fixed when the core is built, or set by the call's own options is refused with its name. */
+export type RunRenderOptions = Record<string, Record<string, unknown>>;
+
 export interface RenderHtmlOptions {
     title?: string | null;
     /** Unresolved references are Warnings instead of Errors (default `false`). */
     unresolved_refs_warning?: boolean | null;
+    /** This run's render options (`refs.unresolved` is refused: `unresolved_refs_warning` sets it). */
+    render_options?: RunRenderOptions | null;
 }
 
 /** One part of a definition's delivery: a text, a file path, an address, the table that supplies the text per document (registry list only), or `host` (the host supplies it; a run's list only). */
@@ -223,6 +229,8 @@ export interface RenderTextOptions {
     per_tree?: boolean | null;
     /** Place the pieces in the text (default `false`). */
     pieces?: boolean | null;
+    /** This run's render options, as for html (`refs.unresolved`, `text.width` and `text.link_addresses` are refused: this object's keys set them). */
+    render_options?: RunRenderOptions | null;
 }
 
 /** The result of `render_text`; `trees` and `tree_diagnostics` only with `per_tree`, one per handle given, each tree rendered alone. */
@@ -272,7 +280,7 @@ export interface ScanGraphicsRef {
     origin: string | null;
 }
 
-/** A label a tree defines: its anchor when it is the one the label itself forms (`type-label`, the same in every document; `null` for a point anchored otherwise: on its number, a renumbered title, a collision) and the FLM source of the content the point shows (`null`: none; a single braced group without its braces). */
+/** A label a tree defines: the anchor of its point when one of the labels of its point forms it (`type-label`, the same in every document; `null` for a point anchored otherwise: on its number, a renumbered title, a collision) and the FLM source of the content the point shows (`null`: none; a single braced group without its braces). */
 export interface ScanLabel {
     label: string;
     anchor: string | null;
@@ -293,6 +301,15 @@ export interface ScanDuplicate {
     end: number;
 }
 
+/** A term definition (`\begin{defterm}{term} … \end{defterm}`): the labels of its point (the one computed from the term, `defterm:<term>`, which a term link targets; one per alias; then the written ones), its anchor when one of its labels forms it, the FLM source of the term (`null`: blank), and the byte range of its body in the tree's source (`null`: an empty body, or one written through a user definition). */
+export interface ScanTerm {
+    labels: string[];
+    anchor: string | null;
+    display: string | null;
+    body_start: number | null;
+    body_end: number | null;
+}
+
 /** What the scan found in one tree. */
 export interface ScanTree {
     /** The labels whose point the tree holds, in the order of the points. */
@@ -300,12 +317,16 @@ export interface ScanTree {
     /** The reference sites of the tree, in tree order. */
     refs: ScanRef[];
     graphics: ScanGraphicsRef[];
+    /** The term definitions of the tree, in tree order. */
+    terms: ScanTerm[];
+    /** The citation keys the tree cites, each once, in order of first citation in the tree. */
+    cited: string[];
 }
 
 /** The result of `scan`: one entry of `trees` per handle given. */
 export interface ScanOut {
     trees: ScanTree[];
-    /** Cited keys in order of first citation, each with the origin of that citation. */
+    /** The cited keys of all the trees, each once, in order of first citation, with the origin of that first citation (every tree that cites a key lists it in its own `cited`). */
     cited: [string, string | null][];
     duplicate_labels: ScanDuplicate[];
     standalone_violations: number;
@@ -542,12 +563,14 @@ mod tests {
             "a": null,
             "b": { "c": null, "d": 1 },
             "settings": { "math": { "x": null } },
+            "render_options": { "html": { "lang": null } },
             "e": [{ "f": null, "g": "h" }, null],
         });
         drop_nulls(&mut value);
         assert_eq!(value, json!({
             "b": { "d": 1 },
             "settings": { "math": { "x": null } },
+            "render_options": { "html": { "lang": null } },
             "e": [{ "g": "h" }, null],
         }));
     }

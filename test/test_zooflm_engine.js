@@ -10,7 +10,7 @@ import fs from 'fs';
 
 import { load_zoodb_flm_wasm_node } from '../src/zooflm/_load_wasm_node.js';
 import {
-    ZooFlmEngine, ZooFlmFragment, ZooFlmError, format_diagnostic, value_not_empty,
+    ZooFlmEngine, ZooFlmFragment, ZooFlmError, format_diagnostic, range_origin, value_not_empty,
 } from '../src/zooflm/engine.js';
 
 
@@ -385,6 +385,33 @@ describe('ZooFlmEngine', function () {
             assert.deepStrictEqual(one.diagnostics.map(name_of), ['flm.xnotes.list.footnote']);
         });
 
+        it('takes render options for its run only: the pieces left out, the marks kept', function () {
+            const exclude = { pieces: { exclude: ['flm.xnotes.list.footnote', 'flm.citations.bibliography'] } };
+            const r = engine.render_document({
+                compose: ({ rdrblock, endnotes }) => rdrblock(F.bob.biography) + endnotes(),
+                render_options: exclude,
+            });
+            // No list is built, so none is left unplaced; the marks stay
+            // (no render option of the core drops them).
+            assert.deepStrictEqual(r.diagnostics, []);
+            assert.doesNotMatch(r.html, /flm-xnotes-footnote-list|flm-citations-bibliography/);
+            assert.match(r.html, /href="#fn-1"/);
+            assert.match(r.html, /href="#citation-1"/);
+            // The next run without them builds the lists again.
+            const again = engine.render_document({ compose: ({ rdrblock, endnotes }) => rdrblock(F.bob.biography) + endnotes() });
+            assert.match(again.html, /flm-citations-bibliography/);
+            // A key that is unknown, fixed when the engine is created, or set by
+            // the call's own options is refused with its name.
+            const compose = ({ rdrblock }) => rdrblock(F.bob.biography);
+            assert.throws( () => engine.render_document({ compose, render_options: { pieces: { exclud: [] } } }),
+                           /the feature `pieces` has no setting `exclud`/ );
+            assert.throws( () => engine.render_document({ compose, render_options: { citations: { placement: 'in-place' } } }),
+                           /`citations\.placement` is not a render option/ );
+            assert.throws( () => engine.render_document({ compose, render_options: { refs: { unresolved: 'allow' } } }),
+                           /`refs\.unresolved` is set by/ );
+            assert.throws( () => engine.render_document({ compose, render_options: [] }), TypeError );
+        });
+
         it('rdr() renders an array holding standalone fragments, and names what it cannot render', function () {
             const r = engine.render_document({ compose: ({ rdr }) => rdr([F.alice.name, 'and', F.bob.name]) });
             assert.deepStrictEqual(r.diagnostics, []);
@@ -539,6 +566,19 @@ describe('ZooFlmEngine', function () {
             assert.doesNotMatch(text.text, /<[a-z]|\n$/);
             assert.deepStrictEqual([text.requires, text.definitions], [[], []]);
             assert.throws( () => engine.render_fragment(F.bob.notes), /eq:energy/ );
+        });
+
+        it('render_fragment takes render options for its run only', function () {
+            const f = engine.make_fragment('\\section{Sec}\nText.', { origin: origin('frank', 'outline'), layout: 'blocks' });
+            assert.match(engine.render_fragment(f).html, /^<h1 /);
+            const tagged = engine.render_fragment(f, { render_options: { html: { heading_tags: { section: 'h3' } } } });
+            assert.match(tagged.html, /^<h3 /);
+            assert.match(engine.render_fragment(f, { output: 'text' }).text, /^Sec\n=+\n/);
+            const text = engine.render_fragment(f, { output: 'text', render_options: { text: { root_heading_level: 0 } } });
+            assert.match(text.text, /^Sec\n-+\n/);
+            assert.throws( () => engine.render_fragment(f, { output: 'text', render_options: { text: { width: 20 } } }),
+                           /`text\.width` is set by/ );
+            engine.release(f);
         });
 
         it('render_text of two fragments: one run, and each alone', function () {
@@ -884,6 +924,22 @@ describe('ZooFlmEngine', function () {
             engine.release([long, fragment, inside, whole.fragment]);
         });
 
+        it('truncate({ first_paragraph }) leaves out a float only after the first paragraph break', function () {
+            const float = '\\begin{figure}\\includegraphics{images/Smiley}\\caption{C.}\\end{figure}';
+            const after = engine.make_fragment(`First, with a note\\footnote{N.} and \\cite{arXiv:1234.5678}.\n\n${float}\n\nMore.`,
+                                               { origin: origin('frank', 'after') });
+            const t1 = engine.truncate(after, { chars: 500, first_paragraph: true });
+            assert.strictEqual(t1.fragment.source, 'First, with a note\\footnote{N.} and \\cite{arXiv:1234.5678}.');
+            assert.strictEqual(t1.truncated, true);
+            // A float in the first paragraph (no blank line before it) is
+            // kept when it fits; so are the note and the citation.
+            const inside = engine.make_fragment(`First text.\n${float}\nStill the first paragraph.\n\nSecond.`,
+                                                { origin: origin('frank', 'inside') });
+            const t2 = engine.truncate(inside, { chars: 500, first_paragraph: true });
+            assert.ok(t2.fragment.source.includes('\\begin{figure}'), t2.fragment.source);
+            engine.release([after, t1.fragment, inside, t2.fragment]);
+        });
+
         it('a truncated preview keeps its images and its label for the diagnostics', function () {
             const { fragment } = engine.truncate(F.alice.biography, { chars: 55 });
             assert.ok(fragment.source.includes('\\includegraphics{images/Smiley}'), fragment.source);
@@ -925,6 +981,76 @@ describe('ZooFlmEngine', function () {
             assert.deepStrictEqual(scan.diagnostics.map( (d) => `${d.severity} ${d.identifier} ${d.origin.label}` ),
                                    ['warning flm.refs.unresolved people/bob.yml#biography']);
             assert.strictEqual(scan.has_errors, false);
+            assert.deepStrictEqual(tree(F.bob.biography).cited, ['arXiv:1234.5678']);
+            assert.deepStrictEqual(tree(F.alice.biography).cited, []);
+            assert.deepStrictEqual(tree(F.alice.biography).terms, []);
+        });
+
+        it('scan() reports the term definitions with their bodies, and every fragment\'s cited keys', function () {
+            const glossary = engine.make_fragment(
+                'Words.\n\n\\begin{defterm}{Smiley}\\label{topic:smiley}\\aliasterm{Smileys}\n'
+                + '  A face drawn with a \\emph{dot} or two \\cite{arXiv:1234.5678}; café.\n\\end{defterm}',
+                { origin: origin('gina', 'glossary') },
+            );
+            const user = engine.make_fragment('Many \\term{Smileys}, see \\ref{topic:smiley} and \\cite{arXiv:1234.5678}.',
+                                              { origin: origin('hugo', 'notes') });
+            const scan = engine.scan([glossary, user]);
+            assert.deepStrictEqual(scan.diagnostics, []);
+            const [term] = scan.trees[0].terms;
+            assert.deepStrictEqual(term.labels, ['defterm:Smiley', 'defterm:Smileys', 'topic:smiley']);
+            assert.strictEqual(term.anchor, 'defterm-Smiley');
+            assert.strictEqual(term.display, 'Smiley');
+            // The body without the fields, cut out of the source (offsets in
+            // bytes: the multibyte character before the end counts twice).
+            assert.strictEqual(term.body.trim(), 'A face drawn with a \\emph{dot} or two \\cite{arXiv:1234.5678}; café.');
+            assert.ok(glossary.source.endsWith(`${term.body}\\end{defterm}`));
+            assert.strictEqual(term.body_end - term.body_start, Buffer.byteLength(term.body));
+            const body = engine.make_fragment(term.body, { origin: origin('gina', 'glossary-body'), layout: 'blocks' });
+            assert.deepStrictEqual(body.diagnostics, []);
+            // The term link and the reference target its labels.
+            assert.deepStrictEqual(scan.trees[1].refs, [
+                { label: 'defterm:Smileys', resolved: true }, { label: 'topic:smiley', resolved: true },
+            ]);
+            // Both fragments list the key; the scan's own list has its first citation.
+            assert.deepStrictEqual(scan.trees.map( (t) => t.cited ), [['arXiv:1234.5678'], ['arXiv:1234.5678']]);
+            assert.deepStrictEqual(scan.cited.map( (c) => [c.key, c.fragment] ), [['arXiv:1234.5678', glossary]]);
+            engine.release([glossary, user, body]);
+        });
+
+        it('gives a term\'s body the field\'s origin, its file position moved to where the body starts', function () {
+            // The field starts at line 20, column 3 of its file; its later
+            // lines are indented by 2 (a YAML block scalar).
+            const field = engine.make_fragment(
+                'Intro.\n\n\\begin{defterm}{Smiley}\n  A face, see \\ref{eq:nowhere}.\n'
+                + '  \\begin{figure}\\includegraphics{images/Smiley}\\caption{C.}\\end{figure}\n\\end{defterm}',
+                { origin: origin('alice', 'biography', { start_line: 20, start_col: 3, indent: 2 }), layout: 'blocks' },
+            );
+            const [term] = engine.scan([field]).trees[0].terms;
+            // The body starts after `\begin{defterm}{Smiley}`, on the field's
+            // third line: line 22 of the file, column 24 + 2.
+            const { label, start_line, start_col, indent, approx } = term.body_origin;
+            assert.deepStrictEqual([label, term.body_origin.term, start_line, start_col, indent, approx],
+                                   ['people/alice.yml#biography', 'defterm:Smiley', 22, 26, 2, undefined]);
+            const body = engine.make_fragment(term.body, { origin: term.body_origin, layout: 'blocks' });
+            const render = (f) => engine.render_document({ compose: ({ rdrblock }) => rdrblock(f), unresolved: 'warn' });
+            const where = (r) => r.diagnostics.map( (d) => [d.identifier, d.file_line, d.file_col] );
+            // The body's diagnostic is where the field's own render puts it,
+            // and its image is found under the field's label.
+            const page = render(body);
+            assert.deepStrictEqual(where(page), [['flm.refs.unresolved', 23, 17]]);
+            assert.deepStrictEqual(where(page), where(render(field)));
+            assert.match(page.html, /src="\/pic\/Smiley-0123abcd\.png"/);
+            engine.release([field, body]);
+            // A cut on the first line moves the column; approximate positions
+            // are moved and stay approximate; without positions, approx.
+            const exact = engine.make_fragment('Hello world', { origin: origin('ivy', 'f', { start_line: 5, start_col: 7 }) });
+            const folded = engine.make_fragment('A\n\nB', { origin: origin('ivy', 'g', { start_line: 5, start_col: 7, approx: true }) });
+            const bare = engine.make_fragment('A\n\nB', { origin: origin('ivy', 'h') });
+            const position = (o) => [o.label, o.start_line, o.start_col, o.approx];
+            assert.deepStrictEqual(position(range_origin(exact, 6)), ['people/ivy.yml#f', 5, 13, undefined]);
+            assert.deepStrictEqual(position(range_origin(folded, 3)), ['people/ivy.yml#g', 7, 1, true]);
+            assert.deepStrictEqual(position(range_origin(bare, 3, { label: 'glossary#a' })), ['glossary#a', undefined, undefined, true]);
+            engine.release([exact, folded, bare]);
         });
     });
 });
