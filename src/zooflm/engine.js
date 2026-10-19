@@ -1203,14 +1203,19 @@ export class ZooFlmEngine
      * between them resolve) for ``text``, and, with ``per_fragment``, each
      * fragment alone for ``trees`` (the search index's use: a reference to
      * another fragment does not resolve there, and shows its label). Pieces
-     * are left out (a citation is its mark alone). The error policy applies
-     * to the whole run's diagnostics; ``tree_diagnostics`` are each
-     * fragment's own run's, reported as they are.
+     * are left out by default (a citation or a footnote is its mark alone);
+     * with ``pieces``, each run places them after its text (the list of
+     * cited works under its heading, the footnotes), so that ``trees`` holds
+     * each fragment's own. The error policy applies to the whole run's
+     * diagnostics; ``tree_diagnostics`` are each fragment's own run's,
+     * reported as they are.
      *
      * @param {Iterable<ZooFlmFragment>} fragments
      * @param {object} [options]
      * @param {number|null} [options.width=null] - columns; ``null`` never wraps
      * @param {boolean} [options.link_addresses=false] - print a link's address
+     * @param {boolean} [options.pieces=false] - place the pieces (the list of
+     *     cited works, the footnotes) after the text of each run
      * @param {boolean} [options.per_fragment=true]
      * @param {string} [options.context='default']
      * @param {string} [options.unresolved]
@@ -1219,8 +1224,8 @@ export class ZooFlmEngine
      *     has_errors }``, the texts without a trailing newline
      */
     render_text(fragments, {
-        width = null, link_addresses = false, per_fragment = true, context = DEFAULT_CONTEXT,
-        unresolved = null, error_policy = null,
+        width = null, link_addresses = false, pieces = false, per_fragment = true,
+        context = DEFAULT_CONTEXT, unresolved = null, error_policy = null,
     } = {})
     {
         const list = this._fragment_list(fragments);
@@ -1229,7 +1234,7 @@ export class ZooFlmEngine
         this._ensure_context(context);
         const out = this._core.render_text(list.map( (f) => f.handle ), {
             width, link_addresses, unresolved_refs_warning: unresolved === 'warn',
-            per_tree: Boolean(per_fragment), pieces: false,
+            per_tree: Boolean(per_fragment), pieces: Boolean(pieces),
         });
         const diagnostics = this._map(out.diagnostics, list);
         const tree_diagnostics = out.tree_diagnostics.map( (ds, i) => this._map(ds, [list[i]]) );
@@ -1471,8 +1476,11 @@ export class ZooFlmEngine
     /**
      * A shortened copy of a fragment for previews: the source cut to about
      * ``chars`` characters at the node level (a word boundary in text;
-     * mathematics and environments kept whole or left out; groups open at the
-     * cut closed; ``marker`` appended), parsed again as a new fragment with
+     * mathematics, verbatim content and environments kept whole or left out;
+     * a command cut only inside its last argument, else left out, what its
+     * element sets apart from the text, such as a citation's keys or a
+     * reference's target, never cut; groups open at the cut closed;
+     * ``marker`` appended), parsed again as a new fragment with
      * the same layout, standalone flag and origin, the canonical label
      * unchanged (so that its images and citations still match the graphics
      * and citations tables) and ``truncated: true`` added (shown by

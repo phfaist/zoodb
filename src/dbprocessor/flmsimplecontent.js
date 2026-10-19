@@ -81,6 +81,39 @@ export function flm_options_layout(flm_options)
 
 
 /**
+ * Where the value of an object's field was copied from, when the field lies
+ * in a copy of another object's values: the relations populator records each
+ * back-reference entry it makes in the target object's
+ * ``_zoodb.copied_fields`` (the entry's path, as ``relations.children.0``,
+ * mapped to ``{ object_type, object_id, field }``, the relation object it
+ * copies; see :js:meth:`ZooRelation.process_object_relation`).
+ *
+ * @param {Object} object - the zoo object (its ``_zoodb`` is read)
+ * @param {string} fieldname - the field's path, as in ``_zoodb.flm_fields``
+ * @returns {Object|null} ``{ object_type, object_id, field }``, the field
+ *     the value was copied from (``relations.parents.2.detail`` for the field
+ *     ``relations.children.0.detail``), or ``null``
+ */
+export function copied_field_source(object, fieldname)
+{
+    const copied = object?._zoodb?.copied_fields;
+    if (copied == null || fieldname == null) {
+        return null;
+    }
+    const parts = String(fieldname).split('.');
+    for (let n = parts.length; n > 0; --n) {
+        const prefix = parts.slice(0, n).join('.');
+        if (Object.hasOwn(copied, prefix)) {
+            const { object_type, object_id, field } = copied[prefix];
+            const rest = parts.slice(n);
+            return { object_type, object_id, field: [field, ...rest].join('.') };
+        }
+    }
+    return null;
+}
+
+
+/**
  * The origin of the fragment of an object's field: ``{ object_type,
  * object_id, field, source_path }``, plus the position of the field's value
  * in its source file when the loader recorded one in
@@ -170,6 +203,14 @@ export function field_origin(object_type, object, fieldname)
  * Each fragment's origin is ``{ object_type, object_id, field,
  * source_path }`` (:func:`field_origin`); its canonical label is
  * ``source_path#field``.
+ *
+ * A field of a back-reference, a copy of another object's relation that the
+ * relations populator records (:func:`copied_field_source`), is not compiled
+ * on its own: it holds the fragment of the field it copies (compiled once, as
+ * that object's field, with its origin and its file position), at every
+ * processing, a reload included.  :meth:`object_fragments` leaves such a copy
+ * out (the fragment is its source object's), :meth:`object_field_fragments`
+ * flags it.
  */
 export class FLMSimpleContentCompiler extends ZooDbProcessorBase
 {
@@ -228,7 +269,8 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
 
     /**
      * Releases the fragments of an object's FLM fields (those listed in
-     * ``obj._zoodb.flm_fields`` that this engine holds).
+     * ``obj._zoodb.flm_fields`` that this engine holds; not the fragments its
+     * back-references hold, which are other objects' fields).
      *
      * @param {Object} obj
      */
@@ -243,17 +285,40 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
 
     /**
      * The live fragments (of this engine, not released) of the FLM fields of
-     * an object, in the order of ``obj._zoodb.flm_fields``.
+     * an object, in the order of ``obj._zoodb.flm_fields``; a field that
+     * holds the fragment of the field it copies (a back-reference's
+     * ``detail``) is left out, since that fragment is the other object's.
      *
      * @param {Object} obj
      * @returns {Generator<ZooFlmFragment>}
      */
     * object_fragments(obj)
     {
+        for (const { fragment, copy } of this.object_field_fragments(obj)) {
+            if (!copy) {
+                yield fragment;
+            }
+        }
+    }
+
+    /**
+     * The live fragments of the FLM fields of an object, in the order of
+     * ``obj._zoodb.flm_fields``, each as ``{ fieldname, fragment, copy }``:
+     * ``copy`` is true for a field that holds the fragment of the field it
+     * copies (:func:`copied_field_source`, a back-reference), whose fragment
+     * belongs to that other object.
+     *
+     * @param {Object} obj
+     * @returns {Generator<Object>}
+     */
+    * object_field_fragments(obj)
+    {
         for (const fieldname of obj?._zoodb?.flm_fields ?? []) {
-            const f = getfield(obj, fieldname);
-            if (this._is_live_fragment(f)) {
-                yield f;
+            const fragment = getfield(obj, fieldname);
+            if (this._is_live_fragment(fragment)) {
+                const source = this._copied_field_source_object(obj, fieldname);
+                const copy = (source != null && getfield(source.object, source.fieldname) === fragment);
+                yield { fieldname, fragment, copy };
             }
         }
     }
@@ -261,6 +326,52 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
     _is_live_fragment(f)
     {
         return is_fragment(f) && f._engine === this.engine && !f.released;
+    }
+
+    // The object whose field a copied field copies (`copied_field_source()`),
+    // when this compiler compiles that object's type: { object_type, object,
+    // fieldname }, or null (no copy, no zoo, or another object type).
+    _copied_field_source_object(obj, fieldname)
+    {
+        const source = copied_field_source(obj, fieldname);
+        if (source == null || this.zoodb == null
+            || !(this.config.object_types ?? []).includes(source.object_type)) {
+            return null;
+        }
+        const object = this.zoodb.objects?.[source.object_type]?.[source.object_id];
+        return (object == null) ? null
+            : { object_type: source.object_type, object, fieldname: source.field };
+    }
+
+    // The fragment of the field a copied field copies, compiled in place as
+    // that object's field (with its origin and file position) if it is not
+    // yet (its object comes later in the zoo, or was replaced by a reload);
+    // null when the field is no copy, or when the field it copies is not an
+    // FLM field (the copy is then compiled as a field of its own).  Its
+    // diagnostics are reported with that object's (compile_object()).
+    _copied_field_fragment(obj, fieldname)
+    {
+        const source = this._copied_field_source_object(obj, fieldname);
+        if (source == null) {
+            return null;
+        }
+        const value = getfield(source.object, source.fieldname);
+        if (this._is_live_fragment(value)) {
+            return value;
+        }
+        const schema = this.zoodb.schema(source.object_type);
+        for (const { fieldname: f, fieldvalue, parent, parent_index, flm_options }
+             of this._iter_flm_fields(source.object, schema)) {
+            if (f === source.fieldname) {
+                const fragment = this._make_fragment(fieldvalue, {
+                    flm_options,
+                    origin: field_origin(source.object_type, source.object, source.fieldname),
+                });
+                parent[parent_index] = fragment;
+                return fragment;
+            }
+        }
+        return null;
     }
 
     // ----
@@ -405,7 +516,10 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
     /**
      * Compile all FLM-enabled fields of the database object `obj` in place,
      * replacing each field's string value with its fragment (a value that is
-     * already a fragment of the engine is kept).
+     * already a fragment of the engine is kept).  A field that copies another
+     * object's field (:func:`copied_field_source`, a back-reference) gets that
+     * field's fragment, compiled in that object first if needed; its
+     * diagnostics are that object's.
      *
      * The list of compiled field names is stored in `obj._zoodb.flm_fields` so
      * that later stages (e.g. `process_data_dump()`) know which fields to
@@ -439,6 +553,15 @@ export class FLMSimpleContentCompiler extends ZooDbProcessorBase
 
             // register this field as having FLM content
             obj._zoodb.flm_fields.push(fieldname);
+
+            // a copy of another object's field (a back-reference's detail)
+            // holds that field's fragment, compiled once; its diagnostics
+            // are that object's
+            const copied = this._copied_field_fragment(obj, fieldname);
+            if (copied != null) {
+                parent[parent_index] = copied;
+                continue;
+            }
 
             const f = this._make_fragment(fieldvalue, {
                 flm_options,

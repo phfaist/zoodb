@@ -172,6 +172,15 @@ export class ZooRelation
      * property if configured, and adds back-references to the target object if
      * `backreference` is configured in the relation spec.
      *
+     * A back-reference entry is a copy of the relation object's values (but
+     * the target's ID), plus the ID of `obj` and `obj` itself.  The target
+     * object's ``_zoodb.copied_fields`` records where each entry's values come
+     * from: the entry's path (``backref_field.N``) maps to ``{ object_type,
+     * object_id, field }``, the relation object of `obj` it copies (``field``
+     * its path in `obj`, as ``relations.parents.2``).  The FLM field compiler
+     * reads it, so that the fragment of a copied FLM field gives the position
+     * of the value in the file it was written in.
+     *
      * @param {Object} obj - A database object of type `this.object_type`.
      * @param {Object} options - Must include `process_object_types` (array of
      *     object types being processed), used to guard back-reference writes.
@@ -179,12 +188,15 @@ export class ZooRelation
      */
     process_object_relation(obj, options)
     {
-        for (const relation_object of this.get_object_relation_objects(obj)) {
-            this._process_single_relation(obj, relation_object, options);
-        }
+        const relation_objects = this.get_object_relation_objects(obj);
+        relation_objects.forEach( (relation_object, i) => {
+            const relation_field = this.source_has_multiple_relations
+                ? `${this.object_field}.${i}` : this.object_field;
+            this._process_single_relation(obj, relation_object, options, relation_field);
+        });
     }
 
-    _process_single_relation(obj, relation_object, options)
+    _process_single_relation(obj, relation_object, options, relation_field)
     {
         let zoodb = this.zoodb;
         const { process_object_types } = options;
@@ -264,6 +276,17 @@ export class ZooRelation
             //      {target_object, backref_object, backref_field: this.backref_field});
 
             concatlistfield(target_object, this.backref_field, [ backref_object ]);
+
+            // where the entry's values come from (a shorthand ID copies none)
+            if (!this.value_is_shorthand_object_id && target_object._zoodb != null) {
+                const index = getfield(target_object, this.backref_field).length - 1;
+                target_object._zoodb.copied_fields ??= Object.create(null);
+                target_object._zoodb.copied_fields[`${this.backref_field}.${index}`] = {
+                    object_type: this.object_type,
+                    object_id: obj._zoodb.id,
+                    field: relation_field,
+                };
+            }
 
         }
     }
@@ -370,9 +393,10 @@ export class RelationsPopulator extends ZooDbProcessorBase
     /**
      * Delete every auto-populated relation field (object pointers and
      * back-reference lists) from all objects in the database, leaving only the
-     * original source data.  Called before `process_zoo()` rebuilds relations
-     * from scratch, and also before a data dump to avoid serialising circular
-     * references.
+     * original source data, and the records of the back-reference copies
+     * (``_zoodb.copied_fields``, see :meth:`ZooRelation.process_object_relation`).
+     * Called before `process_zoo()` rebuilds relations from scratch, and also
+     * before a data dump to avoid serialising circular references.
      *
      * @param {Object} [options]
      * @param {Object} [options.dbobjects] - Alternative object dictionary to
@@ -389,6 +413,20 @@ export class RelationsPopulator extends ZooDbProcessorBase
                   });
               };
         this.check_all_clean_fields({ action: clear_field, dbobjects });
+
+        // the records of the back-reference copies go with them
+        const backref_object_types = new Set(
+            Object.values(this.relations ?? {}).flat()
+                .filter( (relation) => relation.use_backreference )
+                .map( (relation) => relation.to_object_type )
+        );
+        for (const object_type of backref_object_types) {
+            for (const object of Object.values((dbobjects ?? this.zoodb.objects)[object_type] ?? {})) {
+                if (object?._zoodb != null) {
+                    delete object._zoodb.copied_fields;
+                }
+            }
+        }
     }
 
     /**

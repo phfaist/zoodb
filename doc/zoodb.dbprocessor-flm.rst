@@ -231,9 +231,13 @@ Reloads
 On a reload (``zoodb.update_objects()``, which the loader handler calls when
 the zoo is loaded again), the zoo is processed again: the fields already
 compiled are kept, those of the new objects are compiled, and the fragments of
-the replaced objects are released once the processing has succeeded.  A reload
-that fails (with the loader handler's ``throw_reload_errors: false``, as in a
-development server) leaves the previous index, tables and snippets usable.
+the replaced objects are released once the processing has succeeded.  The
+back-references, which the relations populator makes again, hold the
+fragments of the relations they copy again (see `The fragments and their
+origins`_), so that the scan results, the fragments and the data dumps after a
+reload are those of a first load.  A reload that fails (with the loader
+handler's ``throw_reload_errors: false``, as in a development server) leaves
+the previous index, tables and snippets usable.
 
 
 Ad hoc fragments
@@ -413,6 +417,25 @@ recorded where the field's value starts in its file
 carries that position, and the diagnostics give the line and column in the data
 file.
 
+A back-reference made by the relations populator (see
+:doc:`zoodb.dbprocessor-relations`) is a copy of another object's relation,
+and the populator records it in the target object's ``_zoodb.copied_fields``
+(read by :func:`copied_field_source`).  Its FLM fields (a relation's
+``detail``) are not compiled on their own: at every processing of the zoo, a
+reload included, such a field holds the fragment of the field it copies,
+compiled once as that object's field (with its origin and its file position;
+compiled first if the copy comes earlier in the zoo).  A diagnostic in it is
+that object's and names the place in the data file where the text is written
+(``people/alice.yml#relations.parents.0.detail:7:13``), in the processing and
+in every page that renders the copy, and its images are found from that file.
+In the scan (:js:meth:`~ZooFlmProcessor.object_scan`), the references, the
+citations and the images in it count for both objects, as the text shows on
+both objects' pages, and the labels and the term definitions it holds for the
+relation's object only (they are defined once).
+:js:meth:`~FLMSimpleContentCompiler.object_fragments` leaves such a field out
+(its fragment is the other object's) and
+:js:meth:`~FLMSimpleContentCompiler.object_field_fragments` flags it.
+
 ``compile_object()`` writes the paths of the compiled fields to
 ``obj._zoodb.flm_fields`` and their parse diagnostics to
 ``obj._zoodb.flm_diagnostics``.  A field that already holds a live fragment of
@@ -442,4 +465,7 @@ Reference
    :short-name:
 
 .. js:autofunction:: src/dbprocessor/flmsimplecontent.field_origin
+   :short-name:
+
+.. js:autofunction:: src/dbprocessor/flmsimplecontent.copied_field_source
    :short-name:

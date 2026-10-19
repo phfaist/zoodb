@@ -66,6 +66,7 @@ class CitationSourceCustomTest extends CitationSourceBase
 
 async function make_zoo({
     continue_with_errors = false, allow_unresolved_references = false, refs = {}, flm_options = {},
+    searchable_text_options = {},
 } = {})
 {
     const host = make_mock_host();
@@ -98,7 +99,7 @@ async function make_zoo({
             ...flm_options,
         },
 
-        searchable_text_options: { object_types: ['person'] },
+        searchable_text_options: { object_types: ['person'], ...searchable_text_options },
 
         zoo_permalinks: {
             object: (object_type, object_id) => `/${object_type}/${object_id}`,
@@ -287,6 +288,8 @@ describe('ZooFlmProcessor', function () {
             const doc = zoodb.objects.person.bob._zoodb.searchable_text_doc;
             assert.strictEqual(doc.name, 'Bob \\(B_0\\)');
             assert.match(doc.biography, /^Bob is a friend of Alice Aaliz, whose early life is told in Early life\.¹/);
+            // by default, a citation and a footnote are their marks alone
+            assert.doesNotMatch(doc.biography, /Custom reference|Bob says so|References/);
             assert.match(zoodb.objects.person.alice._zoodb.searchable_text_doc.topics_detail, /^Since /);
         });
 
@@ -481,6 +484,25 @@ describe('ZooFlmProcessor', function () {
                 assert.deepStrictEqual(page.diagnostics, []);
                 assert.match(page.html, /<img [^>]*src="\/pic\/fig-dot\.[0-9a-z]{4}\.png"/);
                 assert.doesNotMatch(page.html, /srcset=/);
+            } finally {
+                zoodb.zoo_flm_engine.free();
+            }
+        });
+
+        it('searchable_text_options.flm_pieces puts the cited works and the footnotes in the search text', async function () {
+            const zoodb = await load_zoo({ searchable_text_options: { flm_pieces: true } });
+            try {
+                const bob = zoodb.objects.person.bob._zoodb.searchable_text_doc;
+                // the same text, then the field's footnotes and cited works
+                assert.match(bob.biography, /^Bob is a friend of Alice Aaliz, whose early life is told in Early life\.¹/);
+                assert.match(bob.biography, /\n¹ Bob says so\.\n/);
+                assert.match(bob.biography, /\nReferences\n-+\n\n\[1\] Custom reference xyz$/);
+                // a standalone field (its snippet) and a field without a piece are unchanged
+                assert.strictEqual(bob.name, 'Bob \\(B_0\\)');
+                const alice = zoodb.objects.person.alice._zoodb.searchable_text_doc;
+                assert.match(alice.topics_detail, /^Since /);
+                assert.doesNotMatch(alice.topics_detail, /References|Footnotes/);
+                assert.match(alice.biography, /\n¹ Mostly red ones\./);
             } finally {
                 zoodb.zoo_flm_engine.free();
             }

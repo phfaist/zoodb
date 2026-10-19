@@ -14,7 +14,8 @@ import { check_error_policy, is_fragment } from '../zooflm/engine.js';
  * alone: a standalone fragment through the snippet cache, the others through
  * one `engine.render_text()` over the object's fragments, each field's text
  * from ``trees`` (a fragment rendered alone, in which a reference to a label
- * of another field shows the label; the search index does not mind).
+ * of another field shows the label; the search index does not mind), with
+ * its pieces when the option `pieces` is set.
  *
  * Pass an instance's `assemble_doc_text_values` method as the
  * `assemble_doc_text_values` option of :class:`SearchableTextFieldset` when
@@ -30,10 +31,18 @@ import { check_error_policy, is_fragment } from '../zooflm/engine.js';
  * - `error_policy` — the policy of the text renders (default
  *   ``'continue'``: the search text is made whatever the content holds; the
  *   FLM processor and the page renders report the content's errors).
+ *
+ * - `pieces` — if `true`, the text of each fragment that is not standalone
+ *   ends with its pieces, as `engine.render_text()` places them: the list of
+ *   the works it cites (under the citations' heading) and its footnotes, so
+ *   that an object is found by the authors and titles of the works it cites.
+ *   Default `false`: a citation or a footnote is its mark alone (``[1]``),
+ *   which makes a smaller index.  A standalone fragment holds neither (the
+ *   FLM processor's standalone check), so its snippet is used either way.
  */
 export class FLMSearchableDocTextValuesAssembler
 {
-    constructor({ engine, render_value_fn, error_policy } = {})
+    constructor({ engine, render_value_fn, error_policy, pieces } = {})
     {
         this.engine = engine;
         if (this.engine == null) {
@@ -41,6 +50,7 @@ export class FLMSearchableDocTextValuesAssembler
         }
         this.render_value_fn = render_value_fn ?? ( (v) => String(v) );
         this.error_policy = check_error_policy(error_policy ?? 'continue');
+        this.pieces = Boolean(pieces ?? false);
     }
 
     _fragment_text(f, trees)
@@ -63,7 +73,9 @@ export class FLMSearchableDocTextValuesAssembler
         }
         const trees = new Map();
         if (fragments.length > 0) {
-            const out = this.engine.render_text(fragments, { per_fragment: true, error_policy: this.error_policy });
+            const out = this.engine.render_text(fragments, {
+                per_fragment: true, pieces: this.pieces, error_policy: this.error_policy,
+            });
             if (out.diagnostics.length > 0) {
                 debug(`search text: ${out.diagnostics.length} diagnostic(s)`);
             }

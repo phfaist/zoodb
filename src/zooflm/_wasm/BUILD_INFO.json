@@ -11,6 +11,6 @@
     },
     "wasm_bindgen": "0.2.127",
     "paths_remapped": true,
-    "wasm_size_bytes": 5153150,
-    "build_date": "2026-10-18T19:29:41.243Z"
+    "wasm_size_bytes": 5157363,
+    "build_date": "2026-10-19T01:36:57.257Z"
 }

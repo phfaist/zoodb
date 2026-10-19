@@ -131,6 +131,10 @@ import loMerge from 'lodash/merge.js';
  *   to the returned ZooDb instance.
  * - `searchable_text_options.object_types` — array of object types to include
  *   in the searchable text index.  Consumed by `use_searchable_text_processor.js`.
+ * - `searchable_text_options.flm_pieces` — if `true`, the search text of an
+ *   FLM field also holds the works it cites and its footnotes (default
+ *   `false`: a citation is its mark alone).  Consumed by
+ *   `use_searchable_text_processor.js`.
  * - `schemas` — passed to :class:`SchemaLoader`; must contain `schema_root`,
  *   `schema_rel_path`, and `schema_add_extension`.
  * - `schema_names` — array of schema names to load (or `null` to auto-detect
@@ -222,6 +226,8 @@ export async function makeStandardZooDb(config)
 
             searchable_text_options: {
                 object_types: [], // ['code',]  // only e.g. search for codes
+                // the works an FLM field cites and its footnotes in its search text
+                flm_pieces: false,
             },
 
             zoo_permalinks: null, //{ object:, graphics_resource: }

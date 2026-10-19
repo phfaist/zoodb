@@ -21,7 +21,7 @@ in `README.md` of this folder.
   brief 13 `1f1f0f8`; step 6 part 0 (the package: term bodies and per-tree cited keys in
   the scan, per-call render options) and part A (the EC zoo clones, the data
   re-indented) `c6b11b9` (13); B1's results and closing with G6 fixed in the package
-  (this update; the hash to be filled by the main session).
+  `1d7230c` (13).
 - **What exists now.** `rust/` is a cargo workspace (`zoodb-autocitefetch-wasm`,
   `zoodb-flm-wasm`; flm-core by path from `/Users/philippe/projects/flm-rs/flm-core`);
   the FLM module is committed as `src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` (5.14 MB)
@@ -209,16 +209,15 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
   (the zoo and its pages) is done in the sitegen clone (`9311d27`, `9ff93ff`, `70558e5`,
   `7847ecc`, and at its closing `5ae77b8`, `f2ec92c`). G6, an object type without pages
   (the EC zoo's spaces), is fixed in the package: an object whose `object_href` returns
-  `null` gets no index entry (this update's commit, the hash to be filled by the main
-  session). F1 is open upstream (05, "Findings to report"): flm-core reads a citation
-  key after the typography rewrite for the render but as written for the scan, so the
-  data's 18 `manual:{…}` keys with `"`, `'` or `--` fail with `flm.citations.no-entry`
-  (42 Errors); no workaround, the data unchanged; the default full build exits 1 at
-  gray's meta description until flm-rs is fixed, and the sitegen's
-  `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` gives the later parts full builds to inspect, the
-  errors printed. Next: B2 (presentation, exports, scripts, tests, dev mode) per brief
-  13, from the sitegen clone at `f2ec92c`; its `eczoodb` tests start at 72 passing, 2
-  pending, 3 failing.
+  `null` gets no index entry (`1d7230c`). F1 is open upstream (05, "Findings to
+  report"): flm-core reads a citation key after the typography rewrite for the render
+  but as written for the scan, so the data's 18 `manual:{…}` keys with `"`, `'` or
+  `--` fail with `flm.citations.no-entry` (42 Errors); no workaround, the data
+  unchanged; the default full build exits 1 at gray's meta description until flm-rs is
+  fixed, and the sitegen's `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` gives the later parts
+  full builds to inspect, the errors printed. Next: B2 (presentation, exports, scripts,
+  tests, dev mode) per brief 13, from the sitegen clone at `f2ec92c`; its `eczoodb`
+  tests start at 72 passing, 2 pending, 3 failing.
 - For Philippe from step 6 so far: F1 in flm-rs (05) and whether the sitegen's switch
   may stay (13, question 10); the two archives B1's install wrote in
   `~/.yarn/berry/cache` (13, B1, Review fixes), which he may delete.

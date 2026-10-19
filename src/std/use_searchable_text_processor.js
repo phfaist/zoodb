@@ -24,7 +24,9 @@ import {
  *
  * The ``searchable_text_options.object_types`` config option is inspected; set
  * this to an array of object type names that we'd like to be able to search
- * for.
+ * for.  With ``searchable_text_options.flm_pieces: true``, the text of an FLM
+ * field also holds the works it cites and its footnotes (the assembler's
+ * option `pieces`); by default a citation is its mark alone.
  */
 export function use_searchable_text_processor(_this)
 {
@@ -33,7 +35,10 @@ export function use_searchable_text_processor(_this)
     // without an FLM engine, the fieldset's default assembly (the values as
     // strings)
     const searchable_text_doc_values_assembler = (_this.zoo_flm_engine != null)
-          ? new FLMSearchableDocTextValuesAssembler({ engine: _this.zoo_flm_engine })
+          ? new FLMSearchableDocTextValuesAssembler({
+              engine: _this.zoo_flm_engine,
+              pieces: searchable_text_options.flm_pieces ?? false,
+          })
           : null;
     _this.searchable_text_fieldset = new SearchableTextFieldset({
         field_name_title: 'name',

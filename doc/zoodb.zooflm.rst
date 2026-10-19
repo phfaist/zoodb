@@ -502,11 +502,14 @@ Text and LaTeX output
 :js:meth:`ZooFlmEngine.render_text` renders fragments as plain text: ``text``,
 one run over all of them, in which references between them resolve; and, with
 ``per_fragment`` (the default), ``trees``, each fragment rendered alone, in
-which a reference to another fragment shows its label.  Pieces are left out,
-so a citation is its mark alone.  The options are ``width`` (``null``, the
-default, never wraps), ``link_addresses`` (print the address after a link's
-text), ``context``, ``unresolved`` and ``error_policy``.  The searchable-text
-processor uses it for the search index.
+which a reference to another fragment shows its label.  Pieces are left out by
+default, so a citation or a footnote is its mark alone; ``pieces: true``
+places them after each run's text (the footnotes and the list of cited works,
+under their headings; with ``per_fragment``, each tree gets its own).  The
+other options are ``width`` (``null``, the default, never wraps),
+``link_addresses`` (print the address after a link's text), ``context``,
+``unresolved`` and ``error_policy``.  The searchable-text processor uses it for
+the search index.
 
 :js:meth:`ZooFlmEngine.render_latex` renders fragments as one document of
 recomposed LaTeX, LaTeX code written back from the FLM content for a printed
@@ -561,9 +564,15 @@ Truncation
 
 :js:meth:`ZooFlmEngine.truncate` makes a shortened copy of a fragment for a
 preview: the source is cut to about ``chars`` characters (at a word boundary;
-mathematics and environments are kept whole or left out, groups open at the
-cut are closed), ``marker`` (default ``' …'``) is appended, and the result is
-parsed as a new fragment.  It keeps the original's layout, standalone flag and
+mathematics, verbatim content and environments are kept whole or left out,
+groups open at the cut are closed), ``marker`` (default ``' …'``) is appended,
+and the result is parsed as a new fragment.  A command is cut only inside its
+last argument (the text of ``\emph{…}`` or ``\href{…}{…}``); a cut that would
+fall in an earlier argument, such as the note of ``\cite[note]{keys}``, leaves
+the command out whole, and what a command's element declares apart from the
+text around it (the keys of a ``\cite``, the target of a ``\ref`` or
+``\hyperref``, the address of a ``\href``, a footnote's content) counts
+nothing and is never cut.  It keeps the original's layout, standalone flag and
 canonical label, so its images and citations still match the tables, and its
 origin carries ``truncated: true``.  ``first_paragraph: true`` keeps only what
 precedes the first paragraph break (a blank line): a float written after it is

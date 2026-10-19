@@ -600,6 +600,21 @@ describe('ZooFlmEngine', function () {
             assert.deepStrictEqual(wrapped.trees, []);
         });
 
+        it('render_text with pieces: each tree ends with its footnotes and the works it cites', function () {
+            const out = engine.render_text([F.bob.biography, F.bob.notes, F.alice.biography], { pieces: true });
+            assert.strictEqual(out.has_errors, false);
+            const [bob, notes, alice] = out.trees;
+            assert.match(bob, /^Bob is a friend of Alice Aaliz\.¹ He wrote\u00a0\[1\]\./);
+            assert.match(bob, /\n¹ Since the Zoo opened\./);
+            assert.match(bob, /\nReferences\n-+\n\n\[1\] A\. Author, A title, arXiv:1234\.5678 \(2020\)$/);
+            // a tree without a footnote or a citation has no piece
+            assert.doesNotMatch(notes, /References|Footnotes/);
+            assert.doesNotMatch(alice, /References|Footnotes/);
+            // and the whole run's text places them once, after all of it
+            assert.strictEqual(out.text.match(/References/g).length, 1);
+            assert.ok(out.text.indexOf('A. Author') > out.text.indexOf('Bob proved'));
+        });
+
         it('render_latex gives the recomposed LaTeX of the fragments', function () {
             const out = engine.render_latex([F.bob.biography, F.bob.notes], { raw_label_types: ['person'] });
             assert.strictEqual(out.has_errors, false);
@@ -922,6 +937,25 @@ describe('ZooFlmEngine', function () {
             assert.strictEqual(whole.truncated, false);
             assert.strictEqual(whole.fragment.source, long.source);
             engine.release([long, fragment, inside, whole.fragment]);
+        });
+
+        it('truncate() never cuts a citation key, a reference target or an earlier argument', function () {
+            // The budget would run out inside the key, the target, the note.
+            const cases = [
+                [ 'See \\cite{arXiv:1234.5678} and some more words.', 8,
+                  'See \\cite{arXiv:1234.5678} and …' ],
+                [ 'A \\hyperref[sec:a-rather-long-target]{the text} and more.', 8,
+                  'A \\hyperref[sec:a-rather-long-target]{the …}' ],
+                [ 'Text and \\cite[A rather long note]{arXiv:1234.5678} after.', 14,
+                  'Text and …' ],
+            ];
+            for (const [ source, chars, expected ] of cases) {
+                const f = engine.make_fragment(source, { origin: origin('frank', 'cut') });
+                const { fragment } = engine.truncate(f, { chars });
+                assert.strictEqual(fragment.source, expected);
+                assert.deepStrictEqual(fragment.diagnostics, []);
+                engine.release([f, fragment]);
+            }
         });
 
         it('truncate({ first_paragraph }) leaves out a float only after the first paragraph break', function () {

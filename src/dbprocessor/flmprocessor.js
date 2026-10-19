@@ -99,7 +99,11 @@ function object_key(object_type, object_id)
  *    ad hoc fragments of :meth:`compile_flm_fragment`): per object the labels
  *    it defines (with their anchors and display sources), the references it
  *    makes, the images it shows, the term definitions it holds (with their
- *    bodies), the keys each of its fields cites (:meth:`object_scan`).
+ *    bodies), the keys each of its fields cites (:meth:`object_scan`).  A
+ *    back-reference's field (a relation's ``detail``) holds the fragment of
+ *    the relation's own field, compiled once: the references, citations and
+ *    images in it count for both objects, its labels and term definitions
+ *    for the relation's object only.
  *    Labels are unique zoo-wide: a label defined twice is the Error
  *    ``zoodb.labels.duplicate``; a standalone field that holds a reference, a
  *    citation, a label or a note is the Error ``zoodb.standalone.violation``.
@@ -143,8 +147,11 @@ function object_key(object_type, object_id)
  * already compiled are kept, those of the new objects are compiled, and once
  * the processing succeeded the fragments of the replaced objects are
  * released (a reload that fails leaves the previous index, tables and
- * snippets usable).  The data dump (`process_data_dump()`) writes the
- * fragments as their FLM source and the engine's data as ``data.zooflm``.
+ * snippets usable); the back-references, which the relations populator makes
+ * again, hold the relations' fragments again, so that a reload gives the
+ * scan results of a first load.  The data dump (`process_data_dump()`)
+ * writes the fragments as their FLM source and the engine's data as
+ * ``data.zooflm``.
  *
  * Options (constructor):
  *
@@ -468,8 +475,9 @@ export class ZooFlmProcessor extends ZooDbProcessorBase
 
     /**
      * The fragments of the zoo: every object's FLM fields (in the order of
-     * the object types, the objects and their fields), then the ad hoc
-     * fragments.
+     * the object types, the objects and their fields; a back-reference's
+     * field, which holds the fragment of another object's field, is that
+     * object's), then the ad hoc fragments.
      *
      * @returns {ZooFlmFragment[]}
      */
@@ -501,7 +509,10 @@ export class ZooFlmProcessor extends ZooDbProcessorBase
      *
      * ``cited`` holds every key the object cites: one entry per key and
      * field (``fragment``, ``origin`` its label), in the order of the fields
-     * and of the first citation in each; ``cite_prefix`` (lowercase) and
+     * and of the first citation in each (a back-reference's field, which
+     * holds the fragment of the relation's field in the other object, counts
+     * with that fragment and its origin; its ``labels`` and ``terms`` are the
+     * other object's only); ``cite_prefix`` (lowercase) and
      * ``cite_key`` are the key as the citation manager and the citation
      * compiler name it (``cite_prefix`` ``null`` for a key without a
      * prefix). ``terms`` holds the term definitions of the object's fields
@@ -614,19 +625,57 @@ export class ZooFlmProcessor extends ZooDbProcessorBase
             return { key, cite_prefix, cite_key, origin, fragment };
         };
         const labels = new Map();
+        const tree_labels = new Map();
         for (const tree of scan.trees) {
-            const entry = object_entry(tree.fragment);
-            for (const l of tree.labels) {
-                const info = { ...l, fragment: tree.fragment };
-                labels.set(l.label, info);
-                entry?.labels.push(info);
+            const infos = tree.labels.map( (l) => ({ ...l, fragment: tree.fragment }) );
+            for (const info of infos) {
+                labels.set(info.label, info);
             }
-            entry?.refs.push(...tree.refs.map( (r) => ({ ...r, fragment: tree.fragment }) ));
-            entry?.graphics.push(...tree.graphics.map( (g) => ({ ...g, fragment: tree.fragment }) ));
-            entry?.terms.push(...tree.terms.map( (t) => ({ ...t, fragment: tree.fragment }) ));
-            // every key each field cites (the scan's own list has the first
-            // citation of each key only)
-            entry?.cited.push(...tree.cited.map( (key) => cited_entry(key, tree.fragment.origin.label, tree.fragment) ));
+            tree_labels.set(tree, infos);
+        }
+        // what a tree adds to an object's entry: the references, the images,
+        // every key the field cites (the scan's own list has the first
+        // citation of each key only), and for the object the fragment belongs
+        // to (`own`) the labels and the terms it defines
+        const add_tree = (entry, tree, { own }) => {
+            if (own) {
+                entry.labels.push(...tree_labels.get(tree));
+            }
+            entry.refs.push(...tree.refs.map( (r) => ({ ...r, fragment: tree.fragment }) ));
+            entry.graphics.push(...tree.graphics.map( (g) => ({ ...g, fragment: tree.fragment }) ));
+            if (own) {
+                entry.terms.push(...tree.terms.map( (t) => ({ ...t, fragment: tree.fragment }) ));
+            }
+            entry.cited.push(...tree.cited.map( (key) => cited_entry(key, tree.fragment.origin.label, tree.fragment) ));
+        };
+        // the objects' fields, in the order of the objects and of their
+        // fields; a back-reference's field holds the fragment of the
+        // relation's field (`copy`), which counts for both objects
+        const trees = new Map(scan.trees.map( (tree) => [tree.fragment, tree] ));
+        const held = new Set();
+        for (const object_type of this.zoodb?.object_types ?? []) {
+            for (const obj of Object.values(this.zoodb.objects[object_type] ?? {})) {
+                for (const { fragment, copy } of this.flm_simple_content_compiler.object_field_fragments(obj)) {
+                    const tree = trees.get(fragment);
+                    if (tree == null) {
+                        continue;
+                    }
+                    held.add(fragment);
+                    const entry = copy
+                        ? object_entry({ origin: { object_type, object_id: obj._zoodb?.id } })
+                        : object_entry(fragment);
+                    if (entry != null) {
+                        add_tree(entry, tree, { own: !copy });
+                    }
+                }
+            }
+        }
+        // the ad hoc fragments, under the object their origin names
+        for (const tree of scan.trees) {
+            const entry = held.has(tree.fragment) ? null : object_entry(tree.fragment);
+            if (entry != null) {
+                add_tree(entry, tree, { own: true });
+            }
         }
         const cited = scan.cited.map( (c) => cited_entry(c.key, c.origin, c.fragment) );
         this.scan_results = { objects, labels, cited, duplicate_labels: scan.duplicate_labels, trees: scan.trees };

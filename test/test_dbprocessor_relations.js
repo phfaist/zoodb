@@ -196,6 +196,38 @@ describe('zoodb.dbprocessor.relations', function () {
             assert.strictEqual(backref.dish, zoodb.objects.dish.pasta);
         });
 
+        it('records where the values of each backreference come from, and clears the record with them', async function () {
+
+            const populator = new RelationsPopulator();
+            let zoodb = new ZooDb({
+                processors: [ populator ],
+                schema_validator,
+            });
+
+            await zoodb.load_data(get_simple_test_data());
+
+            const { fork, knife, spoon } = zoodb.objects.utensil;
+            assert.deepStrictEqual({ ...fork._zoodb.copied_fields }, {
+                'can_eat_dishes.0': { object_type: 'dish', object_id: 'pasta', field: 'relations.eaten_with.0' },
+            });
+            assert.deepStrictEqual({ ...knife._zoodb.copied_fields }, {
+                'can_eat_dishes.0': { object_type: 'dish', object_id: 'pasta', field: 'relations.eaten_with.1' },
+            });
+            assert.deepStrictEqual({ ...spoon._zoodb.copied_fields }, {
+                'can_eat_dishes.0': { object_type: 'dish', object_id: 'soup', field: 'relations.eaten_with.0' },
+            });
+            assert.strictEqual(zoodb.objects.dish.pasta._zoodb.copied_fields, undefined);
+
+            // the dump leaves the record out with the backreferences; the zoo keeps both
+            const dump = await zoodb.data_dump();
+            assert.strictEqual(dump.db.objects.utensil.fork._zoodb.copied_fields, undefined);
+            assert.ok(fork._zoodb.copied_fields != null);
+
+            populator.clear_all_relation_fields();
+            assert.strictEqual(fork.can_eat_dishes, undefined);
+            assert.strictEqual(fork._zoodb.copied_fields, undefined);
+        });
+
         it('data dump: auto-populated fields are stripped in dumps', async function () {
 
             let zoodb = new ZooDb({

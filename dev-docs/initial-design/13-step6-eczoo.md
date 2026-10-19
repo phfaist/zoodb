@@ -154,10 +154,14 @@ Philippe's.
 |---|---|---|---|
 | G1. The body of a term definition | the glossary (`concepts.11ty.js`): each `defterm` with its body, its anchor and the objects that refer to it | `engine.scan()` reports per tree the labels with `anchor` and `display` (the term), and the references; not the body | the crate's scan reports, for a label whose point is a `defterm`, the byte range of its body in the source (from the element index), so that JavaScript makes the body fragment from `fragment.source` |
 | G2. Every object that cites a key | `/references` (the backrefs), `collectbib.js` (`encountered_in_list`), `scripts/query_bib_references.js` | the scan's `cited` comes from flm-core's `flm.citations.keys`: one entry per key, with the origin of its first citation; so `object_scan(type, id).cited` lists only the keys whose first citation in the zoo is in that object, although the processor's doc says "the keys it cites" (a finding in itself) | the crate's scan reports the cited keys per tree (the `flm.citations.cite` elements of the element index), as it does the images; `object_scan().cited` then complete |
-| G3. Marks and floats in previews | the random code widget's data (no citation or footnote marks, no floats), the meta descriptions, the code graph's info pane | `render_document()` takes no per-call render options (the core merges the settings' render options into every run); a page without `endnotes()` gets `zoodb.compose.piece-not-placed` and keeps its marks | to confirm first: whether `truncate({ first_paragraph })` already leaves out the floats (the data's rule is a short first paragraph), and whether flm-rs has render options that drop marks; if it has, the engine passes per-call render options through; if not, a question for flm-rs, no request |
-| G4. A Unicode→LaTeX table | `generatebibtex.js` (the site's BibTeX export, loaded with the module) and, commented out, the handbook's `mk_bib.js` | pylatexenc's `get_builtin_uni2latex_dict`, shipped in the deleted `flm-js-src/`; not FLM | a copy of the table as data in the sitegen (pylatexenc is MIT), an npm package, or `render_latex` with flm-rs's `unicode` render option of the recomposed output: Philippe's choice |
+| G3. Marks and floats in previews | the random code widget's data (no citation or footnote marks, no floats), the meta descriptions, the code graph's info pane | `render_document()` takes no per-call render options (the core merges the settings' render options into every run); a page without `endnotes()` gets `zoodb.compose.piece-not-placed` and keeps its marks | to confirm first: whether `truncate({ first_paragraph })` already leaves out the floats (the data's rule is a short first paragraph), and whether flm-rs has render options that drop marks; if it has, the engine passes per-call render options through; if not, a question for flm-rs, no request; B2: the random code previews render with `pieces.exclude` (the lists of footnotes and citations), their citation marks stay (443 of 1,155 previews; no flm-rs option) |
+| G4. A Unicode→LaTeX table | `generatebibtex.js` (the site's BibTeX export, loaded with the module) and, commented out, the handbook's `mk_bib.js` | pylatexenc's `get_builtin_uni2latex_dict`, shipped in the deleted `flm-js-src/`; not FLM | a copy of the table as data in the sitegen (pylatexenc is MIT), an npm package, or `render_latex` with flm-rs's `unicode` render option of the recomposed output: Philippe's choice; B2: `render_latex` of an engine of the export's own with `latex-recomposed.unicode: 'replace'` (the BibTeX export equals the baseline's but for 4 of 5,217 entries, by a character's spelling); no copy of the table |
 | G5. The preview apps | `previewtool/` (`yarn preview`, the live preview of data edits) and `/gitpreview.html` (`jscomponents/gitzoopreview/`) | both run through `@phfaist/zoodbtools_preview`, a package of the `zoodbtools` repository (not among the repositories of this step; its installed copy read in the sitegen's `node_modules`), on the old API | a clone and port of `zoodbtools` (a part F), or the two apps left on the old API until later: Philippe's choice |
 | G6. An object type without pages (found by B1) | the EC zoo's `space` objects (14; no page, no FLM content refers to one) | the processor's index has one entry, with an href, per object of every type (`object_href(type, id)` for each), and `set_index()` refuses an entry whose href is not a string; the site's permalink function throws for `space` (“Unknown object type ‘space’”), which stops the load | done in the package (ruled 2026-10-18; B1's Closing): the processor leaves out of a context's index an object whose `object_href` returns `null`, and the labels of its fields (a reference to them is then unresolved in that context's renders, `flm.refs.unresolved`; any other href that is not a string is still refused by `set_index()`); the site's permalink returns `null` for `space` (sitegen `5ae77b8`), and B1's TEMPORARY placeholder href (`zoodbobjectref:/space:ID`) is gone |
+| G7. Truncation inside a command's arguments (found by B2) | the random code data (each description's first paragraph cut at 500 characters) | `truncate()` (the crate's `truncate.rs`) descended into every argument of a command and could cut in any of them: 18 of the 1,155 previews failed to parse again (a `\cite` key, the note of a second call, a `\hyperref` target cut; 21 Errors, which `'abort'` would throw) | done in the package (B2, for the main session to commit): what a command's element declares apart from the text (flm-core's `apart_from_text_of()`: citation keys, reference targets, link addresses, footnotes) counts nothing and is never cut; a command is cut only inside its last argument, else left out whole; a verbatim group is kept whole or left out; a Rust test, an engine test, `doc/zoodb.zooflm.rst`, `CHANGELOG.md`, the module rebuilt |
+| F2. The text of a formula in a term's lead-in (flm-rs, found by B2) | the search index's text (3 terms of the data hold a formula) | the text output writes `Construction A_4: …` for a `defterm` whose term is `Construction \(A_4\)`, while the running text keeps `\(A_4\)`; the HTML is right | a finding for 05's table (the main session's edit); nothing worked around |
+| G8. Backreference details on the first load and after a reload (found by B2; its effects measured by B2's review) | the references page's "Appears in", collectbib's `encountered_in` and the glossary's "Referenced in" in dev mode (one zoo kept across rebuilds); the diagnostics of a relation's `detail` | the relations populator copies a relation's raw `detail` into the backreference before the FLM processor compiles the fields. On the first load each backreference detail (3,432 in the EC zoo: `relations.parent_of.N.detail` 1,117, `relations.cousin_of.N.detail` 2,315) was compiled a second time, as a field of the object it is copied to, under that object's file and without a position (15,356 live fragments): 5 of F1's 42 page lines named that file at a position counted from the field (`/c/fusion.html`: `…/mbqc/fusion.yml#relations.cousin_of.1.detail:1:74` for gkp.yml's `relations.cousins.3.detail` at 85:89; likewise `/c/convolutional.html`, `/c/griesmer.html`, `/c/dodecahedron.html`, `/c/icosahedron.html`). After a reload the backreference held the forward relation's own fragment, which the scan (grouping by `fragment.origin`) credited twice to the forward object and not to the object holding the backreference: on the full data, after a reload with no change, 949 objects' `cited` and 320 objects' `refs` differed from the first load's, the key–object pairs fell from 11,447 to 9,020 and the live fragments from 15,356 to 11,924 (test data: 3 objects' `refs`). In dev mode (Eleventy's watch rebuild after a touch of one code file, B2's package with G7) the references page then showed 9,012 "Appears in" links instead of a fresh build's 11,432, the glossary 582 "Referenced in" items instead of 736, the BibTeX and CSL-JSON exports the same 5,217 entries in another order, and the dump differed; the other 1,275 HTML pages and the other files were equal. The first load matched the baseline (11,432 links), a reload did not | done in the package (B2's review fixes, for the main session to commit), as the main session ruled (a detail compiled once, both objects credited, the diagnostics at the forward field): the relations populator records where each backreference entry's values come from (`_zoodb.copied_fields`, rebuilt with the backreferences, left out of dumps); the field compiler gives a copied field the fragment of the field it copies, compiled once as that object's field with its origin and position (first when the copy comes first in the zoo), and `object_fragments()` leaves the copy out; the scan, over the objects' fields, counts the fragment's references, citations and images for both objects, its labels and term definitions for the forward object only (a label in a detail is defined once). On the full data all 3,432 details are their relations' fragments, with 11,924 live fragments at every load and build; after a reload with no change 0 objects differ (`cited`, `refs`, `labels`, `terms`, `graphics`, diagnostics; 17,336 cited entries and 11,447 pairs both times) and the data dump is equal (test data likewise); the five lines name the place where the text is written; the full build's pages and exports are byte-identical to B2's (the dump's citations table holds the same 5,217 entries in another order); in dev mode every page and export after the touch and after the second and the fifth edit equals a fresh build's (`references.html` 11,432 links, `concepts.html` 736 items; the dump differs by its snippet cache, as before the fix, and after an edit its `db` also by the edited file's `source_file_modification_token`). Tests, `doc/zoodb.dbprocessor-flm.rst`, `doc/zoodb.dbprocessor-relations.rst`, `CHANGELOG.md` |
+| G9. The cited works' texts in the search text (B2's question 13, ruled in the review fixes) | the search index (`dat/searchindex.json`): a code found by the authors and titles of the works it cites, as with the baseline's index | the searchable-text assembler renders each field's text with `engine.render_text()`, which placed no piece, so a citation and a footnote were their marks (`[1]`, `¹`); the crate's text runs can place them (`pieces: true`), the engine did not pass it on; the former text renderer wrote each citation in full | done in the package (B2's review fixes, for the main session to commit): `engine.render_text({ pieces })`, the assembler's option `pieces` and the standard setup's `searchable_text_options.flm_pieces` (default `false`): each field's text ends with its footnotes and the list of the works it cites, under the headings `Footnotes` and `References` (a standalone fragment holds neither: the standalone check); an engine test, a standard-setup test, `doc/zoodb.dbprocessor-searchable.rst`, `doc/zoodb.zooflm.rst`, `doc/std.rst`, `CHANGELOG.md`; the sitegen sets it (`1c1cf55`): the index is 4,605,733 bytes (baseline 4,443,321, marks alone 2,349,486), `introduced` 273,062 characters (235,118; 7,543), and five queries for a cited author or title give the baseline's numbers of results, with `approximate_qecc` or `qubits_into_qubits` at the baseline's rank or one place off (14th for `Zeng`, as in the baseline; 2nd or 3rd for the others), where the marks-only index missed the code in 3 of the 5 queries and ranked it lower in the other 2 (10th, 8th) |
 
 ### The citation caches
 
@@ -1111,7 +1115,7 @@ and no key is rewritten anywhere), goes into 05's "Findings to report" table, an
 sitegen clone gets an explicit diagnostic switch, so that B2 to E can build and inspect
 the full site while F1 is open.
 
-*The package change (G6; committed by the main session).* In
+*The package change (G6; committed by the main session as `1d7230c`).* In
 `src/dbprocessor/flmprocessor.js` (`_index_entries`), an object whose `object_href`
 returns exactly `null` gets no index entry in that context, and neither do the labels of
 its fields (their href would be the object's). Any other value that is not a string
@@ -1224,3 +1228,770 @@ run's draft (above); (2) the installs keep Yarn's mirror on, moved into the scra
 instead of `YARN_ENABLE_MIRROR=0`, which cannot install offline from the copied caches,
 and the network fallback was not run; D and E say so instead of naming
 `YARN_ENABLE_MIRROR=0`.
+
+### B2. Presentation, exports, scripts, tests, dev mode
+
+Done 2026-10-19 by B2's agent (Opus; node 23.7, the worktree at `1d7230c`). Nine commits
+in the sitegen clone, with the two trailers; none in the data clone or the handbook
+clone; nothing pushed. One package change in the worktree (G7 below; uncommitted, for
+the main session), and two more by the review fixes (G8 and G9, at the end). Logs,
+probes and the copy of the final full build's `_site/`:
+`/private/tmp/claude-501/-Users-philippe-Research-projects-zoodb-zoodb/a1dd88e1-7168-44e0-92fc-0b56c08d4645/scratchpad/step6/B2/`
+(below `B2/`; `B2/probes/` holds the scripts, run with plain `node` from the sitegen
+clone; `B2/site_final/_site/` the full build compared below). Every build, test and
+probe ran with `TMPDIR` set to `B2/tmp/` (the bibliography's Anystyle helper makes a
+temporary folder there, and Node keeps its compile cache there).
+
+**Bookkeeping.** The hash of the G6 package commit, `1d7230c`, is filled in B1's Closing
+and in `HANDOVER.md` (two places there).
+
+**The install at the start.** The installed package's `src/` differed from the
+worktree's at `1d7230c` in one file: the tarball predated the commit's JSDoc lines in
+`src/std/stdzoodb.js` (`object()` may return `null`). The worktree was packed and
+installed again by the Setup's procedure (`B2/repack_install.sh`: the overlay of the
+root `package.json` and `yarn.lock` from `B1close/`, the lock's `@phfaist/zoodb@file:`
+entry, the mirror's copy of the tarball and `node_modules/@phfaist/zoodb` removed,
+`YARN_GLOBAL_FOLDER=…/B1close/yarn-global YARN_ENABLE_NETWORK=0 yarn install`, the root
+files restored); then once more after G7. Each time: nothing fetched, one
+`node_modules/@phfaist/zoodb`, 0.3.0, its `src/` equal to the worktree's.
+
+**Commits** (sitegen clone, branch `zoodb-flmrs`, on `f2ec92c`):
+
+- `00e4fe9` The bibliography exports on the FLM engine: references page, BibTeX,
+  CSL-JSON (7 files). `eczoohelpers/eczcollectbib/collectbib.js`:
+  `collectFromZooFlmProcessorEncountered()` reads every key each object cites from
+  `scan_results.objects` (`cited`, one entry per key and field), each described as
+  before (`encountered_in.resource_info` `{ object_type, object_id, source_path }`,
+  `what` the field's origin label; serializable), so the scripts' filters keep working.
+  `generatebibtex.js`: the import of the deleted `flm-js` table replaced by a
+  `LatexSpeller`, an FLM engine of its own with `latex-recomposed: { unicode: 'replace'
+  }`, one `render_latex()` per distinct character, cached; LaTeX's six syntax characters
+  (`\ % # $ _ ^`) keep the spellings the former table gave them; a character the engine
+  cannot spell is `?`, as before. `generateBibtex()` (and `generateBibtexEntries()`) is
+  now async: it creates the speller's engine and frees it before it returns. The
+  ready-formatted citations (`collectBibRefs.js --keep-manual`) are written by that
+  engine's `render_latex()` (the hooks `\flmHref`, `\flmUrl`, which the former
+  recomposer wrote too). `site/src/references.11ty.js`: `render_document({ compose })`,
+  the compiled citation texts as ad hoc fragments released when the page is done, the
+  backrefs through `ref()`, an object without a page left out (none cites).
+  `site/eleventy.config.js` imports `prepareEczooBibReferences` again and no longer
+  ignores the three bibliography pages; `bibreferences_bib.11ty.js` awaits the entries;
+  `scripts/bibrefs/collectBibRefs.js` loses the `flm-js` recomposer. The eczcollectbib
+  tests gain two (a speller run; a non-ASCII character outside `generateBibtex()`
+  throws).
+- `30a6016` The random code data on the FLM engine; the B1 scaffolding of the site's
+  configuration removed (3 files). `jscomponents/randomcode/generate_data.js`: the first
+  paragraph of each description cut at 500 characters by `engine.truncate()`, rendered
+  by `render_document({ compose, render_options })` (G3 below), released; `snippet(name,
+  'html')`; the import of the removed `docrefs_placeholder_ref_resolver` gone.
+  `site/src/index.11ty.js` embeds the data again; `eleventy.config.js` is back to the
+  original's (no ignore left).
+- `346c4b6` Meta descriptions computed once per code; sort keys' warnings printed;
+  computed short names released on reload (3 files). `site/src/c/c.11ty.js`:
+  `page_description_text` memoized per code in a `WeakMap` keyed by the processor's
+  `scan_results` (replaced by every processing of the zoo, a reload included, so a
+  description that refers to an object that changed is computed again).
+  `eczoodb/compile_codelist.js`: the sort keys print the warnings of their
+  `render_text()` with the list and the code (an Error throws, as everywhere under
+  `'abort'`). `eczoodb/eczoodb.js`: the computed `short_name` marks the fragments it
+  makes (a `WeakSet`), and `EcZooDb.update_objects()` releases those of the codes a
+  reload replaces, once the update has succeeded.
+- `efd561a` The random code data computed once per processing of the zoo (1 file): the
+  same memo for the home page and `dat/randomcodedata.json`.
+- `e516670` The presentation on the FLM engine's HTML: its stylesheet, the EC zoo's
+  look, MathJax 4 (10 files). `site/src/dynamic_style/flm.css.11ty.js` (new):
+  `/dynamic_style/flm.css`, one comment line and `html_stylesheet()`;
+  `templates/layout/base_page.11ty.js` links it before `main.scss` and writes
+  `html_scripts()` in `<head>` (unsqueezed); `flm-formatting.scss` rewritten,
+  `genericpage.scss`, `codelist-page.scss` and
+  `jscomponents/codegraph/CodeGraphInformationPane_style.scss` likewise (the table
+  below); `jscomponents/mathjax/setup.js` rewritten (below); `docs/site.md`,
+  `docs/jscomponents.md`, `docs/architecture.md` follow.
+- `20ad41e` The eczoodb tests on the FLM engine (6 files): below.
+- `fa6bab1` The scripts on the FLM processor's scan results; the FLM howto's custom
+  bullet (4 files). `scripts/zooStats.js` counts the references to each code from
+  `scan_results` (each object's `refs` by label) and prints `.source`; the obsolete
+  `query_bib_references.js` reads every object's cited keys from `scan_results`;
+  `llm/gen_inputs_v1.js` reads `introduced.source`. `flm_howto.md` line 82:
+  `\begin{itemize}[label={⇒}]`.
+- `5012e97` BibTeX export: a character without a LaTeX spelling logged by its identifier
+  (1 file): the speller's debug line names the code point and the identifiers, so that
+  no line of a build log reads as an FLM error (8 such characters in the full data:
+  U+01CE, U+0301, U+0303, U+0308, U+1EAF, U+1EC5, U+202F, U+FFFD).
+- `ce83723` The background of code through the FLM engine's custom property (1 file):
+  `--flm-verbatim-background`, so that code as a block gets the translucent background
+  too.
+
+The scripts are not run: their loader (`scripts/_helpers/helperEcZooLoader.js`) reads
+the tracked `_zoodb_citations_cache/`, which a run would write to and whose stale
+entries could reach the network; they are linted (no error).
+
+**The package change (G7; for the main session to commit).** The random code data meets
+a defect of the package's truncation, which no earlier page met (B1's truncations keep
+the whole first paragraph or the code lists' long budgets). `truncate()` (the crate's
+`rust/zoodb-flm-wasm/src/truncate.rs`) descended into every argument of a command and
+cut in any of them, closing the group: on the full data 18 previews of 1,155 failed to
+parse again with 21 Errors (`\cite{arxiv:1108.0 …}`, a citation key cut:
+`flm.citations.no-entry` ×16; a note of a second `\cite` cut, its keys lost:
+`core.arguments.missing-mandatory-argument` ×3 and `flm.citations.no-key` ×2;
+`\hyperref[topic:quantum …]`, a target cut: `flm.refs.unresolved` ×1;
+`B2/logs/randomcode_diags_before.txt`), which under `'abort'` would stop the default
+build once F1 is fixed. The old FLM's truncator descended only into a command's main
+text argument and kept the others whole. The fix, with flm-core's public
+`apart_from_text_of()` (`model::aspects`), the aspect flm-core already uses for the
+plain text of titles: what a command's element declares apart from the text around it (a
+`\cite`'s keys, a `\ref`'s or `\hyperref`'s target, a `\href`'s address, a footnote's
+content) counts nothing and is never cut; a command is cut only inside its last
+argument, and a cut that would fall in an earlier one leaves the command out whole (a
+citation chunk `\cite{a}\cite{b}` is one command); a verbatim group is kept whole or
+left out, as mathematics. Files: `rust/zoodb-flm-wasm/src/truncate.rs` (the rule),
+`rust/zoodb-flm-wasm/src/engine.rs` (a test, 6 cases, each truncation parsed again
+without a diagnostic), `src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` and `BUILD_INFO.json`
+(`yarn build:wasm flm`, 13.3 s: 5,157,363 bytes, +4,213; `flm_core_git` `5de1c198`, not
+dirty; path check green), `src/zooflm/engine.js` (the JSDoc of `truncate`),
+`test/test_zooflm_engine.js` (a test: a key, a target and an earlier argument never
+cut), `doc/zoodb.zooflm.rst` ("Truncation"), `CHANGELOG.md` (a bullet). After it, the
+random code data has one diagnostic on the full data, gray's F1 Error.
+
+**Settings and options against the baseline.** The zoo's engine settings are unchanged
+(`eczoo_flm_engine_settings` of B1; settings hash unchanged). New options: the BibTeX
+speller's engine `{ settings: { 'latex-recomposed': { unicode: 'replace' } } }` (the
+zoo's engine writes characters as UTF-8 with the default `declare`, and `render_latex()`
+takes no per-call render options, so the zoo's settings would have had to change, and
+with them the handbook's, D); the random code previews' `render_options: { pieces: {
+exclude: ['flm.xnotes.list.footnote', 'flm.citations.bibliography'] } }`.
+
+*G3, what each preview leaves out.* The random code data: the lists of footnotes and of
+citations (not built, no `zoodb.compose.piece-not-placed`), and the floats by the cut to
+the first paragraph (no preview holds a `<figure>`); its citation marks stay, linking to
+`#citation-N`, which is not on the home page: 443 of the 1,155 previews carry marks,
+which the former renderer inhibited (`inhibit_render_endnote_marks`), and flm-rs has no
+render option that leaves them out (Part 0; no request). The meta descriptions: text
+(`render_text`), which leaves out every piece; a citation is its number, as in the
+baseline. The code lists' truncated descriptions (B1) exclude nothing: the list page
+places their endnotes, as `render_endnotes: true` did. The code graph's information pane
+is C's.
+
+*The stylesheet.* The pages link `/dynamic_style/flm.css`, 15 of the engine's 17 style
+definitions: all but the backend's page style (`flm.html.style.page`, which
+`html_stylesheet()` leaves out) and `flm.headings.style`, which has no parts, all in
+`@layer flm`, then `main.scss`. Every rule of
+the site is outside that layer, so it wins over the engine's whatever its specificity,
+and so do the site's element rules (`p`, `a`, `h2`, `code`, `dt`: the site's link
+colors, paragraph spacing and heading sizes stay). The table maps each old selector (the
+survey's about 50 in `flm-formatting.scss`, and those of the other files):
+
+| old selector | new counterpart |
+|---|---|
+| `.paragraph-in-list` (and `:first-child`, `:last-child`, `::before`) | kept: the site's own class (the value lists of `render_code.js`), not FLM's |
+| `.p-block`, `.p-block:first-child`, `.p-block:last-child` | `:root { --flm-block-spacing: 2*$parskip-half-length }` (the engine's `.flm-pres-par, .flm-pres-block` margins); the first and last child: the engine's default |
+| `.emph, .textit`, `.textbf` | dropped: the engine's default (`.flm-pres-span[data-flm-style=…]`) |
+| `.enumeration > dt` (upright) | `.flm-pres-list > dt` (terms lists; none in the data) |
+| `.enumeration.enumerate, .enumeration.itemize` (row gap, `dt` margin) | `.flm-pres-list[data-flm-kind~="enumerate"]`, `…~="itemize"]`: `--flm-list-indent: 0.8em`, `--flm-list-label-gap: 1rem`, `--flm-list-entry-spacing: 0.5em` (the engine's list grid) |
+| `.heading-level-3` (the data's `\subsection`) | `.flm-pres-block--heading[data-flm-heading="subsection"]` |
+| `.heading-level-4` and its `::after` dash (`\paragraph`) | `.flm-pres-runin--heading[data-flm-heading="paragraph"]` (italic, not bold); the dash dropped: the engine writes its run-in stop `.` (setting `html.run_in_stop`; no `\paragraph` in the data) |
+| `table.cells` (margins, `max-width`) | `.flm-pres-cells`; `border-collapse`: the engine's (`collapse`) |
+| `table.cells td, th` | dropped: the engine's default (the same padding) |
+| `.cellstyle-H` | dropped: the engine's `th[scope="col"]` rule |
+| `.cellstyle-rH` | dropped (empty) |
+| `.cellstyle-l`, `-c`, `-r` | dropped: the engine's `[data-flm-align]` |
+| `.cellstyle-green`, `-blue`, `-yellow`, `-red` | `:root { --flm-cells-green: … }` etc., the site's translucent colors (the engine's are opaque, wrong in the dark scheme) |
+| `.cellstyle-lvert`, `-rvert` | dropped: the engine's `[data-flm-rules~="left"]`, `[data-flm-rules~="right"]` |
+| `.celltbledge-top`, `-bottom` | dropped: the engine's outline on the table (`--flm-cells-outline`) |
+| `.verbatimcode` | `.flm-pres-verbatim[data-flm-kind="code"][data-flm-display="inline"]`; the background `--flm-verbatim-background` |
+| `.verbatima` | `.flm-pres-verbatim[data-flm-kind="a"]`: the text's font and size (it is a `<code>` now, which the site's `code` rule sets in monospace); the italics: the engine's |
+| `.verbatimcode-environment` | `.flm-pres-verbatim[data-flm-display="block"]` (font, margins; `pre` and scrolling: the engine's) |
+| `figure.float`, `figure.float.float-table` | `.flm-pres-block.flm-floats-float`, `…[data-flm-kind~="table"]` |
+| `.float-contents`, `.float-contents img`, `.float-contents table.cells` | `> .flm-floats-float-content`, `> .flm-pres-image`, `> .flm-pres-cells` |
+| `figcaption`, `figcaption > span` | `> .flm-floats-float-caption`, `> .flm-pres-par`; `--flm-floats-caption-size: 1em`, `--flm-floats-caption-spacing: 0.75em` |
+| `.defterm .defterm-term` | `.flm-defterm .flm-defterm-leadin`; `--flm-runin-gap: 0` (the lead-in writes its own space) |
+| `.display-math` | dropped: the engine's (a block, scrolling); `--flm-math-display-space-above/below: 0` (MathJax's container spaces it, as before) |
+| `.endnote-marks, .citation-marks` | `.flm-xnotes-xnote-mark, .flm-citations-mark` |
+| `.quote, .address, .blockquote` | `.flm-pres-block.flm-quote` (each kind by `[data-flm-kind~=…]`) |
+| `.quote`, `.quote::before` | `.flm-pres-block.flm-quote[data-flm-kind~="quote"]`, `::before` |
+| `.quote .quote-lines`, `.quote .quote-text`, `+ .quote-lines` | `> .flm-quote-lines`, `> .flm-quote-text` (with their own first and last child margins), `+ .flm-quote-lines` |
+| `.quote .quote-lines .quote-lines-indent` | `--flm-tab: 2.5em` (the engine writes a line's indentation as `--flm-element-indent-left`) |
+| `.quote-attributed`; `.quote .quote-attributed::before` (dash) | `.flm-quote > .flm-quote-attributed`; the dash dropped: the engine's `--flm-quote-attributed-lead` |
+| `.quote-block` | `--flm-quote-block-rule`, `--flm-quote-block-padding` |
+| `.address .quote-lines` | dropped: the engine's default (`--flm-quote-address-size: 0.933em`) |
+| `.blockquote` | `.flm-pres-block.flm-quote[data-flm-kind~="blockquote"]` |
+| the alternatives commented out (the first block, options A and C) | translated, still commented out (their attribution dash would double the engine's) |
+| `#endnotes` (`genericpage.scss`) | `.flm-citations-bibliography, .flm-xnotes-footnote-list` |
+| `#endnotes dl`, `dd`, `dt, dd` (transition) | `> .flm-pres-list` (margins; `--flm-list-indent: 0px`, `--flm-list-label-gap: 5px`, `--flm-list-entry-spacing: 0.4em`), `> li` |
+| `#endnotes dt` (upright, right-aligned) | dropped: the engine's labels are spans, right-aligned |
+| `#endnotes #footnotes dt` | `.flm-xnotes-footnote-list .flm-xnotes-entry-mark`; `--flm-xnotes-list-rule: none` (no line above the list, as before) |
+| `.page_style_cards #endnotes`, its `dt` (no page uses the class) | `.page_style_cards .flm-citations-bibliography, …`, `.flm-pres-list-label` |
+| `.codelist-autodescription .enumeration.enumerate, .enumeration.itemize` | `--flm-list-entry-spacing: .1em` on `… .flm-pres-list[data-flm-kind~="enumerate"]`, `…~="itemize"]` |
+| `.CodeGraphInformationPane .endnotes`; `.flm-html-error` (and `> pre`, dark) | `.flm-citations-bibliography, .flm-xnotes-footnote-list`; `.flm-pres-unknown, .flm-pres-unsupported, .flm-pres-dropped` (C checks the pane's HTML) |
+| `$endnote-superscript-font-size` (`variables.scss`, `tiles-persons.scss`, `def-fixbaseline-superscript-text.scss`); `.sectioncontent`, `.code-href-references` (`ecc-code-page.scss`) | kept: the site's own variable, mixin and classes; `href-ref ref-*` is still written by ZooDb's composer (`ref()`) |
+| `.visual-highlight + dd` (`visual-highlight.scss`) | dropped (review fixes, `030d469`): the anchored entry is now the engine's `<li id="citation-N">`, which holds its label and its text and which `.visual-highlight` highlights whole; no anchor of the site is a `<dt>` any more |
+
+Not set, the engine's default kept: the spacing of the heading above a list of
+references or footnotes where the site sets none (the site's `h2` declares an invalid
+margin), outside the code pages (whose `.ecc-code-page h2` styles it as before). The
+look was not checked in a browser (no Parcel before C; E takes the screenshots).
+
+*MathJax.* What the pages deliver: in `<head>`, after the stylesheet links and before
+the profile's module script, `html_scripts()` of the zoo's engine: the definition
+`flm.html.mathjax`, its inline part (4,209 characters: `window.MathJax` with
+`startup.elements: ['.flm-pres-math--passthrough']`, `tags: 'none'`, the `texhtml`
+package, the click listener and the `flm:region-updated` code), then `<script
+src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" async>`. The zoo's settings
+override no `html.definitions`, so the parts `html_definitions()` lists are the ones the
+runs use (18 definitions: 17 styles, 1 script; part 0's finding needs nothing here).
+`mathjax/setup.js`'s `load()` configures and loads nothing: if MathJax has loaded
+(`MathJax.version` and `startup.promise`) it awaits `startup.promise`, else it chains
+`startup.ready` (calling the configuration's own or `defaultReady()`) and then awaits
+the promise; it throws if the page carries no configuration. No `mathjax@3`,
+`cdnjs…/mathjax/3`, `.inline-math` or `.display-math` is left in the site's sources
+(`eczoodb`, `site/src`, `templates`, `jsc_profiles`, `sitelib`, `stylesheets`,
+`jscomponents`). The per-render `definitions` and `requires` are not used (every page
+links the whole stylesheet).
+
+**The eczoodb tests** (`20ad41e`). `test_eczoodb.js` reads `short_name.source`;
+`test_render_code.js` and `test_render_codelist.js` take `.html` of the renderers'
+results, pass `zoo_flm_engine` (not the former environment and `doc_metadata`) and check
+that `diagnostics` is empty. The top-level `flm_allow_unresolved_*` keys of four files
+(five places) move into `flm_options` (`allow_unresolved_citations`,
+`allow_unresolved_references`), and `test/_loadeczoodb.js` merges the test's options
+deeply (`lodash/merge`), else the test's `flm_options` would replace the full options'
+(the Node loader, the citations). No expectation changes: the test data has no
+unresolved reference or citation (under `'abort'` one would have thrown before), and the
+same 72 tests pass as before, with the three fixed: 75 passing, 2 pending (skipped in
+`test_load_yamldb.js`, `test_stats.js`), 0 failing. `yarn eslint` on the test folder
+reports the one error and two warnings that predate this part (two top-level suites, the
+skipped tests).
+
+**The search index and the dump** (B2's full build before the review fixes;
+`B2/searchidx/`, `B2/dump/`; the final index, 4,605,733 bytes: G9 and the Review fixes
+below).
+
+- *Search index*: 4,443,321 → 2,349,486 bytes; the same `info`, the same 28 store
+  fields, 1,155 documents with the same ids in the same order. The difference is
+  content: the former text output wrote each citation as its full formatted reference in
+  brackets (`[D. Gottesman, Surviving as a Quantum Computer in a Classical World (2024)
+  URL]`), the engine's text output writes its mark (`[1]`, after a no-break space). Over
+  all fields, the differing runs are 19,277 citation texts become numbers, 14,760
+  no-break or white space, 792 citation numbers, 1 quotation mark (melas, B1's
+  correction), and 1,983 others, of which 205 are not next to a citation: the text
+  layout of the engine (a heading underlined with `---` for `~~~`, an image as `[image:
+  /fig/…]` for `[figure]`, tables laid out in columns) and F2 below. `introduced`,
+  mostly a `\cite`, falls from 235,118 to 7,543 characters; `description` from 1,165,932
+  to 815,535 (87 equal, 287 equal but for white space, 781 otherwise different); names,
+  ids, short names and the plain fields are equal. Three codes diffed:
+  `approximate_qecc.description` 543 → 338 characters (a no-break space; the citation
+  text of `arxiv:2105.14777` → its number), `qubits_into_qubits.description` 636 → 560
+  (a no-break space; Gottesman's book → `1`), `rotor.description` 400 → 399 (one space).
+  A's two one-space values (`approximate_qecc` `features.decoders.6`,
+  `qubits_into_qubits` `features.decoders.2`) do not show: the search text has no double
+  space in either build (the text output collapses white space). So a code is no longer
+  found by the authors or titles of the works it cites (question 13 below; since the
+  review fixes it is again, G9 and the Review fixes below).
+- *Dump* (`dat/eczoodata.json`): 5,633,320 → 7,652,206 bytes. `db.objects` 3,932,369 →
+  5,586,753, of which `_zoodb.flm_field_positions` 1,595,724 (20.9 % of the dump; 11
+  Deferred (b)) and `_zoodb.flm_diagnostics` 2,866 (F1's Errors, stored under the
+  switch); `zooflm` 2,047,011 (26.8 %: citations 1,398,581 for 5,217 keys, snippets
+  480,075 for 2,008, index 157,639, graphics 10,634) where the baseline's `refs_data`
+  held 1,682,506 (citations 1,291,475, refs 382,091, graphics 8,895). The growth is the
+  positions (+1.60 MB) and the snippets (+0.48 MB), less the smaller index (−0.22 MB).
+
+**The 17 objects of the searchable-text assembler** (`B2/logs/search_diags.txt`,
+`engine.render_text()` wrapped during a full load): all 17 are F1's, 18
+`flm.citations.no-entry` diagnostics for the 18 `manual:{…}` keys: the codes `hexagonal`
+(`protection`), `perfect_binary` (2, `description`), `bch`, `ira`, `qc_ldpc`,
+`cross_interleaved_reed_solomon`, `current_mirror` (`introduced`), `extended_golay`,
+`quasi_cyclic`, `projective`, `gkp` (a cousin's `detail`), `gray`, `perfect`
+(`description`), `locally_recoverable` (`realizations.1`), `ag` (`features.rate`),
+`generalized_reed_solomon` (`features.decoders.3`), `stellated_dodecahedron_css`
+(`features.decoders.0`). Nothing else. With `flm_pieces` true (G9, the review fixes),
+the search index holds 22 `[dropped: bibliography entry]` placeholders in 19 fields of
+these 17 codes (`gray.introduced`: `[1] [dropped: bibliography entry]`): the text
+output's stand-in, in the cited-works piece, for a key without an entry, rendered under
+`'continue'`; the marks-only index had none. An effect of F1 in the inspection builds,
+gone once F1 is fixed; not worked around.
+
+**Duplicate computed term labels across objects.** None: the scan's 60 `defterm:` labels
+are distinct, no term is defined in two objects, and the zoo-wide scan reports no
+duplicate label.
+
+**The two no-break spaces of `~\cite`.** The data writes `~\cite` 12 times; the engine
+writes the author's `~` as a no-break space and then, before an attached mark, its own
+(`<span class="flm-pres-span flm-citations-space">&#xA0;</span>`, flm-rs's citations
+feature), regardless of the `~`: `W state&#xA0;<span …>&#xA0;</span>[1]` (11 in the code
+pages' HTML; the meta description reads `W state  [1].`), where the baseline had one
+space (`B2/probes/tilde_cite.mjs`: `Text~\cite{…}` gives two, `Text \cite{…}` and
+`Text\cite{…}` one). This is flm-rs's, the finding of 05 already recorded in step 4; no
+data change.
+
+**The bibliography exports and the random code data against the baseline** (the
+original's `site/_site/`, read in place; `B2/bib/`).
+
+- `dat/bibreferences.bib`: 5,217 entries in both, the same keys in the same order, 5,213
+  identical; the other 4 differ by a character's spelling, the engine's table against
+  pylatexenc's: Cyrillic letters written `{\fontencoding{T2A}\selectfont\CYRK}` for
+  `{\CYRK}` (one entry, 15 letters), `⟨⟩` as `\ensuremath{\langle}` for `{\textlangle}`,
+  a subscript `₁` as `\ensuremath{_1}` for `?`, and a combining diaeresis as `?` for
+  `\ensuremath{\ddot{}}`. So no data copy of pylatexenc's table was needed (G4).
+- `dat/bibreferences_csl.json`: byte-identical.
+- `references.html`: 5,217 entries, the same sort keys in the same order, the same
+  11,432 "Appears in" links; the visible text equal after decoding entities and
+  normalizing spaces (the 9 entries left differ only in my normalizer's handling of
+  `\text{…}` inside formulas, which the engine writes as HTML content).
+- `dat/randomcodedata.json`: 516,525 → 812,339 bytes (the markup's longer classes and
+  the marks); 1,155 codes, the same ids in the same order, the names' text equal; with
+  the citation marks and white space left aside, 1,085 descriptions equal, 66 equal up
+  to the cut (the budget is counted differently), 4 others: `melas` (B1's quotation
+  mark) and `cmr`, `zrm`, `bosonic_rotation` (text inside a formula, `\textnormal{…}`,
+  written as HTML content). Computed once per processing in 0.85 s.
+
+**Dev mode** (`B2/devmem/`, and for the review fixes `B2/fix/devmem/`,
+`B2/fix/once/devmem/` and `B2/fix2/devmem/`). `yarn dev` runs Parcel, which cannot
+bundle before C, so the measurement ran Eleventy in watch mode with the site's own
+configuration wrapped by `B2/devmem/devmem.config.js` (`--watch`, no Parcel, the full
+data, the LOCAL cache, the switch, `NODE_OPTIONS=--expose-gc`): after each zoo load and
+each build it logs the resident size, the JS heap after two `gc()`, the module's linear
+memory and the live fragments (`engine.core.fragment_count()`), then changes the data: a
+touch of `codes/quantum/qubits/stabilizer/qubit_css.yml` (no change of content), then
+five edits (a YAML comment line appended each time); at the end it writes the file back
+(`git status` of the data clone empty). The "after build" measure is taken in the
+`eleventy.after` handler, while the build's results (about 165 to 170 MB, Eleventy's
+`eventsArg.results`) are still referenced from the stack. Runs: before (`before.jsonl`,
+the computed short names not released) and after (`after.jsonl`) this part's fixes; with
+the review fixes' first G8 fix, which compiled the copies again at every processing
+(replaced since, see the gaps table; `fix/devmem/g8.jsonl`, with heap snapshots after
+the first load and builds 1, 2, 5 and 7), and then also the search index generator
+loaded with the configuration (`fix/devmem/lunr.jsonl`; heap snapshots after the first
+load and builds 1 and 2); then G8 fixed by compiling each detail once,
+with `_site/` copied after builds 1, 2, 4 and 7 to compare with a fresh build
+(`fix/once/devmem/after2.jsonl`, "G8 fixed" below; the same with no G8 fix:
+`fix/once/devmem/before.jsonl`, the touch and two edits); and the final state, with G9
+as well (the search texts with the cited works), `_site/` copied after builds 2 and 7
+and heap snapshots after builds 1, 2, 6 and 7 (`fix2/devmem/final.jsonl`). The wasm and
+resident sizes are the final run's:
+
+| after | live fragments: B2 before / B2 / final | JS heap MB: B2 / first G8 fix / with `b219ad1` / G8 fixed / final | wasm MB (final) | resident MB (final) |
+|---|---|---|---|---|
+| first load | 15,356 / 15,356 / 11,924 | 213.5 / 215.9 / 216.2 / 211.3 / 216.5 | 117.9 | 687.9 |
+| first build | 15,356 / 15,356 / 11,924 | 505.5 / 508.0 / 508.0 / 503.1 / 512.5 | 158.5 | 934.3 |
+| reload, no change; build | 11,924 / 11,924 / 11,924 | 498.4; 772.9 / 499.6; 779.4 / 498.6; 511.2 / 493.6; 506.6 / 502.9; 515.8 | 158.5 | 1,045.6; 1,052.9 |
+| edit 1, build | 11,939 / 11,938 / 11,924 | 774.1 / 781.1 / 512.3 / 507.6 / 516.8 | 158.5 | 1,320.4 |
+| edit 2, build | 11,940 / 11,938 / 11,924 | 775.3 / 782.3 / 513.3 / 508.4 / 517.9 | 158.5 | 1,488.0 |
+| edit 3, build | 11,941 / 11,938 / 11,924 | 776.5 / 783.8 / 514.7 / 509.8 / 519.3 | 158.5 | 1,348.2 |
+| edit 4, build | 11,942 / 11,938 / 11,924 | 777.5 / 784.6 / 515.7 / 510.7 / 520.2 | 158.5 | 1,193.5 |
+| edit 5, build | 11,943 / 11,938 / 11,924 | 778.0 / 785.5 / 516.5 / 511.4 / 520.7 | 158.5 | 1,601.2 |
+
+So the zoo, the engine and the module stay one across rebuilds, and every build releases
+what it makes. The one leak of fragments was the computed short name of each code a
+reload replaces (one fragment per edited code and reload, not 1,155 per reload: the
+computed data processor recomputes only the updated objects), released since B2. The
+drop of B2's runs at the first reload, 15,356 to 11,924, was G8: on the first load the
+3,432 backreference details (`relations.parent_of.N.detail` 1,117,
+`relations.cousin_of.N.detail` 2,315) were compiled a second time, as fields of the
+objects they are copied to, and after a reload they were the forward relation's own
+fragments, which the scan counted twice for the forward object and not for the holder;
+B2's 14 new fragments at the first edit were the edited code's backreferences, compiled
+as copies again. So the pages after a reload differed from a fresh build. Without the
+fix (`fix/once/devmem/before/`), the first build equals a fresh one (B2's `site_final`),
+but after the touch `references.html` has 9,012 "Appears in" links (a fresh build:
+11,432) and `concepts.html` 582 "Referenced in" items (736); `bibreferences.bib` and
+`bibreferences_csl.json` hold the same 5,217 entries in another order (two CSL ids that
+two `manual` keys share then take the other key's entry); the dump differs; the other
+1,275 HTML pages and files are equal. After the second edit the counts are 9,041 and
+587. With G8 fixed (each detail compiled once), the 3,432 details are their relations'
+fragments and the live fragments stay at 11,924 after every load and build. Every page
+and export after the touch and after the second and the fifth edit equals the fresh full
+inspection build's (`fix/once/logs/cmp_after2.txt`, and likewise in a first run,
+`cmp_after.txt`); `references.html` and `concepts.html` are byte-identical. Only
+`dat/eczoodata.json` differs, before and after the fix alike, in its `zooflm.snippets`
+(2,800 entries after the touch, 2,799 after an edit, against 2,008): the engine's
+snippet cache keeps the snippets of the computed short names that the previous build's
+pages rendered, and a fresh build writes the dump before those pages. After an edit its
+`db` also differs, by the edited file's `source_file_modification_token`. The module's
+memory grows once, in the first build, and not after. In one of the three runs with G8
+fixed (`fix/once/devmem/after.jsonl`), the JS heap grew by about 169 MB per build from
+the first edit on (506.6 to 1,350.0 MB after edit 5), about one build's results each
+time. Two runs of the same package did not show it: `after2` with the same edits and
+copies, and `heap`, with three edits, snapshots after builds 2 to 4 and no copies, which
+grew by about 1 MB per build; nor did the final run, with G9 (about 1 MB per build). The
+growth was not reproduced, so its retainer was not traced. In the final run too every
+page and export after the touch and after the fifth edit equals the fresh full
+inspection build's, the search index included (`fix2/logs/cmp_devmem_build2.txt`,
+`cmp_devmem_build7.txt`); the dump differs by its snippet cache, as above, and after the
+edits also by the edited file's `source_file_modification_token`, which the edit
+changes.
+
+The JS heap, traced with heap snapshots (`B2/fix/probes/heapsnap.mjs`: the nodes of a
+snapshot grouped by the earlier snapshot that first saw their ids, each group attributed
+to the nearest older object on its shortest path from the GC roots;
+`B2/fix/devmem/analysis_S*.txt`; for the final state `B2/fix2/probes/heapsnap.mjs`, the
+same with a mode `count` of the objects of a type, and `B2/fix2/devmem/analysis_S2.txt`,
+`analysis_S7.txt`, `objects_S1_S2.txt`, `modules_S7_all.txt`):
+
+- *The step of about 270 MB at the second build* was the first build's output kept for
+  the rest of the process. After the second build, 286 MB of objects made by the first
+  build were still alive, 267 MB of them under the first build's
+  `TemplateMap.collectionsData` (the content of every page), reached from the GC roots
+  only through lunr's module: `lunr.QueryParseError.prototype` is an `Error` made when
+  lunr is first loaded (`lunr.js` line 2982, `= new Error`), and V8 keeps the call sites
+  of an Error's stack trace, with the objects they were called on, until its `stack` is
+  read; one of them was a call on that TemplateMap (the site's configuration sets
+  `Error.stackTraceLimit = 999`, so every frame is kept). lunr (through
+  `@phfaist/zoodbtools_search`) was first loaded by the `import()` of
+  `src/dat/searchindex.11ty.js`, during the first build. The site's configuration now
+  imports the search index generator before any build (sitegen `b219ad1`): after the
+  second build, the objects of the first build still alive are 17.8 MB (the Eleventy
+  state of the current build replaces them), and the heap after a rebuild is 511 to
+  517 MB instead of 779 to 786 MB (506.6 to 511.4 MB with G8 fixed, 515.8 to 520.7 MB
+  in the final run, whose search texts are longer). In the final run's snapshot after
+  build 2, the one `TemplateMap`, the one `TemplateWriter` and the one bibliography
+  collector (`EczBibReferencesCollector`) alive are build 2's; those of build 1 are
+  freed. What build 2 made and is alive then (381.4 MB) is the current build's state:
+  its results on the stack (172.0 MB), Eleventy's `TemplateWriter` (100.4 MB), the
+  bibliography collector (66.0 MB), the scan results (10.2 MB), the templates' rendered
+  promises (9.2 MB), the cached data dump (7.9 MB). The same pin existed before the port
+  (the template and lunr are unchanged since the original).
+- *The growth of about 1.1 MB per rebuild*, before and after the fixes alike: in the
+  snapshot after build 7, what builds 3 to 5 made and is still alive is 8.5 MB of
+  snapshot self size, mostly compiled code, scripts and 66 ES module records (22
+  templates per build). These are Eleventy's: at every watch rebuild it imports each
+  `.11ty.js` template again under a new URL (`?_cache_bust=<time>`, its
+  `Util/Require.js`), and Node never frees a module. The rest is 0.9 MB of `cite_locales`
+  arrays of the CSL engines that citation-js's `plugin-csl` caches by template and
+  locale (`engines.js`; the bibliography collector uses it). Neither is the package's or
+  the site's; not changed. The final run gives the same picture: from the build after
+  the touch to the fifth edit's, the heap after a build grows from 515.8 to 520.7 MB,
+  1.0 MB per rebuild. In the snapshot after build 7, what builds 3 to 6 made and is
+  still alive is 6.5 MB of self size: 2.2 MB under 100 module records and most of the
+  3.3 MB of compiled code; 15 templates have 7 module records each, one per build
+  (`c.11ty.js`, `list.11ty.js`, `references.11ty.js`, `searchindex.11ty.js`, …;
+  Eleventy 3.1.5, `src/Util/Require.js` line 135 sets `_cache_bust`). The other 0.9 MB
+  in that group are element stores of the engine's `_fragments_of_label` arrays, which
+  V8 replaces as the fragments of a label are added and released; each array has one,
+  and the numbers of labels and of fragments stay at 11,884 and 11,924 after every
+  build, so this is no growth. In the final run's snapshots nothing of the package or of
+  the site accumulates (one earlier run kept about one build's state per rebuild: the
+  dev-mode paragraph above, and left open below).
+
+A rebuild took 20 to 30 s in B2's runs (the reload 14 to 24 s: every reload processes
+the whole zoo again, a touch included); in the review fixes' runs the reload took 21 to
+61 s and the build 28 to 69 s (snapshots written, the machine busier), and in the final
+run 15.8 to 16.4 s and 20.8 to 22.6 s. No second engine stays alive: the BibTeX
+speller's is created and freed in each build.
+
+**Deviations.**
+
+1. A package change (G7), a Rust change with the wasm module rebuilt, which the rules
+   require for a gap of the package (worktree files listed above; the main session
+   commits). Cargo and wasm-pack updated their own bookkeeping outside the worktree
+   while building: `~/.cargo/.global-cache` (cargo's last-use database, written by every
+   cargo call) and `~/Library/Caches/.wasm-pack/.wasm-opt-50385c9e73ccee70.lock`;
+   nothing was downloaded. No way around these was found for a module build.
+2. The installed package was packed and installed again at the start (its `src/` lacked
+   a JSDoc change of `1d7230c`), and again after G7.
+3. G4 through a second FLM engine created and freed by each `generateBibtex()` call, not
+   the zoo's engine: `render_latex()` takes no per-call render options and the setting
+   changes all of an engine's LaTeX runs (question 12). The six syntax characters keep
+   hand-written spellings (LaTeX's escapes, as pylatexenc gave them), since FLM cannot
+   take them as bare text.
+4. Not asked for: the random code data memoized per processing (the home page and the
+   data page each computed it, and printed gray's F1 Error twice); the references page
+   leaves out a backref to an object without a page (none in the data); the speller's
+   debug line reworded (`5012e97`).
+5. The dev-mode measurement through a wrapper of the site's configuration in watch mode
+   instead of `yarn dev` (Parcel); its data changes are temporary edits of a file of the
+   data clone, written back at the end.
+6. `TMPDIR` set to the scratchpad for every run (the Anystyle helper's `mkdtemp` and
+   Node's compile cache would otherwise write to the system's temporary folder).
+7. The code graph pane's stylesheet (C's app) updated with the others, since the brief's
+   stylesheet row lists it; C checks it against the pane's new HTML.
+8. The `\paragraph` dash of the old look dropped (the engine writes its run-in stop; no
+   `\paragraph` in the data).
+
+**Findings** (also in the gaps table above).
+
+- G7 (package, fixed): truncation inside a command's arguments (above).
+- F2 (flm-rs, text output): a formula in a term definition's lead-in loses its
+  delimiters in the text output (`Construction A_4: …` where the running text keeps
+  `\(A_4\)`; the HTML is right; `B2/probes/defterm_math.mjs`); 3 terms of the data hold
+  a formula; it reaches the search index's text. Not reported upstream (a finding for
+  05's table, the main session's edit).
+- G3's residual (flm-rs, known since Part 0): the citation marks of a preview cannot be
+  left out; 443 random code previews show marks linking to notes not on the page.
+- The search index no longer holds the cited works' texts (above): the engine's text
+  output leaves out the pieces by design; `render_text` of the core could place them
+  (`pieces: true`, which the engine does not pass). Question 13; G9 since the review
+  fixes, which place them as the main session ruled.
+- G8 (package; fixed by the review fixes, below): the relations populator copies a
+  relation's raw `detail` into the backreference before the FLM processor compiles the
+  fields. On the first load each backreference detail was compiled a second time, as a
+  field of the object it is copied to (3,432 extra fragments, under that object's file
+  and without a position: 5 of F1's 42 page lines named the wrong file); after a reload
+  the backreference held the forward relation's fragment, which the scan credited twice
+  to the forward object and not to the holder, so that dev-mode pages after a reload
+  differed from a fresh build: after a touch of one code file, the references page lost
+  2,420 of its 11,432 "Appears in" links and the glossary 154 of its 736 "Referenced in"
+  items, and the bibliography exports changed their order (the scan's counts are in the
+  gaps table). B2 first wrote here that nothing was visible on the data; the review
+  measured otherwise. Fixed as the main session ruled: one fragment per detail, counted
+  for both objects; the five lines name gkp.yml, quasi_cyclic.yml, projective.yml and
+  extended_golay.yml at the positions of the text; a reload gives the first load's scan
+  results, fragments and dump, and the dev-mode pages equal a fresh build's.
+- The howto's manual citation example (`… 1003--1592 (1943)`) would meet F1 (a key with
+  `--`); not changed. Its claim that `\ref{figure:…}` gives "Figure X" predates the port
+  (the baseline reads `Fig. I` too); corrected in the review fixes (`6c37737`). The other
+  examples of the howto render
+  without a diagnostic on the zoo's engine (`B2/logs/howto_check.txt`: the example,
+  styles, escapes, mathematics, the four lists, references and links, sections and
+  terms, the table syntax of every cells example), the bracket form `[{⇒}]` alone
+  refused.
+- `render_latex()` takes no `render_options`, unlike `render_document()` and
+  `render_fragment()` (question 12).
+
+**Checks** (logs in `B2/logs/`).
+
+| check | result |
+|---|---|
+| test build (`ECZOO_DEVELOPMENT_MODE=1 yarn build-test-noparcel`) | exit 0, 66 files written (36 HTML, B1's 35 and `references.html`; with `dat/bibreferences.bib`, `bibreferences_csl.json`, `randomcodedata.json`, `dynamic_style/flm.css`), 3.8 s, peak resident size 594 MB; no diagnostic, no Warning; no `<flm:`, no `flm:` followed by a digit; `Pass 1: 63 cached, 4 to fetch` (64 and 3 in one run; local sources), `Retrieved citations: 113 considered, 0 failed` (`build_test_final.log`); every commit's tree built this way with exit 0 (`20ad41e` only together with `fa6bab1`) |
+| full inspection build (`ECZOO_CITATIONS_CACHE_DIR=_zoodb_citations_cache_LOCAL ECZOO_FLM_CONTINUE_WITH_ERRORS=1 yarn build-simple-noparcel`, `/usr/bin/time -l`) | exit 0 in four runs, 44.2 to 65.9 s (B1: 37.8 to 40.4 s), peak resident size 1,016 to 1,350 MB (B1: 831 to 849); the last: 55.6 s, 1,100 MB, 1,425 files written, 1,428 in `_site/` (`build_full_final4.log`); the bibliography page 4.2 s, the references page 0.8 s, the home page 0.8 s (Eleventy's benchmark) |
+| pages against the baseline | the same 1,277 HTML pages, path for path (1,155 code pages, 86 lists and `/all`, 3 domains, 18 kingdoms, the single pages with `references.html`); `dat/` the same 5 files; `dynamic_style/flm.css` new; the sitemap's 1,274 locations in both |
+| diagnostics of the full inspection build | 43 lines, all `flm.citations.no-entry` Errors of F1's 18 `manual:{…}` keys: 42 in the pages, each once (B1's 43 printed gray's meta description twice), and 1 in the random code data (gray; a page B1 did not build); 0 Warnings, no other diagnostic; no `<flm:`, no `flm:` followed by a digit (`build_full_final_diags.txt`) |
+| full build as committed (no switch) | exit 1 after 27.6 s, peak 1,053 MB, "Wrote 0 files": gray's meta description (F1), as in B1 (`build_full_default.log`) |
+| retrievals | every full build: `Pass 2: 2124 cached, 0 to fetch`, `Retrieved citations: 7341 considered, 0 failed`; `Pass 1: 4739 cached, 478 to fetch` (the local `manual` and `preset` sources) in all runs but one, `4869 cached, 348 to fetch`, when the 130 `preset` entries of the LOCAL cache were still fresh from an earlier run; no network; the bibliography's Anystyle cache answered all 478 look-ups (no run of `anystyle`) |
+| dev mode | the table above (`devmem/before.jsonl`, `after.jsonl`) |
+| `eczoodb` tests (`cd eczoodb && yarn test`) | 75 passing, 2 pending, 0 failing, 14.5 s; offline: the manager's 14 runs each `Pass 1: 64 cached, 3 to fetch` from the local `manual` (2) and `qecdborg` (1, a `file:` URL), `113 considered, 0 failed`; the test cache keeps its 111 lines (`eczoodb_tests_after.log`, `eczoodb_tests_after_debug.log`) |
+| `eczcollectbib` tests | 16 passing (14 and 2 new) |
+| the stylesheet page | `_site/dynamic_style/flm.css`, 44,882 bytes: one comment line and exactly `html_stylesheet()` (44,809 bytes) of a new engine created with the zoo's core configuration (the same settings hash) (`probes/stylesheet_cmp.mjs`) |
+| the SCSS alone | `site/stylesheets/main.scss` and the pane's stylesheet compile with the clone's `sass` 1.83.0, no error, no warning (`B2/sass/`); no old-class selector in the compiled CSS but those the table keeps |
+| the layout's `<head>` | the MathJax 4 configuration and loader, the link to `/dynamic_style/flm.css`; nothing of MathJax 3 |
+| the bibliography exports, the random code data, the search index, the dump | above |
+| package (worktree) | `yarn lint` clean; `yarn test` 475 passing (474 and 1); `zoodb-flm-wasm` clippy clean, 20 tests (19 and 1); `yarn build:wasm flm` path check green; `yarn node playground/play_example.mjs` exit 0; the docs build without a warning (the main checkout's Sphinx 8.1.3, read-only, output in `B2/docbuild/`); `yarn pack` 75 files, 2,346,424 bytes (SHA-256 `97b3583a…`, `logs/pack_trunc.sha256`) |
+| git state | worktree: the brief, `HANDOVER.md` and the package files of G7 modified, nothing else; sitegen clone: `00e4fe9` to `ce83723` on `f2ec92c`, `status --short` empty, root `package.json` and `yarn.lock` equal to the committed form, 16 commits over `origin/main` (A's one, B1's six, these nine; trailers checked), push URL the disabled one; installed `src/` equal to the worktree's; data and handbook clones unchanged (`60bbc93ae`, `c73b681`); the originals: `status` empty, heads `a2ad583`, `7ade20a2f`, `c73b681` (read with `--no-optional-locks`), no file newer than this part's start; nothing new under `~/.yarn`, `~/.cache` or `/tmp` from this part (cargo's and wasm-pack's two bookkeeping files: deviation 1) |
+
+**Open questions** (numbered after the brief's ten).
+
+11. F1 stays Philippe's; with this part the random code data also shows gray's F1 Error
+    (one line more in the inspection builds).
+12. Should `render_latex()` take per-call `render_options`, as `render_document()` does
+    (a crate and engine addition), so that the BibTeX export can use the zoo's engine
+    instead of a second one? Not needed now.
+13. The search index (reworded after the review fixes): the site indexes the cited
+    works' texts again, as the baseline did (the main session's ruling; G9,
+    `searchable_text_options.flm_pieces: true`). Keep this, or index the citation marks
+    alone (`flm_pieces: false`): an index about half the size (2,349,486 bytes instead
+    of 4,605,733), but a code is then no longer found by the authors or titles of the
+    works it cites. A side effect of the texts: the words of the two headings
+    (`References`, `Footnotes`) are in every field that cites or has a footnote, so a
+    search for "references" matches 1,115 codes (54 in the baseline).
+14. F2 for 05's table. (G8, asked here first, is fixed in the package by the review
+    fixes, for the main session to commit.)
+15. The `\paragraph` stop: keep the engine's `.` or set `html.run_in_stop` to the old
+    dash (no `\paragraph` in the data today).
+
+**For C, D and E.**
+
+- C: the code graph pane's stylesheet now selects the engine's classes
+  (`.flm-citations-bibliography`, `.flm-xnotes-footnote-list`, `.flm-pres-unknown`, …);
+  the profiles' `mathjax.load()` waits for MathJax 4 (the search widget and the random
+  code widget still call `MathJax.typesetPromise()` on new content, which the engine's
+  `flm:region-updated` event could replace); Parcel meets `/dynamic_style/flm.css`
+  (`@layer`) and the inline MathJax configuration in every page's `<head>` for the first
+  time; the random code previews carry citation marks; `gitzoopreview` still imports
+  `docrefs_placeholder_ref_resolver` (excluded, G5); the TEMPORARY stand-in of
+  `eczcodegraph.js` is left as it was.
+- D: `generateBibtex()` is async now and makes its own engine (the handbook's
+  `mk_bib.js` calls it, commented out); the zoo's engine settings are unchanged
+  (`latex-recomposed.unicode` stays `declare` for the handbook's own run);
+  `test/_loadeczoodb.js` merges options deeply.
+- E: the look on the new HTML is unchecked in a browser (the screenshots); the
+  comparison should classify the citation marks in the random code widget, the search
+  index's content (since the review fixes each field's text followed by its footnotes
+  and cited works, where the baseline wrote each citation in full in place; G9), the
+  references page and the glossary after a dev-mode reload (G8), the image sizes now set
+  by the engine's stylesheet, the double no-break space of `~\cite`; the build is 5 to
+  25 s slower and about 200 to 500 MB larger at its peak than B1's, with the
+  bibliography pages, the references page and the random code data built again; the
+  default build still stops at F1. While F1 lasts, the search index also holds 22
+  `[dropped: bibliography entry]` placeholders (G9), gone once F1 is fixed. E should
+  watch the heap in its dev-mode runs: one of B2's four runs kept about one build's
+  state per rebuild, not reproduced and with no retainer found (left open below),
+  possibly another `Error` whose stack pins a build, as lunr's did.
+
+**Review fixes** (2026-10-19). The review (Opus, read-only; its probes and logs in
+`B2/review/`) gave the verdict "fix first": two must-fix items (the statements about G8
+in this brief, and G8 itself, a defect of the package), three should-fix items (the JS
+heap in dev mode, `.visual-highlight + dd`, the howto on `\ref` of a float), notes, and
+"accepted" for the eight deviations. The main session ruled G8 (each detail compiled
+once, both objects credited, the diagnostics at the relation's own field) and question
+13 (the cited works' texts indexed again, as in the baseline). Three fixer agents
+(Opus) did the round: a first one, stopped by a usage limit before it reported
+(`B2/fix/`); a second one for G8 (`B2/fix/once/`, with a copy of the first one's
+worktree state in `once/first_fixer/`); and a third one for the rest, the checks and
+this paragraph (`B2/fix2/`). Four commits in the sitegen clone on `ce83723`, each with
+the two trailers and with the root `package.json` and `yarn.lock` in their committed
+form: `030d469`, `6c37737` and `b219ad1` (the first fixer), `1c1cf55` (the third). Two
+package changes in the worktree, uncommitted, for the main session: G8 and G9 (gaps
+table). Nothing in the data clone or the handbook clone; nothing pushed.
+
+- (must) *The statements about G8.* B2 wrote that G8 showed nothing on the data. The
+  review measured two effects (`B2/review/probes/reload_cited.mjs`). On the first load,
+  5 of F1's 42 page lines named the file of the object holding the backreference, at a
+  position counted from the field. After a reload with no change, the scan credited
+  every backreference detail twice to the relation's own object and not to the holder:
+  on the full data `cited` differed for 949 objects and `refs` for 320, the key–object
+  pairs fell from 11,447 to 9,020 and the fragments from 15,356 to 11,924 (test data: 3
+  objects' `refs`). The second fixer rewrote the G8 row of the gaps table, the G8
+  finding and the dev-mode paragraph and table with these counts, and with what they
+  did to the pages in dev mode, measured on the package without the fix: after a touch
+  of one code file, the references page had 9,012 "Appears in" links instead of a fresh
+  build's 11,432, and the glossary 582 "Referenced in" items instead of 736.
+- (must) *G8 in the package.* The first fixer compiled every backreference copy again
+  at each processing, as the holder's own fragment with the position of the source. The
+  second fixer kept that fixer's record of the copies (`src/dbprocessor/relations.js`:
+  `_zoodb.copied_fields`, rebuilt with the relation fields, left out of dumps; its test
+  in `test/test_dbprocessor_relations.js`) and replaced the rest, as ruled. The field
+  compiler (`src/dbprocessor/flmsimplecontent.js`) gives a copied field the live
+  fragment of the field it copies (`copied_field_source()`); if the source is not
+  compiled yet, it compiles the source's field in place first, as that object's field,
+  with its origin, position and schema options. `object_fragments()` leaves the copy out
+  (the new `object_field_fragments()` flags it), so that every fragment is listed and
+  released once. The scan (`src/dbprocessor/flmprocessor.js`, `_process_scan()`) builds
+  each object's entry over its fields, so that a copy credits its holder with the
+  fragment's references, citations and images, while its labels and term definitions
+  stay with the relation's object. The first fixer's route was dropped because it
+  compiled each detail twice (3,432 extra fragments: 15,356 live instead of 11,924),
+  defined a label written in a detail twice (`zoodb.labels.duplicate` in the new test)
+  and reported a detail's diagnostics on both objects. Tests:
+  `test/test_dbprocessor_flmprocessor_backrefs.js`, 7 tests (the record; the copy is the
+  relation's fragment with its position, also when the copy comes first in the zoo; the
+  scan's credits, with no duplicate label; equal snapshots, fragments and dump after a
+  reload with no change; a reload of the holder, then of the source; dumps; a diagnostic
+  in a detail on the relation's object only, at
+  `items/a.yml#relations.parents.0.detail:7:17`, before and after a reload); a variant
+  without the label fails 7 of 7 on `1d7230c`'s `src/` and 5 of 7 on the first fixer's.
+  Also `doc/zoodb.dbprocessor-flm.rst`, `doc/zoodb.dbprocessor-relations.rst` and a
+  `CHANGELOG.md` bullet. On the full data (`B2/fix/once/probes/reload_once.mjs`), a
+  first load and a reload with no change agree in every object's `cited`, `refs`,
+  `labels`, `terms`, `graphics` and diagnostics (17,336 cited entries and 11,447 pairs
+  both times) and in the dump; there are 11,924 live fragments at every load and build;
+  the five lines name the file and position where the text is written (checks below).
+  In dev mode, every page and export after the touch and after the second and the fifth
+  edit equals a fresh build's (the dump aside, left open below).
+- (should) *The JS heap in dev mode* (the dev-mode paragraph above). The first fixer
+  traced it with heap snapshots: the step of about 265 MB after the first reload was the
+  first build's `TemplateMap`, with the content of every page, held for the rest of the
+  process by lunr's `QueryParseError.prototype`, an `Error` made when lunr is first
+  loaded, whose stack trace kept a call on that `TemplateMap`; lunr was first loaded by
+  `src/dat/searchindex.11ty.js` during the first build. `b219ad1` imports the search
+  index generator from `site/eleventy.config.js`, before any build, with a comment that
+  says why. It stays: it is the site's own code, it changes no output, and the `Error`
+  then keeps only the frames of the configuration's loading. The growth of about 1 MB
+  per rebuild is Eleventy's: it imports every `.11ty.js` template again at each watch
+  rebuild (`?_cache_bust=`), and Node never frees a module record. The third fixer
+  checked both on the final state, with G8 and G9 (snapshots after builds 1, 2, 6 and
+  7): after the touch's build the one `TemplateMap`, `TemplateWriter` and bibliography
+  collector alive are build 2's; the heap after a build goes from 515.8 to 520.7 MB over
+  the five edits; what builds 3 to 6 left is 6.5 MB, mostly module records and their
+  compiled code, 15 templates having one module record per build. The growth is
+  recorded, not changed: its holder is Eleventy's, neither the package's nor the site's.
+  The run that grew by about 169 MB per build (the second fixer's `after`) was not
+  reproduced in three further runs.
+- (should) *`.visual-highlight + dd`*, dropped from
+  `site/stylesheets/visual-highlight.scss` by `030d469`. Checked: the commit removes
+  that one rule and nothing else. The site's script
+  (`jscomponents/linkanchorvisualhighlight/`) adds the class to the target of a `#`
+  link, which on a list of citations is the engine's `<li id="citation-N">`, holding the
+  label and the text; no `<dt>` of the built site has an `id`. `main.scss` and the
+  pane's SCSS compile with sass 1.83.0 without an error or a warning, the CSS differing
+  from B2's by that rule (`B2/fix/sass/`). The selector table has a row for it.
+- (should) *The howto* (`flm_howto.md`, `6c37737`). Checked: it changes the two places
+  and nothing else. With the zoo's settings, `\ref{figure:…}` gives *Fig. I* and
+  `\ref{table:…}` *Tab. I*, and `\ref[S]{…}` gives *Figure I* and *Table I*
+  (`B2/fix/probes/howto_refs.mjs`, `B2/fix/logs/howto_refs.txt`). The F1 example and the
+  sentence on the legend of a float without a caption (*Figure X*, which the engine
+  writes as `Figure II`) are unchanged.
+- (ruling) *The cited works in the search text* (G9; question 13 reworded). In the
+  package: `engine.render_text()` takes `pieces` (`src/zooflm/engine.js`; the crate's
+  text runs could already place them), `FLMSearchableDocTextValuesAssembler` takes the
+  option `pieces` (`src/dbprocessor/searchabletextflm.js`), and the standard setup reads
+  `searchable_text_options.flm_pieces` (`src/std/use_searchable_text_processor.js`,
+  `src/std/stdzoodb.js`; default `false`). Tests: in `test/test_zooflm_engine.js`, each
+  tree ends with its footnotes and its cited works, a tree without them has no piece,
+  and the whole run's text places them once; in `test/test_dbprocessor_flmprocessor.js`,
+  with the option a field's search text holds its footnote and its cited work, while a
+  standalone field and a field without a piece are unchanged, and by default it holds
+  neither. Docs: `doc/zoodb.dbprocessor-searchable.rst`, `doc/zoodb.zooflm.rst`,
+  `doc/std.rst`; a `CHANGELOG.md` bullet. The sitegen sets `flm_pieces: true` in
+  `eczoodb/eczoodb.js` (`1c1cf55`). A field's search text is now its text, then its
+  footnotes under `Footnotes` and its cited works under `References`
+  (`qubits_into_qubits.description` ends `… [1; Ch. 2].`, then `[1] D. Gottesman,
+  Surviving as a Quantum Computer in a Classical World (2024) URL`); the baseline wrote
+  each citation in full where it stands, so a work cited twice in a field is now listed
+  once. Against the baseline (`B2/fix2/searchidx/`, `logs/searchidx_cmp_pieces.txt`):
+  4,605,733 bytes (baseline 4,443,321; with the marks alone 2,349,486); the same `info`,
+  28 store fields and 1,155 ids in the same order; `introduced` 273,062 characters
+  (235,118; 7,543), `description` 1,141,693 (1,165,932; 815,535). Queried as the site's
+  client queries it (`SearchIndex.load` with the site's lunr options;
+  `B2/fix2/probes/search_query.mjs`, `logs/search_queries.txt`, `search_queries2.txt`),
+  words that only the cited works hold give the baseline's numbers of results, each rank
+  of the two codes the baseline's or one place off; the index of marks alone missed the
+  code in 3 of the 5 queries and ranked it lower in the other 2 (10th, 8th):
+
+  | query | baseline | marks alone | cited works (now) |
+  |---|---|---|---|
+  | `Zeng` | 53 results, `approximate_qecc` 14th | 1, not found | 53, 14th |
+  | `valence-bond-solid` | 27, `approximate_qecc` 2nd | 15, not found | 27, 2nd |
+  | `Cao Zeng Laflamme` | 89, `approximate_qecc` 4th | 15, 10th | 89, 3rd |
+  | `Surviving` | 34, `qubits_into_qubits` 2nd | 3, not found | 34, 3rd |
+  | `Gottesman Surviving` | 86, `qubits_into_qubits` 2nd | 14, 8th | 86, 3rd |
+  | `references` | 54 | 43 | 1,115 |
+
+  The last row is the side effect of the two headings, whose words are in every field
+  that cites or has a footnote (question 13). The zoo load's searchable-text step (from
+  the FLM processor's last line to the next processor's first) took 9.7 s, against
+  10.9 s with the marks alone in the second fixer's build.
+- (notes) The first fixer corrected the stylesheet sentence (15 of the 17 style
+  definitions, `flm.headings.style` having no parts). Deviation 1's two bookkeeping
+  writes (`~/.cargo/.global-cache`, the wasm-opt lock) are recorded for Philippe as a
+  side effect of building the module, like B1's yarn archives; another process also
+  writes the cargo file (it changed again at 11:37 during this round, which ran no
+  cargo command). The memos keyed by `scan_results` are left as they are; a documented
+  processing generation of the package, and a release by `ComputedDataProcessor` of the
+  fragment values it replaces, stay suggestions.
+
+Checks of the final state (the worktree with G7, G8 and G9, the sitegen clone at
+`1c1cf55`; by the third fixer, logs in `B2/fix2/logs/`; every run with `TMPDIR` in the
+scratchpad):
+
+| check | result |
+|---|---|
+| package | `yarn lint` clean; `yarn test` 485 passing (483 with G8, and G9's 2), `git status` unchanged by the suite; `yarn node playground/play_example.mjs` exit 0; Sphinx 8.1.3 (the main checkout's environment, read-only) on `doc/`, output in `B2/fix2/docbuild/`: no warning |
+| pack and install | `B2/fix2/repack_install.sh` (the Setup's procedure): 75 files, 2,350,269 bytes, SHA-256 `b0a639fd…` (`pack_pieces.sha256`); offline, the only `YN0013` the tarball read from disk; one `node_modules/@phfaist/zoodb`, 0.3.0, its `src/` equal to the worktree's; the root files restored |
+| test build (`ECZOO_DEVELOPMENT_MODE=1 yarn build-test-noparcel`) | exit 0, 66 files written (36 HTML, 69 in `_site/`), 4.1 s, peak resident size 563 MB; no FLM diagnostic, no `<flm:`, no `flm:` followed by a digit; `Pass 1: 63 cached, 4 to fetch` (local sources), `113 considered, 0 failed`; the one generatebibtex brace warning of every earlier run |
+| full inspection build (the switch, the LOCAL cache) | exit 0, 89.9 s, peak resident size 931 MB (the machine's load average was 15 to 21 from other processes: the bibliography page alone took 18.5 s, 6.1 s in the second fixer's run), 1,425 files written, 1,428 in `_site/`, 1,277 HTML; 43 lines, all `flm.citations.no-entry` of F1's 18 keys and the same as the second fixer's (`f1_lines_short.txt`), the five G8 lines at the place of the text (`/c/fusion.html` at `gkp.yml#relations.cousins.3.detail:85:89`, and `/c/convolutional.html`, `/c/griesmer.html`, `/c/dodecahedron.html`, `/c/icosahedron.html` at quasi_cyclic.yml, projective.yml and extended_golay.yml); no other diagnostic, no marker; `Pass 1: 4739 cached, 478 to fetch`, `Pass 2: 2124 cached, 0 to fetch`, `7341 considered, 0 failed` |
+| full build against the earlier ones | `diff -rq` against the second fixer's fresh build (`B2/fix/once/site_fresh/`): only `dat/searchindex.json` (G9); against B2's `site_final`, the second fixer found only the order of the dump's `zooflm.citations` (the same 5,217 entries); a copy is in `B2/fix2/site_fresh/` |
+| search index | above (G9) |
+| default build (no switch) | not re-run (it would empty the inspection `_site/` that C uses); the first fixer's: exit 1 after 38.4 s, at gray's meta description (F1) |
+| dev mode | the final column of the table above (`B2/fix2/devmem/final.jsonl`; the four snapshots, about 310 MB each, kept in `B2/fix2/devmem/final/`); every page and export after the touch and after the fifth edit equals the fresh build's, the search index included; the dump differs by `zooflm.snippets` (2,800 and 2,799 entries against 2,008) and after the edits by the edited file's modification token; the data clone's status empty at the end |
+| `eczoodb` tests (`cd eczoodb && yarn test`) | 75 passing, 2 pending, 0 failing, 16.3 s; 14 manager runs with `113 considered, 0 failed` each (13 at 64 cached and 3 to fetch, one at 63 and 4: the preset entry, whose TTL is seconds; local sources); the test cache keeps its 111 lines |
+| `eczcollectbib` tests | 16 passing |
+| the clone's eslint | `eczoodb/eczoodb.js` and `site/eleventy.config.js`: no error, no warning |
+| not re-run | the Rust checks and `yarn build:wasm` (G8 and G9 change no Rust; G7's ran in B2) |
+| git and home state | worktree at `1d7230c`: the brief, `HANDOVER.md` and the package files of G7, G8 and G9 modified, `test/test_dbprocessor_flmprocessor_backrefs.js` new, nothing else; sitegen clone at `1c1cf55`, `status --short` empty, root `package.json` and `yarn.lock` in their committed form, 20 commits over `origin/main` (B2's nine and the four above with both trailers; none touches the root files), push URL the disabled one, `site/_site/` the fresh full inspection build again (the dev-mode run rebuilt it; `diff -rq` against `B2/fix2/site_fresh/` empty); data clone `60bbc93ae` and handbook clone `c73b681`, both clean; the originals at `a2ad583`, `7ade20a2f`, `c73b681`, `status` empty, no file newer than this round's start (read with `--no-optional-locks`); nothing new under `~/.yarn`, `~/.cache` or `/tmp` from this round (the new `~/.npm/_logs` entries are `npm root --global` runs in another folder, by another process) |
+
+Left open, and why. F2 (05's table, the main session's edit) and questions 11, 12, 13
+(reworded: keep the cited works' texts or index the marks alone, about half the size)
+and 15, all Philippe's. In dev mode the dump's snippet cache holds the snippets of the
+previous build's computed short names (2,800 entries against a fresh build's 2,008);
+it predates G8 and changes no page, the main session's call whether it matters. Two CSL
+ids shared by two `manual` keys each take the entry of the key met first (the
+"Duplicate citation key" lines); a different order of encounter swaps them, as the
+package without the G8 fix showed in dev mode; this predates G8. `docs/architecture.md`
+line 49 of the sitegen still says that FLM is the JS-transpiled version, left for C or
+E. The worktree's `CLAUDE.md` describes the searchable-text assembler as
+`FLMSearchableDocTextValuesAssembler({ engine })`; its option `pieces` could be added
+there by the main session (agents leave `CLAUDE.md` alone). One of the four dev-mode
+runs (`B2/fix/once/devmem/after.jsonl`, with G8 fixed) kept about one build's state per
+rebuild: the JS heap after each build from the touch's on was 506.6, 675.8, 844.0,
+1,013.0, 1,181.7 and 1,350.0 MB, the growth surviving the next zoo load; it did not
+reproduce in the three other runs and no retainer was found, so E watches the heap in
+its dev-mode runs.

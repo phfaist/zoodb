@@ -53,6 +53,16 @@ Relation specification objects may have the following fields:
     entry to store the actual referring object.  Defaults to
     ``<source_object_type>``.
 
+  A back-reference entry copies the values of the relation object (but the
+  target's ID).  The populator records where they come from in the target
+  object's ``_zoodb.copied_fields``: the entry's path (``relations.children.0``)
+  maps to ``{ object_type, object_id, field }``, the relation object it copies
+  (``field`` its path, ``relations.parents.2``).  The FLM field compiler reads
+  it to give a copied FLM field the fragment of the field it copies, compiled
+  once, with that field's file position (see :doc:`zoodb.dbprocessor-flm`).
+  The record is rebuilt with the back-references at every processing and left
+  out of data dumps with them.
+
 
 
 

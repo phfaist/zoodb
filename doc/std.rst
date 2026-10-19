@@ -173,7 +173,10 @@ boilerplate code:
     
           searchable_text_options: {
               // which DB object types to search
-              object_types: ['myfancyobject',....]
+              object_types: ['myfancyobject',....],
+              // true: the search text of an FLM field also holds its
+              // footnotes and the works it cites (default: their marks alone)
+              flm_pieces: false,
           },
     
           zoo_permalinks: {

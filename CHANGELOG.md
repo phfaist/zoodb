@@ -51,5 +51,30 @@ ported.
   get no index entry in that context, and a reference to them is unresolved in
   its renders (`flm.refs.unresolved`). Any other value that is not a string is
   still refused by `engine.set_index()`.
+- **Truncation keeps commands whole.** `engine.truncate()` cuts a command
+  only inside its last argument, and never inside what its element sets
+  apart from the text (a `\cite`'s keys, a `\ref`'s or `\hyperref`'s
+  target, a `\href`'s address) or inside verbatim content, so that a preview
+  parses again without errors; a cut that would fall in an earlier argument
+  leaves the command out.
+- **The FLM fields of back-references.** A back-reference's copy of a
+  relation's FLM field (a `detail`) holds the fragment of the relation's own
+  field, compiled once, at every processing, a reload included; `object_scan()`
+  counts its references, citations and images for both objects and its labels
+  and terms for the relation's object. A reload with no change now gives the
+  scan results, fragments and data dumps of a first load (before, a first load
+  compiled the copy a second time, under the holder's file and without a
+  position, and a reload counted it twice for the relation's object and not
+  for the holder). Its diagnostics name the relation's file and position. The
+  relations populator records the copies in `_zoodb.copied_fields`, left out
+  of data dumps; `FLMSimpleContentCompiler.object_fragments()` leaves them
+  out, the new `object_field_fragments()` flags them.
+- **Cited works in the search text, as an option.** `engine.render_text()`
+  takes `pieces: true`, which places each run's footnotes and list of cited
+  works after its text, and `FLMSearchableDocTextValuesAssembler` takes
+  `pieces` (in the standard setup `searchable_text_options.flm_pieces`), so
+  that an object can be found by the works it cites, as the 0.2 text renderer
+  allowed (it wrote each citation in full). By default a citation and a
+  footnote are their marks alone in the search text.
 - **Node 20 or later** (`engines`). The unused dependencies `escape-html`,
   `glob` and `url` are dropped.

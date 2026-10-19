@@ -1534,6 +1534,45 @@ mod tests {
         assert_eq!(t6.source.trim(), "Para one text.", "{:?}", t6.source);
     }
 
+    /// R18: a command is cut only inside its last argument, and what its
+    /// element declares apart from the text (citation keys, reference
+    /// targets, link addresses) is never cut: every truncation parses again
+    /// without a diagnostic (found on the EC zoo data, step 6 B2).
+    #[test]
+    fn truncation_keeps_command_arguments_whole() {
+        let mut engine = Engine::new(&EngineConfig::default()).unwrap();
+        let options = |chars: usize| TruncateOptions { chars, min_chars: None, marker: " …".into(), first_paragraph: false };
+        let cases: [(&str, usize, &[&str], &[&str]); 6] = [
+            // The keys of a \cite count nothing and are never cut.
+            ("See \\cite{arxiv:1108.0123} and some more words here.", 8, &["\\cite{arxiv:1108.0123}"], &[]),
+            // A citation chunk (\\cite{a}\\cite{b}) is one command: a cut in
+            // the note of its second call leaves the chunk out whole, rather
+            // than that call without its keys.
+            ("Text \\cite[Rem. 15.3.27]{preset:a}\\cite[Thm. 15.3.28]{preset:b} after.", 20, &["Text"], &["cite", "Thm", "preset"]),
+            // A cut in the note of a single call leaves it out whole.
+            ("Text and \\cite[A rather long note]{preset:a} after.", 14, &["Text and"], &["cite", "note", "preset"]),
+            // The target of a \hyperref is never cut; its text may be.
+            ("A \\hyperref[topic:quantum-weight-enumerator]{pure and simple} code with more text after it.", 9, &["\\hyperref[topic:quantum-weight-enumerator]{pure"], &["code"]),
+            // The address of a \href is never cut; its text may be.
+            ("\\href{https://example.org/a/long/path}{the link text here} tail", 8, &["\\href{https://example.org/a/long/path}{the link"], &["tail"]),
+            // Verbatim content is kept whole or left out.
+            ("Verbatim \\verbcode{some long code text} after", 12, &["Verbatim"], &["some long", "verbcode"]),
+        ];
+        for (text, chars, kept, left_out) in cases {
+            assert!(engine.parse(text, "a", FragmentLayout::Inline).unwrap().diagnostics.is_empty(), "{text}");
+            let t = engine.truncate(text, "a", FragmentLayout::Inline, &options(chars)).unwrap();
+            assert!(t.truncated && (t.source.ends_with('…') || t.source.ends_with("…}")), "{:?}", t.source);
+            for k in kept {
+                assert!(t.source.contains(k), "{:?} should keep {k:?}", t.source);
+            }
+            for l in left_out {
+                assert!(!t.source.contains(l), "{:?} should leave out {l:?}", t.source);
+            }
+            let reparsed = engine.parse(&t.source, "a", FragmentLayout::Inline).unwrap();
+            assert!(reparsed.diagnostics.is_empty(), "{:?}: {:?}", t.source, reparsed.diagnostics);
+        }
+    }
+
     /// Q12: one recomposed-LaTeX run over several fragments: safe labels
     /// numbered once over the run, object references raw, citations as hooks,
     /// comments dropped, the style file produced.
