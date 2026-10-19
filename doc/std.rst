@@ -380,7 +380,10 @@ The configuration keys of the FLM features, all optional except where noted
    ``object(object_type, object_id)``, the href of an object's page (the
    ``default`` context of the index), and ``graphics_resource(resource_data)``,
    the address of a collected image (``resource_data.src_url`` is the target
-   name the retriever gave the file).
+   name the retriever gave the file).  ``object`` may return ``null`` for an
+   object type without a page, in which case the FLM processor makes no index
+   entry for those objects (nor for the labels of their fields), and references
+   to them are unresolved (see :doc:`zoodb.dbprocessor-flm`).
 
 The former keys ``use_flm_environment`` and ``flm_options.environment_options``
 are refused with a message that names their replacements.

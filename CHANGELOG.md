@@ -45,5 +45,11 @@ ported.
 - **The loaders need the engine for `.flm` files.** `FlmFilesDbDataLoader`
   reads `.flm` files through the engine (`engine` in its config; the standard
   setup passes `zoodb.zoo_flm_engine`).
+- **Objects without a page.** The `object_href` of a context of the FLM
+  processor (in the standard setup, `zoo_permalinks.object`) may return `null`
+  for an object that has no page: the object and the labels of its fields then
+  get no index entry in that context, and a reference to them is unresolved in
+  its renders (`flm.refs.unresolved`). Any other value that is not a string is
+  still refused by `engine.set_index()`.
 - **Node 20 or later** (`engines`). The unused dependencies `escape-html`,
   `glob` and `url` are dropped.

@@ -1,4 +1,4 @@
-# Handover note for continuing the build (written 2026-10-17, updated 2026-10-17 after step 5)
+# Handover note for continuing the build (written 2026-10-17, updated 2026-10-19 in step 6)
 
 Read this first when continuing the ZooDb FLM redesign around flm-rs in a fresh session.
 It says where things are, how each build step is run, the rules that bind, and what comes
@@ -17,8 +17,11 @@ in `README.md` of this folder.
   (prototype, 07); step 1 `e00e24a` (08); step 2 `98d8f40` (09); step 3 `6a545c9` (10);
   docs `41c673d`, `c435de5`; `053c8d6` (Philippe: the main checkout's `scratch/` moved
   here); step 4 parts A and B `19c428c` (11); step 4 part C and these notes `28df685`
-  (its hash added in `7d5f273`); step 5 `e8f7c00` (12). The tree was clean at
-  `e8f7c00`; this update and brief 13 came after it.
+  (its hash added in `7d5f273`); step 5 `e8f7c00` (12); these notes after step 5 and
+  brief 13 `1f1f0f8`; step 6 part 0 (the package: term bodies and per-tree cited keys in
+  the scan, per-call render options) and part A (the EC zoo clones, the data
+  re-indented) `c6b11b9` (13); B1's results and closing with G6 fixed in the package
+  (this update; the hash to be filled by the main session).
 - **What exists now.** `rust/` is a cargo workspace (`zoodb-autocitefetch-wasm`,
   `zoodb-flm-wasm`; flm-core by path from `/Users/philippe/projects/flm-rs/flm-core`);
   the FLM module is committed as `src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` (5.14 MB)
@@ -48,6 +51,22 @@ in `README.md` of this folder.
   quick rebuilds. The build check (pack the worktree, point the example's dependency at
   the tarball, install, build, restore `website/package.json` and `yarn.lock`) is spelled
   out in 11, Results, Part C. The original `../zoodb-example` is read-only.
+- **The EC zoo port** (step 6, brief 13) lives in three clones under `scratch/eczoo/`
+  (ignored through `scratch/.gitignore`): `eczoo_sitegen`, `eczoo_data`,
+  `eczoo_handbook`, each on a branch `zoodb-flmrs` with its push URL disabled, never
+  pushed. The data clone holds A's `fd2a8d992` (the re-indent) and `60bbc93ae` (the
+  `eq:parity` labels); the sitegen clone A's `8634846` and B1's `9311d27`, `9ff93ff`,
+  `70558e5`, `7847ecc`, `5ae77b8`, `f2ec92c`; the handbook clone nothing yet. The
+  sitegen runs on 0.3.0 from the tarball `scratch/zoodb-flmrs.tgz` through a root
+  `resolutions` overlay of its `package.json` and `yarn.lock`, restored before every
+  commit; its installs keep Yarn's mirror out of `~/.yarn` with `YARN_GLOBAL_FOLDER` in
+  the session's scratchpad (`YARN_ENABLE_MIRROR=0` cannot install offline from the
+  copied caches), and a repack needs three stale copies removed first (13, Setup). Its
+  full-data builds use the cache copy `_zoodb_citations_cache_LOCAL`
+  (`ECZOO_CITATIONS_CACHE_DIR`), and `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` gives inspection
+  builds under `'continue'` while F1 is open (below). The originals under
+  `/Users/philippe/Research/projects/2021-qec-zoo/` are read-only (heads `a2ad583`,
+  `7ade20a2f`, `c73b681`).
 - **Prototype runners** in `scratch/proto/js/` (run with
   `NODE_MODULES=/Users/philippe/Research/projects/2021-qec-zoo/eczoo_sitegen/node_modules`,
   data `/Users/philippe/Research/projects/zoodb/zoodb-example/data` and `schemas`, or the
@@ -59,9 +78,9 @@ Since step 4 the steps run in **ultracode mode** (the Workflow tool) with few ag
 on the **Opus model**, each dimensioned to stay well under about 500k tokens of context
 (one part of a step per agent; long outputs to log files in the session's scratchpad).
 
-1. The brief for the step is in this folder (`13-step6-eczoo.md` is next, being drafted
-   by another agent at the time of writing); adjust it to the previous step's Results
-   before handing it off (each brief has a "Results" section the implementer fills in).
+1. The brief for the step is in this folder (`13-step6-eczoo.md` for step 6, one part
+   per agent); adjust it to the previous step's Results before handing it off (each
+   brief has a "Results" section the implementer fills in).
 2. One workflow: an **implementer agent** (`model: 'opus'`) with the brief's path, the
    worktree path and the commit it starts from, the hard rules (below), the context files
    to read, the environment facts, the checks to run, what to put in the Results, the
@@ -120,7 +139,7 @@ zoodb-autocitefetch-wasm`). Module rebuild: `yarn build:wasm flm` (about 15 s wa
 to 2 min cold; the first build with the remapping flags recompiles everything); the
 committed module must match the crate (step 5 rebuilt both). The build reads the flm-rs
 checkout's git state only for `BUILD_INFO.json` (read-only, `git --no-optional-locks`).
-`yarn test` (460 passing after step 5), `yarn lint` (green since step 5 and run by the CI
+`yarn test` (474 passing in step 6), `yarn lint` (green since step 5 and run by the CI
 test job; keep it at zero errors), the sample `yarn node playground/play_example.mjs`.
 Docs: the worktree's `doc/` poetry environment has no packages installed, so step 5 ran
 the main checkout's `~/Library/Caches/pypoetry/virtualenvs/zoodb-doc-oZT3q19H-py3.13/bin/sphinx-build`
@@ -184,16 +203,25 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
 ## Next
 
 - **Step 5** done (12, `e8f7c00`).
-- **Step 6** = brief 13 (`13-step6-eczoo.md`, being drafted at the time of writing): the
-  EC zoo, outside this repository: the `eczoo_sitegen` and `eczoo_handbook` ports (scan
-  results through `processor.scan_results`, the browser apps over
-  `engine.load(data.zooflm)`, the MathJax 3 setup and the old math classes' SCSS replaced
-  by `html_scripts()` and the new classes, the handbook over `render_latex`, a dev-mode
-  engine per rebuild never `free()`d) and the data fixes found (the 127 files to
-  re-indent, the three duplicate labels, `[{⇒}]`, `%%` comments, `\includegraphics`
-  outside floats, the `~\cite` ties); the brief holds the detail. Those folders are
-  read-only under the rules above, so the ports need Philippe's ruling on where they are
-  made (the example's went to a clone) before the step starts.
+- **Step 6** in progress, brief 13 (`13-step6-eczoo.md`): the EC zoo on 0.3.0, ported in
+  the clones above, in the parts A, B1, B2, C, D, E (the brief holds the detail and the
+  Results). Part 0 (the package) and part A (the data) are committed as `c6b11b9`. B1
+  (the zoo and its pages) is done in the sitegen clone (`9311d27`, `9ff93ff`, `70558e5`,
+  `7847ecc`, and at its closing `5ae77b8`, `f2ec92c`). G6, an object type without pages
+  (the EC zoo's spaces), is fixed in the package: an object whose `object_href` returns
+  `null` gets no index entry (this update's commit, the hash to be filled by the main
+  session). F1 is open upstream (05, "Findings to report"): flm-core reads a citation
+  key after the typography rewrite for the render but as written for the scan, so the
+  data's 18 `manual:{…}` keys with `"`, `'` or `--` fail with `flm.citations.no-entry`
+  (42 Errors); no workaround, the data unchanged; the default full build exits 1 at
+  gray's meta description until flm-rs is fixed, and the sitegen's
+  `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` gives the later parts full builds to inspect, the
+  errors printed. Next: B2 (presentation, exports, scripts, tests, dev mode) per brief
+  13, from the sitegen clone at `f2ec92c`; its `eczoodb` tests start at 72 passing, 2
+  pending, 3 failing.
+- For Philippe from step 6 so far: F1 in flm-rs (05) and whether the sitegen's switch
+  may stay (13, question 10); the two archives B1's install wrote in
+  `~/.yarn/berry/cache` (13, B1, Review fixes), which he may delete.
 - Later for Philippe: U2 in flm-rs when he wants `srcset`; the float-anchor policy option
   (05, not raised); the flm-core finding on a `field` environment without a name (05);
   the `~\cite` tie (05); whether dumps drop the positions (11 Deferred (b)); the example's

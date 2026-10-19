@@ -116,8 +116,12 @@ function object_key(object_type, object_id)
  *    label-derived and that source is standalone, else the object's
  *    display), installed by `engine.set_index()`, the ``default`` context
  *    last.  A label in an ad hoc fragment gets an entry under its origin's
- *    ``href``.  A reference that resolves neither in the zoo nor through the
- *    index is the Warning ``zoodb.refs.unresolved`` on its object.
+ *    ``href``.  An object whose ``object_href`` returns ``null`` has no page
+ *    in that context: neither it nor the labels of its fields get an entry
+ *    there, and a reference to them is unresolved in that context's renders
+ *    (``flm.refs.unresolved``).  A reference that resolves neither in the zoo
+ *    nor through the index is the Warning ``zoodb.refs.unresolved`` on its
+ *    object.
  * 4. **Citations.** The cited keys are retrieved by the citation manager and
  *    compiled by the citation compiler (CSL into FLM text, cached in
  *    ``cache_compiled_citations.json``), then installed by
@@ -147,8 +151,10 @@ function object_key(object_type, object_id)
  * - ``engine`` *(required)* -- the zoo's :js:class:`ZooFlmEngine`.
  *
  * - ``contexts`` -- the output contexts, ``{ NAME: { object_href(object_type,
- *   object_id) → string } }``; default one context ``default`` with
- *   ``/TYPE/ID``.
+ *   object_id) → string|null } }``; default one context ``default`` with
+ *   ``/TYPE/ID``.  ``null`` means that the object has no page in that
+ *   context; any other value that is not a string is refused by
+ *   `engine.set_index()`.
  *
  * - ``refs`` -- per-object-type options of the index entries, keyed by
  *   object type: ``formatted_ref_flm_text_fn(object_id, object)`` returns the
@@ -800,7 +806,11 @@ export class ZooFlmProcessor extends ZooDbProcessorBase
     /**
      * The index entries of a context: one per object, and one per label
      * entry (:meth:`_label_entries`) with the href of its object (and ``#``
-     * and the anchor when one of the labels of its point forms it).
+     * and the anchor when one of the labels of its point forms it).  An
+     * object whose ``object_href`` returns ``null`` has no page in this
+     * context: neither it nor the labels of its fields get an entry.  Any
+     * other href that is not a string goes to `engine.set_index()`, which
+     * refuses it (a forgotten ``return`` is caught).
      */
     _index_entries(context_name, label_entries)
     {
@@ -808,15 +818,22 @@ export class ZooFlmProcessor extends ZooDbProcessorBase
         const entries = [];
         for (const object_type of this.zoodb?.object_types ?? []) {
             for (const [object_id, obj] of Object.entries(this.zoodb.objects[object_type] ?? {})) {
+                const href = object_href(object_type, object_id);
+                if (href === null) {
+                    continue;
+                }
                 entries.push({
                     label: object_key(object_type, object_id),
-                    href: object_href(object_type, object_id),
+                    href,
                     display: this._object_display(object_type, object_id, obj),
                 });
             }
         }
         for (const e of label_entries) {
             const href = e.href ?? object_href(e.object.object_type, e.object.object_id);
+            if (href === null) {
+                continue;
+            }
             entries.push({
                 label: e.label,
                 href: (e.anchor != null) ? `${href}#${e.anchor}` : href,

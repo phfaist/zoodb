@@ -35,8 +35,10 @@ import loMerge from 'lodash/merge.js';
  * 
  * The `zoo_permalinks` object should expose the following methods:
  *
- * - `object(object_type, object_id) → string` — builds a URL for a zoo
- *   object.
+ * - `object(object_type, object_id) → string|null` — builds a URL for a zoo
+ *   object.  It may return `null` for an object type without a page, in
+ *   which case the FLM processor makes no index entry for those objects (nor
+ *   for the labels of their fields), and references to them are unresolved.
  * - `graphics_resource(resource_data) → string` — builds a URL for a
  *   collected image; ``resource_data.src_url`` is the target name the
  *   retriever gave the file (see :class:`ZooFlmProcessor` for the other

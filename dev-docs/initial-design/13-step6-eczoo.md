@@ -157,6 +157,7 @@ Philippe's.
 | G3. Marks and floats in previews | the random code widget's data (no citation or footnote marks, no floats), the meta descriptions, the code graph's info pane | `render_document()` takes no per-call render options (the core merges the settings' render options into every run); a page without `endnotes()` gets `zoodb.compose.piece-not-placed` and keeps its marks | to confirm first: whether `truncate({ first_paragraph })` already leaves out the floats (the data's rule is a short first paragraph), and whether flm-rs has render options that drop marks; if it has, the engine passes per-call render options through; if not, a question for flm-rs, no request |
 | G4. A Unicode→LaTeX table | `generatebibtex.js` (the site's BibTeX export, loaded with the module) and, commented out, the handbook's `mk_bib.js` | pylatexenc's `get_builtin_uni2latex_dict`, shipped in the deleted `flm-js-src/`; not FLM | a copy of the table as data in the sitegen (pylatexenc is MIT), an npm package, or `render_latex` with flm-rs's `unicode` render option of the recomposed output: Philippe's choice |
 | G5. The preview apps | `previewtool/` (`yarn preview`, the live preview of data edits) and `/gitpreview.html` (`jscomponents/gitzoopreview/`) | both run through `@phfaist/zoodbtools_preview`, a package of the `zoodbtools` repository (not among the repositories of this step; its installed copy read in the sitegen's `node_modules`), on the old API | a clone and port of `zoodbtools` (a part F), or the two apps left on the old API until later: Philippe's choice |
+| G6. An object type without pages (found by B1) | the EC zoo's `space` objects (14; no page, no FLM content refers to one) | the processor's index has one entry, with an href, per object of every type (`object_href(type, id)` for each), and `set_index()` refuses an entry whose href is not a string; the site's permalink function throws for `space` (“Unknown object type ‘space’”), which stops the load | done in the package (ruled 2026-10-18; B1's Closing): the processor leaves out of a context's index an object whose `object_href` returns `null`, and the labels of its fields (a reference to them is then unresolved in that context's renders, `flm.refs.unresolved`; any other href that is not a string is still refused by `set_index()`); the site's permalink returns `null` for `space` (sitegen `5ae77b8`), and B1's TEMPORARY placeholder href (`zoodbobjectref:/space:ID`) is gone |
 
 ### The citation caches
 
@@ -193,6 +194,7 @@ for r in eczoo_sitegen eczoo_data eczoo_handbook; do
 done
 # 2. what the clones need beyond git (ignored files of the originals, copied, never moved)
 cp -R $Z/eczoo_sitegen/_TEST_zoodb_citations_cache $E/eczoo_sitegen/
+cp -R $Z/eczoo_sitegen/eczoodb/_TEST_zoodb_citations_cache $E/eczoo_sitegen/eczoodb/  # the eczoodb tests' (added after B1)
 mkdir -p $E/eczoo_sitegen/.yarn $E/eczoo_handbook/.yarn
 cp -R $Z/eczoo_sitegen/.yarn/cache $E/eczoo_sitegen/.yarn/      # offline installs
 cp -R $Z/eczoo_handbook/.yarn/cache $E/eczoo_handbook/.yarn/
@@ -204,19 +206,33 @@ cd $W && yarn node tools/extend_citations_ttl.mjs \
 cd $W && yarn pack --out $W/scratch/zoodb-flmrs.tgz
 ```
 
-The temporary dependency of the sitegen clone (Yarn 3.3.0 through corepack, which has
-it cached): a root `resolutions` entry `"@phfaist/zoodb": "file:$W/scratch/zoodb-flmrs.tgz"`
-in `$E/eczoo_sitegen/package.json`, then `yarn install` at the clone's root (with
-`YARN_ENABLE_NETWORK=0` first: the copied cache should hold every archive, the git-URL
-packages included; if not, the install with the network, and the Results say which
-packages were fetched). One edit replaces the five git URLs; if `resolutions` does not
-take, the five `package.json` files are edited instead. Checked after each install:
-exactly one `node_modules/@phfaist/zoodb`, version 0.3.0
-(`find $E/eczoo_sitegen/node_modules -path '*/@phfaist/zoodb/package.json'`). After a
-new pack of the worktree, `yarn install` again (a tarball's lock entry carries its hash).
-The root `package.json` and `yarn.lock` are never staged; each part ends with `git -C
-$E/eczoo_sitegen checkout -- package.json yarn.lock` and a `git status --short` that
-shows nothing but ignored output. The handbook clone does the same with Yarn 4.6.0 (D).
+The temporary dependency of the sitegen clone (Yarn 3.3.0 through corepack, which has it
+cached): a root `resolutions` entry `"@phfaist/zoodb":
+"file:$W/scratch/zoodb-flmrs.tgz"` in `$E/eczoo_sitegen/package.json`, then
+`YARN_GLOBAL_FOLDER=$Y YARN_ENABLE_NETWORK=0 yarn install` at the clone's root, `$Y` a
+folder `yarn-global` in the session's scratchpad (offline first: the copied cache should
+hold every archive, the git-URL packages included; if not, the same with the network,
+and the Results say which packages were fetched). By default (`enableMirror`) Yarn 3 and
+Yarn 4 also write each archive they add to a project's cache into the global mirror
+`~/.yarn/berry/cache`, outside the worktree (B1's install wrote two archives there);
+`YARN_GLOBAL_FOLDER` moves that mirror into the scratchpad. `YARN_ENABLE_MIRROR=0` is no
+way out: with the mirror off, Yarn 3.3.0 and 4.6.0 look a package up in the project's
+cache under its versioned file name (`<slug>-8.zip` for Yarn 3) instead of the checksum
+name the copied caches use, so an offline install misses every archive (B1's Closing).
+The handbook's `.yarnrc.yml` sets `enableGlobalCache: false`, which does not turn the
+mirror off. One edit replaces the five git URLs; if `resolutions` does not take, the
+five `package.json` files are edited instead. Checked after each install: exactly one
+`node_modules/@phfaist/zoodb`, version 0.3.0 (`find $E/eczoo_sitegen/node_modules -path
+'*/@phfaist/zoodb/package.json'`), and its `src/` equal to the worktree's (`diff -rq
+$E/eczoo_sitegen/node_modules/@phfaist/zoodb/src $W/src` empty). After a new pack of the
+worktree, three stale copies go before the same install, since each of them makes the
+install succeed with the previous package: the mirror's copy of the tarball
+(`$Y/cache/@phfaist-zoodb-file-*.zip`), the lock's `@phfaist/zoodb@file:` entry (the
+lock is the temporary one) and `node_modules/@phfaist/zoodb` (the linker does not relink
+an unchanged locator). The root `package.json` and `yarn.lock` are never staged; each
+part ends with `git -C $E/eczoo_sitegen checkout -- package.json yarn.lock` and a
+`git status --short` that shows nothing but ignored output. The handbook clone does the
+same with Yarn 4.6.0 and the same `YARN_GLOBAL_FOLDER` (D).
 
 ## A. The data
 
@@ -331,11 +347,13 @@ graph exporter of `jscomponents`). Read: 07 milestone 5,
 Q12, the handbook's inventory above, flm-rs `docs/python-flm-migration.md` (the LaTeX
 output and its hooks).
 
-- Dependencies: the sitegen clone's four workspaces packed (`yarn pack` in
-  `eczoodb/`, `eczoohelpers/eczcollectbib/`, `jscomponents/`, `_zoodb_citations_cache/`,
-  out to `$E/pack/`), and a `resolutions` block in the handbook clone's `package.json`
-  for `@phfaist/zoodb` (the worktree's tarball) and the four packages (their tarballs),
-  `yarn install` (Yarn 4.6.0, offline first with the copied cache); one
+- Dependencies: the sitegen clone's four workspaces packed (`yarn pack` in `eczoodb/`,
+  `eczoohelpers/eczcollectbib/`, `jscomponents/`, `_zoodb_citations_cache/`, out to
+  `$E/pack/`), and a `resolutions` block in the handbook clone's `package.json` for
+  `@phfaist/zoodb` (the worktree's tarball) and the four packages (their tarballs),
+  `YARN_GLOBAL_FOLDER=$Y YARN_ENABLE_NETWORK=0 yarn install` (Yarn 4.6.0, offline first
+  with the copied cache; the mirror kept out of `~/.yarn` as in the Setup, not by
+  `YARN_ENABLE_MIRROR=0`, which cannot install offline from the copied cache); one
   `node_modules/@phfaist/zoodb` (0.3.0) checked, so that the handbook and `eczoodb`
   share one engine class; restored before committing, as in the sitegen. The Results
   name the sitegen commit packed.
@@ -379,13 +397,15 @@ re-packs and re-runs `yarn build-test`). Read: the Results of A to C.
   spaces, references to figures of other pages that now link instead of showing
   `[figure]`) or listed as a defect. Screenshots of five pages, old and new, through
   Puppeteer, put in the scratchpad for Philippe.
-- A baseline rebuild is not needed for the HTML. For time and memory, the sitegen clone's
-  `main` can be built against zoodb 0.2.1 (the lock's git commit `bb94f3e`, not npm) in
-  a `git worktree` of the clone beside a worktree of the data clone at the same data
-  commit: feasible offline as far as the survey can tell (the copied Yarn cache holds the
-  lock's archives, the git-URL packages included; corepack has Yarn 3.3.0; Puppeteer's
-  Chrome 134 is cached), to be confirmed by `YARN_ENABLE_NETWORK=0 yarn install`; if it
-  fails, E reports the new build's numbers alone.
+- A baseline rebuild is not needed for the HTML. For time and memory, the sitegen
+  clone's `main` can be built against zoodb 0.2.1 (the lock's git commit `bb94f3e`, not
+  npm) in a `git worktree` of the clone beside a worktree of the data clone at the same
+  data commit: feasible offline as far as the survey can tell (the copied Yarn cache
+  holds the lock's archives, the git-URL packages included; corepack has Yarn 3.3.0;
+  Puppeteer's Chrome 134 is cached), to be confirmed by `YARN_GLOBAL_FOLDER=$Y
+  YARN_ENABLE_NETWORK=0 yarn install` (the Setup's form, not `YARN_ENABLE_MIRROR=0`; the
+  six archives B1's install dropped from the clone's cache copied again from the
+  original's); if it fails, E reports the new build's numbers alone.
 - The search index (documents, size, three texts), the dump (`dat/eczoodata.json`:
   size, `zooflm` share, positions share), the BibTeX and CSL exports (if G4 is settled),
   the random code data, the 89 graph SVGs present; the apps loading the dump in
@@ -429,6 +449,9 @@ status --short` empty and no file newer than the start of the part
    which the code graph downloads.
 9. The site's look: the SCSS rewrite changes the HTML the styles hang on; the
    screenshots of E are for his review.
+10. The diagnostic switch `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` of the sitegen clone (B1's
+    Closing; inspection builds under `'continue'` while the flm-rs finding F1 is open):
+    whether it is acceptable to keep, also once F1 is fixed, or removed then.
 
 ## Results
 
@@ -746,3 +769,458 @@ stands. The scripts and outputs of this round are in `fix_A2/`.
   tracked cache, `fix_A2/doi_stale_count.txt`). For B1: `scratch/zoodb-flmrs.tgz`
   already exists as a stale pack of 0.2.1 (360 files, from step 4's example check), so
   setup step 3 must overwrite it before the install.
+
+### B1. The zoo and its pages
+
+Done 2026-10-18 by B1's agent (Opus; node 23.7, the worktree at `c6b11b9`). Three
+commits in the sitegen clone, with the two trailers; none in the data clone or the
+handbook clone; nothing pushed. Logs, probes and page dumps:
+`/private/tmp/claude-501/-Users-philippe-Research-projects-zoodb-zoodb/a1dd88e1-7168-44e0-92fc-0b56c08d4645/scratchpad/step6/B1/`
+(below `B1/`; `B1/probes/` holds the scripts, run with plain `node` from the sitegen
+clone, which import its modules by path).
+
+**Setup step 3.** `yarn pack` overwrote the stale tarball: 75 files, 2,343,589 bytes,
+version 0.3.0. With the root `resolutions` entry, `YARN_ENABLE_NETWORK=0 yarn install`
+failed: 0.3.0 needs `yaml@^2.9.1`, and the copied cache holds `yaml` 2.6.1 and 1.10.2.
+`yarn install` with the network then fetched one package from the registry,
+`yaml@2.9.1` (the tarball came from the disk), in 22 s. One `node_modules/@phfaist/zoodb`,
+0.3.0. Two side effects: Yarn removed from the clone's copied cache the six archives
+only the old zoodb used (`@phfaist-zoodb-https-f088586fcd`, `glob` 11.0.0, `jackspeak`
+4.0.2, `lru-cache` 11.0.2, `minimatch` 10.0.1, `path-scurry` 2.0.0), so E's baseline
+build against 0.2.1 needs them copied again from the original's cache; and Yarn 3's
+global mirror (`enableMirror`, on by default) wrote two archives outside the worktree,
+`~/.yarn/berry/cache/yaml-npm-2.9.1-d61da744fe-8.zip` and
+`@phfaist-zoodb-file-8af460e1f9-8.zip` (step 4's example port left `-10c0` copies
+there). Later installs should pass `YARN_ENABLE_MIRROR=0` (replaced at the Closing:
+`YARN_ENABLE_MIRROR=0` cannot install offline from the copied caches; installs use
+`YARN_GLOBAL_FOLDER=$Y YARN_ENABLE_NETWORK=0`, see the Setup). The build scripts of the
+install (Puppeteer, sharp) wrote nothing in `~/.cache/puppeteer` or `~/.npm/_libvips`.
+The root `package.json` and `yarn.lock` were restored before the first commit and stay
+restored (the copies with the resolution: `B1/package.json.resolutions`,
+`B1/yarn.lock.resolutions`); the builds run against the installed `node_modules`.
+
+**Files changed** (sitegen clone, 22 files).
+
+- `eczoodb/fullopts.js`: `use_flm_engine`; `flm_options.load_wasm` the Node loader;
+  no custom quote feature (the engine's `quote`).
+- `eczoodb/eczoodb.js`: `use_flm_engine`; `flm_options.allow_unresolved_references`
+  and `allow_unresolved_citations` (both `false`) where `makeStandardZooDb()` reads
+  them; the former top-level `flm_allow_unresolved_*` keys were not read by 0.2.1
+  either; `flm_options.engine.settings` (below); the reference displays of codes and
+  code lists are the `name` and `title` fragments; the computed `short_name` is
+  `zoo_flm_engine.make_fragment(…, { origin, layout: 'inline', standalone: true })`,
+  the origin the name's with `field: 'short_name'` (the cut is a prefix, so the file
+  position holds); messages use `.source`. `continue_with_errors: false` kept.
+- `eczoodb/compile_codelist.js`: the sort keys are `snippet(f, 'text')` for a
+  standalone field, `render_text([f]).text` otherwise.
+- `eczoodb/stats.js`: `kingdom.name.source` in a label.
+- `eczoodb/permalinks.js`: TEMPORARY placeholder hrefs for the spaces (G6, above).
+- `eczoodb/render_code.js`, `render_domain.js`, `render_kingdom.js`:
+  `zoo_flm_engine.render_document({ compose })`, `endnotes()` for `<RENDER_ENDNOTES/>`;
+  each returns the render's result (`{ html, diagnostics, … }`) and takes
+  `render_document_options`; `doc_metadata` and `additional_setup_render_context`
+  dropped (the old render context).
+- `eczoodb/render_codelist.js`: the same; the truncated columns and descriptions
+  through `engine.truncate(f, { first_paragraph, chars })` (`chars` the source length
+  when only the first paragraph is asked for), the automatic description an ad hoc
+  fragment (origin label `codelist:ID#auto_description`); all of them released once
+  the page is rendered.
+- `eczoodb/render_code_hierarchy.js`: the names' text from the snippets.
+- `eczoodb/render_utils.js`: `docrefs_placeholder_ref_resolver` removed.
+- `site/src/c/c.11ty.js`: snippets for the title, the navigation and the citation box;
+  the meta description is `render_text` of `truncate(description, { first_paragraph })`,
+  released; the page prints its diagnostics with its URL; `code.name.source` in the
+  BibTeX snippet; the error message's code ID (`data.code_id`, always `undefined`) fixed.
+- `site/src/list/list.11ty.js`, `domain/domain.11ty.js`, `kingdom/kingdom.11ty.js`:
+  text snippets for the titles; the diagnostics printed with the page's URL.
+- `site/src/index.11ty.js`, `lists.11ty.js`, `templates/layout/base_page.11ty.js`:
+  HTML snippets; `.source` for the sort keys; `whitespace_stripped()` became a `trim()`
+  of the snippet.
+- `site/src/concepts.11ty.js`: the glossary through `scan_results` (below).
+- Minimal changes for B1's build, marked TEMPORARY in the code: `site/eleventy.config.js`
+  does not import the bibliography collector (`generatebibtex.js` imports
+  `@phfaist/zoodb/flm-js/…`, gone: G4) and sets `site_ecz_bibliorefs_collector = null`,
+  and ignores `src/references.11ty.js`, `src/dat/bibreferences_bib.11ty.js`,
+  `bibreferences_csl.11ty.js` and `randomcodedata.11ty.js` (B2); `site/src/index.11ty.js`
+  leaves out the random code data (B2); `jscomponents/codegraph/eczcodegraph.js` imports
+  `is_fragment` and has a stand-in `render_text_standalone` that throws, so that the
+  module stays importable (the graph pages and `list.11ty.js` import its options; C).
+- `site/package.json`: `shopt -s nullglob` in `private_add_use_strict_to_site_js_files`.
+  Without Parcel, `_site/vv/*.js` matches nothing and `grep` exits 2, so
+  `build-test-noparcel` exited 2 before this part as well.
+
+**The engine's settings** (`eczoo_flm_engine_settings` in `eczoodb.js`, shared with the
+browser apps so that `settings_hash` matches; each map given replaces the feature's
+default map, so every entry is written out). Checked on 10 code pages against the
+baseline (`B1/pages_new/`) and counted over the 1,155 code pages of both builds.
+
+| item | baseline | engine default | set |
+|---|---|---|---|
+| float numbers | Figure I, Table I | Figure 1 | `floats.types.{figure,table}.number_format: { initial: 'I' }`: 26 figure and 8 table numbers, as the baseline; references `Fig. I` |
+| headings in a field | `\subsection` `<h3>` | `<h2>` (`root_heading_level` 1) | `html.heading_tags: { section: h2, subsection: h3, subsubsection: h4 }`: 42 `<h3>`, as the baseline; the References and Footnotes headings stay `<h2>` |
+| footnote counter | a, b, c | 1, 2, 3 | `xnotes.kinds.footnote` with `#{alph}` (no footnote in the data) |
+| `\paragraph` | run-in | block `<h4>` | `headings.headings.paragraph.run_in: true` (no `\paragraph` in the data) |
+| citation marks | `[1–4]`, `[4,5]`, sorted and compressed | the same | nothing: 13,431 marks in both |
+| bullets | • - ▸ | the same | nothing (all 7 enumerates of the data give their labels) |
+| `defterm` lead-in | `Term: ` | `#{term}: ` | nothing: 60 definitions in both |
+| equation numbers | `(1)` | the same | nothing: 492 in both |
+| external links | `target="_blank"` | no target | none exists (flm-rs has no link-target option) |
+
+Differences left, none settable: the anchors are flm-rs's (`defterm-Finite_20Xfields`
+→ `defterm-Finite_fields`, `sec--Finite-field-alphabet` → `sec--Finite-field_alphabet`,
+`equation-1` → `eq-gen-singleton` for a labeled equation); the site's own links follow,
+links from outside to the old anchors break. A no-break space before a citation mark
+(the old a space; `~\cite` gives two, 05). Display math closes its paragraph. The whole
+HTML contract (classes, attributes, images sized by CSS variables, image addresses
+`/fig/…` before Parcel) is B2's stylesheet. The `sectioncontent` annotation of the
+endnotes block is gone (the code page's `code-bibliography` division keeps its
+classes). The meta descriptions equal the baseline's for 1,154 of 1,155 codes after
+normalizing white space. The one difference is a correction: in `melas`, the source
+`'\(\star\)'` (straight quotes; the YAML writes them `''`) now gives ‘\star’, while the
+baseline typeset the closing quote as an opening one, ‘\star‘
+(`B1/meta_description_diffs.txt`).
+
+**The first full load.** Zero diagnostics on the test data and on the full data, under
+`'continue'` and under `'abort'` (`B1/load_full_abort.log`): 1,155 codes, 87 code
+lists, 3 domains, 18 kingdoms, 156 users, 14 spaces; 14,526 fragments; 170 labels (60
+`defterm`, 56 `topic`, 26 `figure`, 20 `eq`, 8 `table`), 0 duplicates, 0 standalone
+violations; 5,217 citations installed; 27 images; 2,027 snippets. No parse diagnostic,
+so no data fix (A's table unchanged). The "61 defterms" are 61 `\begin{defterm}` in
+the data, one in a YAML comment (`codes/classical/bits/cyclic/binary_cyclic.yml` line
+23): 60 definitions, 60 distinct `defterm:` labels. The scan alone does not render the
+fields: the renders meet the Errors below.
+
+**Diagnostics of the builds.** No Warning in either build or in the load (no `flm.*`,
+no `zoodb.*`). The Errors, all of one kind (measured under `'continue'`, below;
+`B1/build_full_continue_diags.txt`, `B1/noentry_occurrences.tsv`):
+
+| identifier | severity | count | example |
+|---|---|---|---|
+| `flm.citations.no-entry` | Error | 42: 25 citations in 22 data files, on 22 code pages, 8 code-list pages (`/all` included) and 1 meta description | ``codes/classical/bits/nonlinear/gray_map/gray.yml#description:14:23: error: the cited key `manual:{F. Gray, “Pulse Code Communication”, U.S. Patent 2632058 (1953)}` must have a bibliography entry`` |
+
+This is an flm-rs finding (F1), not a data error. A citation key is read twice with
+`spelling_identity`: at lowering, for `flm.citations.keys` and the scan, where it is
+the key as written, and in a stage after the typography rewrite, for the lookup of the
+render, where `"` and `'` have become `“ ” ’` and `--` has become `–`. The citations are
+retrieved and installed under the written key, so the render does not find the 18
+`manual:{…}` keys of the data that hold a straight quote or an apostrophe
+(`B1/noentry_keys.txt`; reproduced on a bare engine, `B1/probes/manual_quotes.mjs`).
+The content is right (the baseline's bibliography shows these entries typeset), so no
+data change was made and nothing was worked around: under `'abort'` the full build stops
+at the first of them (gray's meta description). The way out under the rules is a fix
+in flm-rs (both readings at the same stage), Philippe's call. A data commit writing these
+18 keys with the typographic characters would render the same, but it would work around
+an flm-rs bug, which B1's row on the first full load rules out ("if the content is right
+and flm-rs refuses it, reported (a finding, no workaround)"), so it needs his explicit
+ruling and a row in A's table. A key with `--` fails the same way (the review's probe
+`B1/review/probes/f1_check.txt`: `manual:{A--B}`); the data's one key with `--` and no
+quote (`codes/classical/bits/covering/nearly_perfect.yml` line 25) is in a YAML comment.
+
+**Load and build timings** (full data, warm). Load 23.6 s: YAML files 0.45 s, citation
+manager 1.4 s, relations 0.02 s, git last-modified 9.4 s, FLM processor 4.1 s (fields
+1.06, scan 0.52, index 0.63, retrieval 0.86 and compilation 0.05 from the caches,
+graphics 0.25, snippets 0.74), searchable text 7.1 s, computed data 0.77 s; the first,
+cold load took 43.8 s. Test build (`ECZOO_DEVELOPMENT_MODE=1 yarn build-test-noparcel`):
+4.9 s, 61 files, exit 0. Full build (`ECZOO_CITATIONS_CACHE_DIR=_zoodb_citations_cache_LOCAL
+yarn build-simple-noparcel`) as committed: exit 1 after 31 s (F1). The measurement build,
+the same with `continue_with_errors: true` in `eczoodb.js` (an uncommitted one-line
+change, reverted; `git status` clean afterwards): exit 0, 44.2 s, peak resident size
+748 MB (`/usr/bin/time -l`), 1,420 files; Eleventy's render 9.8 s, of which the code
+pages 5.2 s (1,155) and the code lists 4.4 s (87); the zoo's load inside it 28.6 s.
+
+**The pages.** Every `render_document()` page prints its diagnostics with its URL
+(`format_diagnostic`); the ad hoc fragments (code-list truncations and descriptions,
+the meta descriptions' truncations, the glossary's terms and bodies) are released when
+the page is done. In the measurement build's `_site/`: no `<flm:` marker, no `flm:`
+followed by a digit, no `zoodbobjectref:` in any HTML page (the 14 placeholder hrefs
+are in `dat/eczoodata.json`, the dump's index).
+
+| pages | baseline | B1 |
+|---|---|---|
+| HTML in all | 1,277 | 1,276 |
+| code pages `/c/` | 1,155 | 1,155 |
+| code lists `/list/` (and `/all`) | 86 (+1) | 86 (+1) |
+| domains, kingdoms | 3, 18 | 3, 18 |
+| single pages | 15 | 14: `references.html` not built (B2) |
+| `dat/` | 5 | 2: `eczoodata.json`, `searchindex.json` (the BibTeX, CSL and random code data are B2's) |
+
+**The glossary.** `scan_results.objects`, in the zoo's order: per term, the link to
+the object's page with `#` and the anchor, the term (`display`) and the body (`body`
+with `body_origin`, layout `blocks`) as fragments of the page, the defining object's
+name, and the other objects whose `refs` hold one of the term's labels. Against the
+baseline's `/concepts`: 60 terms, the same terms in the same order, 60 bodies, 736
+"Referenced in" entries, 159 citations. The terms are now typeset (the old page showed
+them as verbatim text: `Construction \(A_4\)` raw).
+
+**What G1 to G3 change on the real data** (`B1/gaps_numbers.txt`). G1: the 60 terms
+all have a body and an anchor; 53 carry a second label (`topic:…`), which the entry's
+"Referenced in" counts. G2: 5,233 cited keys in the zoo, 11,447 object–key pairs,
+2,278 keys cited by more than one object; a list of first citations only would miss
+6,214 pairs (the references page's backrefs, B2). G3: not used by B1's pages (the code
+lists place their endnotes, as `render_endnotes: true` did; the meta description is
+text, without pieces). Of the 1,155 descriptions, 610 have more than one paragraph; no
+first paragraph holds a float, a footnote or a `\label`; 454 hold a citation and 164 a
+reference.
+
+**Retrievals.** Both builds: `Pass 1: 4739 cached, 478 to fetch` (the local `manual`
+348 and `preset` 130 sources, no network), `Pass 2: 2124 cached, 0 to fetch`,
+`Retrieved citations: 7341 considered, 0 failed`; no network. The `eczoodb` tests
+reached the network: their cache folder is relative to the working directory
+(`eczoodb/_TEST_zoodb_citations_cache/`, ignored, present in the original checkout,
+not among the setup's copies), so the first run retrieved 109 entries (53 `arxiv`, 56
+`doi`) into a new copy in the clone. The install fetched `yaml@2.9.1`.
+
+**The `eczoodb` tests for B2** (`cd eczoodb && yarn test`, 76 s; `B1/eczoodb_tests.log`):
+72 passing, 2 pending, 3 failing. `test_eczoodb.js` "should have correct computed
+property values" reads `short_name.flm_text` (`.source` now); `test_render_code.js` and
+`test_render_codelist.js` call `.startsWith` on the renderers' result, now `{ html, … }`.
+The tests still pass the top-level `flm_allow_unresolved_*` keys (never read).
+
+**For B2 and C.** The searchable-text assembler logs 17 objects with a diagnostic, by
+count only (its own `'continue'`): most likely F1's keys (22 code pages hold them). The
+search index is 2.35 MB (baseline 4.44 MB) and the dump 7.65 MB (baseline 5.63 MB). The
+computed `short_name`s (1,155 fragments per load) are made again on each reload and
+never released (dev mode). `jscomponents/gitzoopreview/renderObject.js` and
+`randomcode/generate_data.js` import the removed `docrefs_placeholder_ref_resolver`.
+
+**Deviations.** (1) The spaces' placeholder hrefs (G6) are a workaround in the clone,
+marked TEMPORARY: without them nothing loads, and the package has no way to leave an
+object without a page out of the index. (2) The full build as committed does not exit
+0 (F1); the B1 checks on the full data come from the measurement build under
+`'continue'`, an uncommitted change. (3) The first commit is checked by loading the zoo
+(the site's pages were still on the old API); the second builds the test data with the
+glossary ignored, the third builds it all. (4) The minimal B2/C changes listed above,
+and the `nullglob` fix of a pre-existing script bug. (5) Yarn's global mirror wrote two
+archives outside the worktree (Setup step 3 above; since the Closing, later installs set
+`YARN_GLOBAL_FOLDER=$Y YARN_ENABLE_NETWORK=0`, which moves the mirror into the
+scratchpad). (6) The `eczoodb` tests retrieved 109 entries over the network
+(53 `arxiv`, 56 `doi`): they read their cache from `eczoodb/_TEST_zoodb_citations_cache/`,
+relative to their working directory, and the setup had not copied it. The setup block
+now copies it for any later setup. The clone's copy, written by that first run, has 111
+lines, as the original's does, and serves the tests offline, so it was not copied again.
+
+**Open questions.** G6: the package change (an object whose `object_href` returns
+`null` gets no index entry) or another href for the spaces (answered: the package
+change, see the Closing below). F1: an flm-rs fix
+(Philippe's call; F1 goes in 05's "Findings to report" table, the main session's edit),
+or the data commit of the 18 keys (prepared in `B1/noentry_occurrences.tsv`, not made).
+That commit would be a workaround of the flm-rs bug under B1's own row, so it can be
+made only on Philippe's explicit ruling, with a row in A's table; a key with `--` is
+affected as well. Until F1 is decided, full-data builds under `'abort'` exit 1.
+`target="_blank"` for external links: a site script, or left as it is. (Whether the
+setup copies `eczoodb/_TEST_zoodb_citations_cache/` is settled: it does, deviation (6).)
+
+**Commits** (sitegen clone, branch `zoodb-flmrs`): `9311d27` The zoo on zoodb 0.3.0:
+the FLM engine, its settings, the setup (5 files); `9ff93ff` The pages on the FLM
+engine: render_document(), snippets, truncations (16 files); `70558e5` The glossary
+from the FLM processor's scan results (2 files).
+
+**Review fixes.** The review (Opus, read-only, 2026-10-18; its scripts and its copy of
+the measurement build's `_site/` in `B1/review/`) gave the verdict "fix first": two
+must-fix items, both waiting on rulings and not done here, and five should-fix items,
+all done. One commit in the sitegen clone, with the two trailers: `7847ecc` The glossary
+releases its fragments whatever throws (1 file). No data change (A's table unchanged).
+The scripts and logs of this round are in `B1/fix/`.
+
+- *G6 (must-fix, not done).* The spaces' placeholder hrefs work around a package gap,
+  which the rules forbid; marking them TEMPORARY does not change that, and they also
+  make the site-wide `zoo_object_permalink()` stop throwing for `space`. The review
+  accepts them only until the main session rules on G6, and recommends the package
+  change: the processor leaves out of the index an object whose `object_href` returns
+  `null` (a test, a line in the docs, a `CHANGELOG.md` entry), the worktree packed and
+  installed again, then `permalinks.js` returns `null` for `space`, with the TEMPORARY
+  comment removed. That change is in the worktree's `src/`, which this round may not
+  edit, so the placeholder stays. Keeping a placeholder for good needs Philippe's
+  explicit ruling.
+- *F1 (must-fix, not done).* B1's check "the two builds exit 0" fails on the full data
+  until F1 is decided; re-run here, the full build as committed still exits 1 at gray's
+  meta description. The review confirmed F1 in the crate: the key of the
+  `CitationRequest` reaches the provider (`rust/zoodb-flm-wasm/src/host.rs:124`) after
+  the typography rewrite, while `flm.citations.keys` reports it as written. The paragraph
+  on the diagnostics and the open questions now say that the data commit would be a
+  workaround and that `--` is affected too. Recording F1 in 05's "Findings to report"
+  table is the main session's edit.
+- *The glossary's fragments (done, `7847ecc`).* `concepts.11ty.js` made the term and
+  body fragments before its `try`, so a `make_fragment` (or a permalink) that throws
+  partway, such as an Error in a body under `'abort'`, left the fragments made so far
+  unreleased (B2 measures dev-mode memory across rebuilds). The `try` now opens before
+  the loop; only code lines are re-indented, the text of the templates is unchanged
+  (`git diff -w`: 3 lines in, 2 out). On a mock engine whose third `make_fragment`
+  throws (`B1/fix/probes/concepts_release.mjs`, output `concepts_release.txt`), the new
+  template releases the two fragments made, the committed one none; without a throw
+  both release all four.
+- *melas (done).* The sentence on the meta descriptions read as if the new output were
+  wrong; it now says that the baseline's was (above).
+- *The tests' citations cache (done).* Deviation (6) added; the setup block copies
+  `eczoodb/_TEST_zoodb_citations_cache/` for any later setup.
+- *F1's open question (done).* Reworded as above.
+- *Yarn's global mirror (done).* The setup text made every later install, sitegen and
+  handbook, `YARN_ENABLE_MIRROR=0 yarn install`; the Closing replaced that with
+  `YARN_GLOBAL_FOLDER=$Y YARN_ENABLE_NETWORK=0 yarn install`, since with the mirror off
+  Yarn misses every copied archive offline. **For Philippe:** B1's install wrote two
+  files outside the worktree, which agents may not delete; they are still there (dated
+  2026-10-18 21:47) and can be deleted:
+  `/Users/philippe/.yarn/berry/cache/yaml-npm-2.9.1-d61da744fe-8.zip` and
+  `/Users/philippe/.yarn/berry/cache/@phfaist-zoodb-file-8af460e1f9-8.zip`.
+
+The review's verdicts on the open questions: G6, the package change; F1, a fix in
+flm-rs (the data commit only on Philippe's ruling; until then B2 measures under
+`'continue'`, as B1 did); `target="_blank"`, Philippe's call (a site script that adds
+it would work around flm-rs, so either the difference is accepted or it is listed as a
+possible flm-rs option, with no request now); the tests' cache, copied in any later
+setup (done above). It accepts deviations (2) to (4), the `nullglob` fix included; it
+calls (6) a setup omission, and the writes of (5) a break of the rule that nothing
+outside the worktree is written, though unintended (the fetch of `yaml@2.9.1` itself is
+the brief's fallback).
+
+Checks re-run at `7847ecc` (logs in `B1/fix/`):
+
+| check | result |
+|---|---|
+| test build (`ECZOO_DEVELOPMENT_MODE=1 yarn build-test-noparcel`) | exit 0, 61 files (35 HTML) in 17.3 s, peak resident size 507 MB; no diagnostic, no Warning; no `<flm:`, no `flm:` followed by a digit; `Pass 1: 63 cached, 4 to fetch` (local sources), `Retrieved citations: 113 considered, 0 failed` (`build_test.log`) |
+| full build as committed (`'abort'`, LOCAL cache) | exit 1 at gray's meta description (F1), 47.9 s, 785 MB (`build_full_abort.log`) |
+| measurement build (`continue_with_errors: true` for the run only, set and reverted with `sed`; `git status` clean after) | exit 0, 1,420 files in 38.6 s, 793 MB; 43 `flm.citations.no-entry` lines (the 42 Errors, gray's printed twice), no Warning; `_site/` equal file for file to the review's copy of the earlier measurement build (`diff -rq` empty, 1,276 HTML pages; `concepts.html` byte-identical: 60 terms, 736 "Referenced in" items); no marker; `zoodbobjectref` in no HTML page (`build_full_continue.log`) |
+| retrievals | both full builds: `Pass 1: 4739 cached, 478 to fetch` (the local `manual` and `preset` sources), `Pass 2: 2124 cached, 0 to fetch`, `Retrieved citations: 7341 considered, 0 failed`; no network |
+| `eczoodb` tests (`cd eczoodb && yarn test`) | 72 passing, 2 pending, 3 failing (the same three, for B2), offline: each of the manager's 14 runs fetched 3 or 4 entries from the local sources (`manual`, `preset`, `qecdborg`), 113 considered, 0 failed; the test cache keeps its 111 lines (`eczoodb_tests.log`) |
+| git state | sitegen clone: `status --short` empty, root `package.json` and `yarn.lock` equal `main`, `7847ecc` on top of `70558e5`; data and handbook clones unchanged; nothing pushed; the originals: `status` empty, heads `a2ad583`, `7ade20a2f`, `c73b681` (read with `--no-optional-locks`) |
+
+Notes of the review, recorded and not acted on. At 22:28:12 an entry was created and
+removed in the original `eczoo_sitegen/.git` folder (its mtime changed; no file inside
+is newer, status and HEAD unchanged), most likely a git command without
+`--no-optional-locks`: agents should pass the flag on the originals (this round's only
+git calls there, a final `status` and `rev-parse`, did). Eleventy computes a code page's
+`page_description_text` twice, so each meta description is truncated and rendered twice
+(worth memoizing per code, B2). `eczoodb/compile_codelist.js:214`: the sort keys'
+`render_text([value])` drops its diagnostics silently. The `\paragraph` run-in gap comes
+from the engine's stylesheet, which B2 delivers. The searchable-text assembler's 17
+objects are not verified as F1's (B2 lists them). When B2 moves the tests'
+`flm_allow_unresolved_*` keys into `flm_options`, the tests start allowing unresolved
+references and citations, and their expectations may change. The 14 placeholder hrefs
+are in `dat/eczoodata.json`'s index, which C's apps load (they go with G6). The other
+"Table I" counts (plain text) differ by one across code pages (37 against 36), for E's
+comparison.
+
+**Closing.** Done 2026-10-19 by B1's closing agent (Opus; node 23.7, the worktree at
+`c6b11b9`), which took over the uncommitted work of a first closing run cut off by a
+usage limit, checked it against the rulings and finished it. Logs, probes and that run's
+diffs (`prev_run/`):
+`/private/tmp/claude-501/-Users-philippe-Research-projects-zoodb-zoodb/a1dd88e1-7168-44e0-92fc-0b56c08d4645/scratchpad/step6/B1close/`
+(below `B1close/`). The main session ruled on the review's two must-fix items on
+2026-10-18: G6 is fixed in the package; F1 gets no workaround (the data is not changed
+and no key is rewritten anywhere), goes into 05's "Findings to report" table, and the
+sitegen clone gets an explicit diagnostic switch, so that B2 to E can build and inspect
+the full site while F1 is open.
+
+*The package change (G6; committed by the main session).* In
+`src/dbprocessor/flmprocessor.js` (`_index_entries`), an object whose `object_href`
+returns exactly `null` gets no index entry in that context, and neither do the labels of
+its fields (their href would be the object's). Any other value that is not a string
+still goes to `engine.set_index()`, which refuses it with its `TypeError` (`set_index():
+an entry is { label, href, display }, got …`, the entry's label included), so a
+forgotten `return` is still caught. The first closing run's draft (91 lines: a
+`TypeError` of the processor's own, a per-context map of the labels left out, and a new
+`zoodb.refs.unresolved` Warning for the references to them) was more than the ruling
+needs and was replaced by this one (23 lines in, 6 out, 14 of them documentation). The
+other consumers of the hrefs, checked: `object_scan()` and `scan_results` hold no href
+(the object stays in the zoo and in the scan results, unchanged); the dump's index is
+the installed one (`engine.dump()`), so it has no entry for such an object, whose data
+is dumped as before; `_zoodb` holds no href; the searchable text renders through the
+same index (`render_text`), where a reference to such an object is unresolved as in
+HTML; the standard setup passes `zoo_permalinks.object` as the `default` context's
+`object_href` as it is (its descriptions in `src/std/stdzoodb.js` and `doc/std.rst` do
+not mention `null`; not edited, outside this round's files).
+
+What a `\ref` to such an object (or, from another object, to a label of its fields)
+gives: in that context's renders the engine's `flm.refs.unresolved` ("the reference
+points at the label `utensil:spoon`, which is not defined"), an Error under the default
+`unresolved: 'error'` (thrown under `'abort'`) and a Warning under `'warn'` (the
+standard setup's `allow_unresolved_references`), the label shown in a
+`data-flm-style="unresolved-reference"` span; the composer's `ref()` and `refhref()`
+give `zoodb.ref.unresolved` (`refhref()` returns `null`). The processor's own check does
+not report it: `zoodb.refs.unresolved` is for a label that neither the zoo nor the index
+defines, and the object is in the zoo. A context where the object has a page resolves
+it, and a label of its fields resolves within its own document. The new
+`test/test_dbprocessor_flmprocessor_pageless.js` (7 tests over the simple test data, the
+utensils without a page in `default` and with one in a second context): the `null` tests
+fail on the committed processor (their `before` hook meets the `set_index()` refusal),
+all pass on the new one. Also: a paragraph in step 3 and a sentence on the `contexts`
+option in `doc/zoodb.dbprocessor-flm.rst`, an entry under 0.3.0 in `CHANGELOG.md`, the
+processor's JSDoc, and G6's row of the gaps table set to done. `yarn lint` clean,
+`yarn test` 474 passing (467 before, 7 new).
+
+*F1.* A row in 05's "Findings to report" table: the two readings of the key, flm-core's
+`elements.rs` and `entries.rs` at `5de1c198` and the crate's `HostCitations::answer`,
+the probes `B1/probes/manual_quotes.mjs` and `B1/review/probes/f1_check.txt`, the counts
+(18 keys, 25 citations in 22 data files, 42 Errors), the ruling and the switch. The data
+clone is untouched.
+
+*The switch* (sitegen `f2ec92c`). With `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` in the
+environment, `eczoodb/eczoodb.js` sets the zoo's `continue_with_errors` to `true` (the
+error policy `'continue'`); unset, it stays `false`, as committed. It is read as
+`((globalThis.process?.env?.ECZOO_FLM_CONTINUE_WITH_ERRORS ?? 0) != 0)`, in the style of
+the other `ECZOO_*` variables of `site/eleventy.config.js`, through `globalThis` so that
+a browser bundle neither inlines nor polyfills it; a comment names F1. `docs/site.md`,
+where the other `ECZOO_*` variables are described, gains a row and a paragraph: the
+switch is for inspection builds while F1 is open, and the site itself is built without
+it. The pages still print their diagnostics.
+
+*The permalinks* (sitegen `5ae77b8`). `eczoodb/permalinks.js` returns `null` for
+`space`, the TEMPORARY comment and the `zoodbobjectref:` placeholder removed. Its
+callers: every other call of `zoo_object_permalink()` names a code, a domain, a kingdom
+or a code list, and the search widget resolves codes only (the searchable text's
+`object_types` is `['code']`); the two loaders that prefix the site's address to the
+permalink (`eczoodb/scripts/try_load_zoo.js`, `scripts/_helpers/helperEcZooLoader.js`)
+pass `null` through (else `https://errorcorrectionzoo.orgnull` would be the spaces'
+index href); the glossary throws if a term is ever defined in an object without a page
+(the spaces define none). `pdfexport/main.js` prefixes the same way but is on the old
+API (question 7) and was left. Nothing relied on the former throw for `space`.
+
+*Pack and install.* `yarn pack`: 75 files, 2,344,001 bytes, version 0.3.0
+(`pack_final.log`, its SHA-256 in `pack_final.sha256`). `YARN_ENABLE_MIRROR=0
+YARN_ENABLE_NETWORK=0 yarn install` failed: all 1,190 archives "can't be found in the
+cache", though the copied cache holds them (`install_final1.log`). With the mirror off,
+Yarn looks a package up in the project's cache under its versioned file name
+(`<slug>-8.zip`) instead of the checksum name the copied cache uses
+(`<slug>-<checksum>.zip`), as the sources of Yarn 3.3.0 and 4.6.0 show
+(`getLocatorPath()`), so the handbook's install (D) would fail the same way. The
+fallback the task names, the network with the mirror off, would have fetched the whole
+tree again and dropped the copied archives as unused, so it was not run. The install ran
+offline with the mirror on and moved into the scratchpad,
+`YARN_GLOBAL_FOLDER=…/B1close/yarn-global YARN_ENABLE_NETWORK=0 yarn install`: nothing
+fetched, nothing written outside the worktree and the scratchpad. Two stale copies had
+to go first, each of which let an install succeed with the previous package: the
+mirror's copy of the earlier tarball
+(`yarn-global/cache/@phfaist-zoodb-file-8af460e1f9-8.zip`, from the first closing run,
+which Yarn reused for the same locator, so that the lock got the old checksum back) and,
+once the cache held the new archive, the linked `node_modules/@phfaist/zoodb`, which the
+linker does not relink for an unchanged locator; the overlay lock's
+`@phfaist/zoodb@file:` entry was removed as well. Then one
+`node_modules/@phfaist/zoodb`, version 0.3.0, whose `src/` equals the worktree's
+(`diff -rq` empty; `install_final2.log` to `install_final4.log`). The Setup paragraph
+above now gives this procedure, and D and E name it in their install commands, where the
+review's nit asked for `YARN_ENABLE_MIRROR=0`. `~/.yarn/berry/cache`: no file newer than
+B1's two archives (`@phfaist-zoodb-file-8af460e1f9-8.zip`, 2026-10-18 21:47:15, and
+`yaml-npm-2.9.1-d61da744fe-8.zip`, 21:47:33).
+
+Checks (logs in `B1close/`):
+
+| check | result |
+|---|---|
+| package | `yarn lint` clean, `yarn test` 474 passing (`lint_test_final.log`) |
+| test build (`ECZOO_DEVELOPMENT_MODE=1 yarn build-test-noparcel`) | exit 0, 61 files (35 HTML) in 3.7 s, peak resident size 514 MB; no diagnostic, no `<flm:`, no `flm:` followed by a digit; `Pass 1: 63 cached, 4 to fetch` (local sources), `Retrieved citations: 113 considered, 0 failed` (`build_test_final.log`) |
+| full build with the switch (`ECZOO_CITATIONS_CACHE_DIR=_zoodb_citations_cache_LOCAL ECZOO_FLM_CONTINUE_WITH_ERRORS=1 yarn build-simple-noparcel`) | exit 0, 1,420 files (1,276 HTML) in 40.4 s, peak 831 MB; 43 diagnostic lines, all `flm.citations.no-entry` Errors (F1's 42, gray's printed twice), 0 Warnings, no other diagnostic; no marker; `dat/eczoodata.json` holds no `zoodbobjectref`, its index 1,589 entries (1,419 objects and 170 labels), none for the 14 spaces, which the dump's objects keep; against the review's copy of the measurement build only `eczoodata.json` differs, by the 14 spaces' entries (objects, citations, graphics, snippets and settings hash equal); retrievals as in B1, `Pass 1: 4739 cached, 478 to fetch`, `Pass 2: 2124 cached, 0 to fetch`, `7341 considered, 0 failed`, no network (`build_full_switch.log`, `build_full_switch_diags.txt`, `dump_index_check_final.txt`, `dump_diff_vs_review.txt`); run again last, 37.8 s, 849 MB, the same counts, so `site/_site/` holds this build |
+| full build as committed (no switch, `'abort'`) | exit 1 after 29.0 s, peak 797 MB, "Wrote 0 files": the `ZooFlmError` of gray's meta description (`flm.citations.no-entry`, the key `manual:{F. Gray, “Pulse Code Communication”, …}`), F1 (`build_full_default.log`) |
+| `eczoodb` tests (`cd eczoodb && yarn test`) | 72 passing, 2 pending, 3 failing (the same three, for B2), 14.1 s; offline: the manager's 14 runs read the local sources only (`manual`, `qecdborg` through a `file:` URL, `preset`), 113 considered, 0 failed; the test cache keeps its 111 lines (`eczoodb_tests_final.log`, `eczoodb_tests_final_debug.log`) |
+| git state | worktree: the processor, the new test, the doc page, `CHANGELOG.md`, this brief, 05 and `HANDOVER.md` modified, nothing else; sitegen clone: `5ae77b8` and `f2ec92c` on `7847ecc`, `status --short` empty, root `package.json` and `yarn.lock` equal `main` (the overlay copies in `B1close/package.json.resolutions` and `yarn.lock.resolutions`); data and handbook clones unchanged; nothing pushed; the originals: `status` empty, heads `a2ad583`, `7ade20a2f`, `c73b681`, no file newer than this round's start |
+
+The default full build still exits 1, at gray's meta description, because of F1, and
+will until flm-rs reads a citation key the same way for the scan and for the render;
+until then the later parts build the full site with the switch. Of B1's open questions,
+G6 is answered (the package change above); F1 stays for Philippe (a fix in flm-rs; the
+data commit of the 18 keys only on his explicit ruling), with the switch for the time
+between; `target="_blank"` stays his call. New, for Philippe (question 10): whether the
+switch may stay. Deviations: (1) the processor change is simpler than the first closing
+run's draft (above); (2) the installs keep Yarn's mirror on, moved into the scratchpad,
+instead of `YARN_ENABLE_MIRROR=0`, which cannot install offline from the copied caches,
+and the network fallback was not run; D and E say so instead of naming
+`YARN_ENABLE_MIRROR=0`.

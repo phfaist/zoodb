@@ -51,6 +51,18 @@ When the zoo is loaded (``process_zoo()``), the processor runs six steps:
    standalone; otherwise it is the object's display.  The ``default`` context
    is installed last.  A reference that resolves neither in the zoo nor
    through the index is the Warning ``zoodb.refs.unresolved`` on its object.
+   An object whose ``object_href`` returns ``null`` has no page in that
+   context (an object type the site shows no page for): neither it nor the
+   labels of its fields get an entry there.  A reference to it, or to one of
+   those labels from another object, is then unresolved in that context's
+   renders: the engine's ``flm.refs.unresolved`` (an Error, or a Warning when
+   the engine's ``unresolved`` is ``'warn'``, as the standard setup's
+   ``allow_unresolved_references`` sets it), and ``zoodb.ref.unresolved`` for
+   the composer's ``ref()`` and ``refhref()``.  The processor's own check
+   (``zoodb.refs.unresolved``) does not report it, since the object and its
+   labels are in the zoo.  Any other value that is not a string is refused by
+   ``engine.set_index()`` (a ``TypeError``), so that a forgotten ``return`` is
+   caught.
 
 4. **Citations.**  The cited keys are retrieved by the citation manager (see
    :doc:`zoodb.citationmanager`) and compiled by the citation compiler (CSL
@@ -117,6 +129,7 @@ The constructor's options (each one is described in the class reference below):
 - ``engine`` *(required)*: the zoo's :js:class:`ZooFlmEngine`.
 - ``contexts``: the output contexts of the index, ``{ NAME: { object_href } }``;
   by default one context, ``default``, with the hrefs ``/TYPE/ID``.
+  ``object_href`` returns a string, or ``null`` for an object without a page.
 - ``refs``, ``refs_defaults``: per object type, the display of references to
   the objects (``formatted_ref_flm_text_fn``).
 - ``graphics_address``: the address written in the output for a collected
