@@ -521,7 +521,13 @@ document: one text per fragment (``trees``), the name and content of the style
 file that the LaTeX needs (``style_name``, ``style``) and a complete
 ``document``.  Labels of the types listed in ``raw_label_types`` are written as
 the content spells them; every other label gets a safe label, numbered across
-the run.  ``drop_comments`` leaves out the comments.
+the run.  ``drop_comments`` leaves out the comments.  It takes
+``render_options`` as ``render_document()`` does
+(``latex-recomposed.drop_comments`` is refused as well: ``drop_comments`` sets
+it), for instance ``{ math: { emit_flm_math_environment_macro: true },
+'latex-recomposed': { unicode_overrides: { '\u202F': '\\,' } } }`` to write
+the display-math environments through the hook ``\flmMathEnvironment`` and to
+give a character a spelling for that run.
 
 
 Scanning

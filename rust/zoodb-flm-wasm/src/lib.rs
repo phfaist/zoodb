@@ -246,6 +246,8 @@ export interface RenderLatexOptions {
     raw_label_types?: string[] | null;
     drop_comments?: boolean | null;
     unresolved_refs_warning?: boolean | null;
+    /** This run's render options, as for html (`refs.unresolved` and `latex-recomposed.drop_comments` are refused: this object's keys set them). */
+    render_options?: RunRenderOptions | null;
 }
 
 /** The result of `render_latex`: one entry of `trees` per handle given. */

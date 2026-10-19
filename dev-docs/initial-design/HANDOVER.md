@@ -21,11 +21,15 @@ in `README.md` of this folder.
   brief 13 `1f1f0f8`; step 6 part 0 (the package: term bodies and per-tree cited keys in
   the scan, per-call render options) and part A (the EC zoo clones, the data
   re-indented) `c6b11b9` (13); B1's results and closing with G6 fixed in the package
-  `1d7230c` (13).
+  `1d7230c` (13); B2's results with G7, G8 and G9 fixed in the package `cca3628` (13);
+  C's results with G10 fixed in the package `6105fcb` (13); D's results with G12
+  (per-call `render_options` of `render_latex()`) fixed in the package, committed by the
+  main session as the D commit (13).
 - **What exists now.** `rust/` is a cargo workspace (`zoodb-autocitefetch-wasm`,
   `zoodb-flm-wasm`; flm-core by path from `/Users/philippe/projects/flm-rs/flm-core`);
-  the FLM module is committed as `src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` (5.14 MB)
-  with its glue, loaders `src/zooflm/_load_wasm.js` (neutral) and `_load_wasm_node.js`;
+  the FLM module is committed as `src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` (5,160,404
+  bytes since D) with its glue, loaders `src/zooflm/_load_wasm.js` (neutral) and
+  `_load_wasm_node.js`;
   the engine `src/zooflm/engine.js` (+ `compose.js`, `fragment.js`, `diagnostics.js`;
   package export `./zooflm/engine`; since step 4 also `parse_fields()` and
   `html_scripts()`); the processor `src/dbprocessor/flmprocessor.js` with the adapted
@@ -42,8 +46,8 @@ in `README.md` of this folder.
   `engines` `node >=20` and a `files` list (75 packed files); the API sample
   `playground/play_example.mjs`; `tools/build_wasm.mjs` remaps the build machine's
   paths, byte-checks the binaries and records `paths_remapped` and
-  `flm_core_git: { commit, dirty }` (flm-rs `2c219ec3`) in `BUILD_INFO.json`; `doc/`
-  rewritten.
+  `flm_core_git: { commit, dirty }` (flm-rs `9ccaa871`, D's rebuild for G12) in
+  `BUILD_INFO.json`; `doc/` rewritten.
 - **The `zoodb-example` port** lives in a clone at `scratch/zoodb-example/` (ignored
   through `scratch/.gitignore`, with `*.tgz`), branch `zoodb-flmrs` there, commits
   `bc0a6ce`, `5cc0c68`, `2242062`, never pushed; its `website/_site/`, `node_modules/`
@@ -56,17 +60,27 @@ in `README.md` of this folder.
   `eczoo_handbook`, each on a branch `zoodb-flmrs` with its push URL disabled, never
   pushed. The data clone holds A's `fd2a8d992` (the re-indent) and `60bbc93ae` (the
   `eq:parity` labels); the sitegen clone A's `8634846` and B1's `9311d27`, `9ff93ff`,
-  `70558e5`, `7847ecc`, `5ae77b8`, `f2ec92c`; the handbook clone nothing yet. The
-  sitegen runs on 0.3.0 from the tarball `scratch/zoodb-flmrs.tgz` through a root
-  `resolutions` overlay of its `package.json` and `yarn.lock`, restored before every
-  commit; its installs keep Yarn's mirror out of `~/.yarn` with `YARN_GLOBAL_FOLDER` in
-  the session's scratchpad (`YARN_ENABLE_MIRROR=0` cannot install offline from the
-  copied caches), and a repack needs three stale copies removed first (13, Setup). Its
+  `70558e5`, `7847ecc`, `5ae77b8`, `f2ec92c`, B2's thirteen (`00e4fe9` … `1c1cf55`) and
+  C's seven (`824d2ad` … `0ac4fb3`), so it stands at `0ac4fb3`, 27 commits over the
+  original's `a2ad583`; the handbook clone D's four (`9dfa0b2`, `34da9e4`, `d1f0248`,
+  `8d44099`) and its review fixes' three (`1fbbb95`, `38141cc`, `d5ccdc5`), so it stands
+  at `d5ccdc5`, 7 commits over `c73b681`. The sitegen runs on 0.3.0 from the tarball
+  `scratch/zoodb-flmrs.tgz` (packed again with G12 in D) through a root `resolutions`
+  overlay of its `package.json` and `yarn.lock`, restored before every commit; its
+  installs keep Yarn's mirror out of `~/.yarn` with `YARN_GLOBAL_FOLDER` in the
+  session's scratchpad (`YARN_ENABLE_MIRROR=0` cannot install offline from the copied
+  caches), and a repack needs three stale copies removed first (13, Setup). Its
   full-data builds use the cache copy `_zoodb_citations_cache_LOCAL`
   (`ECZOO_CITATIONS_CACHE_DIR`), and `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` gives inspection
-  builds under `'continue'` while F1 is open (below). The originals under
-  `/Users/philippe/Research/projects/2021-qec-zoo/` are read-only (heads `a2ad583`,
-  `7ade20a2f`, `c73b681`).
+  builds under `'continue'` while F1 is open (below). The handbook clone installs the
+  same tarball and the sitegen's four packages through a root overlay of its own (six
+  resolutions, `yaml` 2.9.1 among them, put back by `reinstall_handbook.sh`) and builds
+  offline under the sandbox profile `nonet.sb`, both in D's folder
+  `/private/tmp/claude-501/-Users-philippe-Research-projects-zoodb-zoodb/a1dd88e1-7168-44e0-92fc-0b56c08d4645/scratchpad/step6/D/`,
+  with TeX Live 2023 (`--latex-bin`; the class refuses any other) and the ignored cache
+  copy `mkeczhandbook/_zoodb_citations_cache_LOCAL` (13, Results D, For E). The
+  originals under `/Users/philippe/Research/projects/2021-qec-zoo/` are read-only (heads
+  `a2ad583`, `7ade20a2f`, `c73b681`).
 - **Prototype runners** in `scratch/proto/js/` (run with
   `NODE_MODULES=/Users/philippe/Research/projects/2021-qec-zoo/eczoo_sitegen/node_modules`,
   data `/Users/philippe/Research/projects/zoodb/zoodb-example/data` and `schemas`, or the
@@ -139,7 +153,7 @@ zoodb-autocitefetch-wasm`). Module rebuild: `yarn build:wasm flm` (about 15 s wa
 to 2 min cold; the first build with the remapping flags recompiles everything); the
 committed module must match the crate (step 5 rebuilt both). The build reads the flm-rs
 checkout's git state only for `BUILD_INFO.json` (read-only, `git --no-optional-locks`).
-`yarn test` (474 passing in step 6), `yarn lint` (green since step 5 and run by the CI
+`yarn test` (487 passing in step 6), `yarn lint` (green since step 5 and run by the CI
 test job; keep it at zero errors), the sample `yarn node playground/play_example.mjs`.
 Docs: the worktree's `doc/` poetry environment has no packages installed, so step 5 ran
 the main checkout's `~/Library/Caches/pypoetry/virtualenvs/zoodb-doc-oZT3q19H-py3.13/bin/sphinx-build`
@@ -215,12 +229,35 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
   `--` fail with `flm.citations.no-entry` (42 Errors); no workaround, the data
   unchanged; the default full build exits 1 at gray's meta description until flm-rs is
   fixed, and the sitegen's `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` gives the later parts
-  full builds to inspect, the errors printed. Next: B2 (presentation, exports, scripts,
-  tests, dev mode) per brief 13, from the sitegen clone at `f2ec92c`; its `eczoodb`
-  tests start at 72 passing, 2 pending, 3 failing.
+  full builds to inspect, the errors printed. B2 (presentation, exports, scripts, tests,
+  dev mode) is done in the sitegen clone (`00e4fe9` … `1c1cf55`), with G7 (truncation
+  inside a command's arguments), G8 (backreference details compiled once) and G9 (the
+  cited works in the search text) fixed in the package (`cca3628`); C (the browser apps
+  and the first builds with Parcel) is done in the sitegen clone (`824d2ad` …
+  `0ac4fb3`), with G10 (the engine module's re-exports by name, for Parcel) fixed in the
+  package (`6105fcb`). D (the handbook) is done in the handbook clone (`9dfa0b2` …
+  `d5ccdc5`, 7 commits over `c73b681`, the review fixes included), with G12 (per-call
+  `render_options` of `render_latex()`, for the handbook's one recomposed-LaTeX run)
+  fixed in the package, committed by the main session as the D commit; the FLM module is
+  now 5,160,404 bytes, built from flm-rs `9ccaa871` (the zoo's html, text and recomposed
+  LaTeX byte-identical through the module before); G13 (previews repeating their field's
+  labels in the one LaTeX run) is not fixed, and not met on the full data (question 25).
+  F2 to F5 are noted in 05's findings, F1 stays open upstream. D disclosed a breach of
+  the rule that nothing is downloaded, before its sandbox profile existed: `probe1`
+  retrieved three works from arXiv at about 15:15 (one request; `probe1full` likely the
+  same three again at 15:18) and `gen_test1` to `gen_test3` three (one work each) at
+  15:47 to 15:50 on 2026-10-19, recorded only in ignored cache copies (13, Results D,
+  deviation 6); every build from 16:00 on ran under the sandbox profile. The sitegen
+  clone's committed exporter bundle still carries the module before G12 (5,157,363
+  bytes, flm-rs `5de1c198`), which rendered the handbook's 66 code graphs: E rebuilds it
+  (`yarn build` in `jscomponents`) once G12 is committed. The clones stand at: sitegen
+  `0ac4fb3`, data `60bbc93ae`, handbook `d5ccdc5`. Next: E (the full build check of the
+  site), then the step's wrap-up, per brief 13.
 - For Philippe from step 6 so far: F1 in flm-rs (05) and whether the sitegen's switch
   may stay (13, question 10); the two archives B1's install wrote in
-  `~/.yarn/berry/cache` (13, B1, Review fixes), which he may delete.
+  `~/.yarn/berry/cache` (13, B1, Review fixes), which he may delete; the open questions
+  11 to 28 of B2, C and D (13, Results; until he rules on question 23, inspection test
+  builds of the handbook pass the switch on the command line).
 - Later for Philippe: U2 in flm-rs when he wants `srcset`; the float-anchor policy option
   (05, not raised); the flm-core finding on a `field` environment without a name (05);
   the `~\cite` tie (05); whether dumps drop the positions (11 Deferred (b)); the example's

@@ -625,6 +625,36 @@ describe('ZooFlmEngine', function () {
             assert.match(out.trees[1], /\\eqref\{ref1\}/);
             assert.match(out.style_name, /\.sty$/);
         });
+
+        it('render_latex takes render options for that run only', function () {
+            const f = engine.make_fragment('Text\u202Fhere.\n\\begin{align}\n  x = 1\n\\end{align}', {
+                origin: origin('dave', 'notes'), layout: 'blocks',
+            });
+            try {
+                const plain = engine.render_latex([f], { error_policy: 'continue' });
+                assert.match(plain.trees[0], /\\begin\{align\}/);
+                assert.deepStrictEqual(plain.diagnostics.map( (d) => d.identifier ),
+                                       ['flm.latex-recomposed.unknown-character']);
+                const out = engine.render_latex([f], {
+                    render_options: {
+                        math: { emit_flm_math_environment_macro: true },
+                        'latex-recomposed': { unicode_overrides: { '\u202F': '\\,' } },
+                    },
+                });
+                assert.match(out.trees[0], /\\flmMathEnvironment\{align\}/);
+                assert.deepStrictEqual(out.diagnostics, []);
+                assert.ok(out.style.includes('\\newunicodechar{\u202F}{\\,}'), out.style);
+                // the next run without them is as before
+                assert.strictEqual(engine.render_latex([f], { error_policy: 'continue' }).trees[0], plain.trees[0]);
+                assert.throws( () => engine.render_latex([f], { render_options: { 'latex-recomposed': { drop_comments: true } } }),
+                               /`latex-recomposed\.drop_comments` is set by/ );
+                assert.throws( () => engine.render_latex([f], { render_options: { math: { numbered_equations: false } } }),
+                               /`math\.numbered_equations` is not a render option/ );
+                assert.throws( () => engine.render_latex([f], { render_options: [] }), TypeError );
+            } finally {
+                engine.release(f);
+            }
+        });
     });
 
     describe('diagnostics', function () {

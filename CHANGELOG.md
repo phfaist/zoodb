@@ -20,9 +20,12 @@ ported.
   `processor.object_scan()` report each fragment's term definitions with their
   bodies (for a glossary; `body_origin`, from the new `range_origin()`, gives a
   body's fragment the file position of the body) and every key it cites (with
-  `cite_prefix` and `cite_key` in `object_scan()`); `render_document()` and
-  `render_fragment()` take `render_options`, flm-rs render options for that
-  run only. The core settings refuse the keys a run sets itself
+  `cite_prefix` and `cite_key` in `object_scan()`); `render_document()`,
+  `render_fragment()` and `render_latex()` take `render_options`, flm-rs
+  render options for that run only (for `render_latex()`, for instance
+  `math.emit_flm_math_environment_macro` or
+  `latex-recomposed.unicode_overrides`, without changing the engine's
+  settings). The core settings refuse the keys a run sets itself
   (`refs.unresolved`, `text.width`, `text.link_addresses`,
   `latex-recomposed.drop_comments`).
 - **Package exports of the FLM layer.** `./zooflm` (environment-neutral: the

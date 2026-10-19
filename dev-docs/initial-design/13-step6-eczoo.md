@@ -162,9 +162,13 @@ Philippe's.
 | F2. The text of a formula in a term's lead-in (flm-rs, found by B2) | the search index's text (3 terms of the data hold a formula) | the text output writes `Construction A_4: …` for a `defterm` whose term is `Construction \(A_4\)`, while the running text keeps `\(A_4\)`; the HTML is right | a finding for 05's table (the main session's edit); nothing worked around |
 | G8. Backreference details on the first load and after a reload (found by B2; its effects measured by B2's review) | the references page's "Appears in", collectbib's `encountered_in` and the glossary's "Referenced in" in dev mode (one zoo kept across rebuilds); the diagnostics of a relation's `detail` | the relations populator copies a relation's raw `detail` into the backreference before the FLM processor compiles the fields. On the first load each backreference detail (3,432 in the EC zoo: `relations.parent_of.N.detail` 1,117, `relations.cousin_of.N.detail` 2,315) was compiled a second time, as a field of the object it is copied to, under that object's file and without a position (15,356 live fragments): 5 of F1's 42 page lines named that file at a position counted from the field (`/c/fusion.html`: `…/mbqc/fusion.yml#relations.cousin_of.1.detail:1:74` for gkp.yml's `relations.cousins.3.detail` at 85:89; likewise `/c/convolutional.html`, `/c/griesmer.html`, `/c/dodecahedron.html`, `/c/icosahedron.html`). After a reload the backreference held the forward relation's own fragment, which the scan (grouping by `fragment.origin`) credited twice to the forward object and not to the object holding the backreference: on the full data, after a reload with no change, 949 objects' `cited` and 320 objects' `refs` differed from the first load's, the key–object pairs fell from 11,447 to 9,020 and the live fragments from 15,356 to 11,924 (test data: 3 objects' `refs`). In dev mode (Eleventy's watch rebuild after a touch of one code file, B2's package with G7) the references page then showed 9,012 "Appears in" links instead of a fresh build's 11,432, the glossary 582 "Referenced in" items instead of 736, the BibTeX and CSL-JSON exports the same 5,217 entries in another order, and the dump differed; the other 1,275 HTML pages and the other files were equal. The first load matched the baseline (11,432 links), a reload did not | done in the package (B2's review fixes, for the main session to commit), as the main session ruled (a detail compiled once, both objects credited, the diagnostics at the forward field): the relations populator records where each backreference entry's values come from (`_zoodb.copied_fields`, rebuilt with the backreferences, left out of dumps); the field compiler gives a copied field the fragment of the field it copies, compiled once as that object's field with its origin and position (first when the copy comes first in the zoo), and `object_fragments()` leaves the copy out; the scan, over the objects' fields, counts the fragment's references, citations and images for both objects, its labels and term definitions for the forward object only (a label in a detail is defined once). On the full data all 3,432 details are their relations' fragments, with 11,924 live fragments at every load and build; after a reload with no change 0 objects differ (`cited`, `refs`, `labels`, `terms`, `graphics`, diagnostics; 17,336 cited entries and 11,447 pairs both times) and the data dump is equal (test data likewise); the five lines name the place where the text is written; the full build's pages and exports are byte-identical to B2's (the dump's citations table holds the same 5,217 entries in another order); in dev mode every page and export after the touch and after the second and the fifth edit equals a fresh build's (`references.html` 11,432 links, `concepts.html` 736 items; the dump differs by its snippet cache, as before the fix, and after an edit its `db` also by the edited file's `source_file_modification_token`). Tests, `doc/zoodb.dbprocessor-flm.rst`, `doc/zoodb.dbprocessor-relations.rst`, `CHANGELOG.md` |
 | G9. The cited works' texts in the search text (B2's question 13, ruled in the review fixes) | the search index (`dat/searchindex.json`): a code found by the authors and titles of the works it cites, as with the baseline's index | the searchable-text assembler renders each field's text with `engine.render_text()`, which placed no piece, so a citation and a footnote were their marks (`[1]`, `¹`); the crate's text runs can place them (`pieces: true`), the engine did not pass it on; the former text renderer wrote each citation in full | done in the package (B2's review fixes, for the main session to commit): `engine.render_text({ pieces })`, the assembler's option `pieces` and the standard setup's `searchable_text_options.flm_pieces` (default `false`): each field's text ends with its footnotes and the list of the works it cites, under the headings `Footnotes` and `References` (a standalone fragment holds neither: the standalone check); an engine test, a standard-setup test, `doc/zoodb.dbprocessor-searchable.rst`, `doc/zoodb.zooflm.rst`, `doc/std.rst`, `CHANGELOG.md`; the sitegen sets it (`1c1cf55`): the index is 4,605,733 bytes (baseline 4,443,321, marks alone 2,349,486), `introduced` 273,062 characters (235,118; 7,543), and five queries for a cited author or title give the baseline's numbers of results, with `approximate_qecc` or `qubits_into_qubits` at the baseline's rank or one place off (14th for `Zeng`, as in the baseline; 2nd or 3rd for the others), where the marks-only index missed the code in 3 of the 5 queries and ranked it lower in the other 2 (10th, 8th) |
-| G10. The engine module in a Parcel bundle (found by C) | the code graph and the headless SVG exporter (any browser code that imports `is_fragment`, `check_error_policy` or `apply_error_policy` through `./zooflm/engine`, as the field compiler does) | `src/zooflm/engine.js` imported names from `./fragment.js` and `./diagnostics.js` and re-exported both with `export * from`; Parcel 2.13.3 with scope hoisting compiles the imports of those names through the engine module to a namespace object `$…$exports` that the bundle never defines: the exporter's bundle built, then failed in the browser (`ReferenceError: $…$exports is not defined`); reproduced on five files (C, `C/repro/parcel-exportstar/RESULTS.txt`) | done in the package (C, for the main session to commit): the two modules re-exported name by name (the 27 exports of the engine module unchanged), a comment saying why; a test (every export of the two modules is the engine module's, no `export * from` in its source), `doc/zoodb.zooflm.rst` ("Modules"), `CHANGELOG.md`; the exporter's bundle rebuilt on it (sitegen `fcefd2b`) |
+| G10. The engine module in a Parcel bundle (found by C) | the code graph and the headless SVG exporter (any browser code that imports `is_fragment`, `check_error_policy` or `apply_error_policy` through `./zooflm/engine`, as the field compiler does) | `src/zooflm/engine.js` imported names from `./fragment.js` and `./diagnostics.js` and re-exported both with `export * from`; Parcel 2.13.3 with scope hoisting compiles the imports of those names through the engine module to a namespace object `$…$exports` that the bundle never defines: the exporter's bundle built, then failed in the browser (`ReferenceError: $…$exports is not defined`); reproduced on five files (C, `C/repro/parcel-exportstar/RESULTS.txt`) | done in the package (C; committed by the main session as `6105fcb`): the two modules re-exported name by name (the 27 exports of the engine module unchanged), a comment saying why; a test (every export of the two modules is the engine module's, no `export * from` in its source), `doc/zoodb.zooflm.rst` ("Modules"), `CHANGELOG.md`; the exporter's bundle rebuilt on it (sitegen `fcefd2b`) |
 | G11. Index addresses with a scheme in `ref()` and in `\ref` (found by C; not needed by the EC zoo) | a browser app whose output context gives objects addresses such as `jsCallbackRef:…` (the former code graph pane) or `invalid:…` (the preview apps, G5) | the composer's `ref()` and `refhref()` write an index entry's address as given (even `javascript:void(0)`), while flm-rs's HTML output, for the same entry met through `\ref` or `\hyperref` in content, refuses an address whose scheme is not `http`, `https`, `mailto`, `ftp`, `tel` or none: the link without its address and the Error `flm.html.refused-address` (C, `C/logs/href_schemes.txt`) | deferred to Philippe, not needed by the EC zoo (question 22): `ref()` and `refhref()` applying the same address policy, or the docs saying that an index's addresses are paths, fragments or web addresses; the code graph now uses `#jsCallbackRef:TYPE/ID` (sitegen `824d2ad`) |
 | F3. The heading of the lists of notes and citations per render (flm-rs, found by C) | the code graph pane, which placed the lists of citations and footnotes without a heading | `endnotes()` places the lists with the heading the engine writes ("References", "Footnotes"); its text is `citations.heading_title` and `xnotes.kinds.*.title`, bound when the registry is built (a browser engine must keep the zoo's configuration to load the dump), and no render option leaves it out | a note for 05's table (the main session's edit), no request; the pane keeps the heading, sized small (C, question 18) |
+| G12. Render options per call of `render_latex()` (found by D; B2's question 12) | the handbook's run: the display-math environments through the hook `\flmMathEnvironment` (`math.emit_flm_math_environment_macro`; the class scales a formula too wide for its column and sets a formula in a list's value without its labels, as before the port) and spellings for the characters the engine's table lacks (`latex-recomposed.unicode_overrides`), without changing the zoo engine's settings, which the code graph exporter must keep (its engine loads the zoo's dump, `engine.load()` refusing another settings hash) | `render_document()` and `render_fragment()` took per-call render options (part 0), and the crate's html and text runs too, but `render_latex()` did not | done in the package (D, for the main session to commit): the crate's `LatexOptions.render_options`, read like html's and text's (`run_render_options()` with the reserved `refs.unresolved` and `latex-recomposed.drop_comments`, part of the plan's key); the engine's `render_latex({ render_options })`; a Rust test and an engine test, `doc/zoodb.zooflm.rst` ("Text and LaTeX output"), `CHANGELOG.md`; the module rebuilt (D, Deviation 2) |
+| G13. Previews repeat their field's labels in the one LaTeX run (found by D; not fixed) | the handbook's lists of root codes and its code-list tables, which place a description's first paragraph (`engine.truncate()`) beside the full description | `truncate()` keeps everything before the cut, labels and term definitions included; in one `render_latex()` run a label written in both copies is the Error `flm.refs.duplicate-label` (the LaTeX is right: the class drops the preview's labels, `\eczhNoLabels`) | none needed today: on the full data no description's first paragraph holds a label or a term definition (1,155 checked); in the test data the CSS code's does (2 Errors, so the test build stops under `'abort'`; inspection test builds pass the switch on the command line); a `truncate()` option leaving out the labels a preview defines, or the previews in a run of their own, if it is ever needed (question 25) |
+| F4. The image hook's line limit (flm-rs, found by D) | the handbook's figures, too wide for the column | the default `\flmIncludeGraphics` of the recomposed LaTeX's style file writes `\includegraphics[max width=\linewidth,#1]{#2}`, and the run writes `width=` and `height=` for every image whose size the inspector reported; adjustbox applies the keys in order, so `max width` before `width` limits nothing (`max width=100pt,width=300pt` gives 300 pt, `width=300pt,max width=100pt` 100 pt, TeX Live 2023 and 2025); the style file's comment says the image never runs wider than the line | a finding for 05's table (the main session's edit), no request; the class defines the hook with `max width` after the size keys, as the former output wrote it |
+| F5. Characters without a LaTeX spelling (flm-rs, found by D) | the handbook's text: the contributors' names, the cited works' texts, a chapter | the Unicode-to-LaTeX table of the recomposed LaTeX has no spelling for U+202F (narrow no-break space), U+01CE (ǎ), U+0301 (a combining acute accent left alone), U+FFFD and CJK ideographs: the Warning `flm.latex-recomposed.unknown-character` (13 in the handbook's runs: 1 in the chapters, 6 CJK characters of two contributors' names, 2 ǎ, 1 U+0301 and 3 U+FFFD in cited works' texts), the character written as it is | a finding for 05's table (U+202F and U+01CE look like gaps of the table; the others are reasonably outside it), no request; the handbook's run gives the ten spellings (`unicode_overrides`, through G12): nine as the class declares them, U+01CE as LaTeX's own `\v{a}`, which the class does not declare |
 
 ### The citation caches
 
@@ -2004,7 +2008,8 @@ its dev-mode runs.
 Done 2026-10-19 by C's agent (Opus; node 23.7, the worktree at `cca3628`, the sitegen
 clone at `1c1cf55`). Four commits in the sitegen clone, with the two trailers; none in
 the data clone or the handbook clone; nothing pushed. One package change in the worktree
-(G10 below; uncommitted, for the main session). Logs, probes and the browser profiles:
+(G10 below; committed by the main session as `6105fcb`). Logs, probes and the browser
+profiles:
 `/private/tmp/claude-501/-Users-philippe-Research-projects-zoodb-zoodb/a1dd88e1-7168-44e0-92fc-0b56c08d4645/scratchpad/step6/C/`
 (below `C/`; `C/probes/` holds the scripts, run with plain `node` from the sitegen
 clone, which import its modules by path; `C/logs/` the logs). Every build, test and
@@ -2076,13 +2081,13 @@ its `src/` equal to the worktree's; the root `package.json` and `yarn.lock` rest
   page, and the engine's module beside them, `zoodb_flm_wasm_bg.a0cffaf1.wasm`,
   5,157,363 bytes, which the browser code fetches from the exporter's local server.
 
-**The package change (G10; for the main session to commit).** The first Parcel build of
-the exporter succeeded, but in Puppeteer the bundle failed when the code graph loaded
-the zoo: `ReferenceError: $fcd8dccdb75109a6$exports is not defined` in the field
-compiler's constructor. `src/zooflm/engine.js` both imported names from `./fragment.js`
-and `./diagnostics.js` and re-exported the two modules with `export * from`; Parcel
-2.13.3 with scope hoisting (its default for production builds) then compiles every
-import of those names through the engine module (`check_error_policy`,
+**The package change (G10; committed by the main session as `6105fcb`).** The first
+Parcel build of the exporter succeeded, but in Puppeteer the bundle failed when the code
+graph loaded the zoo: `ReferenceError: $fcd8dccdb75109a6$exports is not defined` in the
+field compiler's constructor. `src/zooflm/engine.js` both imported names from
+`./fragment.js` and `./diagnostics.js` and re-exported the two modules with `export *
+from`; Parcel 2.13.3 with scope hoisting (its default for production builds) then
+compiles every import of those names through the engine module (`check_error_policy`,
 `apply_error_policy`, `is_fragment` in `flmsimplecontent.js`, `is_fragment` in
 `eczcodegraph.js`) to a member of a namespace object `$…$exports` that the bundle never
 defines. Reproduced on five files in `C/repro/parcel-exportstar/` (`RESULTS.txt`): a
@@ -2316,9 +2321,9 @@ formula typeset on every page checked. Numbers in the Checks table.
    server run in one Node process, whose JS heap V8 caps at about 4,080 MB by default
    here, and three of four runs of the same steps crashed with `JavaScript heap out of
    memory` in Parcel's rebuild for the first page request after Eleventy's rebuild. The
-   site's `build` script sets `NODE_OPTIONS=--max-old-space-size=8192`; `dev`,
-   `dev-test` and `build-simple` do not. With that option the run survived two rebuilds
-   (Checks; question 21).
+   site's `build` script sets `NODE_OPTIONS=--max-old-space-size=8192`, and since sitegen
+   `0ac4fb3` its `dev` and `dev-test` scripts do too (deviation 8); `build-simple` does
+   not. With that option the run survived two rebuilds (Checks; question 21).
 
 **Checks** (logs in `C/logs/`).
 
@@ -2392,9 +2397,9 @@ formula typeset on every page checked. Numbers in the Checks table.
 **For D and E.**
 
 - D: pack the sitegen clone at `b72901a` or later (the review fixes' two commits on
-  `fcefd2b`), and the worktree with G10 (the
-  tarball `40dc1569…` or the main session's commit): the handbook's exporter, and any
-  bundle of the engine, needs G10. `jscomponents`' package now carries the `.wasm` file
+  `fcefd2b`), and the worktree with G10 (the tarball `40dc1569…`, whose `src/` is that of
+  the main session's commit `6105fcb`): the handbook's exporter, and any bundle of the
+  engine, needs G10. `jscomponents`' package now carries the `.wasm` file
   beside the exporter's bundle (5.16 MB), served by the exporter's `sirv`. The
   handbook's generation runs that exporter (`mkeczhandbook/genltx_handbook.js` imports
   `CodeGraphSvgExporter` from
@@ -2545,3 +2550,679 @@ original as their working folder since 2026-10-16), whose git integration likely
 `git status` there without `--no-optional-locks` (which creates and removes
 `index.lock`, changing the folder's time and not the index's); no command of this round
 writes there (every git command on the originals passed `--no-optional-locks`).
+
+### D. The handbook
+
+Done 2026-10-19 by two agents of D (Opus; node 23.7, the worktree at `6105fcb`, the
+sitegen clone at `0ac4fb3`, the data clone at `60bbc93ae`, the handbook clone from
+`c73b681`). The first agent made the package change (G12), the four commits in the
+handbook clone and the builds, and was stopped by a usage limit before it wrote these
+Results; the second checked its work, ran the checks and the builds again, and wrote
+them. Four commits in the handbook clone (7 after the review fixes: `1fbbb95`,
+`38141cc`, `d5ccdc5`; the clone at `d5ccdc5`), with the two trailers; none in the
+sitegen clone or the data clone; nothing pushed. One package change in the worktree (G12
+below), uncommitted, for the main session. Logs, probes and work folders:
+`/private/tmp/claude-501/-Users-philippe-Research-projects-zoodb-zoodb/a1dd88e1-7168-44e0-92fc-0b56c08d4645/scratchpad/step6/D/`
+(below `D/`; the first agent's logs in `D/logs/`, the second's in `D/finish/logs/`, the
+probes in `D/probes/` and `D/finish/probes/`). Every build ran with `TMPDIR` in `D/` and
+`TEXMFVAR` in `D/texmf-var/`, Inkscape and ImageMagick through two wrappers that give
+them a `HOME` in the scratchpad (`D/bin/`, so that Inkscape's profile and caches stay
+out of `~/Library`), every yarn call offline with the Setup's `YARN_GLOBAL_FOLDER`
+(`D/env.sh`); from 15:51 on the builds could run under a sandbox profile that refuses
+every outbound connection but to localhost (`D/nonet.sb`, checked with
+`D/probes/nettest.mjs`: localhost answers, a remote address gives `EPERM`), under which
+the second agent ran all of its builds.
+
+**The dependencies.** The sitegen clone's four workspaces packed at `0ac4fb3` (`yarn
+pack`, `D/logs/pack_*.log`) into `scratch/eczoo/pack/`: `eczoodb.tgz` (73 files,
+11,223,372 bytes, its test data and test cache included), `eczcollectbib.tgz` (10
+files), `jscomponents.tgz` (75 files, 5,936,006 bytes, the exporter's bundle
+`_headless_exporter_browser_page.cdd65f0e.js` of `b72901a` and the `.wasm` file beside
+it), `_zoodb_citations_cache.tgz` (5 files); each packed file equals the clone's
+(checked again by the second agent, `package.json` aside, which `yarn pack` rewrites).
+The handbook clone's root `package.json` got a `resolutions` block: `@phfaist/zoodb` to
+the worktree's tarball, the four packages to theirs, and a sixth entry,
+`yaml@npm:^2.9.1` to `pack/yaml-2.9.1.tgz` (deviation 3): zoodb 0.3 depends on `yaml`
+2.9.1, which the handbook's copied Yarn cache does not hold, so the first offline
+install stopped at its resolution (`install1.log`, the registry request refused); the
+tarball holds the files of the copy the sitegen clone already had installed
+(`node_modules/@phfaist/zoodb/node_modules/yaml`, equal file for file).
+`YARN_GLOBAL_FOLDER=…/B1close/yarn-global YARN_ENABLE_NETWORK=0 yarn install` with Yarn
+4.6.0 through corepack (`PUPPETEER_SKIP_DOWNLOAD=1`, so that Puppeteer's install step
+downloads nothing): 6 packages added, 61 removed, nothing fetched (`install2.log`).
+After G12 the worktree was packed again and both clones reinstalled by the Setup's
+procedure (`D/reinstall_handbook.sh`, the stale copies removed first; `pack_g12.log`,
+`install_g12.log`, `install_sitegen_g12.log`): 75 files, 2,351,842 bytes, SHA-256
+`f1c71b05…` (`pack_g12.sha256`). In each clone one `node_modules/@phfaist/zoodb`, 0.3.0,
+its `src/` equal to the worktree's, so the handbook and `eczoodb` share one engine
+class; the root `package.json` and `yarn.lock` are restored to their committed form (the
+overlay copies in `D/package.json.resolutions` and `D/yarn.lock.resolutions`; the
+sitegen clone's in `D/sitegen_yarn.lock.resolutions`). The sitegen clone has run on the
+G12 package since 15:37; its `site/_site/` is still C's last build.
+
+**Commits** (handbook clone, branch `zoodb-flmrs`, on `c73b681`):
+
+- `9dfa0b2` The test build's citations cache migrated to `citations.jsonl` (1 file):
+  `zoodb-migrate-citations-cache --cache-dir
+  mkeczhandbook/_testrepo_zoodb_citations_cache` (fetches nothing): 119 entries
+  imported, 1 skipped, `arxiv:2312.11805`, whose legacy expiry (2026-06-25) has passed;
+  the legacy file kept as it is, no longer read.
+- `34da9e4` The handbook on zoodb 0.3: one recomposed-LaTeX run of the FLM engine (9
+  files). `latexcompose.js` (new): `HandbookLatexComposer` over the zoo's engine; the
+  generators write the handbook's own LaTeX as before and, for every FLM value they
+  place, `ltx(value)`, a marker (private-use characters around the fragment's number and
+  its transforms, trimmed or `|` as `\eczvbar`) standing for a fragment of the run;
+  `make()` for the ad hoc texts the handbook writes (titles, a code list's generated
+  description, an affiliation), `truncate()` and `first_paragraph()` over
+  `engine.truncate()`, `ref(label)` for a reference from the handbook's own LaTeX (a
+  fragment `\ref{…}` placed in the run, since a safe label exists only there); `run()`
+  makes one `engine.render_latex()` call over every placed fragment (a fragment placed
+  several times is rendered once) with `raw_label_types` the zoo's object types,
+  `drop_comments: true` and the run's render options, prints the run's diagnostics with
+  `format_diagnostic`; `substitute()` replaces the markers; `release()` releases what
+  the composer made. `main.js`: the zoo without `environment_options` (the headings,
+  tables of cells and quotations are standard features of the engine, whose settings
+  stay the zoo's, since the code graph exporter loads the zoo's dump into an engine of
+  the same configuration); a space has no permalink (`null`, G6); the chapters through
+  `compile_flm_fragment()` with an origin (`content/<file>`, its `source_path` for the
+  images); the run's render options (G12): `math.emit_flm_math_environment_macro` (the
+  display formulas through `\flmMathEnvironment`, which the class scales and sets
+  without labels in a list's value, as before) and `latex-recomposed.unicode_overrides`
+  for the ten characters the engine's table lacks, nine spelled as the class declares
+  them and U+01CE as LaTeX's own `\v{a}`, which the class does not declare (F5; the
+  comment corrected in the review fixes, `38141cc`); the markers counted after the substitution in the LaTeX, the BibTeX and every
+  additional file (a marker left throws); the run's style file
+  `flmrecomposed.<hash>.sty` written to the work folder (an older one removed) and
+  loaded by a two-line `flmlatexdefaults.sty`, which the class loads; the figures' sizes
+  from the graphics processor's fields (`processed_info.graphics`); a dependency that is
+  not a git URL (the packed tarball) gives the version `0000-00-00 unknown`, in the form
+  the class reads. `genltx_*.js`: snippets for the sort keys (`engine.snippet(f,
+  'text')` for names and list titles), `engine.truncate()` through the composer for the
+  first paragraphs and the truncated table values, the parse-tree test of the index
+  alias replaced by a test on the name's source (an inline formula, then a space), the
+  reference to the taxonomy section as a fragment of the run, the concepts' `.eczaux`
+  lines left to the class (their labels are safe labels of the run), a user's
+  affiliation as the data's object `{ short, … }` (a string still accepted).
+  `mk_bib_viacsl.js`: one entry per cited work (`scan_results.cited`), key `cite<N>`,
+  its note the compiled citation's text placed in the run; the `.eczaux` maps each key
+  as the run writes it (`\flmCite{arXiv:…}`, `\flmCite{manual:{…}}`) to its BibTeX key
+  (`\eczauxDefCite`), two spellings of one key sharing their entry. `mk_bib.js` (not
+  used: `main.js` imports `mk_bib_viacsl.js`) gains a comment saying it is not ported
+  (deviation 8).
+- `d1f0248` The class on the LaTeX hooks of the recomposed LaTeX (1 file,
+  `latexstyle/eczhandbook.dtx`, 349 lines added, 150 removed; the former file in
+  `D/eczhandbook.dtx.orig`). The class defines, before the run's style file is loaded,
+  the hooks it sets its own way, and the style file keeps them (its definitions are
+  provided, not imposed): `\flmCite` looks each key up in the `.eczaux` and cites its
+  BibTeX key; `\flmRef` and `\flmHyperref` as the former `\flmRefsCref` and
+  `\flmRefsHyperref` (cleveref, the page, the index entry), `\flmLabelsWithDisplayText`
+  through the class's cleveref labels with a text; the `defterm` environment as before
+  (the term as a lead-in), each of its labels recorded with the term in the `.aux` file
+  for the index of concepts; `\flmTerm` and `\flmTermInDefterm` as the former term
+  links; the `flmFloat` environment by case (a numbered figure checked for its width, an
+  unnumbered float in place); `\flmIncludeGraphics` with `max width` after the size keys
+  (F4); the quotation hooks (`\flmQuoteText`, `\flmQuoteLines`) in the epigraphs' style;
+  `[[`, `]]`, `((`, `))` in mathematics set as `\llbracket`, `\rrbracket`,
+  `\llparenthesis`, `\rrparenthesis` through math-active characters (the engine writes
+  mathematics as written; 07), with amsmath's strut measure and `\sqrt(` adjusted;
+  inline verbatim breaking at its spaces (fvextra); the class's own declarations of
+  characters after the style file's. `\eczhNoLabels` drops a term definition's labels
+  and lead-in as before, and the patches of the former FLM definitions are gone. The
+  hooks the class keeps from before: `\flmMathEnvironment`, `\flmHref`, `\flmUrl`,
+  `\flmEmail`, `\flmRefsHyperref`, `\flmRefsCref`. The headings in content need no
+  setting: the run writes `\flmHeading[toc=true]\section{…}` and `\subsection{…}` (48 in
+  the full build), which the class maps as before (`\subsection` as `\codesubsection` in
+  a code's fields); no content heading has another level.
+- `8d44099` The test build under the FLM engine's `'continue'` policy (1 file,
+  `mkeczhandbook/package.json`): `build-test` sets `ECZOO_FLM_CONTINUE_WITH_ERRORS=1`,
+  the sitegen's switch, read by `eczoodb` (deviation 4). The full build runs without it.
+  Reverted in the review fixes (`d5ccdc5`): the switch goes on the command line, as in
+  the sitegen.
+- The review fixes added `1fbbb95` (the class: a pair in mathematics only of adjacent
+  characters), `38141cc` (a comment of `main.js`) and `d5ccdc5` (Review fixes, below).
+
+**The package change (G12; for the main session to commit).** The handbook's run needs
+two render options for itself (the display formulas through `\flmMathEnvironment`, the
+ten characters' spellings) without changing the zoo engine's settings, which the code
+graph exporter must keep (its engine loads the zoo's dump, `engine.load()` refusing
+another settings hash; B2's question 12). `render_document()` and `render_fragment()`
+take per-call render options since part 0, the crate's html and text runs too,
+`render_latex()` did not. The crate's `LatexOptions` gains `render_options`, read like
+html's and text's (`run_render_options()`, refusing the reserved `refs.unresolved` and
+`latex-recomposed.drop_comments`, which the call's own fields set, and naming any key
+that is not a render option); the options are part of the plan's key; the engine's
+`render_latex({ render_options })` checks them as `render_document()` does. Files:
+`rust/zoodb-flm-wasm/src/engine.rs` (and a Rust test, `render_latex_options_per_call`),
+`rust/zoodb-flm-wasm/src/lib.rs` (the TypeScript type), `src/zooflm/_wasm/`
+(`BUILD_INFO.json`, `zoodb_flm_wasm.d.ts`, `zoodb_flm_wasm_bg.wasm`, rebuilt by `yarn
+build:wasm flm`: 5,160,404 bytes, was 5,157,363), `src/zooflm/engine.js`,
+`test/test_zooflm_engine.js` (an engine test: the options act for that run only, a later
+run is as before, the reserved and unknown keys are refused), `doc/zoodb.zooflm.rst`
+("Text and LaTeX output"), `CHANGELOG.md`. The module was built from the flm-rs checkout
+as it stood, `9ccaa871`, 82 commits after the `5de1c198` of the module before (10 of
+them touching flm-core: a math processor's demand of `flm.math.content`, the
+display-math environments' rule of last resort, compose templates read through `main`,
+tests and docs; deviation 2): `BUILD_INFO.json` records it, `dirty: false`,
+`paths_remapped: true`; flm-core is unchanged from `9ccaa871` to the checkout's present
+head `8643be38`, so the module still matches the crate. Every fragment of the zoo
+rendered by the module before and after (`D/probes/probe3_allrenders.mjs`: 11,094
+fragments, one html, one text and one recomposed-LaTeX run): the four outputs
+byte-identical (`D/probes/out3_old/`, `out3_new/`). wasm-pack ran with its cache copied
+into `D/wasm-pack-cache/` (wasm-bindgen 0.2.127 and wasm-opt from
+`~/Library/Caches/.wasm-pack`), so its lock file there was left alone and nothing was
+downloaded.
+
+**The run on the full data** (the final full build; the second agent's generation gives
+the same numbers). The numbers of 07 milestone 5's table:
+
+| | EC zoo, full data (`60bbc93ae`) |
+|---|---|
+| codes / fragments placed / trees in the one run | 1,155 / 18,623 / 18,623 (the codes' fields, names and relation details, the domains', kingdoms' and code lists' texts, the table values and previews, the contributors, the six chapters, the 5,229 cited works' texts) |
+| zoo load and processing / composition (the 66 code graphs included) / the run / substitution and writing / figures / LaTeX | 29.1 / 75.0 / 3.3 / 0.07 / 49 / 319 s (the second agent's generation: 25.1 / 69.0 / 3.0 s) |
+| the run's memory | wasm linear memory 127.1 MB before, 336.1 MB after; Node's resident size 320 MB before, 594 MB after; Node's peak over the generation 815 MB |
+| LaTeX produced / style file / `.tex`, `.bib`, `.eczaux` | 4,502,908 bytes for the trees / 43,411 bytes (`flmrecomposed.8213d04f.sty`, 106 characters declared) / 6,200,650, 1,382,628 and 383,722 bytes |
+| safe labels: written / distinct | 176 / 174 (`ref1`…`ref174`, unique over the run; `ref34` and `ref35`, the labels of a term definition in `block_quantum`'s transversal gates, are written twice because that fragment is placed twice, the second time in a code list's table value, whose labels the class drops: no label multiply defined in LaTeX) |
+| raw labels | 21 object labels (`domain:…` 3, `kingdom:…` 18) and 2 labels inside a display formula (`sub:gauge`, `sub:stabilizer` of `subsystem_product.yml`, written as the formula's source) |
+| references in the run: to raw object keys / to safe labels | 526 (`\flmHyperref{code:…}` 426, `\flmRef{code:…}` 99, `\flmRef{domain:…}` 1) / 1,713 (`\flmHyperref` 1,650, `\flmRef` 49, `\eqref` 14); besides the run's, the handbook's own LaTeX writes 11,372 references to raw keys through the class's `\flmRefsHyperref` (`genltx_code.js`, `genltx_notable_families.js`: `code:…` 11,344, 8,926 of them with `[eczindexfamilyrel]`, `kingdom:…` 28), which the style file does not define (corrected in the review fixes: this row first counted them as the run's) |
+| citation hooks | 16,403 `\flmCite` (3,533 with a note), 15,537 `\flmCitePreSpace`; 5,245 keys as written in the `.eczaux` (`\eczauxDefCite`), 5,229 BibTeX entries |
+| images, floats, display formulas | 30 `\flmIncludeGraphics`, 38 `flmFloat`, 463 `\flmMathEnvironment` |
+| leftover markers / `[[` left in the LaTeX | 0 / 3,591 (set by the class's math-active characters) |
+| diagnostics | 0 (under `'abort'`, the switch off) |
+
+**F1 in the handbook.** None of F1's lines: the recomposed LaTeX writes each citation
+key as the content spells it, in its `\flmCite` hook, and looks no entry up (the
+bibliography is the handbook's own BibTeX file), so the 18 `manual:{…}` keys that fail
+in the site's HTML give no diagnostic in the handbook's run, and the full generation
+runs under the default `'abort'` without the switch. The keys the run writes are the
+keys the scan reports (`D/logs/probe2.log`, over the zoo's 11,094 fragments: 5,233
+distinct keys both ways, none on one side only; the chapters add 12), and the `.eczaux`
+maps every one: its 20 keys holding `"`, `'` or `--` (F1's 18 among them; e.g.
+`\flmCite{manual:{F. Gray, "Pulse Code Communication", U.S. Patent 2632058 (1953)}}`,
+`cite455`) each have their entry, and the LaTeX log has no undefined citation.
+
+**Unicode.** The handbook needs nothing beyond the zoo engine's default
+`latex-recomposed.unicode: 'declare'`: the run writes the characters as UTF-8, and its
+style file loads `fontenc` (`T1`, `T2A`) and declares each character the run met for
+pdfLaTeX (106, with `\newunicodechar`; 79 of them have a definition of LaTeX's own
+already, such as U+00A0, U+00A8 or U+00AE, hence 79 `newunicodechar` warnings
+"Redefining Unicode character" in the style file); the class's own 44 declarations
+(`\DeclareUnicodeCharacter`) come after the style file and win where they differ, so the
+characters print as before the port (the 12 Cyrillic letters of cited works' texts as
+`?`, the CJK ideographs through `CJKutf8`). The ten characters the engine's table has no
+spelling for (F5: U+202F, U+01CE, U+0301, U+FFFD and six CJK ideographs of two
+contributors' names) get their spellings through the run's `unicode_overrides` (G12):
+the class's for nine of them, LaTeX's own `\v{a}` for U+01CE, which the class does not
+declare; so the run has no `flm.latex-recomposed.unknown-character` Warning (12 on the
+full data without them, `build_full_gen1.log`, and 1 in the chapters, `probe1.log`).
+`'replace'` is not needed (B2 uses it for the site's BibTeX export, through an engine of
+its own). The baseline did not rely on pylatexenc's table: the former recomposer wrote
+the characters as UTF-8 as well (199 non-ASCII characters in the baseline's `.tex`,
+10,769 in its `.bib`; the new: 1,107 and 10,776 on the same data), declared by the
+class, and `get_builtin_uni2latex_dict` appears in the handbook only in commented-out
+imports (`mk_bib.js`, `mk_bib_viacsl.js` before the port), so no difference of
+pylatexenc's table is to be recorded. The new `.tex` holds more non-ASCII characters
+because the citation keys are now written as written (367 of the 382 opening typographic
+quotes are inside `manual:{…}` keys; the baseline wrote safe labels, `\cite{citeN}`);
+the style file's `T2A` encoding adds two font warnings (`T2A/SourceSerifPro-LF/m/n`
+undefined, `T2A/cmr` at 9.5 pt substituted).
+
+**The code graphs.** 66 graphs (3 domains, 63 code lists) through the production
+exporter (`headlessGraphExporter.js`, Puppeteer 24.4.0 with `headless: "new"`, Chrome
+for Testing 134.0.6998.35 from `~/.cache/puppeteer`, nothing downloaded), converted to
+PDF by Inkscape. On the baseline's data their node labels equal the baseline's in 62 of
+the 66 SVG files; the 4 others differ by the corrections C found (`Gauss’ law code` with
+its typographic apostrophe, `B&C` for `B\&C`;
+`D/finish/logs/svglabels_baseline_vs_0608.txt`). Two generations on the same data give
+the same labels in all 66 files, while 54 of the 66 SVG files differ in their layout
+(the node positions): the layout is not reproducible from run to run (finding 8). Chrome
+for Testing rewrote its Crashpad `settings.dat` in `~/Library` at each launch (the main
+session's ruling, disclosed: last at 19:02:56 by the second agent's generation).
+
+**The test build** (`yarn build-test`'s command, with `--citations-cache-dir` pointing
+at an ignored copy, deviation 5). The test data lacks 13 codes the chapters refer to, so
+the run has 13 `flm.refs.unresolved` Errors, and the test data's CSS code has labels in
+the first paragraph of its description, which the kingdom's list of root codes places
+beside the code's entry, so the run has 2 `flm.refs.duplicate-label` Errors (G13; the
+class drops the preview's labels, so the LaTeX is right); under `'abort'` the build
+stops at them, hence the switch for the test builds here (deviation 4, question 23; on
+the command line since the review fixes, not in the script). The LaTeX has the same 13
+references undefined (at 19 places) as the original's last test build
+(`build/testEcZooHandbook/` of the read-only original, 2026-06-03: the same 13 codes),
+no undefined citation, no LaTeX error. The test cache: the committed `citations.jsonl`
+lacks `arxiv:2312.11805` (skipped by the migration), which the chapter Introduction
+cites, so a build on the committed cache retrieves it (question 24); the builds here ran
+on `mkeczhandbook/_testrepo_zoodb_citations_cache_LOCAL/` (excluded in the clone's
+`.git/info/exclude`), the committed cache with that entry and the chapters' three others
+merged in (`zoodb-merge-citations-cache`, `merge_testlocal.log`).
+
+**Retrievals from arXiv** (deviation 6; corrected in the review fixes, which found the
+probe's). Before the sandbox profile existed, the first agent's runs reached the arXiv
+API at least four times, and likely five, against the rule that nothing is downloaded.
+`probe1` (15:15:23 to 15:15:50; `D/probes/probe1.mjs`, run without `DEBUG`, so its log
+shows nothing of it) loaded the test data on `D/probecache/test_cache/`, a copy of the
+sitegen clone's `_TEST_zoodb_citations_cache`, and compiled the chapters Taxonomy,
+Description and ProcessingPipeline, which cite `arxiv:2107.03374`, `arxiv:2312.11805` and
+`arxiv:2503.13517`: the copy's `citations.jsonl`, written at 15:15:50, holds the three
+with arXiv records and fresh time limits (`stale_after` 2026-11-29 to 2026-12-06), which
+neither the source cache nor its legacy file holds (`D/fix/logs/probecache_diff.txt`;
+the first agent listed them at 15:52 and did not take them up), so one request of the
+arXiv source (three keys, one chunk). `probe1full` (15:17:18 to 15:18:00) compiled the
+same chapters over the full data on `D/probecache/full_cache/`, a copy of the sitegen
+clone's `_zoodb_citations_cache_LOCAL` made at 15:17, which lacks the same three: it very
+likely retrieved them again (one more request), which cannot be checked, since the first
+agent replaced that copy at 15:36:39 for `probe3_new` (`probe2` and `probe3_old` ran on
+it in between, over the zoo's keys only, which it holds). The first three test
+generations (`gen_test1.log` to `gen_test3.log`, 15:47 to 15:50, each on a copy of the
+migrated test cache, `D/testcache_run/`) each retrieved `arxiv:2312.11805` (`Source
+‘arxiv’: 1 key(s) in 1 chunk(s)` … `done (1)`, about 200 ms each): three requests. The
+record of the third (`stale_after` 2026-12-06, `expires` 2026-12-18; `probe1`'s record of
+the same work is 34 min 46 s older) was kept with the chapters' three other entries
+(from the legacy test cache) in `D/chapter_citations.jsonl` and merged into the two
+ignored cache copies the later builds use (`merge_testlocal.log`,
+`merge_fulllocal.log`). No other run reached the network: the probes after 15:36
+(`probe3_new`, `probe4_terms`, `probe5_previews`, none with `DEBUG`) ran on the second
+copy, whose `citations.jsonl` (15:49:43) has no entry the sitegen's LOCAL folder lacks
+(only the 130 `preset:` entries rewritten, as every run does); the other early probes
+(`defterm_math`, `features`) load no zoo; every build from 16:00 on logged its sources
+(the test builds `manual` and `qecdborg`, the full builds `manual` and `preset`: `7341
+considered, 0 failed` and `7353 considered, 0 failed`) and ran under the sandbox profile,
+as did the second agent's, the review's and the review fixes' builds.
+
+**The comparison with the baseline.** The baseline is the original's last full build,
+`build/EcZooHandbook/` of the read-only `eczoo_handbook` (2026-06-09: handbook
+`c73b681`, sitegen `6bbebab`, data `0b2ff250c`; 676 pages). The ported handbook was
+generated on the same data in a scratch copy (`D/data_0608/`: the data clone's
+`0b2ff250c` re-indented by `zoodb-reindent-yaml`, 186 values in 122 files of 1,199,
+`D/logs/reindent_0608.log`, and A's renames of the `eq:parity` labels applied,
+`D/eqparity.patch`, the diff of `60bbc93ae`; one commit in a repository of its own so
+that the handbook reads a git version) with the citations cache of October
+(`D/cache_0608/`, a copy of the full build's), so the cited works' texts are October's
+(`build_0608.log`, `D/build_0608/`, deviation 9). The LaTeX (`D/tools/texcount.py`,
+`texcount_0608.txt`) has the same structure, count for count: 1,104 codes, 6,102 field
+sections, 63 code lists, 33 sections, 8 parts, 33 root-code items, 66 code graphs, 145
+contributors, 660 index aliases, 63 tables, 10,960 code links, 1,509 other links, 148
+references, 14 `\eqref`, 195 labels, 228 term links, 60 term definitions, 36 floats, 28
+images, 426 display formulas, 8 tables of cells, 27 verbatim pieces, 22 quotations, 82
+hyperlinks. What differs, every difference classified: the size, 5,503,094 to 5,663,573
+bytes (+2.9 %, the hooks' names and the keys written as written); the citation commands,
+14,797 to 14,838, with the same 19,627 cited keys and the same 3,167 notes
+(`D/finish/logs/cite_grouping_june.txt`): where the content writes consecutive `\cite`
+commands, the former recomposer merged those without a note into one (sorted, the noted
+one last), the engine writes each as written (finding 7, question 26); the inline
+formulas, 23,535 to 23,539, the same formulas in the source once the ligatures are
+mapped (`D/finish/logs/inline_math_june.txt`) and 4 more: the term of a term definition holding
+a formula is written twice now (the environment's argument and the labels' display text,
+`\flmLabelsWithDisplayText`; 3 terms) and a `manual:{…}` key holding a formula is
+written as written (1); the ligatures, `\llbracket` 2,931 and `\llparenthesis` 308 in
+the baseline's LaTeX, `[[` 2,931 now, set by the class (as the baseline set them only
+since the review fixes: the class first joined a pair with a space between, `) )` or `(
+(`, which the baseline's rewrite left as two characters, 81 pairs in 77 formulas, a
+difference of the rendering that the comparison of the PDF's text could not see; Review
+fixes); the comments, 173 `%-` lines
+before, none now (`drop_comments`); the content headings, 47 through `\flmHeading` now.
+The PDF (the first June build; the two June builds after the review fixes gave 676 pages
+and 5,831 hunks, and 677 pages and 19,990 hunks: the page breaks vary from run to run,
+Review fixes): 677 pages against the baseline's 676; its text (`mutool draw -F txt`, one
+word per line, `D/pdfcmp/june/`; 675,234 words against the baseline's 674,339) differs
+in 20,007 hunks of a word diff (`D/tools/classify_diff.py`,
+`D/finish/logs/classify_june.txt`): 15,841 in numbers only
+(page numbers, page references, citation numbers), 2,970 in line breaks, hyphenation and
+quotation glyphs, 1,047 whose text is found elsewhere in the other document (floats,
+footnotes and table headers placed on other pages), and 149 others
+(`D/finish/june_other_samples.txt.different`), read one by one: 3 the version lines (the
+scratch copy's commit, the tarball's unknown version, the handbook's commit); 53 the
+code graphs' labels and captions, figure captions and the lists' table rows placed
+differently across pages; 13 hyphenation, line breaks and footnotes interleaved with
+page numbers; 2 the corrected `B&C`; 1 the index's page lists; 77 in the bibliography:
+69 the cited works' data (78 of the 5,140 compiled citation texts the two caches share
+changed between June and October, 89 are new: published versions, capitalization,
+authors, the MathML of finding 6), 8 characters typeset otherwise with the same glyphs
+(`Falcão`, `Vlǎduţ`, `È`, `Khomskiĭ` composed in the text layer where the baseline's had
+an accent beside the letter; `〈` against `⟨`) and one character corrected (`Z^n` as
+written, a caret, where the baseline printed a circumflex accent). The baseline's LaTeX
+log against the new one on the June data and on the full data: no error in any of the
+three; undefined references or citations none in the three (the one `undefined` line of
+the new logs is the font warning above); "A float is stuck" 8, 7 and 4; overfull boxes
+37, 34 and 38; underfull boxes 1,775, 1,906 and 1,963; hyperref warnings 626, 374 and
+395; unresolved PDF destinations 78, 78 and 85 (footnotes in tables, equations and
+figures of other pages, as before); `newunicodechar` warnings 0, 79 and 79.
+
+**The LaTeX compilation.** TeX Live 2023
+(`/usr/local/texlive/2023/bin/universal-darwin`, pdfTeX 1.40.25, latexmk 4.80, makeindex
+2.17, BibTeX 0.99d, through `--latex-bin`), the installation the class requires: it
+stops with "Please process with TeX Live 2023 only" on another one (its own check since
+March 2026, for its cleveref integration; the second agent's first test run reached TeX
+Live 2025, the default `latexmk` of `/Library/TeX/texbin`, and stopped there,
+`D/finish/logs/build_test_tl2025_refused.log`). Everything it wrote is in the clone's
+ignored `build/` and in the scratchpad. The full build: 6 pdfLaTeX runs, 5 BibTeX runs
+and 10 makeindex runs in 319 s, latexmk ending with "All targets () are up-to-date";
+`EcZooHandbook.pdf` 729 pages, 32,378,130 bytes; the log as above. The test build: 24
+pages.
+
+**Deviations.**
+
+1. A package change (G12), which the rules require for a gap of the package (worktree
+   files listed above; the main session commits).
+2. The FLM module was rebuilt from flm-rs at `9ccaa871`, where the checkout stood, not
+   at the `5de1c198` of the previous module (82 commits later, 10 of them touching
+   flm-core); the checkout is read-only and its state is not ours to choose. The zoo's
+   html, text and recomposed LaTeX are byte-identical through both modules (probe 3),
+   and flm-core is unchanged up to the checkout's present head.
+3. A sixth resolution in the handbook's overlay, `yaml@npm:^2.9.1` to a tarball of the
+   copy the sitegen clone installed: the copied cache lacks zoodb 0.3's `yaml` 2.9.1,
+   and the install is offline; local state like the other five, restored before every
+   commit.
+4. The test build cannot meet "zero FLM diagnostics and no undefined reference" on the
+   test data: 13 unresolved references of the chapters (the same 13 undefined in the
+   original's test build) and the 2 duplicate labels of G13. `build-test` set the
+   sitegen's switch, `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` (`8d44099`), as the task asked
+   for a switch; the full build does not need it (question 23). The review accepted it
+   as a stopgap only, since the sitegen sets the switch in no committed script: the
+   review fixes revert it (`d5ccdc5`), so `yarn build-test` as committed stops at the
+   15 Errors, and an inspection test build passes the switch on the command line
+   (`ECZOO_FLM_CONTINUE_WITH_ERRORS=1 yarn build-test`), as the sitegen's do.
+5. The builds pass `--citations-cache-dir` with ignored copies in the handbook clone,
+   not the brief's sitegen LOCAL folder: the full build
+   `mkeczhandbook/_zoodb_citations_cache_LOCAL/` (the sitegen clone's LOCAL copy and the
+   chapters' four entries, which it lacks; 7,008 entries), the test build
+   `mkeczhandbook/_testrepo_zoodb_citations_cache_LOCAL/` (the migrated test cache and
+   the one entry the migration skipped; 120 entries), since a build writes its cache
+   folder (the crate's `citations.jsonl`, the compiled cache) and neither the tracked
+   test cache nor the sitegen's folder should take the handbook's entries.
+6. Retrievals from the arXiv API before the sandbox profile existed, against the rule
+   (above): one by `probe1` (three works, 15:15; found by the review), likely one more
+   by `probe1full` (the same three, 15:18; its cache copy is gone), three by the first
+   test generations (one work each, 15:47 to 15:50); disclosed, the records kept in the
+   ignored copies.
+7. The LaTeX runs use TeX Live 2023 through `--latex-bin`, since the class refuses any
+   other (predates the port).
+8. `mk_bib.js`, the alternative bibliography that `main.js` does not import, is not
+   ported (a comment says so); it still imports the former FLM layer and would fail if
+   imported (question 28).
+9. Not asked for: the comparison build on the June data in the scratchpad, and the
+   second agent's measurement preload (`D/finish/probes/mem_probe.mjs`, `node --import`,
+   wrapping `render_latex()` to read the memory; outside the clone, its outputs
+   byte-identical to the runs without it).
+
+**Findings** (G12, G13, F4 and F5 also in the gaps table above).
+
+1. G12 (package, fixed): `render_latex()` took no per-call render options (above).
+2. G13 (package, not fixed; question 25): `truncate()` keeps everything before the cut,
+   labels and term definitions included, so a preview placed beside its full field in
+   one LaTeX run repeats the field's labels (`flm.refs.duplicate-label`); not met on the
+   full data (the run has no diagnostic; no description's first paragraph holds a label
+   or a term definition, `D/probes/probe5_previews.mjs`), met in the test data (2
+   Errors).
+3. F4 (flm-rs, a note for 05's table, no request): the default `\flmIncludeGraphics`
+   writes `max width=\linewidth` before the run's `width=` and `height=`, and adjustbox
+   applies keys in order, so it limits nothing (`D/latextest/maxw.tex`: `max
+   width=100pt,width=300pt` gives 300.09 pt, the reverse 100.00 pt, TeX Live 2023 and
+   2025); the class puts `max width` last.
+4. F5 (flm-rs, a note for 05's table, no request): the recomposed LaTeX's table has no
+   spelling for U+202F and U+01CE (likely gaps), nor for U+0301 alone, U+FFFD or CJK
+   ideographs (reasonably outside it).
+5. F1 does not reach the recomposed LaTeX (above): its keys are written and mapped as
+   written.
+6. Eleven compiled citation texts of the October cache (five of June's) hold MathML
+   markup from the works' metadata (`<mml:math xmlns:mml=…>`, e.g. `arxiv:2505.13604`'s
+   title), which the handbook prints as text, as the baseline did for the five; data of
+   the citation sources, predating the port (question 27).
+7. Consecutive citations: the former recomposer merged consecutive `\cite` commands
+   without a note into one (sorted, the noted one last), the engine keeps them as
+   written: on the June data 41 more commands, the same keys and notes; `galois_bch`'s
+   title line reads `[1782, 4033, 4466–4468][832, Ch. 4][825, 4469–4471]` where the
+   baseline printed `[825, 1782, 4033, 4466–4471][832, Ch. 4]` (question 26).
+8. The code graphs' layouts are not reproducible from run to run (54 of 66 SVG files
+   differ between two generations on the same data, their labels equal), presumably as
+   before the port (the baseline cannot be rebuilt to check): E should compare its 89
+   graph SVGs by their labels.
+9. The class refuses every TeX Live but 2023 (its own check, predating the port, for its
+   cleveref integration); the run's style file loads zref-clever for its own definitions
+   of the reference hooks, which the class replaces by its cleveref ones, so both
+   packages are loaded.
+
+**Checks** (logs in `D/logs/` and `D/finish/logs/`).
+
+| check | result |
+|---|---|
+| package | `yarn lint` clean, `yarn test` 487 passing (486 and the G12 test; `D/finish/logs/pkg_lint_test.log`); `cargo clippy -p zoodb-flm-wasm --all-targets -- -D warnings` clean, `cargo test -p zoodb-flm-wasm` 21 passed (`cargo_flm.log`); `yarn node playground/play_example.mjs` exit 0; Sphinx 8.1.3 (the main checkout's, read-only): build succeeded, no warning (`D/logs/docbuild.log`) |
+| the module | `yarn build:wasm flm` exit 0 in 80.9 s, peak 1,654,734,848 bytes (`build_wasm_g12.log`); 5,160,404 bytes, `paths_remapped: true`, `flm_core_git` `9ccaa871`, `dirty: false`; the zoo's 11,094 fragments rendered to html, text and recomposed LaTeX byte-identical through the module before and after (`probe3_old.log`, `probe3_new.log`: 32.7 to 35.8 s, peak 652 to 698 MB) |
+| pack and installs | tarball 75 files, 2,351,842 bytes, SHA-256 `f1c71b05…`, its `src/` equal to the worktree's; the sitegen packages packed at `0ac4fb3`, equal to the clone's files; the handbook's installs offline (`install2.log` 2.3 s, `install_g12.log` 1.4 s, peak 552 MB), the sitegen clone's reinstall offline (1.8 s, the tarball read from disk); in each clone one `@phfaist/zoodb` 0.3.0, `src/` equal to the worktree's (checked again at the end) |
+| test build (second agent; `--citations-cache-dir=./_testrepo_zoodb_citations_cache_LOCAL`, TeX Live 2023, the sandbox) | exit 0 in 24.7 s, peak resident size 531,300,352 bytes; the run 209 fragments in 60 ms, wasm memory 71.1 to 74.3 MB; 15 Errors printed under the switch (13 `flm.refs.unresolved`, 2 `flm.refs.duplicate-label`), nothing else; retrievals `113 considered, 0 failed` and `128 considered, 0 failed` from the local sources; 24 pages; LaTeX log: no error, 13 references undefined at 19 places (the codes the test data lacks), no undefined citation; `.tex` equal to the first agent's final test build but for its generation time, `.bib`, `.eczaux`, style file and class equal (`D/finish/logs/build_test.log`) |
+| test build (first agent's last, 16:48) | exit 0 in 28.1 s, peak 544,735,232 bytes, the same output (`build_test_final.log`) |
+| full build with LaTeX (first agent's last, 16:48 to 16:56, `--citations-cache-dir=./_zoodb_citations_cache_LOCAL`, TeX Live 2023) | exit 0 in 476.9 s, peak resident size 2,097,070,080 bytes; 0 FLM diagnostics under `'abort'`; retrievals `Pass 1: 4739 cached, 478 to fetch` … `7341 considered, 0 failed` for the zoo and `7353 considered, 0 failed` with the chapters, the `manual` and `preset` sources only; LaTeX: 6 pdfLaTeX, 5 BibTeX and 10 makeindex runs in 319 s, 729 pages, 32,378,130 bytes; LaTeX log: no error, no undefined reference or citation, no label multiply defined (`build_full_final.log`, `build/EcZooHandbook/` of the clone) |
+| full generation (second agent, `--skip-compile-latex`, the sandbox, the measurement preload) | exit 0 in 133.4 s, peak resident size 2,042,183,680 bytes (Node's own 815 MB); the run 18,623 fragments in 3.0 s, 0 diagnostics; `.tex` equal to the first agent's final full build but for its generation time, `.bib`, `.eczaux`, style file and class equal; the 66 code graphs with the same labels (`D/finish/logs/gen_full.log`) |
+| earlier runs of the first agent | the probes (`probe1` with its arXiv retrieval, and likely `probe1full`'s, above), `gen_test1` to `gen_test3` (generations, 4.4 to 9.4 s, about 0.51 GB; the arXiv retrievals above), `build_test_1` and `build_test_2` (28.6 and 26.9 s), `build_full_gen1` and `build_full_gen2` (152.5 and 150.1 s, peak 2.34 and 1.84 GB; the first with F5's 12 Warnings before the overrides), `latexmk_full_1` and `latexmk_full_2` (exit 12, undefined references and citations of an earlier state), `latexmk_full_3` (exit 0, 283.9 s), the comparison build on the June data (`build_0608.log`: exit 0, 396.2 s, peak 2,280,996,864 bytes, 0 diagnostics, 677 pages) |
+| comparison with the baseline | above: the structure count for count, the classified differences of the LaTeX and of the PDF's text, the code graphs' labels |
+| the handbook clone's eslint | the eight changed JavaScript files: 1 error, the unused `debug` of `genltx_code.js`, which the original has (the original's same files: 2, `mk_bib_viacsl.js`'s gone) (`eslint_handbook.txt`) |
+| git and home state | worktree at `6105fcb`: this brief, `HANDOVER.md`, 05 and the G12 files modified, nothing else; handbook clone: `9dfa0b2`, `34da9e4`, `d1f0248`, `8d44099` on `c73b681` with both trailers, `status --short` empty, root `package.json` and `yarn.lock` in their committed form, 4 commits over `origin/main` (7 after the review fixes: `1fbbb95`, `38141cc`, `d5ccdc5`; the clone at `d5ccdc5`), push URL the disabled one, `build/` holding the first agent's final builds; sitegen clone at `0ac4fb3` and data clone at `60bbc93ae`, both clean, nothing pushed; the originals at `a2ad583`, `7ade20a2f`, `c73b681`, `status` empty (read with `--no-optional-locks`), no file newer than this part's start but the original sitegen's `.git` folder itself (17:38:38, when no process of D ran; its index of 2026-10-14 unchanged: the editor's git integration C's review found); nothing new under `~/.yarn` or `~/.cache`; under `~/.npm` only other processes' writes (in `_logs` the runs of `npm root --global` in `~/Research/lecturenotes/QEC` and of the TypeScript server's `types-registry` install, cwd `~/Library/Caches/typescript/5.9`, which also wrote 7 files of `_cacache` at 16:50:51 to 16:50:53; the review fixes' audit); `~/Library/texlive/2025/texmf-var/luatex-cache` (luaotfload's lookup cache and the Source Sans Pro font caches) written at 16:24:04 to 16:24:10, when no D command ran LuaTeX or TeX Live 2025 (another program's; the review's note); network: the arXiv retrievals above (deviation 6); under `/tmp` nothing of D (other programs' sockets and folders); `~/.cargo/.global-cache` touched by the cargo calls (cargo's bookkeeping, as in B2); `~/Library/Caches/.wasm-pack` untouched; `~/Library/…/Chrome for Testing/Crashpad/settings.dat` rewritten by the production exporter (disclosed); `~/Library/Caches/ms-playwright/firefox-1522` appeared at 17:52, when no process of D ran (another program's) |
+
+**Open questions** (numbered after C's).
+
+23. The test build's 15 Errors (deviation 4; the chapters' 13 references to codes the
+    test data lacks, G13's 2 duplicate labels): since the review fixes (`d5ccdc5`
+    reverts `8d44099`) `yarn build-test` as committed stops at them under `'abort'`
+    (exit 1 after 5 s), and an inspection test build passes
+    `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` on the command line, as the sitegen's inspection
+    builds do (question 10), printing them and making the PDF as the former test build
+    made it with the same 13 references undefined. Put the switch into the script after
+    all, give the test data the 13 codes, or let the test build allow unresolved
+    references (`allow_unresolved_references`, which leaves G13's 2 Errors)? Until then
+    the review's route: the switch on the command line only.
+24. The committed test cache lacks `arxiv:2312.11805`, whose legacy entry had expired,
+    so the first `yarn build-test` on a fresh clone retrieves it from arXiv. Commit the
+    record D holds (fetched 2026-10-19, in the ignored copy), or leave the retrieval to
+    the first build?
+25. G13: a `truncate()` option leaving out the labels and term definitions a preview
+    would repeat, or the previews in a run of their own, if the full data ever needs it
+    (it does not today)? It is latent in the full build (the review's note): the full
+    build runs under `'abort'`, and the first data edit that puts a label or a term
+    definition into the first paragraph of a root code's description stops it, since
+    the list of root codes places that paragraph beside the full description in the one
+    run (the test data's CSS code already does).
+26. Consecutive citations (finding 7): keep them as written (one bracket per `\cite` of
+    the content), or have the class merge adjacent `\flmCite` hooks as the former
+    recomposer did?
+27. The MathML in eleven cited works' titles (finding 6), printed as text in the
+    handbook and on the site: a cleanup of the citation sources' metadata, or left?
+28. `mk_bib.js` (deviation 8): port it to the engine (it would need `render_latex` of
+    its ready-formatted entries and the run's keys), keep it as the not-ported
+    alternative, or remove it?
+
+**For the main session.** Commit the G12 files listed above; add F4 and F5 to 05's
+"Findings to report" table, as F2 and F3 were (the gaps table's rows hold the text); the
+bookkeeping of this round is in this brief and `HANDOVER.md` (C's commit `6105fcb`, the
+state after C) and in 05 (F2's row). In `HANDOVER.md`, "What exists now" still gives the
+module as 5.14 MB built from flm-rs `2c219ec3`; after D it is 5,160,404 bytes from
+`9ccaa871` (the review's note). The handbook clone stands at `d5ccdc5` after the review
+fixes (Review fixes, below).
+
+**For E.**
+
+- The sitegen clone has run on the G12 tarball (`f1c71b05…`, the module from flm-rs
+  `9ccaa871`) since 15:37; the zoo's renders are byte-identical to the previous module's
+  (probe 3), but its `site/_site/` is C's last build on the earlier package, so E builds
+  anew.
+- The production exporter's code graphs are not reproducible byte for byte (finding 8):
+  compare the 89 graph SVGs by their labels.
+- The citation texts with MathML (finding 6) appear on the site's references and code
+  pages as in the handbook.
+- If E changes the sitegen clone, D packs it again and runs `build-test` again (brief,
+  E), with the switch on the command line (question 23). To install the handbook clone
+  again: `D/reinstall_handbook.sh` (it puts the overlay back and leaves it in place).
+  Build with the overlay still in place and restore the root files only afterwards
+  (`git -C …/eczoo_handbook checkout -- package.json yarn.lock`), and under `sandbox-exec
+  -f D/nonet.sb`: `main.js`'s version lookup (pre-existing) runs `yarn info` on
+  `@errorcorrectionzoo/eczoodb`, and whenever the lock holds the git URL (its committed
+  form) it reads that URL's commit (`6bbebab`, of June) and runs `git fetch --depth=1
+  https://github.com/errorcorrectionzoo/eczoo_sitegen.git 6bbebab…`, a network access,
+  which `GIT_ALLOW_PROTOCOL=file` (set by `D/env.sh` and `run_builds.sh`) blocks before
+  any connection ("fatal: transport 'https' not allowed"; the sandbox would refuse it
+  too); the `.tex` then records that June commit as the sitegen's version
+  (`\eczhbkSetGitVersion…Sitegen{0000-00-00 6bbebab…}`), although the installed package
+  is the `0ac4fb3` pack; with the overlay the version reads `0000-00-00 unknown`. The
+  builds by hand: `cd mkeczhandbook && node main.js
+  --citations-cache-dir=<a copy of ./_zoodb_citations_cache_LOCAL>
+  --latex-bin=/usr/local/texlive/2023/bin/universal-darwin` with the wrappers of
+  `D/bin/` and `TMPDIR` in the scratchpad. The alternative to building by hand after
+  `D/reinstall_handbook.sh` is `D/fix/run_builds.sh`, which needs the root files
+  restored first: it refuses to start unless they are in their committed form, puts the
+  overlay in place for the run and restores the root files at its end.
+- The sitegen clone's committed exporter bundle carries
+  `_headless_exporter_browser_code_dist/zoodb_flm_wasm_bg.a0cffaf1.wasm` (5,157,363
+  bytes), the module of `6105fcb` (flm-rs `5de1c198`), not the G12 module (5,160,404
+  bytes, from `9ccaa871`): the handbook's 66 graphs were rendered by the older module
+  (the zoo's renders are byte-identical through both, probe 3). Once G12 is committed,
+  rebuild the bundle (`yarn build` in `jscomponents`), so that its `.wasm` is the
+  package's, then pack again for D (the review's note).
+- Chrome for Testing rewrites its Crashpad file at each launch of the production
+  exporter, in D as in E (ruled, disclosed).
+
+**Review fixes** (2026-10-19). The review (Opus, read-only; its builds, probes and logs
+in `D/review/`) gave the verdict "fix first": three must-fix items (the arXiv retrievals
+under-reported, the class joining a pair of parentheses across a space, the row of
+references counting the handbook's own hooks as the run's), three should-fix items (the
+items for E building with the committed lock, which reaches GitHub; the switch committed
+in `build-test`; the comment on U+01CE), notes, and verdicts on the nine deviations
+(accepted, but 4 as a stopgap only and 6 not as written). One fixer (Opus; its probes,
+tools and logs in `D/fix/`, every build offline under `D/nonet.sb` with `TMPDIR` in
+`D/fix/tmp/`, TeX Live 2023, the cache folders copies) made all six; none needed a ruling,
+and question 23 stays open with the review's route in place. Three commits in the
+handbook clone on `8d44099`, each with the two trailers and with the root `package.json`
+and `yarn.lock` in their committed form: `1fbbb95`, `38141cc`, `d5ccdc5`. No package
+change (the installed `src/` of both clones still equals the worktree's, tarball
+`f1c71b05…`; `yarn lint` clean and `yarn test` 487 passing again, offline, the worktree's
+status and ignored files unchanged); nothing in the sitegen clone or the data clone;
+nothing pushed.
+
+- (must) *The arXiv retrievals.* Confirmed and completed: `D/probecache/test_cache/`
+  (`probe1`, copied at 15:15:23, its `citations.jsonl` written at 15:15:50 with
+  `D/probes/out1/`) holds `arxiv:2107.03374`, `arxiv:2312.11805` and `arxiv:2503.13517`
+  with arXiv records and fresh time limits, which neither its source (the sitegen
+  clone's `_TEST_zoodb_citations_cache`, its `citations.jsonl` nor its legacy file) nor
+  the sitegen's LOCAL folder holds (`D/fix/logs/probecache_diff.txt`). The first agent's
+  commands, read in its transcript, show where each early run read its cache: `probe1`
+  on that copy; `probe1full`, `probe2` and `probe3_old` on a first copy of the sitegen's
+  LOCAL folder at `D/probecache/full_cache/`, made at 15:17, which it removed and made
+  again at 15:36:39 for `probe3_new`, `probe4_terms` and `probe5_previews` (that second
+  copy has no new entry); `defterm_math` and `features` load no zoo; nothing else ran a
+  zoo before the sandbox profile existed but the three test generations. So: `probe1` one
+  request (three works), `probe1full` likely one more (the same three; not checkable),
+  `gen_test1` to `gen_test3` three (one work each). The retrievals paragraph, deviation 6,
+  the earlier runs' row and the home and network row of the Checks now say so.
+- (must) *Pairs in mathematics across a space.* `1fbbb95`: `\eczh@math@double` peeks
+  with amsmath's `\new@ifnextchar`, which does not skip spaces, instead of
+  `\@ifnextchar`. Counted (`D/fix/tools/mathpairs.py`): 81 pairs with a space between
+  (`) )`, `( (`, `] ]`, `[ [` in mathematics, outside text-mode arguments) in 77 formulas,
+  73 inline and 4 display, 51 distinct, the same in the baseline's LaTeX, in the June
+  build and in the full build (the review's 81). Checked formula by formula with the
+  generated class (`D/fix/ligtest.sh`, `D/fix/tools/cmpboxes.py`,
+  `D/fix/logs/ligtest_after.txt`): each formula holding a pair, adjacent or spaced, set
+  in a box with the class and compared through `\showbox` with the same formula spelled
+  the baseline's way and set with the math-active characters off; on the June data
+  against the baseline's own LaTeX (its `\llbracket` … macros; the formulas aligned in
+  order: 3,316, 554 distinct), on the full data against the baseline's rule applied to
+  each formula (adjacent pairs as the macros; 3,970, 702 distinct). With the class before
+  the fix exactly the 77 formulas with a spaced pair are set otherwise, on both; with the
+  fixed class none. So every adjacent pair is still set as the baseline's macro, and a
+  spaced pair is two characters again. The comparison paragraph is corrected. This
+  comparison, formula by formula, is the measure of the fix's effect: 77 spaced formulas
+  set otherwise before the fix, 0 after (each such pair is 2.1 pt wider than when
+  joined). The page counts are not: page counts, page numbers and `\vbox` overfulls vary
+  between runs, because the code graphs' layouts and sizes vary (finding 8). After the
+  fix the full build has 728 pages, one fewer than the first agent's, and two June
+  builds gave 676 pages and 5,831 hunks (the fixer's) and 677 pages and 19,990 hunks
+  (the read-only verifier's, `D/verify/`), against the first June build's 677 and 20,007
+  (below).
+- (must) *The references row.* Recounted in the full build's `.tex`: the run writes 526
+  references to raw object keys (`\flmHyperref{code:…}` 426, `\flmRef{code:…}` 99,
+  `\flmRef{domain:…}` 1) and 1,713 to safe labels; the 11,372 `\flmRefsHyperref` are the
+  handbook's own (`genltx_code.js:75` and `:117`, `genltx_notable_families.js:570`), a
+  hook of the class that the style file does not define. The row is corrected.
+- (should) *Builds with the committed lock.* Confirmed in `main.js`
+  (`retrieve_yarn_nodejs_package_version()`, pre-existing: `yarn info --all --json`, and
+  for a git URL `git fetch --depth=1 <url> <commit>` into a bare repository under
+  `os.tmpdir()`) and by the review's two builds (`D/review/logs/build_test.log`: "Failed
+  to connect to github.com port 443"; their `.tex` with the sitegen's version `0000-00-00
+  6bbebab…`). The item for E now says to build with the overlay in place, restoring the
+  root files only afterwards, under the sandbox, and why. `D/fix/run_builds.sh` does it:
+  it refuses to start unless the root files are in their committed form, puts the
+  overlay (`D/package.json.resolutions`, `D/yarn.lock.resolutions`) in place for the run
+  and restores the root files at its end; every build of these fixes wrote `0000-00-00
+  unknown` and ran no `git fetch`.
+- (should) *The switch in `build-test`.* `d5ccdc5` reverts `8d44099` (a revert commit:
+  dropping the commit by a reset of the branch was refused by the session's permission
+  check, so the history keeps both), so the committed script is the original's again and
+  an inspection test build passes `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` on the command line,
+  as the sitegen's do. `yarn build-test` as committed now stops at the run's 15 Errors
+  (`build_test_abort.log`: the `ZooFlmError` listing them, exit 1 after 5.4 s). The
+  `8d44099` bullet, the test build's paragraph, deviation 4, the G13 row and question 23
+  say so; question 23 itself (what the committed test build should do) is Philippe's.
+- (should) *U+01CE.* `38141cc`: the comment of `latex_render_options` in `main.js` says
+  that nine overrides are the class's spellings and U+01CE's `\v{a}` is LaTeX's own, which
+  the class does not declare; the `34da9e4` bullet, the Unicode paragraph and the F5 row
+  are corrected the same way. The handbook's eslint on the eight changed files: the one
+  pre-existing error, as before (`D/fix/logs/eslint_handbook.txt`).
+
+The checks run again (`D/fix/run_builds.sh test test-abort full june`, 20:07 to 20:23;
+`D/fix/logs/`, outputs in `D/fix/build_*`). Test build (inspection, the switch on the
+command line, `build_test.log`): exit 0 in 31.8 s, peak 522,027,008 bytes; the run 209
+fragments in 74 ms, 15 Errors (13 `flm.refs.unresolved`, 2 `flm.refs.duplicate-label`);
+retrievals 113 and 128 considered, 0 failed (`manual`, `qecdborg`); 24 pages, no LaTeX
+error, the same 13 references undefined, no undefined citation; the `.bib`, `.eczaux`,
+style file and `flmlatexdefaults.sty` equal to the second agent's test build, the `.tex`
+but for its time and the handbook's commit, the class but for the fix. Full build with
+LaTeX (`build_full.log`, `after_full.txt`): exit 0 in 457.7 s, peak 2,001,846,272 bytes
+(Node's own 672,928 kB); the run 18,623 fragments in 3.5 s, 0 diagnostics under
+`'abort'`, wasm memory 127.1 to 336.1 MB; retrievals `7341 considered, 0 failed` and
+`7353 considered, 0 failed` (`manual` and `preset` only); the `.tex` equal to the second
+agent's generation but for its time and the handbook's commit (to the review's build
+also but for the sitegen's version line), the `.bib`, `.eczaux`, style file,
+`flmlatexdefaults.sty` and `EczInitialPages.tex` equal, the class but for the fix; the
+66 code graphs with the labels of the second agent's and the review's (12 byte-identical);
+LaTeX in 300.7 s (6 pdfLaTeX, 5 BibTeX, 8 makeindex runs); 728 pages, 32,373,747 bytes;
+no error, no undefined reference or citation, nothing multiply defined; 4 floats stuck,
+45 overfull boxes (34 `\hbox`, 11 `\vbox` while `\output` is active; 33 and 5 before the
+fix: the new ones are a line 0.55 pt too wide in a paragraph whose page references
+changed with the page breaks and six pages 0.6 to 2.5 pt too high, a kind the baseline
+has 15 of on the June data), 1,971 underfull boxes, 395 hyperref warnings, 85 unresolved
+destinations, 79 `newunicodechar` warnings. The comparison with the baseline again (the
+June data, `build_0608.log`, `after_june.txt`): exit 0 in 437.9 s, peak 2,169,978,880
+bytes, 0 diagnostics; the `.tex`, `.bib`, `.eczaux` and style file equal to the first June
+build's but for the time and the handbook's commit, so the structure count is identical
+(`texcount_0608.txt`); 676 pages, the baseline's count (the first June build 677);
+675,241 words against the baseline's 674,339; the word diff 5,831 hunks (the first June
+build 20,007; `classify_june.txt`): 1,845 in numbers only (the first June build 15,841),
+2,859 line breaks, hyphenation and quotation glyphs, 984 moved
+or repeated, 143 others, sorted by their place and text, not read one by one
+(`D/fix/tools/bucket_other.py`, `bucket_other_june.txt`; the same sorting puts the first
+June build's 149, which were read one by one, into 77, 43, 26 and 3): 3 the version lines,
+77 in the bibliography (as before: 351 of the bibliography's 366 hunks of every class
+have the first June build's text, the others differ by the page numbers at its page
+breaks), 39 with a figure caption, a code graph's labels or a continued table header
+placed differently, 24 others before the bibliography (words hyphenated or footnotes set
+across page breaks, table rows on other pages, the corrected `B&C`). Its LaTeX log: no
+error, no undefined reference or citation; 6 floats stuck, 43 overfull boxes (30
+`\hbox`, 13 `\vbox`; the baseline 22 and 15), 1,914 underfull boxes, 374 hyperref
+warnings, 78 unresolved destinations (the baseline's 78); the code graphs: 62 of 66 with
+the baseline's labels, the 4 others by `Gauss’` and `B&C` as before, 66 of 66 with the
+first June build's. The verifier's run of the June build after the fix (read-only,
+`D/verify/`, on the same data) gave 677 pages and 19,990 hunks: page counts, page
+numbers (and with them the hunks in numbers only) and `\vbox` overfulls vary between
+runs, because the code graphs' layouts and sizes vary (finding 8), so the June build's
+676 pages and 5,831 hunks do not measure the fix; its effect rests on the
+formula-by-formula box comparison only (77 spaced formulas set otherwise before the fix,
+0 after; above).
+
+Left open: question 23 (Philippe's; the switch on the command line until then); the
+review's notes, carried into the questions and the items above: G13 latent in the full
+build (question 25), the exporter bundle's older module (For E), `HANDOVER.md`'s module
+line (For the main session). Home, network and the originals: no network access (every
+build and probe of the fixes under the sandbox profile; the version lookup ran no fetch);
+nothing new under `~/.yarn`, `~/.cache`, `~/.npm` or `/tmp` since the fixes began
+(`find -newer D/fix/START_MARKER`); the production exporter of the full and June builds
+rewrote Chrome for Testing's Crashpad `settings.dat` (ruled, disclosed); `main.js`'s
+`yarn info` rewrote the handbook clone's ignored `.yarn/install-state.gz`, as in every
+build; the originals at their heads with `status` empty (`--no-optional-locks`). The
+transcripts read for the first agent's commands are the session's own files, read
+only.

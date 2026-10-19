@@ -1267,21 +1267,26 @@ export class ZooFlmEngine
      * @param {string} [options.context='default']
      * @param {string} [options.unresolved]
      * @param {string} [options.error_policy]
+     * @param {object} [options.render_options] - the core's render options
+     *     for this run only, as for :js:meth:`render_document`
+     *     (``latex-recomposed.drop_comments`` is refused as well: the option
+     *     ``drop_comments`` sets it)
      * @returns {object} ``{ trees, style_name, style, document, diagnostics,
      *     has_errors }``, one entry of ``trees`` per fragment
      */
     render_latex(fragments, {
         raw_label_types = [], drop_comments = false, context = DEFAULT_CONTEXT,
-        unresolved = null, error_policy = null,
+        unresolved = null, error_policy = null, render_options = null,
     } = {})
     {
         const list = this._fragment_list(fragments);
         const policy = this._policy(error_policy);
         unresolved = this._unresolved_of(unresolved);
+        render_options = check_render_options(render_options, 'render_latex()');
         this._ensure_context(context);
         const out = this._core.render_latex(list.map( (f) => f.handle ), {
             raw_label_types: Array.from(raw_label_types), drop_comments: Boolean(drop_comments),
-            unresolved_refs_warning: unresolved === 'warn',
+            unresolved_refs_warning: unresolved === 'warn', render_options,
         });
         const diagnostics = this._map(out.diagnostics, list);
         const has_errors = apply_error_policy(diagnostics, policy);

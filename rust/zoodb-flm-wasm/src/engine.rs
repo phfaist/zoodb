@@ -144,6 +144,10 @@ pub struct LatexOptions {
     pub raw_label_types: Vec<String>,
     pub drop_comments: bool,
     pub unresolved_refs_warning: bool,
+    /// Render options of this run only, as for html ([`RenderOptions`]):
+    /// `refs.unresolved` and `latex-recomposed.drop_comments` are refused
+    /// (this struct's fields set them).
+    pub render_options: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -1049,21 +1053,29 @@ impl Engine {
     /// `latex-recomposed` workflow (Q12): the handbook composes the LaTeX
     /// around the per-tree texts.
     pub fn render_latex(&mut self, handles: &[u32], options: &LatexOptions) -> Result<LatexOut, String> {
-        let key = format!("latex:{}:{}:{}", options.unresolved_refs_warning, options.drop_comments, options.raw_label_types.join(","));
-        let settings_render_options = self.render_options.clone();
+        // The per-call render options are part of the plan's key, as for
+        // html (G12).
+        let key = format!(
+            "latex:{}:{}:{}:{}",
+            options.unresolved_refs_warning,
+            options.drop_comments,
+            options.raw_label_types.join(","),
+            serde_json::Value::Object(options.render_options.clone()),
+        );
+        let run_render_options = self.run_render_options(&options.render_options, LATEX_RESERVED)?;
         let plan = self.plan(key, |registry| {
-            // The call's own fields over the settings' values of the same
-            // option types, whose other fields are kept.
-            let mut latex_options: LatexRecomposedRenderOptions = option_or_default(&settings_render_options);
+            // The call's own fields over the settings' (and the per-call)
+            // values of the same option types, whose other fields are kept.
+            let mut latex_options: LatexRecomposedRenderOptions = option_or_default(&run_render_options);
             latex_options.drop_comments = options.drop_comments;
-            let mut recompose: RefsRecomposeOptions = option_or_default(&settings_render_options);
+            let mut recompose: RefsRecomposeOptions = option_or_default(&run_render_options);
             recompose
                 .safe_label_types
                 .extend(options.raw_label_types.iter().map(|t| (t.clone(), SafeLabelMode::Raw)));
             let refs_options = RefsRenderOptions {
                 unresolved: if options.unresolved_refs_warning { UnresolvedRefs::Allow } else { UnresolvedRefs::Error },
             };
-            let mut render_options = settings_render_options;
+            let mut render_options = run_render_options;
             render_options.merge_from(&OptionValues::new().with(latex_options).with(recompose).with(refs_options));
             let mut unsupported = BTreeMap::new();
             unsupported.insert(BackendName::from(latex_recomposed::BACKEND), vec![ElementName::from(FIELD_ELEMENT)]);
@@ -1584,7 +1596,7 @@ mod tests {
         let b = engine.parse("Related to \\ref{code:x}; %% a comment\nand \\begin{align}c=d\\label{eq:two}\\end{align}\\ref{eq:two}, \\ref{eq:one}.", "b.yml#description", FragmentLayout::InlineOrBlocks).unwrap();
         assert!(a.diagnostics.is_empty() && b.diagnostics.is_empty(), "{:?} {:?}", a.diagnostics, b.diagnostics);
         let out = engine
-            .render_latex(&[a.handle, b.handle], &LatexOptions { raw_label_types: vec!["code".into()], drop_comments: true, unresolved_refs_warning: false })
+            .render_latex(&[a.handle, b.handle], &LatexOptions { raw_label_types: vec!["code".into()], drop_comments: true, ..LatexOptions::default() })
             .unwrap();
         let ids: Vec<&str> = out.diagnostics.iter().map(|d| d.identifier.as_str()).collect();
         assert!(!ids.iter().any(|i| i.starts_with("flm.refs.")), "{:?}", out.diagnostics);
@@ -1965,6 +1977,49 @@ mod tests {
             .render_text(&[p.handle], &TextOptions { render_options: per_call(serde_json::json!({ "text": { "width": 20 } })), ..TextOptions::default() })
             .unwrap_err();
         assert!(err.contains("`text.width` is set by"), "{err}");
+    }
+
+    /// G12: render options given for one recomposed-LaTeX run (the
+    /// handbook's), over the settings' key by key: the display-math
+    /// environments through `\flmMathEnvironment`, a character's spelling,
+    /// the settings' style stem kept; a later call without them is as
+    /// before; reserved and registry-bound keys are refused, each named.
+    #[test]
+    fn render_latex_options_per_call() {
+        let config: EngineConfig = serde_json::from_value(serde_json::json!({
+            "settings": { "latex-recomposed": { "style_stem": "zoostyle" } }
+        }))
+        .unwrap();
+        let mut engine = Engine::new(&config).unwrap();
+        let a = engine
+            .parse("Text\u{202F}here.\n\\begin{align}\n  x = 1\n\\end{align}", "a.yml#d", FragmentLayout::InlineOrBlocks)
+            .unwrap();
+        let unknown = |out: &LatexOut| out.diagnostics.iter().any(|d| d.identifier == "flm.latex-recomposed.unknown-character");
+        let before = engine.render_latex(&[a.handle], &LatexOptions::default()).unwrap();
+        assert!(before.trees[0].contains("\\begin{align}") && !before.trees[0].contains("\\flmMathEnvironment"), "{}", before.trees[0]);
+        assert!(unknown(&before), "{:?}", before.diagnostics);
+        let options = LatexOptions {
+            render_options: per_call(serde_json::json!({
+                "math": { "emit_flm_math_environment_macro": true },
+                "latex-recomposed": { "unicode_overrides": { "\u{202F}": "\\," } }
+            })),
+            ..LatexOptions::default()
+        };
+        let out = engine.render_latex(&[a.handle], &options).unwrap();
+        assert!(out.trees[0].contains("\\flmMathEnvironment{align}"), "{}", out.trees[0]);
+        assert!(!unknown(&out), "{:?}", out.diagnostics);
+        let style = out.style.as_deref().unwrap_or("");
+        assert!(style.contains("\\newunicodechar{\u{202F}}{\\,}"), "{style}");
+        assert!(out.style_name.as_deref().is_some_and(|n| n.starts_with("zoostyle.")), "{:?}", out.style_name);
+        let again = engine.render_latex(&[a.handle], &LatexOptions::default()).unwrap();
+        assert_eq!(again.trees, before.trees);
+        let refused = |engine: &mut Engine, value: serde_json::Value, needle: &str| {
+            let err = engine.render_latex(&[a.handle], &LatexOptions { render_options: per_call(value), ..LatexOptions::default() }).unwrap_err();
+            assert!(err.contains(needle), "{err}");
+        };
+        refused(&mut engine, serde_json::json!({ "latex-recomposed": { "drop_comments": true } }), "`latex-recomposed.drop_comments` is set by");
+        refused(&mut engine, serde_json::json!({ "refs": { "unresolved": "allow" } }), "`refs.unresolved` is set by");
+        refused(&mut engine, serde_json::json!({ "math": { "numbered_equations": false } }), "`math.numbered_equations` is not a render option");
     }
 
     /// The settings keys a run always sets itself are refused when the
