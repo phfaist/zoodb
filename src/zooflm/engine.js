@@ -20,8 +20,21 @@ import {
 } from './diagnostics.js';
 import { ZooFlmComposition, DEFAULT_RENDER_VALUE_OPTIONS, html_escape } from './compose.js';
 
-export * from './fragment.js';
-export * from './diagnostics.js';
+// The fragment and diagnostics modules, re-exported by name and not with
+// `export * from`: Parcel 2 (2.13, with scope hoisting, its default for
+// production builds) mis-bundles a module that both imports names from a
+// module and re-exports it with `export *`: a module that imports those names
+// through this one is left with a reference to a namespace object that the
+// bundle never defines (`ReferenceError: $…$exports is not defined`).  Every
+// export of the two modules is listed (test/test_zooflm_engine.js checks it).
+export {
+    LAYOUTS, ZooFlmFragment, is_fragment, make_origin, origin_label, range_origin,
+} from './fragment.js';
+export {
+    ERROR_POLICIES, UNRESOLVED_POLICIES, ZooFlmError, apply_error_policy, check_error_policy,
+    check_unresolved, format_diagnostic, has_errors, line_col_at, make_diagnostic,
+    map_core_diagnostic, origin_location, utf8_offset_to_index,
+} from './diagnostics.js';
 export {
     ZooFlmComposition, DEFAULT_RENDER_VALUE_OPTIONS, value_not_empty, html_escape,
 } from './compose.js';

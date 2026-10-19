@@ -12,6 +12,9 @@ import { load_zoodb_flm_wasm_node } from '../src/zooflm/_load_wasm_node.js';
 import {
     ZooFlmEngine, ZooFlmFragment, ZooFlmError, format_diagnostic, range_origin, value_not_empty,
 } from '../src/zooflm/engine.js';
+import * as engine_module from '../src/zooflm/engine.js';
+import * as fragment_module from '../src/zooflm/fragment.js';
+import * as diagnostics_module from '../src/zooflm/diagnostics.js';
 
 
 const load_wasm = load_zoodb_flm_wasm_node;
@@ -1086,5 +1089,22 @@ describe('ZooFlmEngine', function () {
             assert.deepStrictEqual(position(range_origin(bare, 3, { label: 'glossary#a' })), ['glossary#a', undefined, undefined, true]);
             engine.release([exact, folded, bare]);
         });
+    });
+});
+
+
+describe('the engine module', function () {
+
+    it('re-exports every export of the fragment and diagnostics modules, by name', function () {
+        // By name and not with `export * from`, which Parcel 2.13 mis-bundles
+        // in a module that also imports from the re-exported module (see the
+        // comment in src/zooflm/engine.js).
+        for (const module of [fragment_module, diagnostics_module]) {
+            for (const [name, value] of Object.entries(module)) {
+                assert.strictEqual(engine_module[name], value, `engine.js does not re-export ‘${name}’`);
+            }
+        }
+        const source = fs.readFileSync(new URL('../src/zooflm/engine.js', import.meta.url), 'utf8');
+        assert.doesNotMatch(source, /^export \* from/m);
     });
 });

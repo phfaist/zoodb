@@ -76,5 +76,11 @@ ported.
   that an object can be found by the works it cites, as the 0.2 text renderer
   allowed (it wrote each citation in full). By default a citation and a
   footnote are their marks alone in the search text.
+- **Bundling with Parcel.** `./zooflm/engine` re-exports the fragment and
+  diagnostics modules name by name instead of with `export * from`, which
+  Parcel 2.13 mis-bundles with scope hoisting in a module that also imports
+  from the re-exported module (browser code importing `is_fragment` or
+  `check_error_policy` through the engine, as the field compiler does, then
+  failed with `$…$exports is not defined`).
 - **Node 20 or later** (`engines`). The unused dependencies `escape-html`,
   `glob` and `url` are dropped.

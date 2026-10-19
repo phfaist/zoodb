@@ -51,7 +51,11 @@ compiler still reaches the ``path`` builtin through the atomic file writer, as
 before, so a bundler must provide it).  Under Node,
 import :js:func:`load_zoodb_flm_wasm_node` from
 ``@phfaist/zoodb/zooflm/wasm-node``.  The engine's modules import nothing
-environment-specific and run in browsers as they are.
+environment-specific and run in browsers as they are.  The engine module
+re-exports the names of the fragment and diagnostics modules one by one rather
+than with ``export * from``, so that Parcel 2 bundles code that imports them
+through it (Parcel 2.13, with scope hoisting, mis-bundles a module that imports
+names from a module it also re-exports with ``export *``).
 
 
 Creating an engine

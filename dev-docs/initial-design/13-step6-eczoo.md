@@ -162,6 +162,9 @@ Philippe's.
 | F2. The text of a formula in a term's lead-in (flm-rs, found by B2) | the search index's text (3 terms of the data hold a formula) | the text output writes `Construction A_4: …` for a `defterm` whose term is `Construction \(A_4\)`, while the running text keeps `\(A_4\)`; the HTML is right | a finding for 05's table (the main session's edit); nothing worked around |
 | G8. Backreference details on the first load and after a reload (found by B2; its effects measured by B2's review) | the references page's "Appears in", collectbib's `encountered_in` and the glossary's "Referenced in" in dev mode (one zoo kept across rebuilds); the diagnostics of a relation's `detail` | the relations populator copies a relation's raw `detail` into the backreference before the FLM processor compiles the fields. On the first load each backreference detail (3,432 in the EC zoo: `relations.parent_of.N.detail` 1,117, `relations.cousin_of.N.detail` 2,315) was compiled a second time, as a field of the object it is copied to, under that object's file and without a position (15,356 live fragments): 5 of F1's 42 page lines named that file at a position counted from the field (`/c/fusion.html`: `…/mbqc/fusion.yml#relations.cousin_of.1.detail:1:74` for gkp.yml's `relations.cousins.3.detail` at 85:89; likewise `/c/convolutional.html`, `/c/griesmer.html`, `/c/dodecahedron.html`, `/c/icosahedron.html`). After a reload the backreference held the forward relation's own fragment, which the scan (grouping by `fragment.origin`) credited twice to the forward object and not to the object holding the backreference: on the full data, after a reload with no change, 949 objects' `cited` and 320 objects' `refs` differed from the first load's, the key–object pairs fell from 11,447 to 9,020 and the live fragments from 15,356 to 11,924 (test data: 3 objects' `refs`). In dev mode (Eleventy's watch rebuild after a touch of one code file, B2's package with G7) the references page then showed 9,012 "Appears in" links instead of a fresh build's 11,432, the glossary 582 "Referenced in" items instead of 736, the BibTeX and CSL-JSON exports the same 5,217 entries in another order, and the dump differed; the other 1,275 HTML pages and the other files were equal. The first load matched the baseline (11,432 links), a reload did not | done in the package (B2's review fixes, for the main session to commit), as the main session ruled (a detail compiled once, both objects credited, the diagnostics at the forward field): the relations populator records where each backreference entry's values come from (`_zoodb.copied_fields`, rebuilt with the backreferences, left out of dumps); the field compiler gives a copied field the fragment of the field it copies, compiled once as that object's field with its origin and position (first when the copy comes first in the zoo), and `object_fragments()` leaves the copy out; the scan, over the objects' fields, counts the fragment's references, citations and images for both objects, its labels and term definitions for the forward object only (a label in a detail is defined once). On the full data all 3,432 details are their relations' fragments, with 11,924 live fragments at every load and build; after a reload with no change 0 objects differ (`cited`, `refs`, `labels`, `terms`, `graphics`, diagnostics; 17,336 cited entries and 11,447 pairs both times) and the data dump is equal (test data likewise); the five lines name the place where the text is written; the full build's pages and exports are byte-identical to B2's (the dump's citations table holds the same 5,217 entries in another order); in dev mode every page and export after the touch and after the second and the fifth edit equals a fresh build's (`references.html` 11,432 links, `concepts.html` 736 items; the dump differs by its snippet cache, as before the fix, and after an edit its `db` also by the edited file's `source_file_modification_token`). Tests, `doc/zoodb.dbprocessor-flm.rst`, `doc/zoodb.dbprocessor-relations.rst`, `CHANGELOG.md` |
 | G9. The cited works' texts in the search text (B2's question 13, ruled in the review fixes) | the search index (`dat/searchindex.json`): a code found by the authors and titles of the works it cites, as with the baseline's index | the searchable-text assembler renders each field's text with `engine.render_text()`, which placed no piece, so a citation and a footnote were their marks (`[1]`, `¹`); the crate's text runs can place them (`pieces: true`), the engine did not pass it on; the former text renderer wrote each citation in full | done in the package (B2's review fixes, for the main session to commit): `engine.render_text({ pieces })`, the assembler's option `pieces` and the standard setup's `searchable_text_options.flm_pieces` (default `false`): each field's text ends with its footnotes and the list of the works it cites, under the headings `Footnotes` and `References` (a standalone fragment holds neither: the standalone check); an engine test, a standard-setup test, `doc/zoodb.dbprocessor-searchable.rst`, `doc/zoodb.zooflm.rst`, `doc/std.rst`, `CHANGELOG.md`; the sitegen sets it (`1c1cf55`): the index is 4,605,733 bytes (baseline 4,443,321, marks alone 2,349,486), `introduced` 273,062 characters (235,118; 7,543), and five queries for a cited author or title give the baseline's numbers of results, with `approximate_qecc` or `qubits_into_qubits` at the baseline's rank or one place off (14th for `Zeng`, as in the baseline; 2nd or 3rd for the others), where the marks-only index missed the code in 3 of the 5 queries and ranked it lower in the other 2 (10th, 8th) |
+| G10. The engine module in a Parcel bundle (found by C) | the code graph and the headless SVG exporter (any browser code that imports `is_fragment`, `check_error_policy` or `apply_error_policy` through `./zooflm/engine`, as the field compiler does) | `src/zooflm/engine.js` imported names from `./fragment.js` and `./diagnostics.js` and re-exported both with `export * from`; Parcel 2.13.3 with scope hoisting compiles the imports of those names through the engine module to a namespace object `$…$exports` that the bundle never defines: the exporter's bundle built, then failed in the browser (`ReferenceError: $…$exports is not defined`); reproduced on five files (C, `C/repro/parcel-exportstar/RESULTS.txt`) | done in the package (C, for the main session to commit): the two modules re-exported name by name (the 27 exports of the engine module unchanged), a comment saying why; a test (every export of the two modules is the engine module's, no `export * from` in its source), `doc/zoodb.zooflm.rst` ("Modules"), `CHANGELOG.md`; the exporter's bundle rebuilt on it (sitegen `fcefd2b`) |
+| G11. Index addresses with a scheme in `ref()` and in `\ref` (found by C; not needed by the EC zoo) | a browser app whose output context gives objects addresses such as `jsCallbackRef:…` (the former code graph pane) or `invalid:…` (the preview apps, G5) | the composer's `ref()` and `refhref()` write an index entry's address as given (even `javascript:void(0)`), while flm-rs's HTML output, for the same entry met through `\ref` or `\hyperref` in content, refuses an address whose scheme is not `http`, `https`, `mailto`, `ftp`, `tel` or none: the link without its address and the Error `flm.html.refused-address` (C, `C/logs/href_schemes.txt`) | deferred to Philippe, not needed by the EC zoo (question 22): `ref()` and `refhref()` applying the same address policy, or the docs saying that an index's addresses are paths, fragments or web addresses; the code graph now uses `#jsCallbackRef:TYPE/ID` (sitegen `824d2ad`) |
+| F3. The heading of the lists of notes and citations per render (flm-rs, found by C) | the code graph pane, which placed the lists of citations and footnotes without a heading | `endnotes()` places the lists with the heading the engine writes ("References", "Footnotes"); its text is `citations.heading_title` and `xnotes.kinds.*.title`, bound when the registry is built (a browser engine must keep the zoo's configuration to load the dump), and no render option leaves it out | a note for 05's table (the main session's edit), no request; the pane keeps the heading, sized small (C, question 18) |
 
 ### The citation caches
 
@@ -1995,3 +1998,550 @@ rebuild: the JS heap after each build from the touch's on was 506.6, 675.8, 844.
 1,013.0, 1,181.7 and 1,350.0 MB, the growth surviving the next zoo load; it did not
 reproduce in the three other runs and no retainer was found, so E watches the heap in
 its dev-mode runs.
+
+### C. The browser apps
+
+Done 2026-10-19 by C's agent (Opus; node 23.7, the worktree at `cca3628`, the sitegen
+clone at `1c1cf55`). Four commits in the sitegen clone, with the two trailers; none in
+the data clone or the handbook clone; nothing pushed. One package change in the worktree
+(G10 below; uncommitted, for the main session). Logs, probes and the browser profiles:
+`/private/tmp/claude-501/-Users-philippe-Research-projects-zoodb-zoodb/a1dd88e1-7168-44e0-92fc-0b56c08d4645/scratchpad/step6/C/`
+(below `C/`; `C/probes/` holds the scripts, run with plain `node` from the sitegen
+clone, which import its modules by path; `C/logs/` the logs). Every build, test and
+probe ran with `TMPDIR` set to `C/tmp/`, every yarn call in the clone with
+`YARN_GLOBAL_FOLDER=…/B1close/yarn-global`, `YARN_ENABLE_NETWORK=0` and
+`YARN_ENABLE_TELEMETRY=0` (`C/env.sh`).
+
+**The install.** At the start the installed package's `src/` equalled the worktree's
+(tarball `b0a639fd…`). After G10 the worktree was packed and installed again by the
+Setup's procedure (`C/repack_install.sh`, B2's script with its logs in `C/logs/`): 75
+files, 2,350,670 bytes, SHA-256 `40dc1569…` (`C/logs/pack_reexport.sha256`); offline,
+the only `YN0013` the tarball read from disk; one `node_modules/@phfaist/zoodb`, 0.3.0,
+its `src/` equal to the worktree's; the root `package.json` and `yarn.lock` restored.
+
+**Commits** (sitegen clone, branch `zoodb-flmrs`, on `1c1cf55`):
+
+- `824d2ad` The code graph on the FLM engine: the zoo from the data dump, its labels and
+  its pane (5 files). `jscomponents/codegraph/setup_eczoodb.js`:
+  `load_eczoodb_from_data(data, { load_wasm })` creates the zoo with the relations
+  populator and `use_flm_engine` (the engine of the zoo's own core configuration,
+  `flm_options.engine` of `eczoodb.js`, so that `engine.load()` accepts the dump; in a
+  browser the neutral loader fetches the module, Node passes `load_wasm`), no FLM
+  processor, `continue_with_errors: true` (`'continue'`) and
+  `allow_unresolved_references: true` (`unresolved: 'warn'`); it refuses a dump without
+  `zooflm` (a zoodb 0.2 dump) with a message; it installs `data.zooflm`
+  (`engine.load()`), then the index of a second output context, `codegraph`
+  (`set_index(…, { context })`): the dump's `default` index, the entries of codes,
+  domains and kingdoms given the address `#jsCallbackRef:TYPE/ID` (deviation 2); it
+  loads the dump's `db`, keeps a field compiler on the zoo
+  (`eczoodb.codegraph_flm_compiler`, `FLMSimpleContentCompiler({ engine, error_policy:
+  'continue' })`) and compiles the `name` fields of the codes, domains and kingdoms in
+  place (1,176 fragments, whose text and HTML snippets come from the dump: nothing is
+  rendered for them). `eczcodegraph.js`: B1's TEMPORARY stand-in is gone; a name's text
+  is the fragment's text snippet (`engine.snippet(f, 'text')`), and FLM text stays as
+  it is (the computed short names, strings in the browser's zoo, as before the port).
+  `CodeGraphInformationPane.jsx`: the pane through `render_document({ compose, context:
+  'codegraph' })` with `rdr`, `ref` and `endnotes()`; the fields shown are compiled for
+  each rendering (`compile_flm`; the names are fragments already), the description is
+  truncated by `engine.truncate(f, { chars: 700 })` (the former `truncate_to(700)`), and
+  the fragments made for a rendering are released once its HTML is rendered (in a
+  `finally`); the render's diagnostics go to the console (`console.warn`,
+  `format_diagnostic`); the formulas are typeset through the event `flm:region-updated`
+  dispatched on the pane (bubbling, `detail: { region: null, artifacts: [] }`) instead
+  of `MathJax.typesetPromise([pane])`; a captured link is matched as
+  `#jsCallbackRef:TYPE/ID`, gets its click callback and loses its `href`, as before. The
+  pane's prop `captureLinksToObjectTypes` is gone, and `ui.jsx` no longer passes it (the
+  context fixes the captured types). `CodeGraphInformationPane_style.scss`: the heading
+  the engine writes at the top of each list (`.flm-citations-bibliography >
+  .flm-pres-block--heading`, likewise for the footnotes) at the list's size (question
+  18).
+- `d7a2580` The random code widget typesets its formulas through the FLM engine's event
+  (1 file): `RandomCodeShower._show_code()` dispatches `flm:region-updated` on its box
+  once the new code is in place (`detail.region` the box's id), in place of
+  `MathJax.texReset()` and `MathJax.typesetPromise([box])`. Before MathJax has started
+  the configuration's listener does nothing, and MathJax typesets the page when it
+  starts.
+- `4f73710` The preview apps left on zoodb 0.2's FLM layer (G5): /gitpreview not built;
+  docs (6 files). `site/eleventy.config.js` ignores `src/gitpreview.html`, with a
+  comment naming G5 and this brief; `previewtool/runPreview.js` and
+  `jscomponents/dev/codegraph/codegraphdev_setup.js` gain a comment (not ported, and
+  why); `docs/jscomponents.md` (the code graph on the dump's FLM data and its `.wasm`
+  file, the random code widget's event, the two apps and the dev page not built,
+  Parcel's cache at the repository's root), `docs/site.md` (`gitpreview.html` not
+  built), `docs/architecture.md` (FLM through flm-rs, the line 49 B2 left).
+- `fcefd2b` The headless SVG exporter's bundle rebuilt on the FLM engine (6 files):
+  `yarn build` in `jscomponents` with the root's `.parcel-cache` removed first (finding
+  5): `_headless_exporter_browser_page.dd6757e8.js` 892,639 bytes (the former, with the
+  transpiled FLM layer: 1,918,959), its source map 3,962,130 bytes (8,029,957), the
+  page, and the engine's module beside them, `zoodb_flm_wasm_bg.a0cffaf1.wasm`,
+  5,157,363 bytes, which the browser code fetches from the exporter's local server.
+
+**The package change (G10; for the main session to commit).** The first Parcel build of
+the exporter succeeded, but in Puppeteer the bundle failed when the code graph loaded
+the zoo: `ReferenceError: $fcd8dccdb75109a6$exports is not defined` in the field
+compiler's constructor. `src/zooflm/engine.js` both imported names from `./fragment.js`
+and `./diagnostics.js` and re-exported the two modules with `export * from`; Parcel
+2.13.3 with scope hoisting (its default for production builds) then compiles every
+import of those names through the engine module (`check_error_policy`,
+`apply_error_policy`, `is_fragment` in `flmsimplecontent.js`, `is_fragment` in
+`eczcodegraph.js`) to a member of a namespace object `$…$exports` that the bundle never
+defines. Reproduced on five files in `C/repro/parcel-exportstar/` (`RESULTS.txt`): a
+module that imports from a module it also re-exports with `export *` fails; `export *`
+alone, explicit named re-exports, or `export { … }` of the imported bindings work. The
+fix, generic and in the package as the rules ask: `engine.js` re-exports the six names
+of `fragment.js` and the thirteen of `diagnostics.js` by name, with a comment saying
+why; the package's API is unchanged (27 exports of the engine module, each the same
+binding as before). Files: `src/zooflm/engine.js`, `test/test_zooflm_engine.js` (a test:
+every export of the two modules is the engine module's, and its source has no `export *
+from`; it fails on `cca3628`'s `engine.js`, by its second check), `doc/zoodb.zooflm.rst`
+(the "Modules" section), `CHANGELOG.md` (a bullet). `yarn lint` clean, `yarn test` 486
+passing (485 and the new one), `yarn node playground/play_example.mjs` exit 0, the docs
+built without a warning (the main checkout's Sphinx 8.1.3 run read-only from the
+worktree's `doc/`, output in `C/docbuild/`). No other module of the package has the
+pattern (`src/index.js`, `std/index.js`, `util/index.js`, `zooflm/index.js` re-export
+with `export *` but import nothing from those modules).
+
+**The apps.**
+
+| app | level | what it loads | result |
+|---|---|---|---|
+| code graph (`/code_graph`, its pane, its labels) | 1 | `jsc_profiles/code_graph.js` → `codegraph/setup.js`: the dump `/dat/eczoodata.json` (7,652,206 bytes), the engine's module (`vv/zoodbflmwasm-a0cffaf1.wasm`, 5,157,363 bytes, 1,802,015 gzipped), the bundles (`codegraph-*.js` 875,666 and 3 shared chunks, 1,242,489 bytes in all; the baseline's page loaded 2,332,493 bytes of scripts and a dump of 5,633,320) | in the browser: 1,176 nodes, the labels from the snippets (the 1,155 codes' labels in 1.7 ms under Node; 3 differ from the baseline's raw-source labels, each a correction: `Gauss’ law code`, `B&C` twice), the pane renders with its formulas typeset, its captured links switch the pane; the zoo loads in 551 ms under Node (`C/logs/codegraph_node_full.txt`), a pane renders in 5.7 to 49 ms and releases what it made (1,176 live fragments before and after) |
+| headless SVG exporter | 1 | the same code in Puppeteer, from `codegraph/_headless_exporter_browser_code_dist/` | rebuilt and committed (`fcefd2b`); a kingdom graph (`qubits_into_qubits`) exported to SVG on the full data in 1.7 s, 322,366 bytes, 73 distinct labels, 72 equal to the baseline's `vv/grqubitsinto-9205c06a.svg` and one corrected (`B&C` for `B\&C`); the production build's 89 graphs are E's |
+| random code widget (home page) | 0 | the data B2 embeds in the page | formulas typeset at load and after each refresh (the event); 443 of the 1,155 previews carry citation marks (652 marks, no footnote mark), linking to `#citation-N`, which the home page does not have (G3's residual; question 16) |
+| search widget | 0 | `@phfaist/zoodbtools_search` (unchanged, outside the clone's sources), `/dat/searchindex.json` | `MathJax.typesetClear()`, `texReset()` and `typesetPromise()` work under MathJax 4: `?q=Golay` 34 results, 175 formulas typeset, no delimiter left; `?q=Steane` 69 results, 202 typeset, one result with a raw `\(` (its context window cuts a formula, as before the port); a query with 100 results or more is not typeset at all (the widget's `max_num_results_for_mathjax`, as before) |
+| popups, link highlight | 0 | no FLM API | load without an error on the code pages; the highlight acts on the engine's `<li id="citation-N">` (B2's `030d469`) |
+| `/gitpreview` (`gitzoopreview/`), `previewtool/` | 2 | `@phfaist/zoodbtools_preview` on the old API | excluded (G5, `4f73710`); what fails and what each needs: below |
+| dev page `jscomponents/dev/codegraph/` | none | its committed `eczoodata.json` (a zoodb 0.2 dump) | not ported, as the brief says (excluded, in no build): below |
+
+**MathJax for content updated in place.** The engine's documented mechanism (flm-rs
+`docs/rendering.md`, "A page updated in place", and the comments of the configuration
+`html_scripts()` writes) is the event `flm:region-updated`, dispatched on the element
+whose content is new and bubbling to `document`, where the configuration's listener
+typesets, chained on `MathJax.startup.promise`, the formulas of that element
+(`.flm-pres-math--passthrough`) that carry no `data-flm-original-html` record. It fits
+the pane and the random code widget, whose new content is the engine's HTML; it does
+not fit the search widget, whose results are plain text with `\(…\)` delimiters (the
+search index's text) and no formula element, so `typesetPromise()` stays there (and is
+not the clone's code). `mathjax.load()` (B2) is unchanged; the code graph's profile
+awaits it before the graph loads, so the graph never loads on a page where MathJax
+cannot load (as before the port).
+
+**Parcel, the stylesheet link and the inline script.** Parcel resolves the layout's
+`<link rel="stylesheet" href="/dynamic_style/flm.css">` through the root resolver to the
+file Eleventy wrote (`site/_site/dynamic_style/flm.css`), runs it through its CSS
+pipeline (lightningcss, the site's browserslist targets) and writes it as
+`vv/flm-f1fe95a9.css`, 14,101 bytes from 44,882 (the comments removed, the 15 blocks
+`@layer flm { … }` merged into one), the link rewritten in place, before `main.css`;
+nothing of the engine's stylesheet is lost (38 of 38 `.flm-` class selectors, 107 of 107
+`--flm-` custom properties, 11 of 11 `data-flm-` attributes; in the browser one
+`CSSLayerBlockRule`), and `/dynamic_style/` itself is not in the output (not an entry).
+The inline MathJax configuration stays inline, in place, minified by terser (its
+comment header and the HTML comment `<!-- flm.html.mathjax (feature html) -->` removed,
+the code unchanged in substance), and the CDN loader after it keeps its URL and `async`;
+Parcel inserts its shared bundles (module and nomodule scripts, a stylesheet) before the
+inline script, so the configuration still precedes the loader. In dev mode (Parcel's
+dev server) nothing is minified. The link is the better form here, and B2's choice
+stays (Parcel requires no change): one stylesheet for every page, cached once, loaded in
+`<head>` before the page renders (no unstyled FLM content), in an explicit order before
+`main.scss`, and independent of the pages' JavaScript profiles; imported from
+JavaScript, as the example does (its main stylesheet is imported from JavaScript too,
+for tippy's CSS), the rules would go into the CSS bundles of each of the 7 profiles
+that pages use (deduplicated into shared bundles at Parcel's discretion) and depend on
+the module scripts.
+
+**G5: what fails, and what each preview app would need.** With `src/gitpreview.html`
+built (the ignore reverted for one run, the file restored), the test build with Parcel
+exits 1: Parcel's nine errors `node_modules/@phfaist/zoodb/src/zooflm/index.js does not
+export …` (`RefInstance`, `$$kw`, `make_render_shorthands` twice,
+`ZooTextFragmentRenderer`, `make_and_render_document` twice,
+`html_fragmentrenderer_get_style_information`, `ZooHtmlFragmentRenderer`;
+`C/logs/build_test_parcel_with_gitpreview.log`), which Eleventy reports as `ENOENT …
+rename '.11ty-parcel-temp' -> '_site'` (finding 6). `previewtool/` (a Parcel build of
+`previewApp.html` into the scratchpad, `C/logs/previewtool_parcel.log`): exit 1, the
+same nine errors, five in `jscomponents/gitzoopreview/renderObject.js` (lines 55, 86,
+92, 95) and four in `@phfaist/zoodbtools_preview`'s `dist/module/all.js`. Both apps
+need `@phfaist/zoodbtools_preview` ported (its `renderFlm.js`, 14 uses of the old API)
+and, for `/gitpreview`, `@phfaist/zoodbtools_gitpreview`; then
+`gitzoopreview/renderObject.js` on `render_document()` and the site's renderers (which
+take the engine since B1) without `docrefs_placeholder_ref_resolver`, `RefInstance`,
+`$$kw` and the text renderer; `installZooFlmEnvironmentLinksAndGraphicsHandlers()` of
+both apps replaced by the engine's tables (image addresses as `blob:` or `data:` URLs
+in the graphics table; the preview's links through an index context with addresses
+without a scheme, since their `invalid:zooObjectLink/…` permalinks would meet
+`flm.html.refused-address` as `jsCallbackRef:` did); and the full FLM processor in the
+browser (level 2): the citation manager's module (the inlined `autocitefetch`, about
+0.84 MB of base64) and citeproc in the bundle, the CORS placeholders for arXiv and DOI
+(`CitationSourceApiPlaceholder`) as JavaScript sources of the manager, the CSL style,
+the virtual file system as `fs`, the neutral loader. `previewtool/` also serves the app
+through `@phfaist/zoodbtools_previewremote`.
+
+**The dev page of the code graph** (`jscomponents/dev/codegraph/`, Parcel target
+`dev-codegraph`, built only by `yarn dev-codegraph-build`): excluded, as the brief says
+(listed, not ported). Its page runs the ported `codegraph/setup.js` on its committed
+`eczoodata.json` (6,600,927 bytes, a zoodb 0.2 dump with `refs_data` and no `zooflm`,
+which `load_eczoodb_from_data()` now refuses with a message) and writes no MathJax
+configuration (which `mathjax.load()` requires); `try_mk_json.js` and `try_mk_svg_2.js`
+import `@errorcorrectionzoo/eczoodb/use_relations_populator.js` and
+`use_flm_environment.js`, which the original's `eczoodb` never had, and pass the
+top-level `flm_allow_unresolved_*` keys. Porting it means a dump of a build copied in
+(7.65 MB more in git) and the engine's scripts in its page; the comment in
+`codegraphdev_setup.js` says so.
+
+**The browser check.** Puppeteer 24.4.0 of the clone launched Chrome for Testing
+134.0.6998.35, already installed in `~/.cache/puppeteer` (nothing downloaded), headless,
+with its profile, disk cache and crash dumps in `C/browser/` (`--disable-crash-reporter
+--disable-breakpad`), on the built `_site/` served by the clone's `sirv` on 127.0.0.1,
+every request intercepted (`C/probes/browser_check.mjs`): local ones served, MathJax 4's
+files (`https://cdn.jsdelivr.net/npm/mathjax@4/…` and the `@mathjax/mathjax-newcm-font`
+files) answered from the read-only local copy of MathJax 4.1.3 in flm-rs's
+`target/mathjax-probe/node_modules/@mathjax/` (deviation 4), everything else aborted
+(only Google Fonts' stylesheet was asked for). Pages: the home page (then three
+refreshes of the random code), a code page, `/code_graph#code_ID` (then a click on a
+captured link of the pane), `/search?q=…`; the console's errors and warnings, page
+errors and HTTP errors recorded, and per page the formulas typeset (`mjx-container`
+inside `.flm-pres-math--passthrough`). On the final full build and on the test build,
+and on the dev server: no page error; the only console error is the aborted Google
+Fonts stylesheet (`net::ERR_FAILED`), and on the full build's code graph page, for the
+pane of `triangular_color`, the 404 of `/fig/fig-triangular_color.tpmk.svg` (finding 3,
+question 17; on the dev server that image is broken too, without an error); every
+formula typeset on every page checked. Numbers in the Checks table.
+
+**Deviations.**
+
+1. A package change (G10), which the rules require for a gap of the package (worktree
+   files listed above; the main session commits).
+2. The pane's captured links have the address `#jsCallbackRef:TYPE/ID`, not the brief's
+   `jsCallbackRef:TYPE/ID`: the engine's HTML output refuses an address whose scheme is
+   not `http`, `https`, `mailto`, `ftp`, `tel` or none in a reference written in
+   content (`\ref{code:…}`, `\hyperref`), writing the link without its address and the
+   Error `flm.html.refused-address` (`C/logs/href_schemes.txt`; on the full data the
+   pane of `surface` met it). The address of a fragment has no scheme. This is
+   flm-rs's address policy, not a defect, so no workaround of flm-rs; the composer's
+   `ref()` writes either form (finding 2).
+3. The pane places its lists with the heading the engine writes ("References",
+   "Footnotes"); the former pane placed them without one. The title is the
+   registry-bound setting `citations.heading_title` (likewise `xnotes.kinds.*.title`),
+   which the browser's engine cannot change without leaving the zoo's configuration
+   (`engine.load()` would refuse the dump), and no render option leaves it out (F3). The
+   pane's stylesheet sizes the heading to the list's text (13.6 px in the browser);
+   question 18.
+4. MathJax in the browser check came from a local read-only copy (4.1.3, in flm-rs's
+   `target/mathjax-probe/`, read only), answered through request interception, since no
+   download is allowed; the CDN's `mathjax@4` may be a later 4.x. The fonts of Google
+   Fonts were not loaded (aborted).
+5. The browser runs updated one file outside the worktree and the scratchpad:
+   `~/Library/Application Support/Google/Chrome for Testing/Crashpad/settings.dat` (40
+   bytes, in a folder dated 2025-03-07, rewritten at each launch), although every
+   profile, cache and crash folder was given in the scratchpad and the crash reporter
+   disabled; nothing else (finding 7). The write was avoidable (found by the review):
+   Puppeteer's `headless: 'shell'` launches the chrome-headless-shell 134.0.6998.35
+   installed beside Chrome for Testing in `~/.cache/puppeteer`, which ran the same
+   checks with the same results and left the file alone (Review fixes).
+6. The exporter's check is a probe of mine in Puppeteer (one kingdom graph), not the
+   site's production build, which is E's.
+7. Not asked for: the `docs/` updates; the comments in `previewtool/runPreview.js` and
+   `codegraphdev_setup.js`; the pane's diagnostics on the console (the former pane
+   printed none; they are F1's under `'continue'`, e.g. on `gray`).
+8. Dev mode with the production build's heap (question 21, ruled by the main session
+   after the review fixes): the site's `dev` and `dev-test` scripts set
+   `NODE_OPTIONS=--max-old-space-size=8192` as its `build` script does (sitegen
+   `0ac4fb3`, `site/package.json` alone; the root `package.json` and `yarn.lock` in
+   their committed form). Not run since: E runs dev mode with it and measures the peak
+   against the baseline's.
+
+**Findings** (G10, G11 and F3 also in the gaps table above).
+
+1. G10 (package, fixed): Parcel 2.13 mis-bundles `export * from` in a module that also
+   imports from the re-exported module (above).
+2. G11 (package, not fixed; deferred to Philippe, not needed by the EC zoo: question
+   22): the composer's `ref()` and `refhref()` write an index entry's address as given,
+   while the same entry, met through `\ref` in content, goes through flm-rs's address
+   policy: an index whose addresses have another scheme (`jsCallbackRef:`, `invalid:`,
+   `javascript:`) gives links from `ref()` and links without an address plus an Error
+   from `\ref` (`C/logs/href_schemes.txt`: `javascript:void(0)` passes `ref()`). The EC
+   zoo's addresses are paths and fragments.
+3. The code graph pane shows a float when it falls within the description's first 700
+   characters: 15 of the 1,176 panes (`pless_symmetry`, `polygon`, `120cell`, `24cell`,
+   `600cell`, `disphenoidal288cell`, `hessian_polyhedron`, `simplex_spherical`,
+   `2t_qutrit`, `hessian_qsc`, `css_4_1_2`, `stab_6_4_2`, `4612_color`, `488_color`,
+   `triangular_color`; `C/logs/pane_images.txt`). Its image's address comes from the
+   dump's graphics table, `/fig/fig-….svg`, which the Parcel-built site does not serve
+   (Parcel moves the images it meets in the pages to `vv/` under hashed names and keeps
+   no `fig/`), so the image is a 404 and a console error. Only the build without Parcel
+   serves `/fig/` and shows the image. In dev mode the image is broken too, without a 404
+   (corrected by the review; this finding said `/fig/` was served there): the Eleventy
+   dev server with Parcel's middleware, on 8080 as on Parcel's 3000, answers
+   `/fig/fig-triangular_color.tpmk.svg` with the home page's HTML (status 200,
+   `text/html`, 885,491 bytes, the body of `/`), as it answers `/dynamic_style/flm.css`
+   and any path that is neither a page nor a bundle, although Eleventy wrote the file
+   (`_site/fig/fig-triangular_color.tpmk.svg`, 16,389 bytes; Parcel's
+   `.11ty-parcel-temp/` has no `fig/`). The baseline's pane showed no image for these
+   either (the zoodb 0.2 dump's graphics had `src_url: null`). Not worked around
+   (question 17).
+4. F3 (flm-rs, a note for 05's table, no request): the lists of footnotes and citations
+   carry a heading whose text is fixed when the registry is built; no render option
+   places them without it (deviation 3).
+5. The `build` script of `jscomponents` removes `jscomponents/.parcel-cache`, but Parcel
+   keeps its cache at the repository's root, beside `yarn.lock`: after the package's
+   reinstall, `yarn build` reused the previous build (same bundle hash, "Built in
+   719ms") and the result did not even load in Puppeteer; with the root's cache removed
+   the build was right. Predates the port; flagged in `docs/jscomponents.md`, the script
+   left as it is (question 19).
+6. Two behaviors of `@kitschpatrol/eleventy-plugin-parcel` that predate the port: a
+   Parcel error is reported by Eleventy as `ENOENT … rename '.11ty-parcel-temp' ->
+   '_site'` (the real errors are in the log above it); and `yarn dev`'s Parcel writes
+   into `site/.11ty-parcel-temp/`, which stays when the server is stopped, so the next
+   `yarn build*` (whose scripts remove `_site` and the root cache, not that folder)
+   builds into it and moves it to `_site/` with the dev run's pages: the test build
+   after the dev run had 1,284 HTML pages instead of 35 (`C/logs/
+   build_test_parcel_after_dev_stale.log`); run again with the folder gone (the rename
+   had moved it), it had 35 (question 19).
+7. Chrome for Testing on macOS rewrites its Crashpad `settings.dat` in `~/Library`
+   whatever its profile folder (deviation 5); chrome-headless-shell, which Puppeteer
+   launches for `headless: 'shell'`, does not (the review's and the review fixes'
+   browser runs: the file kept its time of 13:26:21). The production exporter
+   (`jscomponents/codegraph/headlessGraphExporter.js:113`, `headless: "new"`, no
+   `userDataDir`, so its profile goes to `TMPDIR`) launches Chrome for Testing and will
+   rewrite the file in E's `yarn build`, and in D's handbook generation as well:
+   `mkeczhandbook/genltx_handbook.js` imports `CodeGraphSvgExporter` from
+   `@errorcorrectionzoo/jscomponents/codegraph/headlessGraphExporter.js`, whose
+   `setup()` makes that launch. The agents' own probes use `headless: 'shell'` (the
+   installed chrome-headless-shell). Ruled by the main session: the production exporter
+   runs as is in D and E (Philippe's own builds do the same), and the write is
+   disclosed, not avoided (For D and E).
+8. The full build with Parcel peaks at about 3.1 GB resident (the Parcel run of 1,485
+   bundles in 71 to 84 s), against B2's 0.9 to 1.35 GB without Parcel; the dev server
+   with Parcel reached 4.38 GB over its first build, one rebuild and the page requests.
+   That run was the lucky one (corrected by the review): Eleventy and Parcel's dev
+   server run in one Node process, whose JS heap V8 caps at about 4,080 MB by default
+   here, and three of four runs of the same steps crashed with `JavaScript heap out of
+   memory` in Parcel's rebuild for the first page request after Eleventy's rebuild. The
+   site's `build` script sets `NODE_OPTIONS=--max-old-space-size=8192`; `dev`,
+   `dev-test` and `build-simple` do not. With that option the run survived two rebuilds
+   (Checks; question 21).
+
+**Checks** (logs in `C/logs/`).
+
+| check | result |
+|---|---|
+| package | `yarn lint` clean; `yarn test` 486 passing (`pkg_test.log`); `play_example.mjs` exit 0; Sphinx: build succeeded, no warning (`docbuild.log`); pack 75 files, 2,350,670 bytes, SHA-256 `40dc1569…`; install offline, `src/` equal |
+| `yarn build` in `jscomponents` | exit 0 in 5.6 s, peak resident size 876 MB, Parcel 4.3 s (`jsc_build3.log`); before G10 the bundle built (`jsc_build1.log`) but failed at runtime with the `ReferenceError` above |
+| the exporter in Puppeteer | Chrome 134.0.6998.35; the page, its bundle and the `.wasm` served locally, nothing else requested; `qubits_into_qubits` to SVG in 1,707 ms, 322,366 bytes, 73 distinct labels (72 as the baseline's, 1 corrected); the only console error the page's `/favicon.ico` 404 (the dist has none, as before) |
+| test build without Parcel (`ECZOO_DEVELOPMENT_MODE=1 yarn build-test-noparcel`) | exit 0, 65 files written (one less than B2's: `gitpreview.html`), 68 in `_site/`, 35 HTML, 3.9 s, peak 530 MB; no diagnostic; no `<flm:`, no `flm:` followed by a digit (`build_test_noparcel_final.log`) |
+| test build with Parcel (`yarn build-test-simple`) | exit 0, Parcel 126 bundles in 20.9 s, 65 files written, 171 in `_site/`, 35 HTML, 24.9 s, peak 3,044,950,016 bytes (a first run: 28.7 s, 1.89 GB); no diagnostic; no marker in the HTML, data or stylesheets (the strings `<flm:` and `flm:` with a digit occur only in the engine's own code in the two `codegraph-*.js` bundles, its marker templates and patterns); the 319 references to 36 local scripts and stylesheets all present; 24 bundles parse (`node --check`, module bundles as ES modules); retrievals `Pass 1: 63 cached, 4 to fetch`, `113 considered, 0 failed` (`build_test_parcel_final.log`) |
+| test build with `gitpreview.html` | exit 1: Parcel's nine "does not export" errors (G5 above) |
+| full inspection build with Parcel (`ECZOO_CITATIONS_CACHE_DIR=_zoodb_citations_cache_LOCAL ECZOO_FLM_CONTINUE_WITH_ERRORS=1 yarn build-simple`, `/usr/bin/time -l`) | exit 0, 119.3 s, peak resident size 3,133,145,088 bytes; Parcel 1,485 bundles in 71.1 s; 1,424 files written, 1,520 in `_site/` (`build_full_parcel_final.log`); a first run: 135.6 s, 3,073,769,472 bytes, Parcel 84.0 s, the same output |
+| pages against the baseline | 1,276 HTML (baseline 1,277: `gitpreview.html` not built, G5), path for path otherwise: 1,155 code pages, 86 lists and `/all`, 3 domains, 18 kingdoms, 14 single pages (15); `dat/` the same 5 files, each byte-identical to B2's fresh full build (`B2/fix2/site_fresh/`) |
+| diagnostics | 43 lines, all `flm.citations.no-entry` of F1, the same 43 (page and place) as B2's (`f1_lines_short.txt`); no other diagnostic; no marker in HTML, data or stylesheets; retrievals `Pass 1: 4739 cached, 478 to fetch`, `Pass 2: 2124 cached, 0 to fetch`, `7341 considered, 0 failed`, no network |
+| scripts, stylesheets, images the pages reference | 12,537 references to 36 local scripts and stylesheets, 135 to local images: none missing; the external ones: the Google Fonts stylesheet and the MathJax loader, on each of the 1,276 pages (`full_check_site.txt`) |
+| bundles parse | 24 of 24 (`node --check`; `full_bundles_parse.txt`) |
+| bundles against the baseline's (`vv/`, both copies, module and nomodule, in bytes) | `codegraph` 587,725 / 588,226 → 877,864 / 875,666; `gitpreview` 2,113,374 / 2,114,564 → not built; `about`, `default` 2,367 / 2,382 → 2,248 / 2,263; `codepage` 3,839 / 3,824 → 3,705 / 3,720; `home` 4,677 / 4,692 → 4,627 / 4,612; `search` 54,792 / 54,807 → 54,715 / 54,700; `editcodelega` 927,266 / 927,108 → 926,890 / 927,048; `setup` 978 / 993 unchanged; shared scripts 10 → 8 (the two of 1,379,150 and 1,377,740, which held the transpiled FLM layer for the code graph and the git preview, gone; 342,358 / 342,712 → 342,153 / 342,507); `main.css` 40,050 → 40,773; shared stylesheets 8 → 7; new `flm-f1fe95a9.css` 14,104 and `zoodbflmwasm-a0cffaf1.wasm` 5,157,363; 34 files and 9,802,856 bytes against 37 and 11,044,934 (`bundles_cmp_final.txt`) |
+| the stylesheet bundle | 38 of 38 class selectors, 107 of 107 custom properties, 11 of 11 `data-flm-` attributes of the engine's stylesheet (an engine of the zoo's configuration, the one that loads the dump); 15 `@layer flm` blocks merged into 1 (`css_check_full.txt`) |
+| the entry points in the bundles | home: `random-code-box`, `flm:region-updated`; code page: `info-popup-button-zone`, `visual-highlight`; code graph: `flm:region-updated`, `jsCallbackRef`, `zoodbflmwasm-`, `set_index`, `eczoodata.json`, cytoscape; search: `EczooSearchWidget`, `typesetPromise`; every profile `startup.promise` (`entry_points_full.txt`) |
+| the code graph's data | `dat/eczoodata.json` parses: 1,155 codes, 14 spaces, 3 domains, 18 kingdoms, 87 code lists, 156 users; `zooflm` with settings hash `333140776b39fc4f`, accepted by the browser zoo's engine (`engine.load()` under Node, the same code); its index 1,589 entries, 5,217 citations, 27 images, 2,008 snippets, each with its text |
+| browser, full build (`browser_fullfinal*.json`) | home: MathJax 4.1.3 started, the random code's formulas typeset at load and after 3 refreshes; `/c/steane`: 84 of 84 formulas typeset, 79 citation marks, the FLM stylesheet one layer rule; `/c/gray` (`browser_full2.json`, the first full build, the same bundles): 49 of 49; `/code_graph#code_steane`: 1,176 nodes, label `[[7,1,3]] Steane code`, the pane with 21 of 21 formulas typeset, 28 captured links and no `#jsCallbackRef` address left, 3 citation marks and 4 references under the heading (13.6 px), a click on a child code switched the pane (4 of 4 typeset); `#code_gray`: the pane with F1's recovery markup (`.flm-pres-dropped`) and its diagnostic as the console's one warning (`browser_full2.json`); search `Golay` 34 results, 175 formulas typeset, `Steane` 69 and 202 (one result's two fields keep a `\(` that the context window cuts, as before the port); console errors: the aborted fonts, and the 404 of finding 3 on the code graph page; no page error |
+| browser, test build and dev server | test build (`browser_testfinal.json`): `/c/css` 71 of 71, the code graph 14 nodes, the pane 13 of 13 and after the click 7 of 7, search `stabilizer` 4 results and 43 formulas typeset; dev server (`browser_dev.json`): as the full build, and the pane's image of `triangular_color` broken too, though without a 404 (the server answers it with the home page's HTML; corrected by the review, finding 3) |
+| dev mode with Parcel (`yarn dev`, the full data, the LOCAL cache, the switch) | first build 49.0 s (1,424 files), then Eleventy's server on 8080 and Parcel's dev server on 3000; the first page request waited 45.6 s for Parcel, later ones 0.01 to 0.02 s (the four pages 200; in the browser check no HTTP error, bundles and the `.wasm` file included); a touch of `codes/quantum/qubits/stabilizer/qubit_css.yml` rebuilt in 32.7 s, the next request waited 62.9 s for Parcel; 86 diagnostic lines, F1's 43 twice; peak resident size 4,383,457,280 bytes over 410 s; stopped with SIGINT, then SIGTERM for the Parcel watcher left holding ports 3000 and 3001 (exit 129); the data clone's status empty after (`dev_parcel.log`). Not reliable (found by the review): the same steps crashed in three of four runs (the review's two, `C/review/logs/dev.log` and `dev2.log`, and the review fixes' one, `C/fix/logs/dev.log` with `dev_events.txt`): Parcel's rebuild for the first request after Eleventy's rebuild ran out of JS heap at about 4,080 MB (`FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory`), the request got no answer after 62 to 91 s, later requests were refused, yarn exited 129; with `NODE_OPTIONS=--max-old-space-size=8192` the review's run survived two rebuilds (3 builds, F1's 43 lines three times, peak 3,882,860,544 bytes; `dev3.log`); question 21 |
+| `eczoodb` tests, `eczcollectbib` tests | 75 passing, 2 pending; 16 passing; the test cache keeps its 111 lines |
+| the clone's eslint | the seven changed JavaScript files of `824d2ad`, `d7a2580` and `4f73710` but the dev page's: no error, no warning; `codegraphdev_setup.js`: the 5 `no-unused-vars` errors it had before (its unused alternative options) |
+| git and home state | worktree at `cca3628`: this brief and the package files of G10 modified, nothing else; sitegen clone at `fcefd2b`, `status --short` empty, root `package.json` and `yarn.lock` equal to `main`, 24 commits over `origin/main` (these four with both trailers), push URL the disabled one, `site/_site/` the final full inspection build with Parcel; installed `src/` equal to the worktree's; data clone `60bbc93ae`, handbook clone `c73b681`, both clean; the originals at `a2ad583`, `7ade20a2f`, `c73b681`, `status` empty, no file newer than this part's start (read with `--no-optional-locks`); nothing new under `~/.yarn` or `~/.cache`; under `~/.npm/_logs` only other processes' `npm` runs (their logs name other working folders); under `/tmp` nothing of this part (the one new entry, a socket `zeb_def_ipc_65498`, is one of 1,864 such sockets since July of another program); `~/Library/…/Chrome for Testing/Crashpad/settings.dat` rewritten (deviation 5) |
+
+**Open questions** (numbered after B2's).
+
+16. The random code previews (G3's residual): 443 of the 1,155 previews carry citation
+    marks (652 in all) that link to `#citation-N`, which the home page does not have;
+    flm-rs has no option to leave the marks out (05), and the HTML is not patched or
+    the marks hidden. Keep them, ask flm-rs for such an option, or show the previews
+    without citations some other way?
+17. The 15 code graph panes whose description shows a float in its first 700 characters
+    show a broken image on the site built with Parcel (a 404) and in dev mode (the dev
+    server answers the image's address with the home page's HTML); only the build
+    without Parcel shows them (finding 3). Serve `/fig/` in the built site
+    (the dump's image addresses would then resolve for every app that loads it), cut
+    the pane's preview at the description's first paragraph as the random code previews
+    do (which leaves the floats out, and shortens the 610 descriptions of several
+    paragraphs), or leave it?
+18. The pane's lists of references and footnotes now come with their heading (deviation
+    3, F3), sized small. Keep?
+19. The sitegen's build scripts and Parcel's leftovers (findings 5 and 6, predating the
+    port): should `jscomponents`' `build` remove the root's `.parcel-cache`, and the
+    site's `build*` scripts remove `site/.11ty-parcel-temp/`? Not changed here (the
+    sitegen's own instructions ask to flag such issues).
+20. G5 stays Philippe's (port `zoodbtools` in a part of its own, or leave the two apps
+    for later); what each needs is above. G11 is deferred to Philippe, not needed by
+    the EC zoo (question 22).
+21. Dev mode with Parcel on the full data (finding 8, found by the review): with the
+    default heap, three of four runs of `yarn dev` with a touch of a code file crashed
+    at the first page request after Eleventy's rebuild (`JavaScript heap out of memory`
+    at about 4,080 MB); with `NODE_OPTIONS=--max-old-space-size=8192`, which the
+    `build` script has, the run survived two rebuilds. Give `dev` and `dev-test` (and
+    `build-simple`, whose Parcel builds peak at 3.1 to 3.5 GB) the same option, or first
+    find what makes the rebuild peak (Parcel's dev server keeps its graph in Eleventy's
+    process; B2 measured Eleventy's own heap, without Parcel, at about 0.5 GB after each
+    build, but saw one dev run grow by about 169 MB per build, B2's open item of heap
+    retention)? Whether the port raised the peak is not known (the baseline's dev mode
+    with Parcel was never measured). Ruled by the main session: `dev` and `dev-test` get
+    the `NODE_OPTIONS=--max-old-space-size=8192` that the production `build` script sets
+    (sitegen `0ac4fb3`, deviation 8; `build-simple` unchanged). It stays a question for
+    Philippe: keep the option, or reduce the peak?
+22. G11 (deferred to Philippe; not needed by the EC zoo, whose addresses are paths and
+    fragments): should the composer's `ref()` and `refhref()` apply the same address
+    allowlist as the engine's HTML output (`http`, `https`, `mailto`, `ftp`, `tel`, or
+    no scheme), refusing for example `javascript:void(0)`?
+
+**For D and E.**
+
+- D: pack the sitegen clone at `b72901a` or later (the review fixes' two commits on
+  `fcefd2b`), and the worktree with G10 (the
+  tarball `40dc1569…` or the main session's commit): the handbook's exporter, and any
+  bundle of the engine, needs G10. `jscomponents`' package now carries the `.wasm` file
+  beside the exporter's bundle (5.16 MB), served by the exporter's `sirv`. The
+  handbook's generation runs that exporter (`mkeczhandbook/genltx_handbook.js` imports
+  `CodeGraphSvgExporter` from
+  `@errorcorrectionzoo/jscomponents/codegraph/headlessGraphExporter.js`, whose `setup()`
+  launches Puppeteer with `headless: "new"` and no `userDataDir`), so Chrome for Testing
+  rewrites its Crashpad `settings.dat` in `~/Library` in D as in E's `yarn build`
+  (finding 7). Ruled by the main session: the production exporter runs as is in D and E
+  (Philippe's own builds do the same), and the write is disclosed, not avoided; the
+  agents' own probes use `headless: 'shell'` (the installed chrome-headless-shell),
+  which leaves the file alone.
+- E: the production build (`yarn build`) runs the exporter (verified here on one graph
+  only); remove `site/.11ty-parcel-temp/` after any `yarn dev` and the root's
+  `.parcel-cache` before `yarn build` in `jscomponents`; expect 1,276 pages (no
+  `gitpreview.html`), the bundles above, about 3.1 GB of peak resident size with
+  Parcel, 15 broken pane images (with Parcel and in dev mode) until question 17 is
+  decided, the pane's headings, the
+  search widget not typesetting a result list of 100 or more (as before), the code
+  graph page loading 1.24 MB of scripts, a 5.16 MB `.wasm` file (1.80 MB gzipped) and a
+  7.65 MB dump (baseline 2.33 MB and 5.63 MB). Its screenshots need MathJax and the
+  fonts: either the network (Philippe's call) or a local MathJax as here (fonts
+  missing); Chrome for Testing rewrites its Crashpad settings file in `~/Library` at
+  each launch, chrome-headless-shell does not (below).
+- E: `yarn dev` and `yarn dev-test` set `NODE_OPTIONS=--max-old-space-size=8192` since
+  sitegen `0ac4fb3` (question 21, ruled; three of four runs with the default heap
+  crashed at the first request after a rebuild): E runs dev mode with it and measures
+  the peak resident size against the baseline's (a dev run of the baseline with the
+  same option, if E rebuilds it, tells whether the port raised the peak).
+  `build-simple` has no heap option (its Parcel builds peak at 3.1 to 3.5 GB).
+- E: the probes launch chrome-headless-shell (`headless: 'shell'`), which leaves
+  `~/Library` alone; the production exporter (`headlessGraphExporter.js:113`, `headless:
+  "new"`, no `userDataDir`, its profile in `TMPDIR`) launches Chrome for Testing, which
+  rewrites its Crashpad `settings.dat` at each launch: it runs as is and E discloses the
+  write (the main session's ruling, in D's item).
+- E: the production exporter calls `load_eczoodb_from_data()` once per graph (89), so it
+  makes 89 zoos and engines that are never `free()`d; the glue's `FinalizationRegistry`
+  frees the cores on GC (12 sequential loads under Node stayed at about 80 MB external),
+  but a page that keeps every graph alive costs about 18 MB of heap and 4.5 MB of wasm
+  per graph (the review's measures under Node): E watches the exporter page's memory
+  over the 89 exports.
+
+**Review fixes** (2026-10-19). The review (Opus, read-only; its probes and logs in
+`C/review/`) gave the verdict "fix first": two must-fix items (dev mode with Parcel
+reported as working, and the pane images said to show in dev mode), two should-fix
+items (the Crashpad write presented as unavoidable, the diagnostics of the dump's
+loading discarded), notes, and "accepted" for the seven deviations. One fixer (Opus;
+its probes and logs in `C/fix/`, every build and probe with `TMPDIR` in `C/fix/tmp/`,
+every yarn call offline with the Setup's `YARN_GLOBAL_FOLDER`) made all four; only the
+choice of a fix for dev mode needs a ruling (question 21, new). Two commits in the
+sitegen clone on `fcefd2b`, each with the two trailers and with the root `package.json`
+and `yarn.lock` in their committed form: `ac69074` and `b72901a`. No package change
+(the installed `src/` still equals the worktree's, tarball `40dc1569…`); nothing in the
+data clone or the handbook clone; nothing pushed.
+
+- (must) *Dev mode with Parcel.* The review ran `yarn dev` twice as C had (the full
+  data, the LOCAL cache, the switch, a touch of
+  `codes/quantum/qubits/stabilizer/qubit_css.yml`, then a page request): both runs
+  crashed with `FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed
+  - JavaScript heap out of memory` at about 4,080 MB of JS heap, during Parcel's rebuild
+  for the first request after Eleventy's rebuild; the request got no answer after 62 to
+  82 s and yarn exited 129 (`C/review/logs/dev.log`, `dev2.log`). With
+  `NODE_OPTIONS=--max-old-space-size=8192` the same run survived two rebuilds (3 builds,
+  F1's 43 lines three times, peak 3,882,860,544 bytes; `dev3.log`). The fixer ran it
+  once more with the default heap (`C/fix/probes/dev_run.sh`; `C/fix/logs/dev.log` and
+  `dev_events.txt`): first build 50.3 s, the first request answered after 68.8 s
+  (Parcel's first build), the touch's rebuild 63.5 s (the machine was loaded: load
+  average 7 to 28), then the request for `/c/qubit_css` got no answer after 91 s,
+  Parcel's rebuild ran out of heap (a mark-compact at 4,080.7 MB), the server was gone
+  and yarn exited 129; F1's 43 lines twice, no other diagnostic. Three of four runs
+  crashed; C's run was the lucky one. Finding 8, the Checks row, question 21 and the
+  items for E now say so. The scripts are left as they are: they are the sitegen's own,
+  and the choice between the heap option and an investigation of the peak is question
+  21.
+- (must) *The pane images in dev mode.* Confirmed with curl in the fixer's dev run,
+  before the touch: on 8080 and on Parcel's 3000, `/fig/fig-triangular_color.tpmk.svg`,
+  `/dynamic_style/flm.css` and a missing `/no/such/file.svg` all answer 200,
+  `text/html`, 885,491 bytes, the body of `/` (the same MD5), while Eleventy wrote
+  `_site/fig/fig-triangular_color.tpmk.svg` (16,389 bytes) and Parcel's
+  `.11ty-parcel-temp/` has no `fig/`; the review's browser run on the dev server found
+  the image not loaded. Finding 3, the Checks row, the browser check's paragraph,
+  question 17 and the items for E are corrected: the 15 images show only in the build
+  without Parcel.
+- (should) *The Crashpad file.* Deviation 5 and finding 7 now say that the write is
+  avoidable with `headless: 'shell'`, and that the production exporter's launch
+  (`headlessGraphExporter.js:113`, `headless: "new"`) is E's to accept or to put to
+  Philippe (For D and E). The fixer's probes (the browser checks and the exporter's)
+  all launched chrome-headless-shell 134.0.6998.35: `settings.dat` kept its time of
+  13:26:21 through them.
+- (should) *The diagnostics of the dump's loading.* `ac69074`:
+  `load_eczoodb_from_data()` prints what `engine.load()` and the `codegraph` context's
+  `set_index()` return on the console (`warn_diagnostics()`, `format_diagnostic`,
+  `console.warn`, prefixed `Code graph, …`), as the pane does for its renders. Under
+  Node (`C/fix/probes/load_warn.mjs`, `C/fix/logs/load_warn_full.txt`): the full dump
+  gives no warning (the zoo loaded in 550 ms, 1,155 codes); a copy of it whose index
+  display of `code:approximate_oaecc` has an unclosed group gives the Error twice, once
+  for the dump's `default` index and once for the `codegraph` context
+  (`index:code:approximate_oaecc:1:10: error: unclosed group: expected ‘}’ before end of
+  input [core.groups.unclosed-group]`). The clone's eslint on the file: clean. The
+  exporter's bundle holds this code, so `b72901a` rebuilds it (`yarn build` in
+  `jscomponents`, the root's `.parcel-cache` removed first; 6.2 s, peak 877,592,576
+  bytes): `_headless_exporter_browser_page.cdd65f0e.js` 892,825 bytes (was 892,639),
+  its source map 3,963,037 (3,962,130), the page; the `.wasm` file unchanged. In
+  chrome-headless-shell the kingdom graph `qubits_into_qubits` exported to an SVG
+  byte-identical to C's (322,366 bytes, 73 labels), with only local requests and no
+  console message (`C/fix/logs/exporter_probe.txt`).
+
+The checks run again (`C/fix/logs/`). Test build with Parcel (`yarn build-test-simple`,
+`build_test_parcel.log`): exit 0, Parcel 126 bundles in 47.8 s, 65 files written, 171 in
+`_site/`, 35 HTML, 54.5 s, peak 1,818,230,784 bytes (the machine loaded); no diagnostic,
+no marker; the 319 references to local scripts, stylesheets and icons and the 844 local
+links all resolve; 24 of 24 bundles parse; the stylesheet bundle 38/38 classes, 107/107
+custom properties, 11/11 attributes, 15 `@layer` blocks into 1; retrievals 113
+considered, 0 failed; `vv/` equal to the review's test build but for the two
+`codegraph-*.js` bundles (878,044 and 875,846 bytes, 180 more each); in the browser
+(`browser_test_shell.json`) `/c/css` 71 of 71 formulas typeset, the code graph 14
+nodes, the pane 13 of 13 and after a click 16 of 16, search `stabilizer` 4 results and
+43 typeset, the console's only error the aborted fonts. Full inspection build with
+Parcel (`build_full_parcel.log`): exit 0, 136.5 s, peak 2,535,276,544 bytes, Parcel
+1,485 bundles in 84.4 s, 1,424 files written, 1,520 in `_site/`, 1,276 HTML; against C's
+final `_site/` (the review's copy) the only differences are the two `codegraph-*.js`
+bundles and `code_graph.html`, equal once their names are mapped; `dat/` byte-identical;
+the 43 diagnostic lines identical to the review's list, all F1's; retrievals `4739
+cached, 478 to fetch`, `2124 cached, 0 to fetch`, 7,341 considered, 0 failed. Static
+checks (`full_check_site.json`, `full_bundles_parse.txt`, `css_check_full.txt`): 12,537
+references to local scripts and stylesheets and 135 to images, none missing; 90,558
+local links resolve; no marker; 24 of 24 bundles parse; the stylesheet bundle 38/38,
+107/107, 11/11, 15 blocks into 1; in the head of `/c/steane` the MathJax 4
+configuration before its loader, `flm.css` before `main.css`, no MathJax 3; the bundles
+34 files and 9,803,216 bytes (C's table plus the 360 bytes the two `codegraph` bundles
+gained: 878,044 / 875,846). In the browser
+(`browser_full_shell.json`, chrome-headless-shell): the home page's random codes typeset
+over four refreshes; `/c/steane` 84 of 84, 79 citation marks; the code graph 1,176
+nodes, the pane of `steane` 21 of 21 with 28 captured links and the heading at 13.6 px,
+after the click (`triangular_color`) 4 of 4 and its image the 404; the kingdom, domain
+and empty panes and their clicks; search `Golay` 34 results, 175 typeset; no console
+warning (so nothing printed by the loading), the console's errors the aborted fonts and
+that 404; no page error. `site/_site/` holds this full build; the dev run's
+`site/.11ty-parcel-temp/` was removed; the data clone's status stayed empty (the touch
+changes only the time).
+
+Left open: question 21 (Philippe's, or a ruling of the main session); the production
+exporter's Crashpad write (E's, or Philippe's); the review's notes for E (the 89 zoos and
+engines of the exporter page, `build-simple` without a heap option), carried into the
+items for E. The review noticed that the original `eczoo_sitegen/.git` folder's time had
+changed today (14:06:17) with its index, `HEAD` and `FETCH_HEAD` unchanged; during this
+round it changed again (14:21:46), the index still of 2026-10-14. The original is open
+in Philippe's Zed editor (its ESLint, vtsls and Tailwind language servers run with the
+original as their working folder since 2026-10-16), whose git integration likely runs
+`git status` there without `--no-optional-locks` (which creates and removes
+`index.lock`, changing the folder's time and not the index's); no command of this round
+writes there (every git command on the originals passed `--no-optional-locks`).
