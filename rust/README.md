@@ -26,7 +26,8 @@ Only to rebuild a module (not to use or test the package):
   `rustup target add wasm32-unknown-unknown`
 - `wasm-pack`: `cargo install wasm-pack` (on its first run it downloads a
   matching `wasm-bindgen-cli` and `wasm-opt`).
-- The local checkout of flm-rs that `zoodb-flm-wasm` depends on (see below).
+- Network access the first time: cargo fetches flm-rs from its git repository
+  (see below) into `~/.cargo/git/`.
 
 ## Building
 
@@ -49,8 +50,8 @@ The binaries carry no path of the build machine. rustc writes source paths
 into them (panic locations), so `tools/build_wasm.mjs` passes
 `--remap-path-prefix` flags through `CARGO_ENCODED_RUSTFLAGS`, computed at
 each build and never committed: this workspace's root becomes `zoodb-rust`,
-the root of each path dependency (today the flm-core checkout) its package
-name, cargo's registry sources `cargo-registry` (git checkouts `cargo-git`),
+the root of each path dependency (none today) its package name, cargo's
+registry sources `cargo-registry`, its git checkouts (flm-rs) `cargo-git`,
 and the toolchain's sysroot (`rustc --print sysroot`) `rust-sysroot`. Flags
 already given in `CARGO_ENCODED_RUSTFLAGS` or `RUSTFLAGS` (or cargo's
 `CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS`, `CARGO_BUILD_RUSTFLAGS`) are
@@ -58,8 +59,8 @@ kept; rustflags in a cargo configuration file are refused, since
 `CARGO_ENCODED_RUSTFLAGS` would replace them. The tool fails if `/Users/`,
 `/home/` or `C:\` is left in a binary, and `BUILD_INFO.json` records
 `"paths_remapped": true`. The flags are part of cargo's fingerprint: the first
-build with them, and the first build after they change (the workspace, the
-flm-rs checkout or the toolchain moved), rebuilds everything from scratch,
+build with them, and the first build after they change (the workspace or the
+toolchain moved), rebuilds everything from scratch,
 once per machine. Cargo's own `trim-paths` is unstable and not used. Plain
 `cargo` and `wasm-pack` commands (the checks below, the CI job) run without
 these flags; their output is never committed.
@@ -82,15 +83,12 @@ in. The modules are unaffected: `wasm-pack` builds each crate alone. The
 `rust` job of `.github/workflows/node-js-test.yml` runs the per-crate checks
 and both wasm-pack builds (build only).
 
-## The path dependency on flm-rs
+## The dependency on flm-rs
 
-`zoodb-flm-wasm` depends on `flm-core` through a path to a local checkout of
-flm-rs (`/Users/philippe/projects/flm-rs/flm-core`), which is read only.
-Where flm-rs is referenced from (a git dependency, a registry, a vendored
-copy) is settled later. Until then:
-
-- cargo cannot load the workspace where that path does not exist, so neither
-  crate builds or checks there, the citation crate included;
-- the `rust` CI job fails at its first cargo command;
-- `Cargo.lock` records no source for `flm-core`, and the module's
-  `BUILD_INFO.json` says `"flm_core_source": "path"`.
+`zoodb-flm-wasm` takes `flm-core` from the branch `main-rs` of the public FLM
+repository, `https://github.com/phfaist/flm.git` (a git dependency).
+`Cargo.lock` pins the commit a build uses (the `source` line of `flm-core`,
+`git+https://github.com/phfaist/flm.git?branch=main-rs#<commit>`); from this
+directory, `cargo update -p flm-core` moves it to the branch's current head.
+The module's `BUILD_INFO.json` copies that source, commit included, into
+`flm_core_source`.

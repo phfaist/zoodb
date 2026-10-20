@@ -29,16 +29,15 @@ table; the glue (and the base64 module) checked free of `import.meta`,
 version, the `autocitefetch` version or the `flm-core` version with its
 source, `"path"` for a path dependency, the `wasm-bindgen` version,
 `"paths_remapped": true`, the sizes and the build date), plus, for each path
-dependency of the crate whose directory is in a git checkout (today flm-core),
+dependency of the crate whose directory is in a git checkout (none today),
 `<name>_git: { commit, dirty }`: the checkout's `HEAD` and whether `git status
 --porcelain` listed anything under the dependency's own directory, the one of
 its `Cargo.toml` (read with `--no-optional-locks`, so the checkout is not
 written). Only needed after changing `rust/`; users of the package never run
 it. Requires Rust stable with the `wasm32-unknown-unknown` target
 (`rustup target add wasm32-unknown-unknown`), `wasm-pack` (`cargo install
-wasm-pack`) and, for the
-workspace to load at all, the local flm-rs checkout that `zoodb-flm-wasm`
-depends on. Exit status: 0 on success, 1 on any error (a missing tool, a
+wasm-pack`) and, the first time, network access (cargo fetches flm-rs, the
+git dependency of `zoodb-flm-wasm`). Exit status: 0 on success, 1 on any error (a missing tool, a
 failed build, a build machine path left in a binary, rustflags in a cargo
 configuration file, a forbidden token, an unknown name). Never edit the
 generated modules by hand.

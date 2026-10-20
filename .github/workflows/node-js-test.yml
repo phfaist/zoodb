@@ -95,10 +95,8 @@ jobs:
   # would unify serde_json's features and compile the citation crate with
   # `serde_json/std`, which it must never be built with (see rust/README.md).
   #
-  # zoodb-flm-wasm depends on flm-core through a path to a local checkout of
-  # flm-rs, which this runner does not have; cargo cannot load the workspace
-  # without it, so this job fails at its first cargo command until flm-rs is
-  # referenced from a location CI can reach (to be settled).
+  # zoodb-flm-wasm takes flm-core from the branch main-rs of
+  # https://github.com/phfaist/flm.git, at the commit pinned in rust/Cargo.lock.
   rust:
 
     runs-on: ubuntu-latest

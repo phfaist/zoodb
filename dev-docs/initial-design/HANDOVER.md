@@ -28,7 +28,10 @@ in `README.md` of this folder.
   screenshots, dev mode), the consolidated questions for Philippe and these notes at the
   end of step 6, in the main session's final commit of the step (13).
 - **What exists now.** `rust/` is a cargo workspace (`zoodb-autocitefetch-wasm`,
-  `zoodb-flm-wasm`; flm-core by path from `/Users/philippe/projects/flm-rs/flm-core`);
+  `zoodb-flm-wasm`; flm-core since 2026-10-20 a git dependency on the branch `main-rs`
+  of the public `https://github.com/phfaist/flm.git`, before by path from
+  `/Users/philippe/projects/flm-rs/flm-core`; the committed module is still the one
+  built by path from `9ccaa871`);
   the FLM module is committed as `src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` (5,160,404
   bytes since D) with its glue, loaders `src/zooflm/_load_wasm.js` (neutral) and
   `_load_wasm_node.js`;
@@ -151,8 +154,9 @@ Commit trailers: `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>` and
   `GraphicsPublished`, needed for `srcset`) ruled medium-low priority: the standard setup
   accepts `graphics_use_srcset_parceljs` but leaves `srcset` off and warns once until U2
   lands.
-- The flm-core path dependency stays as it is; do not ask where flm-rs will live. The CI
-  `rust` job cannot pass until then (recorded, not worked around).
+- flm-core comes from the branch `main-rs` of the public FLM repository
+  `https://github.com/phfaist/flm.git` (Philippe, 2026-10-20), a git dependency whose
+  commit `rust/Cargo.lock` pins (`cargo update -p flm-core` moves it).
 - No sweep of the EC zoo data; discrepancies are fixed during the switch (step 6).
 - Style with Philippe: questions in prose with full context, plain language, US English,
   never the block question tool; clear and unambiguous explanations.

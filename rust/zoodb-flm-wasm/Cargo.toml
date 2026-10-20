@@ -12,10 +12,9 @@ build = "build.rs"
 crate-type = ["cdylib", "rlib"]     # rlib so `cargo test` can link unit tests on the host
 
 [dependencies]
-# A path dependency on the local flm-rs checkout (read-only). Where flm-rs is
-# referenced from is settled later (Q17); until then this crate builds only
-# where that checkout exists (not in CI).
-flm-core = { path = "/Users/philippe/projects/flm-rs/flm-core", default-features = false }
+# flm-rs, from the branch `main-rs` of the public FLM repository; Cargo.lock
+# records the commit a build uses (`cargo update -p flm-core` moves it).
+flm-core = { git = "https://github.com/phfaist/flm.git", branch = "main-rs", default-features = false }
 wasm-bindgen = "0.2"
 js-sys = "0.3"
 serde = { version = "1", features = ["derive"] }

@@ -11,7 +11,7 @@ refer to `dev-docs/initial-design/` (design questions, technical risks,
 upstream requests).
 
 A member of the cargo workspace in `rust/` (see [`../README.md`](../README.md)
-for the workspace, the prerequisites and the path dependency on flm-rs).
+for the workspace, the prerequisites and the dependency on flm-rs).
 
 ## Modules
 
@@ -132,8 +132,9 @@ yarn build:wasm flm
 builds into `rust/target/pkg/zoodb-flm-wasm/` and regenerates
 `src/zooflm/_wasm/`: `zoodb_flm_wasm.js` (glue), `zoodb_flm_wasm.d.ts`,
 `zoodb_flm_wasm_bg.wasm` and `BUILD_INFO.json` (`binding`, `flm_core` and
-`flm_core_source`, `flm_core_git` when the flm-core directory is in a git
-checkout: `{ commit, dirty }`, the checkout's `HEAD` and whether `git status
+`flm_core_source`, the source `Cargo.lock` records for it, with the commit for
+a git dependency; `flm_core_git` only when flm-core is a path dependency in a
+git checkout: `{ commit, dirty }`, the checkout's `HEAD` and whether `git status
 --porcelain` listed anything under the flm-core directory, `wasm_bindgen`,
 `paths_remapped`, `wasm_size_bytes`, `build_date`; the build machine's paths
 are remapped, see `../README.md`). The module is loaded with
