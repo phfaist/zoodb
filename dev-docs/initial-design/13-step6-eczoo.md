@@ -106,7 +106,7 @@ old FLM API in all (list: `survey/sitegen_flm_touching.txt`). Tally of the old c
 | `pdfexport/` (semi-maintained per the repository's docs) | `flm-js` LaTeX renderer, the old composer | not ported (question for Philippe) | — |
 | tests: `eczoodb/test/` (6 files, 75 `it`), `eczoohelpers/eczcollectbib/test/` (14 `it`) | `test_render_code.js` passes `zoo_flm_environment`; `test_eczoodb.js` reads `short_name.flm_text` | adapted; green | B2 |
 | citation caches | `_zoodb_citations_cache/` (tracked: `citations.jsonl` 7,005 lines, 3,306 `arxiv`, 3,568 `doi`, 130 `preset`; `cache_compiled_citations.json` 2.2 MB; the legacy `cache_downloaded_info.json` 13 MB, no longer read; `_anystyle_manual_citations_cache.json` 0.75 MB); `_TEST_zoodb_citations_cache/` (ignored; 56 `doi` entries, fresh until 2027-02) | copied as they are (section "The citation caches") | setup |
-| the last build | `site/_site/` of the read-only checkout (118 MB, 2026-09-29 12:35: 1,277 HTML pages, 1,155 code pages, 86 lists, 89 graph SVGs; `dat/eczoodata.json` 5.6 MB, `searchindex.json` 4.4 MB, `bibreferences.bib` 2.0 MB): built from `main` at `a2ad583` with zoodb `bb94f3e` and the data's present content (the only data commits since, `2a258edc6` and `7ade20a2f`, change CI workflows) | the baseline of E's comparison, read in place | E |
+| the last build | `site/_site/` of the read-only checkout (118 MB, 2026-09-29 12:35: 1,277 HTML pages, 1,155 code pages, 86 lists, 108 graph SVGs (86 lists, `/all`, 18 kingdoms, 3 domains; the brief first said 89); `dat/eczoodata.json` 5.6 MB, `searchindex.json` 4.4 MB, `bibreferences.bib` 2.0 MB): built from `main` at `a2ad583` with zoodb `bb94f3e` and the data's present content (the only data commits since, `2a258edc6` and `7ade20a2f`, change CI workflows) | the baseline of E's comparison, read in place | E |
 
 ### Inventory: `eczoo_handbook`
 
@@ -419,8 +419,8 @@ re-packs and re-runs `yarn build-test`). Read: the Results of A to C.
   original's); if it fails, E reports the new build's numbers alone.
 - The search index (documents, size, three texts), the dump (`dat/eczoodata.json`:
   size, `zooflm` share, positions share), the BibTeX and CSL exports (if G4 is settled),
-  the random code data, the 89 graph SVGs present; the apps loading the dump in
-  Puppeteer as in C.
+  the random code data, the 108 graph SVGs present (86 lists, `/all`, 18 kingdoms, 3
+  domains; the brief first said 89); the apps loading the dump in Puppeteer as in C.
 
 Results: the numbers above in tables, the diagnostics list, the comparison's
 classification, the screenshots' paths, the build time and peak memory against the
@@ -439,30 +439,160 @@ status --short` empty and no file newer than the start of the part
 
 ## Questions for Philippe
 
-1. The working decisions above (clones in `scratch/eczoo/`, branches never pushed, the
-   tarball dependencies, six parts in this order), and whether the clone's `origin`
-   should rather be the GitHub repositories.
-2. Pushing the three `zoodb-flmrs` branches, and to which remote (`errorcorrectionzoo` or
-   the `phfaist` forks); the agents never push.
-3. The order of the merges: zoodb's `zoodb-flmrs` into `main` first (the clones' git
-   URLs then point at the right code), then `eczoo_data` (if A confirms it reads the
-   same under the deployed site: its CI builds the sitegen's `main`), `eczoo_sitegen`
-   with its lock refreshed, the handbook last with its lock refreshed (it also moves
-   from zoodb 0.1.1 and a sitegen of June).
-4. G1 to G3: whether part 0 (the scan reporting term bodies and every citing object,
-   per-call render options for previews) is added to the package before B1, or the
-   glossary, the references' backrefs and the previews are accepted as degraded for now.
-5. G4: where the Unicode→LaTeX table of the BibTeX export comes from.
-6. G5: whether `zoodbtools` is cloned and ported in this step (the live preview and
-   `/gitpreview`), or those two apps wait.
-7. `pdfexport/`: ported, left on the old API, or removed.
-8. The dump positions (11 Deferred (b)): E measures their share of `eczoodata.json`,
-   which the code graph downloads.
-9. The site's look: the SCSS rewrite changes the HTML the styles hang on; the
-   screenshots of E are for his review.
-10. The diagnostic switch `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` of the sitegen clone (B1's
-    Closing; inspection builds under `'continue'` while the flm-rs finding F1 is open):
-    whether it is acceptable to keep, also once F1 is fixed, or removed then.
+Consolidated at the end of step 6 (E, second half): the ten questions this list held
+before the parts, and every open question of the Results of parts A to E under its
+number (part 0 left none; 32 is A's question on the label names, numbered here; 33 and
+34 are E's second half's). One line each, grouped; the parenthesis says where the
+question is discussed. "Ruling to confirm" marks a question the main session ruled on so
+that the work could go on; "settled" one that a later part answered. Items for his
+information close the list.
+
+**Data and the clones**
+
+- **1.** Ruling to confirm: the working decisions at the top of this brief (the clones
+  in `scratch/eczoo/` made from the local originals, their branches `zoodb-flmrs` never
+  pushed, the tarball dependencies, the parts in this order); and should the clones'
+  `origin` rather be the GitHub repositories? (top of this brief)
+- **2.** Pushing the three `zoodb-flmrs` branches, and to which remote
+  (`errorcorrectionzoo` or the `phfaist` forks): the agents never pushed, and the
+  clones' push URLs are disabled. (`HANDOVER.md`, Next)
+- **3.** The order of the merges: zoodb's `zoodb-flmrs` into `main` first, then
+  `eczoo_data` (safe for the deployed site; it moves the `<lastmod>` of the 127
+  re-indented code pages, and `zoodb-reindent-yaml --dry-run` should check the data
+  first), `eczoo_sitegen` with its lock refreshed, the handbook last with its lock
+  refreshed. (A, the safety paragraph and both Review fixes)
+- **32.** The names `eq:paritys` and `eq:parityqs` of the two renamed labels: keep, or
+  others (a one-line commit)? (A, Open questions)
+- **27.** The MathML markup in eleven cited works' titles, shown as text on the site and
+  in the handbook: clean the citation sources' metadata, or leave it? (D, finding 6; E,
+  the comparison's table)
+
+**flm-rs findings (05, "Findings to report")**
+
+- **11.** Ruling to confirm: F1 gets no workaround (the data unchanged, no key rewritten
+  anywhere) and waits for a fix in flm-rs; the data commit of the 18 `manual:{…}` keys
+  only on Philippe's explicit ruling. Until the fix the default full build exits 1 at
+  gray's meta description. (B1, Closing; B2)
+- **10.** Ruling to confirm, the switch itself (the main session's): the sitegen's
+  `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` (inspection builds under `'continue'` while F1 is
+  open); keep it, also once F1 is fixed, or remove it then? (B1, Closing)
+- **14.** F2 (a formula in a term's lead-in loses its delimiters in the text output), F3
+  (the lists of notes and citations carry a heading fixed with the registry), F4 (the
+  default image hook writes `max width` before the size keys) and F5 (characters without
+  a LaTeX spelling) are noted in 05 by the main session: report them upstream? (B2, C,
+  D; the gaps table)
+- **29.** The no-break space between an opening parenthesis and an attached citation
+  mark, `( [9], Exer. 5.1.11)` (4 places): a row for 05's table, or accepted? (E,
+  finding 3)
+
+**Package gaps left open**
+
+- **4.** Ruling to confirm: G1 to G3 made as part 0 before B1 (the scan's term bodies
+  and per-tree cited keys, per-call render options), on the main session's proposal
+  (`c6b11b9`). (Part 0)
+- **5.** G4, the BibTeX export's Unicode-to-LaTeX spellings: B2 renders them with
+  `render_latex` of an export engine of its own (`latex-recomposed.unicode: 'replace'`;
+  4 of 5,217 entries differ from the baseline's by a character's spelling); keep that,
+  or take the table from elsewhere? (the gaps table, G4)
+- **12.** Settled by G12 (D): `render_latex()` takes per-call `render_options`, so the
+  BibTeX export could use the zoo's engine instead of its own. (B2; D)
+- **16.** G3's residual: 443 random code previews carry 652 citation marks linking to
+  notes the home page does not have (flm-rs has no option to leave marks out): keep
+  them, ask flm-rs for an option, or show the previews another way? (C; E, the
+  screenshots)
+- **6, 20.** G5: port `zoodbtools` in a part of its own (the live preview `previewtool/`
+  and `/gitpreview`, which is not built since C), or leave both apps for later? (C, G5)
+- **22.** G11 (not needed by the EC zoo): should the composer's `ref()` and `refhref()`
+  apply the HTML output's address allowlist, refusing for example `javascript:void(0)`?
+  (C)
+- **25.** G13: a `truncate()` option leaving out the labels and term definitions that a
+  preview would repeat, or the previews in a LaTeX run of their own, once the data needs
+  it (latent in the handbook's full build)? (D)
+- **G6, G8.** Rulings to confirm, done in the package: an object whose `object_href`
+  returns `null` gets no index entry (the EC zoo's spaces; B1, Closing), and a
+  relation's detail is compiled once and credited to both objects (B2, Review fixes).
+- **8.** The field positions in data dumps (`_zoodb.flm_field_positions`, 11 Deferred
+  (b)): 1,595,724 bytes, 20.9 % of the 7.65 MB `dat/eczoodata.json` that the code graph
+  downloads; keep or drop them? (E, the `dat/` table)
+
+**Site choices**
+
+- **9.** The site's look on the engine's HTML: the screenshots in the worktree's
+  `scratch/eczoo/screenshots/index.html` (ignored; a copy of `E/screenshots/`, 13 of its
+  new-site screenshots retaken after the fix of question 33). (E, second half and Review
+  fixes)
+- **33.** Ruling to confirm: the labels of the lists of references (and of numbered
+  lists) sat on a line of their own above each entry, because the site's unlayered
+  `p, ul, ol, pre { margin-top: 1em }` beat the engine's stylesheet in `@layer flm`;
+  ruled by the main session: the engine's stylesheet stays in its layer so that a site's
+  own styles win, and the site adapts its rule, which now leaves out the blocks of the
+  engine's list entries (sitegen `793f2bf`): the text after a label 14.4 px below it
+  before, level with it after, every other element's margins unchanged on all pages,
+  `steane` 10,297 → 9,161 px high (the baseline 9,114). (E, finding 8)
+- **13.** Ruling to confirm: the search index holds each field's cited works again (G9,
+  `flm_pieces: true`: 4.6 MB against 2.3 MB with the marks alone; a search for
+  "references" matches 1,115 codes; the result snippets show them as the text output
+  lays them out, the marks in the text and a `References ----------` list after each
+  item, 6,985 lists in 4,669 field values, where the baseline wrote each citation's text
+  in brackets in place of its mark). (B2, Review fixes; E, the screenshots)
+- **15.** The `\paragraph` stop: the engine's `.` or the former dash
+  (`html.run_in_stop`; no `\paragraph` in the data today)? (B2)
+- **17.** The 15 code graph panes whose first 700 characters hold a float show a broken
+  image on the built site (a 404) and in dev mode: serve `/fig/`, cut the pane at the
+  description's first paragraph, or leave it? (The baseline shows an error box instead
+  of 20 panes, these 15 among them.) (C, finding 3; E, finding 7)
+- **18.** The pane's lists of references and footnotes come with their small heading
+  (F3): keep? (C)
+- **31.** `target="_blank"`: 32,737 links of FLM content now open in the same tab (the
+  engine has no link-target option, and a site script would work around it): accept, or
+  ask flm-rs for an option? (B1; E, first half)
+- **7.** `pdfexport/` (on the former FLM layer, semi-maintained): port it, leave it, or
+  remove it? (the survey)
+
+**Handbook**
+
+- **23.** The test build stops under `'abort'` at its 15 Errors (the chapters' 13
+  references to codes the test data lacks, G13's 2): put the switch into `build-test`,
+  add the 13 codes to the test data, or allow unresolved references there? (D)
+- **24.** Commit the handbook test cache's record of `arxiv:2312.11805` (fetched
+  2026-10-19), or leave its retrieval to the first build of a fresh clone? (D)
+- **26.** Consecutive citations: one bracket per `\cite` as the engine writes them, or
+  the class merging adjacent `\flmCite` hooks as the former recomposer did? The site's
+  HTML merges marks with the same note (E, finding 4). (D, finding 7)
+- **28.** `mk_bib.js`: port it, keep it as the not-ported alternative, or remove it? (D)
+
+**Build tooling**
+
+- **21.** Ruling to confirm: the site's `dev` and `dev-test` scripts set
+  `NODE_OPTIONS=--max-old-space-size=8192` (sitegen `0ac4fb3`); keep it, or reduce the
+  peak (question 34)? (C; E, dev mode)
+- **34.** Dev mode with Parcel on the full data: Parcel's dev server rebuilds every page
+  at each change, and on this machine its rebuild after the first change grew to 6.5 GB
+  of heap without answering within 150 to 600 s and was stopped there, below the `dev`
+  script's 8 GB limit (C's review saw it answer): make the site's lazy option
+  (`ECZOO_RUN_11TY_PARCEL_LAZY=1`, which ran through three rebuilds in at most 2.7 GB of
+  heap) the `dev` script's default, run dev mode without Parcel
+  (`ECZOO_RUN_11TY_PARCEL=0`), or leave it as it is (the baseline's dev mode does the
+  same, so it predates the port)? (E, finding 9)
+- **19.** The sitegen's build scripts and Parcel's leftovers: should `jscomponents`'
+  `build` remove the root's `.parcel-cache`, and the site's `build*` scripts remove
+  `site/.11ty-parcel-temp/`? (C, findings 5 and 6)
+- **30.** A failing production build hangs (the exporter's browser and its idle timer
+  keep Node alive): close the exporter when Eleventy fails (a sitegen fix), or leave it?
+  While F1 is open every default production build meets it. (E, finding 2)
+
+For his information or action, not numbered: the two archives B1's install wrote in
+`~/.yarn/berry/cache` (`@phfaist-zoodb-file-8af460e1f9-8.zip`,
+`yaml-npm-2.9.1-d61da744fe-8.zip`), which he may delete (B1, Review fixes); Chrome for
+Testing's Crashpad `settings.dat` in `~/Library`, rewritten by the production exporter
+in D's and E's builds (ruled by the main session, disclosed); cargo's
+`~/.cargo/.global-cache` and wasm-pack's lock file, their own bookkeeping (B2, D, E);
+D's retrievals from arXiv before its sandbox profile existed (D, deviation 6); the
+directory entries of flm-rs's `playground/` folder, listed (no file opened) by the
+`find -newer` at depth 3 over the flm-rs checkout in E's review fixes, against the rule
+that the folder is never read (E, Review fixes); in dev mode the dump's snippet cache
+keeps the previous build's snippets (2,800 entries against a fresh build's 2,008; no
+page changes; B2, E).
 
 ## Results
 
@@ -2433,12 +2563,12 @@ formula typeset on every page checked. Numbers in the Checks table.
   "new"`, no `userDataDir`, its profile in `TMPDIR`) launches Chrome for Testing, which
   rewrites its Crashpad `settings.dat` at each launch: it runs as is and E discloses the
   write (the main session's ruling, in D's item).
-- E: the production exporter calls `load_eczoodb_from_data()` once per graph (89), so it
-  makes 89 zoos and engines that are never `free()`d; the glue's `FinalizationRegistry`
-  frees the cores on GC (12 sequential loads under Node stayed at about 80 MB external),
-  but a page that keeps every graph alive costs about 18 MB of heap and 4.5 MB of wasm
-  per graph (the review's measures under Node): E watches the exporter page's memory
-  over the 89 exports.
+- E: the production exporter calls `load_eczoodb_from_data()` once per graph (89; 108 in
+  fact, E), so it makes 89 (108 in fact, E) zoos and engines that are never `free()`d;
+  the glue's `FinalizationRegistry` frees the cores on GC (12 sequential loads under
+  Node stayed at about 80 MB external), but a page that keeps every graph alive costs
+  about 18 MB of heap and 4.5 MB of wasm per graph (the review's measures under Node): E
+  watches the exporter page's memory over the 89 (108 in fact, E) exports.
 
 **Review fixes** (2026-10-19). The review (Opus, read-only; its probes and logs in
 `C/review/`) gave the verdict "fix first": two must-fix items (dev mode with Parcel
@@ -2540,16 +2670,17 @@ that 404; no page error. `site/_site/` holds this full build; the dev run's
 changes only the time).
 
 Left open: question 21 (Philippe's, or a ruling of the main session); the production
-exporter's Crashpad write (E's, or Philippe's); the review's notes for E (the 89 zoos and
-engines of the exporter page, `build-simple` without a heap option), carried into the
-items for E. The review noticed that the original `eczoo_sitegen/.git` folder's time had
-changed today (14:06:17) with its index, `HEAD` and `FETCH_HEAD` unchanged; during this
-round it changed again (14:21:46), the index still of 2026-10-14. The original is open
-in Philippe's Zed editor (its ESLint, vtsls and Tailwind language servers run with the
-original as their working folder since 2026-10-16), whose git integration likely runs
-`git status` there without `--no-optional-locks` (which creates and removes
-`index.lock`, changing the folder's time and not the index's); no command of this round
-writes there (every git command on the originals passed `--no-optional-locks`).
+exporter's Crashpad write (E's, or Philippe's); the review's notes for E (the 89 (108 in
+fact, E) zoos and engines of the exporter page, `build-simple` without a heap option),
+carried into the items for E. The review noticed that the original `eczoo_sitegen/.git`
+folder's time had changed today (14:06:17) with its index, `HEAD` and `FETCH_HEAD`
+unchanged; during this round it changed again (14:21:46), the index still of 2026-10-14.
+The original is open in Philippe's Zed editor (its ESLint, vtsls and Tailwind language
+servers run with the original as their working folder since 2026-10-16), whose git
+integration likely runs `git status` there without `--no-optional-locks` (which creates
+and removes `index.lock`, changing the folder's time and not the index's); no command of
+this round writes there (every git command on the originals passed
+`--no-optional-locks`).
 
 ### D. The handbook
 
@@ -2975,7 +3106,7 @@ pages.
 8. The code graphs' layouts are not reproducible from run to run (54 of 66 SVG files
    differ between two generations on the same data, their labels equal), presumably as
    before the port (the baseline cannot be rebuilt to check): E should compare its 89
-   graph SVGs by their labels.
+   (108 in fact, E) graph SVGs by their labels.
 9. The class refuses every TeX Live but 2023 (its own check, predating the port, for its
    cleveref integration); the run's style file loads zref-clever for its own definitions
    of the reference hooks, which the class replaces by its cleveref ones, so both
@@ -3044,7 +3175,7 @@ fixes (Review fixes, below).
   (probe 3), but its `site/_site/` is C's last build on the earlier package, so E builds
   anew.
 - The production exporter's code graphs are not reproducible byte for byte (finding 8):
-  compare the 89 graph SVGs by their labels.
+  compare the 89 (108 in fact, E) graph SVGs by their labels.
 - The citation texts with MathML (finding 6) appear on the site's references and code
   pages as in the handbook.
 - If E changes the sitegen clone, D packs it again and runs `build-test` again (brief,
@@ -3226,3 +3357,826 @@ rewrote Chrome for Testing's Crashpad `settings.dat` (ruled, disclosed); `main.j
 build; the originals at their heads with `status` empty (`--no-optional-locks`). The
 transcripts read for the first agent's commands are the session's own files, read
 only.
+
+### E. The full build check of the site
+
+**First half.** Done 2026-10-19 by E's first agent (Opus; node 23.7, the worktree at
+`1574e62`, the D commit, with a clean status; the sitegen clone from `0ac4fb3`, the
+handbook clone at `d5ccdc5`, the data clone at `60bbc93ae`): the exporter bundle on the
+G12 module and the handbook's test build again, the baseline build on zoodb 0.2.1, the
+production build of the new site, and the comparison of the two. The screenshots, dev
+mode and the rest of section E are the second half's (below). One commit in the sitegen
+clone, with the two trailers; none in the handbook clone or the data clone; nothing
+pushed; no package change and no data change (A's table unchanged). Logs, probes,
+scripts and the comparison's outputs:
+`/private/tmp/claude-501/-Users-philippe-Research-projects-zoodb-zoodb/a1dd88e1-7168-44e0-92fc-0b56c08d4645/scratchpad/step6/E/`
+(below `E/`; `E/cmp/` holds the comparison scripts and `E/cmp/out_main/` their outputs,
+`E/probes/` the probes, `E/logs/` the logs). Every build and probe ran under D's
+sandbox profile `D/nonet.sb` (no outbound connection but to localhost), with `TMPDIR`
+in `E/tmp/`, and every yarn call offline with the Setup's `YARN_GLOBAL_FOLDER`
+(`E/env.sh`, which also sets `YARN_ENABLE_NETWORK=0`, `COREPACK_ENABLE_NETWORK=0`,
+`PUPPETEER_SKIP_DOWNLOAD=1` and `GIT_ALLOW_PROTOCOL=file`). Copies of both built sites
+for the second half and the reviewer: `E/sites/baseline_site/` (the baseline, moved out
+of its scratch checkout) and `E/sites/new_site/` (a copy; the sitegen clone's
+`site/_site/` holds the same build).
+
+**The exporter bundle** (sitegen `5281597`). With the root's `.parcel-cache` removed
+first (C, finding 5), `yarn build` in `jscomponents` on the installed package (its
+`src/` equal to the worktree's, tarball `f1c71b05…`) exited 0 in 9.3 s (Parcel 6.9 s,
+peak resident size 694,697,984 bytes; `E/logs/jsc_build.log`):
+`_headless_exporter_browser_page.5091f61a.js` 892,889 bytes (was 892,825; the engine
+module's G12 lines), its source map 3,963,475 (3,963,037), the page, and
+`zoodb_flm_wasm_bg.0e0d7a8e.wasm` 5,160,404 bytes, byte-identical to the package's
+`src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` (flm-rs `9ccaa871`; the bundle before carried
+the 5,157,363 bytes of `5de1c198`). C's probe (`E/probes/exporter_probe.mjs`, C's
+fixer's copy, `headless: 'shell'`, chrome-headless-shell 134.0.6998.35, the dump of C's
+last build, still in the clone's `site/_site/` then) loaded the bundle and exported the
+kingdom graph `qubits_into_qubits` in 1,922 ms to an SVG of 322,366 bytes with 73
+distinct labels, byte-identical to C's fixer's
+(`C/fix/browser/exporter_qubits_into_qubits.svg`); only the page, the bundle and the
+`.wasm` file were requested, no console message (`E/logs/exporter_probe.txt`). The
+commit replaces the five files of the dist folder; the root `package.json` and
+`yarn.lock` were in their committed form.
+
+**The handbook again.** The four sitegen workspaces packed at `5281597` into
+`scratch/eczoo/pack/` (`yarn pack --out`, D's names; D's tarballs kept in
+`E/pack_before_D/`): `eczoodb.tgz`, `eczcollectbib.tgz` and `_zoodb_citations_cache.tgz`
+byte-identical to D's, `jscomponents.tgz` 5,936,895 bytes (was 5,936,006), its 75 files
+equal to the clone's (`package.json` aside, which `yarn pack` rewrites). The handbook
+reinstalled by `E/reinstall_handbook.sh` (D's script with its inputs copied into `E/`,
+so that nothing is written in `D/`: the overlay of D's `package.json.resolutions` and
+lock, the lock's six file entries, the mirror's and the clone's cached copies of the
+tarballs and the linked packages removed first), offline under the sandbox: 5 packages
+added, 1.7 s, nothing fetched; one `node_modules/@phfaist/zoodb`, 0.3.0, its `src/`
+equal to the worktree's; the installed exporter dist equal to the clone's
+(`E/logs/hb_install_e1.log`). The inspection test build (`E/hb_build_test.sh`: `yarn
+build-test`'s command with the switch on the command line, the overlay in place, the
+root files restored at its end, the cache a copy of
+`_testrepo_zoodb_citations_cache_LOCAL`, TeX Live 2023, Inkscape and ImageMagick through
+wrappers with their `HOME` in `E/inkhome/`): exit 0 in 37.6 s, peak 507,478,016 bytes;
+the 15 Errors under the switch (13 `flm.refs.unresolved`, 2 `flm.refs.duplicate-label`)
+and nothing else; retrievals `113 considered, 0 failed` and `128 considered, 0 failed`;
+24 pages; the LaTeX log has no error, 13 references undefined at 19 places and no
+undefined citation; the `.tex` equal to D's fixer's test build (`D/fix/build_test/`) but
+for its generation time, the two `.bib` files, the `.eczaux`,
+`flmrecomposed.4e697ea8.sty`, `flmlatexdefaults.sty`, the class and
+`EczInitialPages.tex` equal; its 3 code graphs with the labels of D's
+(`E/hb/logs/build_test.log`). The test build has 3 graphs, so the 66 were checked by a
+full generation (`E/hb_build_full.sh`: `yarn build`'s command without the switch and
+with `--skip-compile-latex`, the overlay for the run, a copy of
+`_zoodb_citations_cache_LOCAL`): exit 0 in 166.7 s, peak 2,103,263,232 bytes; 0 FLM
+diagnostics under `'abort'`; retrievals `7341 considered, 0 failed` and `7353
+considered, 0 failed` (local sources only, which the sandbox ensures); the 66 code
+graphs with the same labels as D's final full build in all 66 (11 byte-identical, the
+layouts vary as D's finding 8 says); the `.tex` equal to D's fixer's
+(`D/fix/build_full/`) but for its generation time, the `EcZooHandbookEcZooBibRefs.bib`,
+`.eczaux`, `flmrecomposed.8213d04f.sty`, `flmlatexdefaults.sty`, class and
+`EczInitialPages.tex` equal (`E/hb/logs/build_fullgen.log`). Both builds wrote the
+sitegen's version as `0000-00-00 unknown` (no `git fetch`). The handbook clone's status
+is empty with the root files in their committed form.
+
+**The baseline.** A scratch checkout of the original `eczoo_sitegen` at `a2ad583`,
+`git clone --no-local --branch main` into `E/baseline/eczoo_sitegen/` (40.4 s; push URL
+disabled), beside `E/baseline/eczoo_data/`, a `git clone --no-local` of the data clone
+switched to its `zoodb-flmrs` at `60bbc93ae` (1.0 s), which the site's configuration
+finds as its sibling. The data is the data clone's, not the original's `7ade20a2f`, so
+that both builds read the same data and the same git history (the git last-modified
+dates of the 127 re-indented files are the re-indent's in both): the comparison then
+measures the engine and the port alone. zoodb 0.2.1 reads it as the original data
+(A: `js-yaml` gives the same values for all 1,253 files after the re-indent), so it
+differs from `7ade20a2f` only by the two renamed labels and those dates. The Yarn
+cache: the sitegen clone's copy (1,179 archives) and the six archives B1's install had
+removed from it, copied again from the original's `.yarn/cache`
+(`@phfaist-zoodb-https-f088586fcd-9f542b06ab.zip`, `glob` 11.0.0, `jackspeak` 4.0.2,
+`lru-cache` 11.0.2, `minimatch` 10.0.1, `path-scurry` 2.0.0). `yarn install` (Yarn 3.3.0
+through corepack) offline under the sandbox: exit 0 in 10.8 s, nothing fetched, the
+mirror unchanged (7 files); Yarn removed from the copy's cache the two archives the
+baseline does not use (the zoodb 0.3.0 tarball and `yaml` 2.9.1); one
+`node_modules/@phfaist/zoodb`, 0.2.1 at `bb94f3e`, as the committed lock resolves it
+(`E/logs/baseline_install.log`); the checkout's status stayed empty. The citations
+cache: a copy of the sitegen clone's `_zoodb_citations_cache_LOCAL/` made just before
+the build (a second copy of the same state in `E/cachecopy_start/`), excluded in the
+checkout's `.git/info/exclude`. The build: `E/prod_build.sh`, the same script as the
+new site's, `cd site && yarn build` with
+`ECZOO_CITATIONS_CACHE_DIR=_zoodb_citations_cache_LOCAL` and
+`ECZOO_FLM_CONTINUE_WITH_ERRORS=1` (unknown to the original, so without effect there),
+under `/usr/bin/time -l`. It ran offline, so the brief's fallback (the named
+baseline output) was not needed. To tie it to that output: against the original's
+`site/_site/` of 2026-09-29 (read in place), the fresh baseline differs only where the
+data change reaches (`E/cmp/out_named_vs_fresh/`, `E/cmp/named_vs_fresh_diffq.txt`):
+the visible text and the formulas (labels normalized) of all 1,277 pages are equal; the
+files differ in `c/qubit_subsystem_css.html` and `c/qudit_subsystem_css.html` (the two
+label names in the MathJax source, 3 bytes), `dat/eczoodata.json` (127 codes' git
+dates and modification tokens, 2 descriptions), `dat/searchindex.json` (the same 2
+descriptions) and `sitemap.xml` (218 `<lastmod>` dates); `vv/` is identical file for
+file, the 108 code graphs and every bundle included. So the earlier parts' comparisons
+against the named output hold for this baseline.
+
+**The builds** (`E/logs/baseline_prod.log`, `E/logs/new_prod.log`; the sitegen clone's
+`site/.11ty-parcel-temp/` was absent and both scripts removed the root's
+`.parcel-cache`). Both exit 0 with 1,424 files written. The machine was busier during
+the new build (one-minute load averages of 11.6 at its start and at its end, against
+4.9 to 6.1 before the baseline's and 2.7 after it), so Parcel's times are not
+comparable.
+
+| | baseline (zoodb 0.2.1) | new (0.3.0) |
+|---|---|---|
+| wall / user time | 1,285.3 s / 1,426.6 s | 358.9 s / 594.7 s |
+| peak resident size (`time -l`, the largest process) | 3,896,901,632 bytes | 3,518,578,688 bytes |
+| Eleventy: written in | 1,424 files in 1,283.0 s | 1,424 files in 356.0 s |
+| zoo load (to "Zoo is now loaded!") | 476.8 s: FLM compilation and scan 275.1 s, citations 2.0 s, searchable text about 126 s | 29.0 s: git last-modified 11.9 s, FLM processor 4.2 s (fields 0.99, scan 0.49, index and retrieval 1.58, compilation 0.04, graphics 0.26, snippets 0.83), searchable text 9.4 s |
+| Eleventy render, all | 694.9 s | 225.1 s |
+| code pages (1,155) | 256.1 s | 5.1 s |
+| code lists (87) | 167.5 s | 4.3 s |
+| graph pages: lists 87, kingdoms 18, domains 3 | 187.8, 15.3, 4.9 s | 186.3, 17.2, 4.8 s |
+| references, glossary, BibTeX, home page | 43.8, 7.1, 6.9, 2.5 s | 1.0, 0.08, 5.2, 0.8 s |
+| Parcel | 1,492 bundles in 65.6 s | 1,485 bundles in 91.2 s |
+| retrievals | `Pass 1: 4739 cached, 478 to fetch`, `Pass 2: 2124 cached, 0 to fetch`, `7341 considered, 0 failed` | the same |
+| `_site/` | 1,538 files, 1,277 HTML, 120,037,270 bytes | 1,532 files, 1,276 HTML, 130,913,156 bytes |
+
+Diagnostics of the new build: 43 lines, all `flm.citations.no-entry` Errors of F1's 18
+`manual:{…}` keys, identical (page and place) to C's list (`C/logs/f1_lines_short.txt`
+against `E/logs/new_prod_f1_lines_short.txt`): 23 on 22 code pages, gray's meta
+description, 18 on 7 code lists and `/all`, and 1 in the random code data; no Warning,
+no other diagnostic. No `<flm:` and no `flm:` followed by a digit in any HTML, JSON, CSS
+or XML file (only in the engine's own code in the two `codegraph-*.js` bundles, as C
+found); no `zoodbobjectref` anywhere; every page's head has the MathJax 4 loader and
+nothing of MathJax 3. The 108 graph exports ran through the production exporter
+(`headless: "new"`, Chrome for Testing 134.0.6998.35), which rewrote its Crashpad
+`settings.dat` in `~/Library` in each production run (ruled, disclosed; last at 22:18).
+
+**The default build** (no switch; `E/logs/new_default.log`), run once before the
+production build, so that the clone's `site/_site/` holds the production build:
+Eleventy stopped with "Wrote 0 files in 30.28 seconds" at the `ZooFlmError` of gray's
+meta description (`flm.citations.no-entry`, the key `manual:{F. Gray, “Pulse Code
+Communication”, U.S. Patent 2632058 (1953)}`), F1, peak 1,138,262,016 bytes. The
+process did not exit then: the exporter's browser, launched when the zoo loaded, and
+its 25-minute idle timer kept Node alive; when the timer fired (20:10:51 UTC),
+`page.close()` threw `Protocol error: Connection closed` (an unhandled rejection that
+Eleventy printed), so `browser.close()` was never reached, and Node and Chrome waited
+on. I terminated the browser after 36 min; Node then exited and the script recorded
+exit 1 (2,196 s). The exporter's code (`headlessGraphExporter.js`,
+`site/sitelib/init_headless_graph_exporter.js`, the exporter's part of
+`eleventy.config.js`) is the original's, unchanged by the port, so this predates it
+(finding 2).
+
+**The exporter page's memory** over the 108 exports (C's review's item;
+`E/probes/chrome_rss_sampler.sh` sampled the resident size of every Chrome process of
+the build once a second, `E/probes/chrome_rss_analyze.py` matched the samples to the
+log's graph lines; `E/logs/exporter_memory.txt`). The page's own heap cannot be read
+from outside the production exporter, so its renderer process stands for it.
+
+| | baseline | new |
+|---|---|---|
+| exports (lists, kingdoms, domains) | 108 (87, 18, 3) in 195 s | 108 (87, 18, 3) in 190 s |
+| largest renderer, per-export minima by quarter of the exports | 527, 683, 951, 720 MB | 586, 1,058, 1,126, 1,134 MB |
+| largest renderer, maximum | 2,464 MB (export 95) | 3,157 MB (export 105) |
+| all Chrome processes, maximum | 2,686 MB | 3,508 MB |
+
+The page keeps one zoo and one engine per graph until it collects them (C's review:
+about 18 MB of heap and 4.5 MB of wasm per graph if kept): the renderer settles at
+about 1.1 GB from the second quarter on, 0.2 to 0.4 GB above the baseline's, with
+transient peaks 0.7 GB higher; no growth that would exhaust it, and all 108 exports
+succeeded.
+
+**The comparison** (the fresh baseline `E/sites/baseline_site/` against
+`E/sites/new_site/`; scripts in `E/cmp/`). *Pages and files*: 1,277 HTML pages against
+1,276, path for path but for `gitpreview.html` (G5, C's `4f73710`); outside `vv/` no
+other file differs in name; `sitemap.xml` (1,274 locations), `schemas/` and `icons/`
+byte-identical. *Visible text* (`cmp_html.py`: scripts and styles left out, tags
+stripped with a space at block boundaries, entities decoded, every kind of white space
+collapsed, formulas taken out and compared apart; `classify_runs.py`): equal on 319
+pages; on the other 957 it differs by 2,861 runs of words, every one classified, none
+unexplained. *Per page* the counts of links, images (136), figures (36), citation marks
+(21,480), citation anchors (18,809) and display formulas (513) are equal on every page
+but six: 7 links fewer on 5 pages and 3 inline formulas more on the glossary (below).
+*Formulas* (`cmp_formulas.py`): 42,233 against 42,236; 473 formulas on 192 pages differ
+in their markup only: the engine writes the content of the text commands in them as HTML
+(`<tex-html>`), and once these commands of the sources (494 `\text`, 46 `\textnormal`,
+21 `\textit`, 6 `\textrm`, 1 `\textup`) are unwrapped, all formulas are equal on 1,274
+pages, the 2 others being the glossary's 3 new formulas and chebyshev's `\text{~even}`,
+whose `~` is now the no-break space it stands for. The classes, with the known ones of
+the earlier parts:
+
+| class | count | where | cause |
+|---|---|---|---|
+| a no-break space before an attached citation mark where the source has none (`Steane code[1,2]` → `Steane code [1,2]`, `Ref.[1]` → `Ref. [1]`) | 2,802 runs on 938 pages | 932 in the codes' name headings (the `introduced` citation), 5 elsewhere in code pages, 933 in 4 code lists' rows, 932 in `/all` | engine (flm-rs's citations feature writes `flm-citations-space` before an attached mark; B1) |
+| the same after an opening parenthesis (`([9], Exer. 5.1.11)` → `( [9], Exer. 5.1.11)`) | 4 runs on 4 pages | `evaluation`, `griesmer`, `klein_quartic`, `q-ary_simplex` | engine; flm-rs finding candidate (finding 3) |
+| the two no-break spaces of `~\cite` | 16 places on 9 pages (the baseline: one space each) | code pages and lists | flm-rs finding (05, step 4) |
+| F1: an entry of the list of references dropped under the switch (`<span class="flm-pres-dropped" data-flm-condition="flm.citations.no-entry">dropped: bibliography entry</span>`) | 41 entries on 30 pages; 7 links fewer on 5 pages (the dropped entries' URLs) | 22 code pages, 7 lists, `/all` | flm-rs finding F1 |
+| adjacent citations with the same note merged into one mark (`[1; Table I][2; Table I]` → `[1,2; Table I]`, `[4; Prop. 1.1.4][2; Prop. 1.1.4]` → `[2,4; Prop. 1.1.4]`) | 3 runs on 3 pages; the plain-text "Table I" of the code pages 39 → 38 (B1 counted 37 and 36 otherwise) | `fermions_into_qubits`, `evaluation_varieties`, `q-ary_linear` | engine (flm-rs's citations; finding 4) |
+| melas: the closing quotation mark corrected (`‘\star‘` → `‘\star’`) | 6 runs on 6 pages and 1 meta description | `melas`, 4 lists, `/all` | engine (a correction, B1) |
+| the glossary's terms with a formula typeset (`Construction \(A_4\)` shown raw before) | 3 terms, 3 formulas more | `concepts.html` | port choice (B1) |
+| a list value holding display math is a paragraph (a block boundary in the text, both shown as blocks by `.paragraph-in-list`) | 2 runs on 2 pages | `qudit_4_1_2`, `quantum_transversal` | engine (markup only) |
+| text inside formulas written as HTML content for MathJax's `texhtml` (same formulas once unwrapped) | 473 formulas on 192 pages | code pages, lists | engine |
+| the citation marks' markup (`citation-marks` → `flm-citations-mark` with its space) | 21,480 marks on 1,222 pages | everywhere | engine |
+| `target="_blank"` on the links of FLM content (`href-href`) | 42,445 → 9,708 (32,737 fewer; the site's own links keep it) | 1,274 pages | engine (no link-target option; B1's open question) |
+| equation anchors (`equation-N` → `eq--<hash>`, `eq-<label>` for a labeled one) | 513 → 547 ids (527 and 20) on the same 311 pages; the 14 `\eqref` links follow | code pages | engine |
+| other anchors: `defterm-` (63 of 66 renamed, `Finite_20Xfields` → `Finite_fields`), `sec--` (39 of 39), the `endnotes` id gone (1,222 pages), `item--` ids new (74) | as counted | code pages, lists | engine (B1); every local link resolves on both sites, but for the 1,263 client-side `/code_graph#…` fragments of both |
+| image sizes: inline `width:…pt;height:…pt` → the engine's custom properties, which its stylesheet resolves | 27 images on 27 pages | code pages | engine (B2); the look is the screenshots' |
+| MathML in cited works' texts (`mml:math` as text) | 138 on 41 pages in both | code pages, lists | data of the citation sources, unchanged (question 27) |
+| meta descriptions | 1,276 compared: 454 differ as written; once white space is normalized (U+00A0 as a space) 1 differs (`melas`); the 453 others by a no-break space before a citation mark only, in place of the source's space (683 places) or as `~\cite`'s second (`w_state`, 1 place) (`E/fix/out/meta.txt`) | code pages | engine (above: `melas`; the citations feature's space; `~\cite`'s two spaces) |
+| `[figure]` placeholders for floats of other pages | 0 in both | | none in the data (B1) |
+| the HTML's size | 51,317,482 → 61,154,717 bytes (+19 %) over the 1,276 common pages (51,323,031 with `gitpreview.html`) | | engine (the markup's classes and attributes) |
+
+*The `dat/` files* (`cmp_dat.py`, `out_main/dat.txt`): each of the new build's five
+files is byte-identical to B2's fresh full build (`B2/fix2/site_fresh/dat/`), and the
+fresh baseline's are the named output's but for the data change above, so B2's
+classifications hold as they are; rechecked here:
+
+| file | baseline | new | what differs |
+|---|---|---|---|
+| `bibreferences.bib` | 2,034,858 bytes, 5,217 entries | 2,035,302 bytes, 5,217 | the same keys in the same order, 5,213 identical, 4 by a character's spelling (the speller's table against pylatexenc's: 15 Cyrillic letters with `\fontencoding{T2A}\selectfont`, `⟨⟩` as `\ensuremath{\langle}`, `₁`, a combining diaeresis): engine (G4, B2) |
+| `bibreferences_csl.json` | 5,569,667 bytes | the same | byte-identical |
+| `randomcodedata.json` | 516,525 bytes | 812,339 bytes | 1,155 codes, same ids in the same order; 443 previews carry 652 citation marks linking to `#citation-N`, which the home page does not have, no footnote mark, no figure (G3's residual: flm-rs has no option to leave the marks out, question 16); B2's text classification (1,085 equal, 66 equal up to the cut, 4 others: `melas` and text inside formulas) |
+| `searchindex.json` | 4,443,324 bytes | 4,605,733 bytes | the same `info`, 28 store fields, 1,155 ids in the same order; `introduced` 235,118 → 273,062 characters, `description` 1,165,932 → 1,141,693 (G9: each field's text, then its footnotes and cited works); B2's five queries give the baseline's numbers of results, the codes at the baseline's rank or one place off, and `references` 54 → 1,115 results (question 13; `out_main/search_queries.txt`) |
+| `eczoodata.json` | 5,633,323 bytes (`db` 3,950,797, `refs_data` 1,682,506) | 7,652,206 bytes (`db` 5,605,178, `zooflm` 2,047,011) | `zooflm` 26.8 % (citations 18.3 %, snippets 6.3 %, index 2.1 %, graphics 0.1 %); `_zoodb.flm_field_positions` 1,595,724 bytes, 20.9 % (11 Deferred (b), question 8) |
+
+*Bundles* (C's `bundles_cmp.py`, `out_main/bundles.txt`): 37 files and 11,044,934 bytes
+against 34 and 9,806,385; as in C's table but for the G12 module: `codegraph` 587,725
+and 588,226 → 875,910 and 878,108 bytes (C's fixer: 875,846 and 878,044), the
+`gitpreview` bundles and the two shared chunks of the transpiled FLM layer gone,
+`flm-*.css` 14,104 and `zoodbflmwasm-*.wasm` 5,160,404 new, `main.css` 40,050 → 40,773.
+*The code graphs* (`cmp_graphs.py`, `out_main/graphs.txt`, both as the review fixes left
+them; the first version, `cmp_graphs_v1.py` with `graphs_v1.txt`, missed `all.html`'s
+graph): 108 graph SVGs in each `vv/` (21 kingdom and domain graphs, 87 list graphs; the
+survey's and section E's 89 is a miscount), shown by the same 108 pages; 98
+byte-identical to the baseline's (the same hashed names), and the 10 others differ by
+their labels' corrections only, C's (`B\&C` → `B&C` in 24 labels, `Gauss' law code` →
+`Gauss’ law code` in 8), which change the layout around them; on every page the same
+labels otherwise. *The references page* (`cmp_refs.py`): 5,217 entries, the same sort
+keys in the same order, the same 11,432 "Appears in" links to the same targets; the
+visible text equal (above). *The glossary*: the same 1,327 links in its main part and
+the same text but for the 3 typeset terms. *The browser apps on the production build*
+(C's `browser_check.mjs`, chrome-headless-shell, MathJax 4.1.3 answered from the
+read-only local copy in flm-rs's `target/mathjax-probe/`, everything else aborted, the
+web fonts among it; `E/logs/browser_prod_shell.json`): the home page's random code
+typeset over four refreshes; `/c/steane` 84 of 84 formulas typeset, 79 citation marks,
+the engine's stylesheet one layer rule; the code graph 1,176 nodes, the pane of `steane`
+21 of 21 formulas, 28 captured links, its "References" heading at 13.6 px, after a click
+the pane of the code clicked; the kingdom, domain and empty panes and their clicks;
+search `Golay` 34 results with 175 formulas typeset; no page error; the console errors
+the aborted Google Fonts stylesheet and, on the code graph page, the 404 of
+`/fig/fig-triangular_color.tpmk.svg` (C's finding 3, the 15 pane images, question 17;
+the dump is byte-identical to C's, so its count of 15 holds). The pane headings (F3) and
+these images are runtime classes: they do not show in the static comparison.
+
+**Deviations.**
+
+1. The default build ran before the production build, not after: its script removes
+   `site/_site/` and writes nothing, so in this order the clone keeps the production
+   build. It did not exit by itself (finding 2); I terminated its browser after 36 min,
+   and the exit code 1 was recorded then.
+2. The 66 code graphs of the handbook were checked by a full generation without LaTeX,
+   besides D's test build, which has 3 graphs.
+3. D's scripts were copied into `E/` with `E/`'s paths (`reinstall_handbook.sh`, the
+   test mode of `run_builds.sh`, the Inkscape and ImageMagick wrappers, their `HOME`
+   in `E/inkhome/`), so that nothing was written in `D/`. Yarn's mirror in
+   `B1close/yarn-global/` is the Setup's: the reinstall removed its copies of the five
+   tarballs (`-10.zip`) as the Setup's procedure says, and Yarn added them again.
+4. The exporter page's memory was measured from outside (the resident size of Chrome's
+   processes), since the production exporter runs as is; there is no JS heap figure.
+5. Not asked for in this half: C's browser check on the production build (above), and
+   the tie of the fresh baseline to the named output.
+6. Outside the worktree and the scratchpad: Chrome for Testing's Crashpad
+   `settings.dat` rewritten by the production exporter (the handbook's full generation,
+   both production builds and the default build; ruled, disclosed); `main.js`'s
+   `yarn info` rewrote the handbook clone's ignored `.yarn/install-state.gz`, as in
+   every build. Nothing new under `~/.yarn`, `~/.cache`, `~/.npm` or `/tmp` from this
+   part (`find -newer E/START_MARKER`: in `/tmp` only other programs' sockets and
+   folders, `cc-socks`, `zeb_def_ipc_11465`, a Logitech agent's socket).
+
+**Findings.**
+
+1. The site's code graphs are reproducible byte for byte: all 108 SVG files of the
+   fresh baseline equal those of the original's build a month older, and 98 of the new
+   build's equal the baseline's, the 10 others differing only around the corrected
+   labels. D's finding 8 (54 of the handbook's 66 graphs differ between two
+   generations) is therefore not the exporter's general behavior; why the handbook's
+   layouts vary was not investigated (the handbook's own options or graph sizes are the
+   suspects).
+2. A production build that fails does not exit (pre-existing, the sitegen's): the
+   exporter's browser and its 25-minute idle timer keep the process alive after
+   Eleventy's error, and when the timer fires `page.close()` throws `Protocol error:
+   Connection closed`, so the browser stays and so does the process (36 min here,
+   until terminated). With F1 open, any default build in production mode hangs this
+   way; the data repository's CI builds would wait for their job's timeout instead of
+   failing (question 30).
+3. A no-break space between an opening parenthesis and an attached citation mark,
+   `( [9], Exer. 5.1.11)`, where the baseline wrote `([9], Exer. 5.1.11)` (4 places):
+   flm-rs's citations feature writes its space before every attached mark, whatever
+   precedes it. A candidate for 05's table (the main session's edit; question 29).
+4. Adjacent citations with the same note are merged into one mark in the HTML
+   (`[1,2; Table I]`, 3 places), where the baseline kept one mark per command; the
+   recomposed LaTeX keeps them as written (D's finding 7), so the site and the handbook
+   now differ in this, in opposite directions from before.
+5. The new build is 3.6 times faster (358.9 s against 1,285.3 s; the code pages 5.1 s
+   against 256.1 s, the zoo's load 29.0 s against 476.8 s) with a peak resident size
+   0.38 GB lower, on a busier machine; the graph exports take the same time (190 s and
+   195 s), and the exporter's renderer peaks 0.7 GB higher (above).
+6. The production build exports 108 graphs, not the brief's 89.
+
+**Checks** (logs in `E/logs/`, `E/hb/logs/`, outputs in `E/cmp/out_main/`).
+
+| check | result |
+|---|---|
+| exporter bundle | `yarn build` in `jscomponents` exit 0 in 9.3 s (Parcel 6.9 s), peak 694,697,984 bytes; `.wasm` 5,160,404 bytes, equal to the package's; bundle 892,889 bytes; the probe in chrome-headless-shell: `qubits_into_qubits` in 1,922 ms, 322,366 bytes, 73 labels, byte-identical to C's fixer's SVG, 3 local requests, no console message; committed `5281597` with both trailers, root files in their committed form |
+| handbook packs and install | `eczoodb.tgz`, `eczcollectbib.tgz`, `_zoodb_citations_cache.tgz` byte-identical to D's; `jscomponents.tgz` 5,936,895 bytes, 75 files equal to the clone's; install offline 1.7 s, 5 packages added; one `@phfaist/zoodb` 0.3.0, `src/` equal to the worktree's |
+| handbook test build (switch on the command line, sandbox, `GIT_ALLOW_PROTOCOL=file`) | exit 0 in 37.6 s, peak 507,478,016 bytes; 15 Errors (13 `flm.refs.unresolved`, 2 `flm.refs.duplicate-label`); 113 and 128 considered, 0 failed; 24 pages; LaTeX: no error, 13 references undefined at 19 places, no undefined citation; outputs equal to D's fixer's but for the generation time; 3 graphs with D's labels |
+| handbook full generation (no switch, no LaTeX) | exit 0 in 166.7 s, peak 2,103,263,232 bytes; 0 diagnostics; 7341 and 7353 considered, 0 failed; 66 graphs with the labels of D's final full build (11 byte-identical); `.tex` equal but for its time, the other outputs equal |
+| baseline install | offline, exit 0 in 10.8 s, peak 728,547,328 bytes; nothing fetched; zoodb 0.2.1 at `bb94f3e`; status empty |
+| baseline production build | exit 0, 1,285.3 s, peak 3,896,901,632 bytes; 1,424 files written, 1,538 in `_site/`, 1,277 HTML; Parcel 1,492 bundles in 65.6 s; 108 graph exports; retrievals as above, no network |
+| fresh baseline against the named output | visible text and formulas equal on all 1,277 pages; `vv/` identical; files differing only by the data change (2 code pages, dump, search index, sitemap) |
+| new production build (switch, LOCAL cache) | exit 0, 358.9 s, peak 3,518,578,688 bytes; 1,424 files written, 1,532 in `_site/`, 1,276 HTML; Parcel 1,485 bundles in 91.2 s; 108 graph exports; 43 `flm.citations.no-entry` lines, identical to C's, nothing else; no marker; no `zoodbobjectref`; retrievals `4739 cached, 478 to fetch`, `2124 cached, 0 to fetch`, `7341 considered, 0 failed` |
+| default build (no switch) | Eleventy "Wrote 0 files in 30.28 seconds", the `ZooFlmError` of gray's meta description (F1); peak 1,138,262,016 bytes; exit 1 after 2,196 s, once its browser was terminated (finding 2) |
+| exporter page memory | above: 108 exports; renderer minima 586 to 1,134 MB, maximum 3,157 MB (baseline 527 to 951 and 2,464) |
+| comparison | 2,861 text runs on 957 pages, all classified, none unexplained; formulas equal once unwrapped but the glossary's 3 and chebyshev's `~`; counts per page equal but on 6 pages (F1's links, the glossary's formulas); `dat/` as in the table; 108 graphs, 98 byte-identical, 10 by the label corrections; `references.html` 11,432 links |
+| browser apps (production build, chrome-headless-shell) | no page error; formulas typeset on every page checked; the console errors the aborted fonts and the pane image's 404 |
+| git and home state | worktree at `1574e62`, only this brief modified; sitegen clone `5281597` on `0ac4fb3` (28 commits over `a2ad583`), status empty, root files in their committed form, push URL the disabled one, `site/_site/` the production build; handbook clone `d5ccdc5` and data clone `60bbc93ae`, both clean, push URLs disabled; the originals at `a2ad583`, `7ade20a2f`, `c73b681`, `status` empty, no file newer than this part's start (`--no-optional-locks`); the baseline checkout and its data clone clean; nothing new under `~/.yarn`, `~/.cache`, `~/.npm` or `/tmp` from this part; Crashpad's `settings.dat` rewritten (deviation 6) |
+
+**Open questions** (numbered after D's).
+
+29. The no-break space between an opening parenthesis and an attached citation mark
+    (finding 3, 4 places): a finding for 05's table, or accepted as it is?
+30. A failing production build hangs until terminated (finding 2, predating the port):
+    should the site close the exporter when Eleventy fails (a sitegen fix, flagged here
+    as the sitegen's instructions ask), or is it left? While F1 is open, every default
+    production build meets it.
+31. `target="_blank"` (B1's open question) now has its count: 32,737 links of FLM
+    content open in the same tab where they opened a new one.
+
+**For the second half.**
+
+- The screenshots (five pages, old and new) can use the two copies in `E/sites/`. The
+  baseline's pages load MathJax 3.2.0 from cdnjs, of which no local copy exists (the
+  flm-rs copy is MathJax 4.1.3; the original's and the baseline's `node_modules` have
+  none), so the baseline's formulas stay untypeset offline unless the main session
+  decides otherwise; the web fonts are aborted on both sides. Worth a look in the
+  screenshots: the space before the name's citation mark (2,802 places), the images
+  sized by the engine's stylesheet, the text inside formulas (`approximate_qecc`'s
+  `\textup{\(\alpha\)-dits}`), the pane's heading and the broken pane image.
+- Dev mode on the full data with the heap option (C's item, question 21) and its peak
+  against the baseline's (a dev run of `E/baseline/eczoo_sitegen/` would give it; its
+  `node_modules` are installed); B2 asked to watch the JS heap across rebuilds.
+- After any run of the default build, its browser must be stopped by hand (finding 2).
+- The baseline checkout `E/baseline/` (1.3 GB with its `node_modules`) can be removed
+  once the second half is done.
+
+**For the main session.** Commit this brief; the sitegen clone stands at `5281597`;
+add finding 3 to 05's table if Philippe agrees (question 29); correct the brief's
+"89 graph SVGs" (survey and section E) to 108; D's finding 8 now has the site's
+counterpart (finding 1).
+
+**Second half.** Done 2026-10-19 and 2026-10-20 by E's second agent (Opus; node 23.7,
+the worktree at `1574e62` with the first half's Results uncommitted; the sitegen clone
+at `5281597`, the handbook clone at `d5ccdc5`, the data clone at `60bbc93ae`): the
+screenshots, dev mode, the checks before handing back, and the step's wrap-up (the
+questions for Philippe consolidated above, the step-6 entry of `README.md`'s status log,
+`HANDOVER.md` at the end of step 6). No commit in any clone, no package change, no data
+change (A's table unchanged), nothing pushed. Scripts, logs and outputs: `E/half2/`
+(`probes/`, `logs/`), `E/devmode/` (a folder per dev-mode run) and `E/screenshots/`.
+Every run was offline under `D/nonet.sb`, with `TMPDIR` in `E/tmp/`. The machine was
+short of memory throughout: other programs held 13 to 17 GB of swap (it has 16 GB of
+memory) and its disk had 17 to 18 GB free, so resident sizes are low and timings long
+wherever a process's pages went to swap; the JS heap figures (`process.memoryUsage()`)
+do not depend on it.
+
+**The screenshots** (`E/screenshots/index.html`: the pairs side by side, each with its
+page's console errors; `E/half2/probes/shots.mjs`, `make_index.py`; per site
+`E/screenshots/<new|baseline>/_log.json`, `E/half2/logs/shots_*.log`).
+chrome-headless-shell 134.0.6998.35 (Puppeteer's `headless: 'shell'`, which leaves
+Crashpad alone), a window 1280 px wide (900 px high), full pages cut at 16,000 px
+(`qubit_stabilizer` is 27,586 px high, `concepts` 35,905, `references` 418,981; the
+baseline's alike), each copy in `E/sites/` served by `sirv` on 127.0.0.1, every external
+request aborted but MathJax. The new site's MathJax 4 came from the read-only local copy
+of MathJax 4.1.3, as in C. The baseline loads MathJax 3.2.0 from cdnjs, of which no copy
+exists on the paths the rules open (a MathJax 3 elsewhere on the machine was not used),
+and its home page widget, code graph and search wait for MathJax before they start: so
+the same MathJax 4.1.3 answered the baseline's MathJax 3 address as a stand-in (MathJax
+4 reads the baseline's version 3 configuration), and a third set,
+`E/screenshots/baseline_nomathjax/`, shows the ten static pages as the baseline loads
+offline, formulas as source. Taken on both sites (27 pairs, 3 minutes per site): the
+home page, with `golay` put into the random code widget through the widget's own
+`_show_code()`; the widget alone for `golay` and `steane`; three code pages, `steane` (a
+figure, two display formulas, 79 citation marks), `qubit_stabilizer` (a table float,
+cells, six term definitions, 249 marks) and `approximate_qecc` (text inside formulas);
+the code list `quantum_cyclic`; the kingdom `qubits_into_qubits`; the code graph with
+`steane`'s pane; `references`; `concepts`; the search page with `Golay` typed and RETURN
+pressed (34 results on both); and the panes of C's 15 codes (question 17).
+
+Console errors: on the new site, on every page the aborted Google Fonts stylesheet
+(`net::ERR_FAILED`) and nothing else, but on each of the 15 panes its image's 404
+(`/fig/fig-….svg`); no page error; every formula typeset (84 of 84 on `steane`, 265 of
+265 on `qubit_stabilizer`, 107 of 107 on `approximate_qecc`, 630 of 630 on `concepts`,
+1,956 of 1,956 on `references`, 21 of 21 in `steane`'s pane, 1 to 17 in the 15 panes).
+On the baseline: the same fonts error; on the code graph page, for `steane`'s pane and
+for each of the 15, the former renderer's
+`🚨🚨🚨 FLM RENDERING ERROR 🚨🚨🚨 Error: No such graphics ‘…’` (finding 7); no page error;
+every formula typeset by the stand-in (627 on `concepts`: the 3 terms with a formula are
+source there).
+
+What the screenshots cannot show: the web fonts (Google Fonts' stylesheet for Source
+Sans 3 was aborted; the text is in Source Sans 3 all the same because the font is
+installed on this machine in `~/Library/Fonts`, as a variable font, so its weights may
+differ a little from the web font's, and a machine without it shows a fallback); the
+baseline's own formulas (MathJax 4 with its New Computer Modern font stands in for
+MathJax 3 and its TeX fonts, so formulas look alike on both sides); footnotes (the EC
+zoo data has none: no `\footnote` in any data file); the dark theme; anything below
+16,000 px; the code graph beyond one pane.
+
+What they show (question 9): the header, navigation, tiles, colors, the references page,
+the home page and the kingdom page look the same on both sites. The differences:
+
+- The lists of references of the code pages, code lists and glossary, and the content's
+  numbered lists, set each label on a line of its own above its entry, where the
+  baseline hangs it at the left (finding 8). This alone makes the new pages taller:
+  `steane` 10,297 px against 9,114 (1,137 px of the 1,183 from its 79 entries),
+  `qubit_stabilizer` 27,586 against 24,071 (3,411 of 3,515), `approximate_qecc` 10,178
+  against 8,769 (1,038 of 1,409), `concepts` 35,905 against 32,426 (2,288 of 3,479),
+  `quantum_cyclic` 4,444 against 4,176 (259 of 268)
+  (`E/half2/logs/label_offset_new.json`). Fixed since (finding 8, sitegen `793f2bf`): in
+  the retaken screenshots the labels sit beside their entries, and these pages are
+  9,161, 24,176, 9,141, 33,617 and 4,185 px high.
+- The display formulas stand further from the text (most of the glossary's remaining
+  1,190 px; not measured formula by formula).
+- The images have the baseline's sizes on 26 of the 27 code pages that show one (equal
+  widths and heights in CSS pixels, `E/half2/logs/img_sizes_*.json`); `quantum_tanner`'s
+  image, 1,218 px wide in its file, is held to the column (625 px wide) where the
+  baseline drew it 974 px wide, past the column's edge.
+- The random code widget shows the preview's citation marks (`golay`: `[1]`, `[2]`,
+  `[3]`, `[4,5]`; G3's residual, question 16), which link to notes the home page does
+  not have; the baseline's preview has no marks, but a space before the punctuation
+  where each mark was (`simple groups .`).
+- The search results' snippets show the citation marks (`[1]`, `[4,5]`) and, after each
+  item of a field, the list of its cited works as the text output lays it out, run
+  together into the snippet's text: a `References` heading underlined with dashes, then
+  the entries (`introduced`:
+  `[1] References ---------- [1] M. J. E. Golay, “Notes on digital coding”, …`; a field
+  with several items, such as the decoders or a relation's details, one list per item).
+  The baseline wrote each citation's text in brackets in place of its mark
+  (`[M. J. E. Golay, “Notes on digital coding”, …]`) and had no such list. The search
+  index holds 6,985 of these lists in 4,669 field values of 1,115 codes
+  (`E/fix/out/search_refs.txt`); G9 (`flm_pieces: true`), question 13.
+- The code graph pane renders every code with a float, the 15 of question 17 with a
+  broken image, where the baseline shows the former renderer's error box instead of the
+  pane for 20 of them (finding 7); the pane's lists carry their small "References"
+  heading (F3, question 18).
+- The glossary types the 3 terms with a formula (`Construction \(A_4\)` was source), and
+  the citation marks have the space before them that the first half counted (2,802
+  places).
+
+**Dev mode** (`E/devmode/`; the harness `devmem.config.js`, a copy of B2's final one
+made for `eleventy --serve` and for either checkout, and `run.sh`, which runs the
+command of the site's `dev` script: `_site/` and the root's `.parcel-cache` removed,
+`ECZOO_DEVELOPMENT_MODE=1`, its `DEBUG`, `NODE_OPTIONS=--max-old-space-size=8192` of
+`0ac4fb3` plus `--expose-gc`, the LOCAL cache and the switch, under `/usr/bin/time -l`
+and the sandbox). The harness wraps the site's own configuration: after the zoo's load
+and after each build it logs the memory after two `gc()` calls (resident size, JS heap,
+the module's linear memory, the live fragments), every 5 s it logs the memory without a
+collection, after each build it asks the dev server for `/`, `/c/qubit_css`,
+`/references` and `/concepts` (so that Parcel builds, as a browser would make it) and
+logs the memory again, it copies `_site/` (Eleventy's output) after the builds listed,
+and then it changes the data: a touch of `codes/quantum/qubits/stabilizer/qubit_css.yml`
+in the data clone, then five edits (two in the lazy run; a YAML comment line appended),
+the file written back at the end (or on a signal). Five runs:
+
+| run | what | result |
+|---|---|---|
+| `serve1` | `yarn dev`'s form with Parcel, the requests waited for (40 min each) | zoo load 33.2 s, first build 57.5 s (1,424 files); Parcel's first build answered the first request after 70.1 s, the others in 17 to 29 ms; the JS heap peaked at 1,671 MB during it (5-s samples) and was 749 MB after it; the touch: reload 16.2 s, rebuild 41.3 s; then Parcel's rebuild: the heap 1,585 MB 14 s after the build, 4,064 MB after 74 s, 6,234 MB after 145 s, 6,550 MB at the last sample (177 s), the event loop blocked up to 29 s at a time, the resident size 0.33 to 2.35 GB (the rest in swap); no answer after 150 s; stopped then (SIGTERM, exit 1 after 359 s), with the machine's swap at 17.0 GB and 17 GB free on the disk; `time -l`: 3,454,435,328 bytes resident at most, 8,386,067,576 bytes of peak memory footprint |
+| `new1` | the same with the first harness (requests abandoned after 600 s) | the same first build (answered after about 66 s; heap 750 MB after it); after the touch, Parcel's rebuild did not answer within 600 s, and the live heap after two `gc()` calls was then 5,767 MB (resident 2,067 MB); stopped after the first edit; 3.53 GB resident at most (sampled) |
+| `watch1` | B2's form: `eleventy --watch`, `ECZOO_RUN_11TY_PARCEL=0`, the heap option, a touch and five edits | below; exit 0 after 312 s, 1,426,243,584 bytes resident at most; the data clone's status empty after |
+| `base_serve1` | the baseline checkout (zoodb 0.2.1) in `yarn dev`'s form with the same options and harness, under a guard (`guard.sh`) that stops it past a 6,500 MB heap, 19 GB of swap or less than 10 GB free on the disk | zoo load 670.5 s (heap 576 MB after it), first build 1,129.1 s; Parcel's first build answered after 71.3 s, the heap peaking at 2,072 MB during it and at 1,056 MB after it; the touch: reload 17.5 s, rebuild 464.8 s (heap 1,221 MB after it); then Parcel's rebuild did as on the new site: the heap 2,233 MB 27 s after the build, 4,471 MB after 120 s, 6,570 MB after 207 s, no answer; the guard stopped it there (exit 1 after 1,888 s); `time -l`: 2,799,779,840 bytes resident at most, 9,119,340,032 bytes of peak memory footprint; the scratch data clone's status empty after (the heap samples are sparse there: the former FLM layer's work blocks the event loop) |
+| `serve_lazy` | `yarn dev`'s form with `ECZOO_RUN_11TY_PARCEL_LAZY=1` (an option of the site's configuration: Parcel builds only what is requested, with source maps), a touch and two edits, under the guard | exit 0 after 408.5 s, every request answered: the first build's four pages in 15.6, 2.7, 50.8 and 1.0 s (`/references` the longest), and after the touch and each edit the first request in 61.0, 30.4 and 20.8 s, the others in 8 to 26 ms; the JS heap at most 2,672 MB (while Parcel built `/references`), at most 1,777 MB after the touch, 665 to 677 MB after two `gc()` calls after each round of requests; 3,335,356,416 bytes resident at most; Eleventy's output and the four served pages after the second edit equal the first build's (the dump aside, as below); the data clone's status empty after |
+
+The zoo across five rebuilds (`watch1`, B2's form; measured after two `gc()` calls):
+
+| after | JS heap MB | wasm MB | live fragments | resident MB |
+|---|---|---|---|---|
+| first load (34.1 s) | 216.8 | 117.9 | 11,924 | 705.2 |
+| first build | 512.9 | 158.7 | 11,924 | 933.1 |
+| touch: reload (16.1 s), build | 503.6; 516.2 | 158.7 | 11,924 | 823.4; 989.8 |
+| edit 1: reload (16.4 s), build | 504.9; 517.1 | 158.7 | 11,924 | 814.8; 903.4 |
+| edit 2, build | 518.3 | 158.7 | 11,924 | 1,060.8 |
+| edit 3, build | 519.5 | 158.7 | 11,924 | 1,136.3 |
+| edit 4, build | 520.5 | 158.7 | 11,924 | 1,310.2 |
+| edit 5: reload (15.8 s), build | 509.4; 521.2 | 158.7 | 11,924 | 822.4; 1,356.8 |
+
+So the zoo, the engine and the module stay one across rebuilds, as in B2's final run:
+the fragments and labels (11,884) constant, the module's memory grown once in the first
+build, the heap after a build up by 3.3 MB at the first rebuild and by 0.7 to 1.2 MB at
+each one after (Eleventy's template modules, B2). The retention B2 left open, about 169
+MB per build in one of its four runs, did not show in this run, the fifth (nor in the
+Parcel runs: `serve1` 749.4 MB after the first round of requests and 753.6 MB after the
+rebuild, `serve_lazy` 664.8, 672.9, 676.6 and 675.8 MB after each of its four rounds).
+The pages after a reload equal a fresh build's: in `watch1` every file of `_site/` after
+the touch (build 2) and after the fifth edit (build 7) equals the first build's, but
+`dat/eczoodata.json`, whose snippet cache holds 2,800 and 2,799 entries instead of 2,008
+(B2: the previous build's computed short names) and, after the edits, the edited file's
+`source_file_modification_token`; `references.html` (5,217 entries, 11,432 "Appears in"
+links) and `concepts.html` are byte-identical; likewise in `new1` after the touch
+(`E/half2/probes/dump_diff.py`, `E/cmp/cmp_refs.py`). In the Parcel runs Eleventy's part
+took the same times as in `watch1` (first build 55.7 and 57.5 s, rebuild 41.3 and 43.7
+s, the zoo's reload 16.2 to 17.7 s), and Eleventy's output after the touch equals the
+first build's in the same way.
+
+So `yarn dev` with Parcel, as the site's `dev` script runs it, did not serve the first
+change on the full data within these runs, on this machine as it was today, on the new
+site as on the baseline: Eleventy rewrites all 1,424 files at each rebuild, Parcel's dev
+server (in the same process) builds every page again, and that rebuild grew to 6.5 GB of
+JS heap (`serve1` 6,550 MB, `base_serve1` 6,570 MB; `new1` 5,767 MB after 600 s) without
+answering a request within 150 to 600 s, against 1.7 GB (new) and 2.1 GB (baseline) for
+Parcel's first build. Each run was stopped there, by hand (`serve1`, `new1`) or by the
+guard (`base_serve1`), with 13 to 17 GB of the machine's swap in use and below the 8 GB
+heap limit that the `dev` script sets, so whether the rebuild would have finished is not
+known (C's review saw it answer, below). The baseline does the same, so this predates
+the port. The port lowers what comes before it: the first build 57.5 s against 1,129.1
+s, a rebuild 41.3 s against 464.8 s, the heap after the first build and Parcel's 749 MB
+against 1,056 MB. C's review ran the same steps with the same option and had both
+rebuilds answered (C's `dev3`: 3.88 GB resident at most; its heap was not sampled), and
+with the default heap three of four runs crashed at about 4,080 MB of heap in that
+rebuild (C, finding 8). With the site's lazy option Parcel builds only what is asked
+for, and dev mode with Parcel ran through a touch and two edits in at most 2.7 GB of
+heap (finding 9, question 34).
+
+**The checks before handing back** (the brief's section, for the whole of step 6 at its
+end; logs in `E/half2/logs/`). The items of section E that the first half covered (the
+production build and its diagnostics, the comparison, the search index, the dump, the
+BibTeX and CSL exports, the random code data, the 108 graph SVGs, the apps loading the
+dump) are in its Checks table above.
+
+| check | result |
+|---|---|
+| worktree lint (`yarn lint`) | exit 0, no error (the eslintrc deprecation notice only), 1.2 s |
+| worktree tests (`yarn test`, offline under the sandbox) | 487 passing in 8 s, peak 347,799,552 bytes; `git status --short --ignored` the same before and after |
+| Rust, per crate (`cargo clippy -p … --all-targets -- -D warnings`, `cargo test -p …`, with `--offline`, under the sandbox) | `zoodb-flm-wasm`: clippy clean, 21 tests passed; `zoodb-autocitefetch-wasm`: clippy clean, 40 tests passed; both from the existing build (3.3 s and 0.9 s); no module built; the worktree's status unchanged; cargo rewrote its `~/.cargo/.global-cache` (23:43; disclosed) |
+| pack (`yarn pack --out E/half2/pack/zoodb-check.tgz`) | 75 files, 2,351,842 bytes, SHA-256 `f1c71b05…`, byte-identical to `scratch/zoodb-flmrs.tgz`, its `src/` equal to the worktree's; the worktree's status unchanged |
+| API sample (`yarn node playground/play_example.mjs`) | exit 0: Bob's page (a reference, a footnote, the figure, a citation) and Alice's name as a text snippet (`E/half2/logs/wt_play.log`) |
+| docs (the main checkout's `~/Library/Caches/pypoetry/virtualenvs/zoodb-doc-oZT3q19H-py3.13/bin/sphinx-build`, Sphinx 8.1.3, read-only, run from the worktree's `doc/` with `PYTHONDONTWRITEBYTECODE=1`, output in `E/half2/docbuild/`) | build succeeded, 0 warnings; the worktree's status and ignored files unchanged |
+| the installed package | sitegen and handbook clones: one `node_modules/@phfaist/zoodb` each, version 0.3.0, its `src/` equal to the worktree's (`diff -rq` empty) |
+| worktree status | at `1574e62`; `git status --short` lists this brief, `README.md` and `HANDOVER.md` only |
+| the clones | each on `zoodb-flmrs`: sitegen `793f2bf`, 29 commits over `origin/main` (A's, B1's, B2's, C's, E's first half's and the closing work's F8 fix; `5281597` and 28 at the end of this half), data `60bbc93ae` (2), handbook `d5ccdc5` (7), every commit with both trailers (`%(trailers)`); `git status --short` empty, the root `package.json` and `yarn.lock` in their committed form, push URL `no-push-from-this-clone`, nothing pushed (`origin/main..` lists these commits only) |
+| the originals | heads `a2ad583`, `7ade20a2f`, `c73b681`, `status` empty (`--no-optional-locks`), no file newer than E's start (21:07) in any of them; the main checkout at `bb94f3e` on `main`, its status empty |
+| home and `/tmp` | nothing new under `~/.yarn`, `~/.cache` or `~/.npm` since this half began (`find -newer E/half2/START_MARKER`); under `/tmp` only two sockets of another program (`zeb_def_ipc_*`) and, in `/tmp/claude-501/`, where this session's scratchpad is, the folders of other sessions; Crashpad's `settings.dat` untouched by this half (still 22:18: the screenshots and probes used chrome-headless-shell, and dev mode runs no exporter); `~/.cargo/.global-cache` rewritten by the Rust checks (23:43) |
+| screenshots | 27 pairs and the 10 offline baseline pages; console errors as above; `E/screenshots/index.html` |
+| F8 fix (the closing work, `E/close/`, offline under the sandbox) | sitegen `793f2bf` with both trailers, the root files in their committed form, status empty; `sass` 1.83.0 compiles `main.scss` without a message, its CSS differing from `5281597`'s by the one selector; `yarn build-simple` (Parcel, no exporter, the switch, the LOCAL cache): exit 0 in 118.8 s, peak 3,438,247,936 bytes, Parcel 1,485 bundles in 69.6 s, 1,424 files written, 1,520 in `_site/`, 1,276 HTML; F1's 43 lines, the same as E's (page and place), nothing else; retrievals `4739 cached, 478 to fetch`, `2124 cached, 0 to fetch`, `7341 considered, 0 failed`; `main-a7ae1e3e.css` (40,811 bytes) differs from the production `main-e386b899.css` (40,773) by the selector only, `flm-f1fe95a9.css` unchanged; the HTML equal to the production copy's but for the stylesheet's name (1,168 files) and, on the 108 graph pages, the names of the graph placeholders; margins, page heights and the check of all 1,276 pages as in finding 8; screenshots retaken (27, 13 replaced in `scratch/eczoo/screenshots/new/`, the earlier ones kept as `<name>.before-f8.png`), the index's 27 rows and 54 images load, its 77 file links resolve |
+| dev mode | the runs above; the data clone's status empty after each, the baseline's data clone too (`git status --short`) |
+| panes of the 35 codes with a float (`E/half2/probes/panes_all.mjs`) | new: 35 render, 15 with the broken image of question 17, no error box; baseline: 20 error boxes (the 15, `rotated_surface`, `stab_18_4_4`, `stab_4_1_2`, `stab_5_1_2`, `steane`), 15 render, none with an image (`E/half2/logs/panes_all_*.json`) |
+
+**Deviations** (numbered after the first half's).
+
+7. The baseline's screenshots use MathJax 4.1.3 standing in for its MathJax 3.2.0 (the
+   address of the one answered with the files of the other): no allowed local copy of
+   MathJax 3 exists, and without MathJax the baseline's home page widget, code graph and
+   search never start (their scripts wait for MathJax). The baseline's static pages are
+   also shot without MathJax (`baseline_nomathjax/`), formulas as source. Its formulas
+   are therefore drawn by MathJax 4 on both sides.
+8. The five rebuilds did not all run through Parcel in the script's form: in both
+   `yarn dev` runs Parcel's rebuild after the first change (the touch) did not answer,
+   its heap above 5.7 GB and the process swapped out, and I stopped them (`new1` after
+   600 s of waiting and one more edit; `serve1` after 150 s, when the machine's swap
+   reached 17.0 GB with 17 GB free on the disk). The five rebuilds were measured in B2's
+   form (`watch1`: Eleventy in watch mode without Parcel), which holds the zoo, the
+   engine and the module, as B2 measured them; the Parcel runs give the first build and
+   Parcel's part. The baseline's run and the lazy run (three rebuilds through Parcel)
+   went under a guard for the same reason.
+9. The harness was changed after `new1`: its wait for the dev server sent requests that
+   it abandoned after 5 s (about 70 left pending in Parcel's server), and it gave up
+   after 600 s; `serve1` waits for the server's port, then for each answer (40 min at
+   most), and logs the memory every 5 s without a collection. `new1`'s numbers are kept
+   as a second observation.
+10. The Rust checks ran with `--offline` under the sandbox (no download either way); the
+    screenshots, probes and dev-mode runs ran under the sandbox profile too.
+11. Not asked for: the panes of all 35 codes with a float on both sites (finding 7), the
+    image sizes on the 27 code pages with an image, the label offsets (finding 8), a
+    second `yarn dev` run, and the run with the site's lazy option (finding 9).
+12. The machine's state: other programs held 13 to 17 GB of swap during this half (16 GB
+    of memory, 17 to 20 GB free on the disk); the resident sizes and the times of the
+    dev-mode runs depend on it, the heap figures do not.
+
+**Findings** (numbered after the first half's).
+
+7. The baseline's code graph shows the former renderer's error box
+   (`🚨 FLM ERROR 🚨 Error: No such graphics ‘…’`) instead of the pane of 20 codes, all of
+   them codes whose description holds a figure: C's 15, `rotated_surface`,
+   `stab_18_4_4`, `stab_4_1_2`, `stab_5_1_2` and `steane` (of the 35 codes whose page
+   has a float; the fresh baseline's bundles and dump equal the named output's, so the
+   deployed site does the same). The new pane renders all 35: the 15 with the broken
+   image of question 17, the other 5 without their figure, which falls after the cut at
+   700 characters. C's finding 3 said that the baseline's panes showed no image for the
+   15; they show this error.
+8. The labels of the lists of references (code pages, code lists, the glossary; the code
+   graph pane not checked) and of the content's numbered lists stand on a line of their
+   own above each entry, where the baseline hangs them at the left: the engine's
+   stylesheet puts label and text side by side in a grid and sets the text's top margin
+   to 0, but it is in `@layer flm`, and the site's unlayered base rule
+   `p, ul, ol, pre { margin-top: 1em; margin-bottom: 1em }` (in `main.css`) wins over
+   any layered rule, so each entry's paragraph starts 14.4 px below its label
+   (`E/half2/logs/label_style_new.json`, `label_offset_new.json`). It adds 14.4 px per
+   entry, 6 to 14 % to the height of the pages measured (the screenshots above). A
+   sitegen matter, not the package's: the site's base rules could go into a cascade
+   layer declared before `flm` (`@layer base, flm;`), or the rule could leave out the
+   engine's paragraphs (`p:not(.flm-pres-par)`); other places where the site's unlayered
+   rules meet the engine's layered ones may differ the same way (the display formulas'
+   spacing is one candidate, not traced). Question 33, ruled by the main session (to
+   confirm): the engine's stylesheet stays in `@layer flm`, so that a site's own styles
+   win, and the site adapts its rule. Fixed in the sitegen clone by E's closing work,
+   `793f2bf` (`site/stylesheets/fonts-basic-appearance.scss`): the selector became
+   `:is(p, ul, ol, pre):where(:not(.flm-pres-list > li > *))`, with the same
+   declarations and still the specificity of `p`, so the rule no longer reaches the
+   blocks of the engine's list entries, whose margins the engine's layer sets. The
+   smallest change that leaves every other element as it was: one selector, no value of
+   the engine's copied into the site, and the engine's values for those blocks differ
+   from the site's only after a label; a cascade layer for the site's base rules would
+   put the engine's layer above all of them, and `p:not(.flm-pres-par)` would take every
+   paragraph of the engine out of the rule and raise its specificity. Measured in
+   chrome-headless-shell (`E/close/out/margins_before.json`, `margins_after.json`): the
+   block after each label had a computed `margin-top` of 14.4 px (16 px in
+   `approximate_qecc`'s numbered list) and has 0 px, its top level with its label's, on
+   all 79, 237, 72, 18 and 159 entries of `steane`, `qubit_stabilizer`,
+   `approximate_qecc`, `quantum_cyclic` and `concepts`; ordinary paragraphs keep 16 px
+   above and below; `references.html` (the site's own list, none of the engine) is
+   unchanged, its height too. On all 1,276 pages, each loaded with the production main
+   stylesheet and again with the fix's (`E/close/out/css_swap_check_summary.txt`):
+   margins changed on 1,222 pages, for 18,828 elements, each the paragraph after a label
+   in a list of the engine (18,809 in lists of references, 16 in numbered lists, 3 in
+   itemize lists), and for no other element; 54 entries on 11 code lists stay 7.2 px
+   below their label, in itemize lists inside `.codelist-autodescription`, whose own
+   rule (`p, dl, ul, ol { margin: 0.5em 0 }` in `codelist-page.scss`) the fix leaves as
+   it was. The screenshots' page heights: `steane` 10,297 → 9,161 px (the baseline
+   9,114), `qubit_stabilizer` 27,586 → 24,176 (24,071), `approximate_qecc` 10,178 →
+   9,141 (8,769), `quantum_cyclic` 4,444 → 4,185 (4,176), `concepts` 35,905 → 33,617
+   (32,426); the code graph pane's lists had the same offset (5 of the 15 panes'
+   screenshots changed).
+9. With Parcel, `yarn dev` on the full data rebuilds every page at each change: Eleventy
+   rewrites all 1,424 files, Parcel's dev server (in the same process) builds them all
+   again, and that rebuild grew to 6.5 GB of JS heap here without answering within 150
+   to 600 s, when it was stopped (by hand or by the guard, below the `dev` script's 8 GB
+   limit; C's review saw the same rebuild answer under that limit), against about 1.7 GB
+   for Parcel's first build and 0.5 GB for the zoo and Eleventy (dev mode above; C's
+   finding 8 had it crash at the default 4 GB). The site's configuration has an option
+   that builds only what is requested (`ECZOO_RUN_11TY_PARCEL_LAZY=1`, Parcel's
+   `shouldBuildLazily`): with it, dev mode ran through a touch and two edits, every
+   request answered (the first after each change in 21 to 61 s), with at most 2.7 GB of
+   heap. The baseline's dev mode does the same (its Parcel rebuild grew to 6.5 GB of
+   heap as well before the guard stopped it), so this predates the port. Question 34.
+10. The zoo's own memory in dev mode is flat over five rebuilds (B2's form, the fifth
+    such run): the retention of about 169 MB per build that one of B2's runs showed did
+    not come back.
+11. The EC zoo data holds no footnote (the word occurs only in two YAML comments and a
+    lint script), so the footnote lists of the engine, which the code graph pane and the
+    search text place, are never met on the full data.
+12. On one code page, `quantum_tanner`, the image is held to the column (625 px wide)
+    where the baseline drew it 974 px wide, past the column; the 26 other images have
+    the baseline's sizes.
+
+**Open questions** (numbered after the first half's; 32 is A's question, numbered here).
+32: the names `eq:paritys` and `eq:parityqs` (A). 33: the reference labels (finding 8):
+ruled by the main session, the sitegen's rule changed (`793f2bf`, the closing work); to
+confirm. 34: dev mode with Parcel on the full data (finding 9). All the questions of the
+step, consolidated, are in "Questions for Philippe" above.
+
+**For the main session.** Commit this brief, `README.md` and `HANDOVER.md` as the step's
+final commit; nothing is pending in the clones (sitegen `5281597`, data `60bbc93ae`,
+handbook `d5ccdc5`, all clean). The first half's items stay: add finding 3 of the first
+half to 05 if Philippe agrees (question 29), correct the survey's and section E's "89
+graph SVGs" to 108. The baseline checkout `E/baseline/` (1.3 GB with its `node_modules`)
+and the screenshots' browser profiles in `E/browser/` can go once the review is done;
+`E/screenshots/` is for Philippe. The sitegen clone's `site/_site/` holds E's production
+build again: the dev-mode runs had replaced it, so it was copied back from
+`E/sites/new_site/` (`diff -rq` empty), and the root's `.parcel-cache` they left was
+removed.
+
+**Review fixes** (2026-10-20). The review (Opus, read-only; its re-run of the production
+build, its probes and logs in `E/review/`) gave the verdict "fix first": two must-fix
+items (`HANDOVER.md` said that every build and probe of D ran under the sandbox profile,
+and had lost the paragraph that disclosed D's retrievals from arXiv; the screenshots'
+summary called the search page the same on both sites), five should-fix items (the
+dev-mode wording, the README's "the formulas equal", the meta-description row, the
+evidence cited for the code graphs, the screenshots kept only in the session's
+scratchpad), notes, and verdicts on the fifteen deviations of the two reports (all
+accepted; for the stops of the dev-mode runs, deviation 8, the wording drawn from them
+is corrected below). Its own production build in the sitegen clone
+(`E/review/logs/prod.log`: exit 0 in 462.6 s on a busier machine, the 43 F1 lines
+identical, `_site/` byte-identical to `E/sites/new_site/`) confirms the kept copy, and
+its re-run of `cmp_html.py` and `classify_runs.py` reproduced their outputs byte for
+byte. One fixer (Opus; scripts, logs and outputs in `E/fix/`) made all seven; none
+needed a ruling. No commit in any clone, no package change, no data change, no build:
+the fixes are in this brief, `README.md` and `HANDOVER.md`, with two comparisons re-run
+on the kept copies, one count in the search index and a copy of the screenshots.
+
+- (must) *No network in D.* `HANDOVER.md`'s "No network" item now says that every build
+  and probe of E, and every build of D from 16:00 on 2026-10-19 (D's words), ran under
+  `nonet.sb` (made at 15:51), and that before it D's `probe1`, likely `probe1full`, and
+  its first three test generations reached the arXiv API (D, the retrievals paragraph
+  and deviation 6, whose times these are); "Philippe's decisions" carries the same
+  pointer as an item of its own next to the other items outside the rules (the `~/.yarn`
+  archives, Crashpad, cargo). The consolidated questions already listed it among the
+  items for his information.
+- (must) *The search page.* Confirmed on the two screenshots
+  (`E/fix/thumbs/search_new_top.png`, `search_baseline_top.png`, their top 1,800 px):
+  the new snippets show the marks and, after each item of a field, a
+  `References ----------` list run into the text, where the baseline wrote each
+  citation's text in brackets in place of its mark. In the search index 6,985 such lists
+  sit in 4,669 field values of 1,115 codes (of them 932 values of `introduced`, 718 of
+  `description`, 683 and 433 of the relations' details), the baseline's none
+  (`E/fix/scripts/search_refs.py`, `E/fix/out/search_refs.txt`). "The search page" left
+  the sentence of the pages that look the same, the list of differences has a bullet for
+  it, and question 13 names the visible effect.
+- (should) *Dev mode.* The harness logs show that the Parcel runs neither failed nor
+  finished (`E/devmode/*/devmem.jsonl`, `heap.jsonl`, `guard.txt`): in `serve1`,
+  Eleventy's rebuild ended at 178.3 s of the run and the last heap sample, 6,549.6 MB,
+  came at 355.0 s, 177 s later; the run exited after 359 s (stopped by SIGTERM about 150
+  s after the rebuild, deviation 8; when the signal came is not logged, and the blocked
+  event loop delays its handler); in `base_serve1` the rebuild ended at 1,675.3 s and
+  the guard stopped the run at 6,569.9 MB at 1,882.6 s, 207 s later; `new1` held a live
+  heap of 5,767.3 MB when its harness gave up after 600 s. The dev-mode conclusion
+  above, finding 9, question 34 and the README now say that the rebuild grew to 6.5 GB
+  of heap without answering within 150 to 600 s and was stopped there, by hand or by the
+  guard, below the `dev` script's 8 GB limit, and that C's review saw it answer; the
+  conclusion gives the three runs' figures.
+- (should) *The formulas in the README.* "the formulas equal once the text inside them
+  is unwrapped (but chebyshev's `~` and the glossary's 3 newly typeset terms)", as the
+  comparison above found.
+- (should) *Meta descriptions.* Counted again on the kept copies
+  (`E/fix/scripts/cmp_meta.py`, `E/fix/out/meta.txt`): 454 of the 1,276 differ as
+  written; once white space is normalized with U+00A0 as a space, only `melas` differs
+  (`cmp_classes.py` normalized through Python's `\s`, which matches U+00A0, and printed
+  only that count); the 453 others differ by a no-break space before a citation mark
+  alone, in 683 places in place of the source's space and once as the second no-break
+  space of `w_state`'s `~\cite`. The row says so.
+- (should) *The graphs' evidence.* `E/cmp/cmp_graphs.py` looked only in `list/`,
+  `domain/` and `kingdom/`, so it missed `all.html`'s graph, and it read the first
+  400,000 characters of each SVG to tell a graph from a figure, so its count of `vv/`
+  missed the three largest (`lgraphall`, `lgraphq`, `lgraphcl`, whose first label lies
+  past that point): hence its 107 pages and 105 files. The second version (the first
+  kept as `E/cmp/cmp_graphs_v1.py` and `out_main/graphs_v1.txt`) includes `all.html`,
+  reads every file in full and compares the files byte for byte too; its output replaces
+  `out_main/graphs.txt` (a copy in `E/fix/out/`): 108 pages with a graph on each site
+  (`all.html`, 86 lists, 3 domains, 18 kingdoms), 108 distinct graph files, none shared
+  by two pages, 108 graph SVGs in each `vv/`; 98 pages with byte-identical files and the
+  same labels, 10 that differ in their labels (`all.html` among them), the pairs `B\&C`
+  → `B&C` 24 times (12 and 12) and `Gauss' law code` → `Gauss’ law code` 8 times, each
+  label counted as often as the files hold it: the figures above, which now come from
+  the file cited. The paragraph cites the second version.
+- (should) *The screenshots.* `E/screenshots/` (68 files, 62 MB) is copied to the
+  worktree's `scratch/eczoo/screenshots/`, ignored through `scratch/.gitignore`'s
+  `eczoo/` (`diff -rq` empty); question 9, the README and `HANDOVER.md` point there, and
+  `HANDOVER.md` says where the two sites last once the scratchpad is gone: the new one
+  is the sitegen clone's `site/_site/`, and the original's own `site/_site/` (read-only)
+  stands for the baseline, which it equals but for the data change. The copy's
+  `index.html`, opened from a file URL in chrome-headless-shell 134.0.6998.35 offline
+  under the sandbox (the review's `check_index.mjs` aimed at the copy,
+  `E/fix/scripts/check_index_copy.mjs`; `E/fix/logs/index_check.json`): 27 rows of 2
+  images, the 54 images loaded, its 64 file links resolve, no request outside the
+  folder, no console message.
+- (note) Two of the review's notes, applied: the row of the HTML's size says that its
+  51,317,482 bytes are the 1,276 pages both sites have (51,323,031 with
+  `gitpreview.html`; the HTML holds no comment, so the note's "with comments stripped"
+  was not the cause); the README's "34 questions" is now "the questions for Philippe,
+  numbered 1 to 34" (6 and 20 are one, 12 is settled).
+
+Left open, for the main session as the review routes them: finding 3 into 05 (question
+29, Philippe's). No question was added. The review's re-run of the production build
+rewrote Chrome for Testing's Crashpad `settings.dat` (00:18; ruled, disclosed) and the
+clone's ignored `_zoodb_citations_cache_LOCAL` files, as every build does, and left a
+root `.parcel-cache` (157 MB, ignored) in the sitegen clone, which the fixes removed so
+that the clone is again as `HANDOVER.md` describes it (C, finding 5). State at the end
+of the fixes: the worktree at `1574e62`, `git status --short` listing this brief,
+`README.md` and `HANDOVER.md` only (the copy of the screenshots is ignored); the clones
+at `5281597`, `60bbc93ae` and `d5ccdc5`, status empty, the root files in their committed
+form, push URLs disabled, nothing pushed; the originals at `a2ad583`, `7ade20a2f`,
+`c73b681`, status empty (`--no-optional-locks`), no file newer than the fixes' start;
+the main checkout at `bb94f3e`, status empty; nothing new under `~/.yarn`, `~/.cache`,
+`~/.npm` or `/tmp` from the fixes (`find -newer E/fix/START_MARKER`: in
+`/tmp/claude-501/` only Claude Code's own `bash-edit-diff` file), and Crashpad's
+`settings.dat` untouched by them (still 00:18; the index check used
+chrome-headless-shell). One slip, disclosed: the last check's `find -newer` over
+flm-rs's checkout (depth 3, to show that nothing there had changed; it printed nothing)
+walked the directory entries of its `playground/` folder, which the rules say is never
+read; no file of it was opened.
+
+**Closing work** (2026-10-20; one agent, Opus, on the main session's list; scripts, logs
+and outputs in `E/close/`, every build and probe offline under `D/nonet.sb` with
+`TMPDIR` in `E/close/tmp/`). F8 ruled and fixed: the sitegen clone's `793f2bf` (finding
+8, question 33, the Checks row "F8 fix"). The 13 retaken screenshots replace their
+earlier ones in `scratch/eczoo/screenshots/new/`, where those stay as
+`<name>.before-f8.png` (with `_log.before-f8.json`), and its `index.html` notes each;
+they show E's production pages with the fix's main stylesheet in place of the production
+one (`E/close/site_f8/`), since the fix's build differs from the production build only
+in that stylesheet, hashed names and its placeholders for the graphs, and its own
+screenshots of `steane` and `approximate_qecc` are byte-identical to those;
+`E/screenshots/` is as it was. The sitegen clone's `site/_site/` now holds that
+`yarn build-simple` build at `793f2bf` (placeholders on the 108 graph pages); E's
+production build stays in `E/sites/new_site/`. The root `.parcel-cache` the build left
+(140 MB, ignored) was removed (C, finding 5). The screenshots used a copy of E's script
+(`E/close/probes/shots.mjs`, its browser profile in `E/close/browser/`, the settings
+unchanged). The check of all pages ran in three passes: the headless browser stopped
+answering twice (after about 1,160 and 90 pages), and the pages left were run again in a
+fresh one, so every page has a result. The verifier's two wording points: the dev-mode
+bullet above now says only what the logs show of `serve1`'s end, and the listing of
+flm-rs's `playground/` folder is among the items for Philippe's information (the
+consolidated list and `HANDOVER.md`). The README's step-6 entry is one line like the
+earlier ones, and the graph SVGs are counted as 108 in the survey and section E, with
+C's and D's 89 marked. Joined without a change of content, the README's entry still
+names the sitegen clone at `5281597` (28 commits over `a2ad583`); the main session may
+update it to `793f2bf` (29).
