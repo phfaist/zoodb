@@ -12,20 +12,22 @@ Index searchable content
    } from '@phfaist/zoodb/dbprocessor/searchabletextflm';
 
 
-The searchable text processor gives every object of the chosen types a flat
-search document, ``{ _z_otype, id, title, FIELD: text, ... }``: the object
+The searchable text processor attaches to every object of the chosen types a flat
+search document, ``{ _z_otype, id, title, FIELD: text, ... }`` containing the object
 type, the ID, the title (the field that the schema's ``_zoo_titlefield`` names,
 by default ``name``) and the text of each searchable field.  The document is
 stored as ``obj._zoodb.searchable_text_doc``.  A site builds its search index
 from these documents, for instance with a client-side search library such as
 `Lunr.js <https://lunrjs.com/>`_.
 
-A :class:`SearchableTextFieldset` says which fields go into the documents and
+A :class:`SearchableTextFieldset` specifies which fields go into the documents and
 how their values become text.  By default, every field of the schemas goes in,
 except the auto-populated ones (``_auto_populated``), those whose name starts
 with ``_``, those marked ``_zoo_search: { include_in_index: false }`` in the
 schema, and those listed in its option ``exclude_fields``.  Nested fields are
-named with ``_`` (``relations_parents``); a list's items go into one field.
+flattened in the search document's keys, with the nested keys combined with
+an underscore (e.g.,  ``relations: { parents: {...}}`` is mapped to
+``relations_parents``).  List items are concatenated into one field.
 The :class:`SearchableTextProcessor` builds the documents when the zoo is
 loaded, and again for the objects of each reload.  A data dump leaves them out
 unless the dump option ``searchabletext_remove_doc_info`` is ``false``.
@@ -46,6 +48,7 @@ turns them into plain text through the engine:
   does not mind.
 
 A citation and a footnote are their marks alone (``[1]``, ``¹``) by default.
+**THIS IS A BUG OF CLAUDE'S IMPLEMENTATION. ZOODB-FLM SHOULD NOT BEHAVE LIKE THIS. FIX ME!!**
 With the option ``pieces: true``, each field's text ends with its pieces: its
 footnotes and the list of the works it cites, under their headings, so that an
 object is found by the authors and titles of the works it cites (the index is

@@ -32,13 +32,10 @@ The `ZooDb` library is geared towards providing the following features:
   the database up to date (as for the Error Correction Zoo): The community can
   update your database by contributing pull requests.
 
-* Rich and flexible content formatting using Flexible Latex-Like Markup (FLM,
-  see :ref:`zoodb-flm`), a LaTeX-inspired markup language that can include
-  citations, sectioning, cross-references, figures, tables, etc., and that is
-  configured through settings and user-defined macros.  FLM content is
-  processed by flm-rs, the Rust implementation of FLM, compiled to WebAssembly
-  and bundled with the package: no Rust toolchain is needed to use it, and the
-  same module runs in Node.js and in the browser.
+* Rich and flexible content formatting using
+  `Flexible Latex-Like Markup (FLM) <https://github.com/phfaist/flm>`_,
+  a LaTeX-inspired markup language that can include citations, sectioning,
+  cross-references, figures, tables, etc., and can be extended at will.
 
 * Each object type have a specific data structure that is specified by a schema,
   which extends the `JSON Schema <https://json-schema.org/learn/getting-started-step-by-step>`_.

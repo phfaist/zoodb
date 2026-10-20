@@ -21,7 +21,7 @@ standard setup (see :ref:`zoodb-std`) the zoo's engine is
 loaded: a site's templates only render with it.
 
 This API replaces the JavaScript transpilation of the Python FLM library that
-ZooDb used up to version 0.2 (see the 0.3.0 entry of ``CHANGELOG.md``).
+ZooDb used up to version 0.2.
 
 
 Modules
@@ -54,7 +54,8 @@ import :js:func:`load_zoodb_flm_wasm_node` from
 environment-specific and run in browsers as they are.  The engine module
 re-exports the names of the fragment and diagnostics modules one by one rather
 than with ``export * from``, so that Parcel 2 bundles code that imports them
-through it (Parcel 2.13, with scope hoisting, mis-bundles a module that imports
+through it (though note that Parcel 2.13 with scope hoisting
+appears to mis-bundle a module that imports
 names from a module it also re-exports with ``export *``).
 
 
@@ -291,10 +292,8 @@ piece.  ``K`` is a token of the call: a marker produced by another call is
 never substituted, and any marker that the call did not produce is the Error
 ``zoodb.compose.stray-marker``.
 
-The composer may therefore branch on data (``ne()``, relations, names), but
-the HTML of a placed fragment is never in its hands: the strings that hold
-markers are meant to be concatenated, not cut, measured or rewritten.  A
-marker that appears twice is substituted at both places.
+The composer may therefore only branch on data (``ne()``, relations, names),
+and never on the rendered HTML obtained through render method calls.
 
 The helpers:
 

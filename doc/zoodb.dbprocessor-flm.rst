@@ -16,8 +16,8 @@ over the engine ``zoodb.zoo_flm_engine`` (see :ref:`zoodb-std`); the processor
 is then ``zoodb.zoo_flm_processor``.
 
 
-What the processor does
-~~~~~~~~~~~~~~~~~~~~~~~
+Processing steps
+~~~~~~~~~~~~~~~~
 
 When the zoo is loaded (``process_zoo()``), the processor runs six steps:
 

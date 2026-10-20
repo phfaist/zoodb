@@ -5,9 +5,8 @@ Setting up a "Standard" ZooDb
 
 Using the `ZooDb` class interface directly is relatively tedious, so I've
 regrouped together some common options and initialization tasks into some
-standard presets: :func:`makeStandardZooDb` creates the zoo with the processors
-you enable, and :func:`makeStandardYamlDbDataLoader` creates the loader of its
-data files.
+standard preset, see :func:`makeStandardZooDb` and
+:func:`makeStandardYamlDbDataLoader`.
 
 To set up a simple “standard zoo,” you can find inspiration from the following
 boilerplate code:
@@ -265,14 +264,14 @@ Also, check out our simple example which we provide in a separate repo (see
 What the standard zoo holds
 ---------------------------
 
-:func:`makeStandardZooDb` creates the FLM engine first, then the processors in
-this order: the relations populator, the git last-modified processor, the FLM
+:func:`makeStandardZooDb` creates the FLM engine along with the following
+processors: the relations populator, the git last-modified processor, the FLM
 processor, the searchable text processor, and the ``extra_db_processors`` (by
 ``priority``).  The returned zoo carries:
 
 - ``zoodb.zoo_flm_engine``: the FLM engine (:js:class:`ZooFlmEngine`, see
-  :doc:`zoodb.zooflm`), with which the site renders the pages
-  (``render_document()``, ``snippet()``, ``html_stylesheet()``,
+  :doc:`zoodb.zooflm`), which the site can use to render pages
+  (see ``render_document()``, ``snippet()``, ``html_stylesheet()``,
   ``html_scripts()``).  It exists as soon as :func:`makeStandardZooDb`
   returns, before any data is loaded.
 - ``zoodb.zoo_flm_processor``: the FLM processor (:js:class:`ZooFlmProcessor`,
@@ -280,17 +279,18 @@ processor, the searchable text processor, and the ``extra_db_processors`` (by
   collector.
 - ``zoodb.zoo_relations_populator``, ``zoodb.zoo_gitlastmodified_processor``,
   ``zoodb.searchable_text_processor``: the other processors (``null`` when not
-  enabled); ``zoodb.zoodb_named_processors`` names them all.
+  enabled); ``zoodb.zoodb_named_processors`` collects the installed processors
+  by name.
 - ``zoodb.zoo_permalinks`` and ``zoodb.zoo_object_permalink(object_type,
   object_id)``, from the config's ``zoo_permalinks``.
 - ``zoodb.config``: the configuration, merged with its defaults.
 
-Under Node, give ``flm_options.load_wasm: load_zoodb_flm_wasm_node`` (from
-``@phfaist/zoodb/zooflm/wasm-node``), which reads the engine's WebAssembly
-module from the package's files.  In a browser, leave it out: the engine then
-fetches the module from ``wasm_url`` (``@phfaist/zoodb/zooflm/wasm``), which a
-bundler serves as an asset.  Files are read through the config's ``fs`` (with
-its ``fs.promises``).
+Under Node, you should specify ``flm_options.load_wasm: load_zoodb_flm_wasm_node``
+(from ``@phfaist/zoodb/zooflm/wasm-node``) to load the engine's WebAssembly
+module from the package's files.  This step is not necessary in a browser, since
+the engine then automatically fetches the module from ``wasm_url``
+(``@phfaist/zoodb/zooflm/wasm``) that bundlers are configured to include as an asset.
+Files are read through the config's ``fs`` via ``fs.promises``.
 
 
 The FLM options
@@ -387,6 +387,3 @@ The configuration keys of the FLM features, all optional except where noted
    object type without a page, in which case the FLM processor makes no index
    entry for those objects (nor for the labels of their fields), and references
    to them are unresolved (see :doc:`zoodb.dbprocessor-flm`).
-
-The former keys ``use_flm_environment`` and ``flm_options.environment_options``
-are refused with a message that names their replacements.

@@ -3,7 +3,7 @@ Integration into the Eleventy website builder
 
 The `ZooDb` library is designed to easily be integrated into a static website
 built with `Eleventy (11ty) <https://11ty.dev/>`_.  Check out our simple example
-(see :ref:`example`), whose templates this page follows.
+(see :ref:`example`).
 
 The integration does not require any special 11ty plugin from ZooDb.  Instead,
 you load the zoo database using :js:func:`makeStandardZooDb` (see
@@ -46,8 +46,10 @@ template can access the ``zoodb`` object:
 
 With this setup, every template receives a ``data.zoodb`` property containing
 the fully loaded :class:`ZooDb` instance, and its FLM engine as
-``data.zoodb.zoo_flm_engine``.  Eleventy runs under Node, so the zoo's
-configuration gives the engine the Node loader of its WebAssembly module:
+``data.zoodb.zoo_flm_engine``.
+
+As every script that runs under Node, the zoo's configuration must point FLM to
+the WebAssembly module explicitly:
 
 .. code:: javascript
 
@@ -64,10 +66,9 @@ The FLM stylesheet and scripts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The HTML of FLM content needs the engine's stylesheet, and its scripts in the
-page's ``<head>``.  :js:meth:`ZooFlmEngine.html_scripts` gives the script tags:
+page's ``<head>``.  :js:meth:`ZooFlmEngine.html_scripts` returns the script tags:
 today MathJax 4, its configuration for FLM content first, then its loader
-(``<script src="…" async>``).  The layout prints them; in a Nunjucks layout,
-where the global data ``zoodb`` is at hand:
+(``<script src="…" async>``).  Use, for instance, as follows:
 
 .. code:: html
 
@@ -83,8 +84,8 @@ where the global data ``zoodb`` is at hand:
    </body>
    </html>
 
-:js:meth:`ZooFlmEngine.html_stylesheet` gives the stylesheet, which a template
-of its own can write as a file of the site:
+The method :js:meth:`ZooFlmEngine.html_stylesheet` returns the default stylesheet
+that a template should include, possibly as a separate generated page:
 
 .. code:: javascript
 
@@ -133,14 +134,14 @@ For a single page that lists all objects of a given type:
 
    export default { data, render };
 
-The method :js:meth:`ZooFlmEngine.snippet` gives the HTML (``'html'``) or the
-plain text (``'text'``, for a page's ``<title>``) of a standalone field, such
-as an object's name: content that is rendered on its own, without references,
+The method :js:meth:`ZooFlmEngine.snippet` returns a compiled version of a 
+standalone FLM fragment field either as HTML (``'html'``) or as
+plain text (``'text'``) of a standalone field. A standalone fragment is
+content that is rendered on its own, without references,
 citations or notes (the schema annotation ``_flm: standalone``).  The FLM
-processor rendered these snippets once, when the zoo was processed.  A field
-that is not standalone is the Error ``zoodb.snippet.not-standalone`` here: it
-needs a page, below.  :js:meth:`ZooFlmEngine.snippet_of_text` does the same for
-a piece of FLM text that is not a field.
+processor renders these snippets once when processing the zoo.  The ``snippet()``
+method emits an error (``zoodb.snippet.not-standalone``) if the given field
+is not standalone.
 
 
 Rendering full object pages
@@ -200,13 +201,14 @@ example (``website/src/person/person.11ty.js``), shortened:
 
    export default { data, render };
 
-:js:meth:`ZooFlmEngine.render_document` calls the composer once.  ``rdr()`` and
-``rdrblock()`` do not render a field on the spot: they place it in the page and
-return a marker.  When the composer returns, the engine renders every field
-placed in the page as one document (references between them resolve, the
-footnotes and figures are numbered across the page), and replaces the markers
-with the HTML.  So the composer builds the whole page as one string and returns
-it; the markers are only meaningful in that string.
+The function :js:meth:`ZooFlmEngine.render_document` calls the composer once.
+Use  ``rdr()`` and
+``rdrblock()`` to mark the locations where specific dynamic content should
+be rendered.  (These functions place a marker, rather than rendering the field
+on the spot; do not attempt to read or parse their return value.)
+When the composer returns, the engine renders every field
+placed in the page as one document, resolving references between them and numbering
+footnotes and figures across each page.
 
 The result is ``{ html, definitions, requires, diagnostics, has_errors }``.
 Under the default error policy (``'abort'``), an Error in the page's content
@@ -243,11 +245,10 @@ The helpers that the composer receives (see :js:class:`ZooFlmComposition`):
 Images and data files
 ---------------------
 
-The FLM processor collects the images that the content shows (see
-:doc:`zoodb.resourcecollector`); the site copies each one to the address that
-``zoo_permalinks.graphics_resource`` gives it.  The example's
-``website/src/pic/pic.11ty.js`` does it with a pagination over the collected
-images:
+The FLM processor collects the images referenced by constructs such as `\includegraphics{figure.png}`
+(see :doc:`zoodb.resourcecollector`); the site copies each one to the address returned by
+``zoo_permalinks.graphics_resource``.  For instance (cf. ``website/src/pic/pic.11ty.js`` in
+the example repo):
 
 .. code:: javascript
 
@@ -277,10 +278,10 @@ images:
    export default { data, render };
 
 A template can also write the zoo's data dump for browser apps
-(``JSON.stringify(await zoodb.data_dump())``, as the example's
-``website/src/dat/zoodbdata.11ty.js`` does): the dump holds the engine's data
-as ``zooflm``, with which a browser app renders the zoo's content (see
-:doc:`zoodb.dbprocessor-flm`).
+(``JSON.stringify(await zoodb.data_dump())``, cf.
+``website/src/dat/zoodbdata.11ty.js`` in the example repo).  The dump
+can be loaded in a browser app, see
+:doc:`zoodb.dbprocessor-flm` for how to set this up.
 
 
 Relevant API reference

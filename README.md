@@ -7,10 +7,7 @@ of the [Error Correction Zoo](https://errorcorrectionzoo.org/).
 Features:
 
 - Database stored in JSON/YAML files and specified by JsonSchema files.
-- Content in FLM, a LaTeX-like markup language
-  ([syntax](https://zoodb.readthedocs.io/en/latest/flm/)), processed by
-  flm-rs, the Rust implementation of FLM, compiled to WebAssembly (bundled; no
-  Rust toolchain needed to use the package)
+- Support for content in [FLM](https://github.com/phfaist/flm) markup format.
 - Automatically populated relationship fields and backreferences, based
   on simple text fields storing primary keys/IDs.
 - Seamless integration into [11ty](https://11ty.dev/) to generate static HTML websites
@@ -22,6 +19,3 @@ Features:
 - etc.
 
 Documentation: https://zoodb.readthedocs.io/en/latest/
-
-Release notes: [CHANGELOG.md](CHANGELOG.md) (version 0.3.0 replaces the FLM
-layer: zoos written for 0.2 need to be ported).
