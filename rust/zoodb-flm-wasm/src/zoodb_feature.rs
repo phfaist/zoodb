@@ -1,6 +1,7 @@
 //! The ZooDb feature of the registry: what ZooDb adds beside the standard
 //! features: the `srcset` publish stage (Q7, R8), the standalone check stage
-//! (Q5) and the `field` environment of the FLM-files loader (Q16).
+//! (Q5), the `field` environment of the FLM-files loader (Q16) and the rule
+//! of links that open in a new tab (brief 14, P1; [`crate::links`]).
 //!
 //! The standard `graphics` feature registers `flm.graphics.publish.html`,
 //! which writes `flm.graphics.published.html` (the address of each image and
@@ -97,11 +98,15 @@ impl SrcsetConfig {
 
 pub struct ZoodbFeature {
     pub srcset: Option<SrcsetConfig>,
+    /// Whether links to an address outside the site open in a new tab on the
+    /// HTML backend (the rule of [`crate::links`]); the engine sets it only
+    /// when the `href` feature is on.
+    pub link_target_blank: bool,
 }
 
 impl FlmFeature for ZoodbFeature {
     fn info(&self) -> FeatureInfo {
-        FeatureInfo::new(FEATURE, "ZooDb").docs("What ZooDb adds beside the standard features: the `field` element, the standalone check and the srcset publish stage.")
+        FeatureInfo::new(FEATURE, "ZooDb").docs("What ZooDb adds beside the standard features: the `field` element, the standalone check, the srcset publish stage and the links that open in a new tab.")
     }
 
     fn register(&self, b: &mut FeatureBuilder<'_>) -> Result<(), BuildError> {
@@ -135,10 +140,14 @@ impl FlmFeature for ZoodbFeature {
         // Registered only when configured: a second writer of the published
         // table must be preferred by the plan, and the engine prefers it
         // exactly when srcset is configured.
-        match &self.srcset {
-            Some(srcset) => b.stage(Arc::new(PublishStage { srcset: srcset.clone() })),
-            None => Ok(()),
+        if let Some(srcset) = &self.srcset {
+            b.stage(Arc::new(PublishStage { srcset: srcset.clone() }))?;
         }
+        // Brief 14, P1: links to an address outside the site in a new tab.
+        if self.link_target_blank {
+            crate::links::register(b)?;
+        }
+        Ok(())
     }
 }
 

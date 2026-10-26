@@ -35,7 +35,7 @@ export function srcset_core_config(option)
 }
 
 // the keys of `flm_options.engine` that use_flm_engine() reads
-const ENGINE_OPTION_KEYS = ['dollar_math', 'settings', 'off', 'render_value_options'];
+const ENGINE_OPTION_KEYS = ['dollar_math', 'settings', 'off', 'link_target_blank', 'render_value_options'];
 
 
 /**
@@ -54,10 +54,12 @@ const ENGINE_OPTION_KEYS = ['dollar_math', 'settings', 'off', 'render_value_opti
  *   ``dollar_math`` (whether ``$…$`` delimits math; default `false`),
  *   ``settings`` (the settings of the standard features, one map per
  *   feature, user definitions under ``userdefs``), ``off`` (standard
- *   features switched off by name), and ``render_value_options`` (how the
- *   composer's ``rdr()`` renders arrays).  Any other key throws an ``Error``
- *   naming it; a key set to `null` or `undefined` takes its default, as does
- *   the whole object.
+ *   features switched off by name), ``link_target_blank`` (default `true`:
+ *   in the HTML output, a link of ``\href``, ``\url`` or ``\email`` to an
+ *   address outside the site opens in a new tab; `false`: no link gets a
+ *   target), and ``render_value_options`` (how the composer's ``rdr()``
+ *   renders arrays).  Any other key throws an ``Error`` naming it; a key set
+ *   to `null` or `undefined` takes its default, as does the whole object.
  * - `_this.config.flm_options.resources.graphics_use_srcset_parceljs` —
  *   ``{ enabled: true, ... }`` asks for a ``srcset`` of Parcel-compatible
  *   image-resize URLs on raster images (:func:`srcset_core_config`).  The
@@ -101,6 +103,7 @@ export async function use_flm_engine(_this)
         srcset: null,
         settings: engine_options.settings ?? {},
         off: engine_options.off ?? [],
+        link_target_blank: engine_options.link_target_blank ?? true,
     };
     debug(`Creating the FLM engine`, { core });
 

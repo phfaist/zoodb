@@ -26,6 +26,8 @@ for the workspace, the prerequisites and the dependency on flm-rs).
 - `src/host.rs` — the citations and graphics tables and the services that
   answer from them.
 - `src/zoodb_feature.rs` — the ZooDb feature of the registry.
+- `src/links.rs` — the feature's lowering rule of links on the HTML backend
+  (links to an address outside the site in a new tab).
 - `src/truncate.rs` — the truncation helper for previews.
 - `build.rs` — the stack link argument (see Invariants).
 
@@ -53,7 +55,7 @@ core.
 
 | method | returns |
 |---|---|
-| `new ZooFlmCore(config)`, config `{ dollar_math?, settings?, off?, srcset? }`: `settings` one map per standard feature (`{ math: { … } }`, user definitions under `userdefs`: `macros`, `environments`, `specials`), `off` features switched off by name, `srcset` `{ pixel_density_list?, image_max_zoom_factor? }` | the core; throws on an unknown feature or setting, naming the feature and the key |
+| `new ZooFlmCore(config)`, config `{ dollar_math?, settings?, off?, srcset?, link_target_blank? }`: `settings` one map per standard feature (`{ math: { … } }`, user definitions under `userdefs`: `macros`, `environments`, `specials`), `off` features switched off by name, `srcset` `{ pixel_density_list?, image_max_zoom_factor? }`, `link_target_blank` (default `true`) the links in a new tab (see The ZooDb feature) | the core; throws on an unknown feature or setting, naming the feature and the key |
 | `ZooFlmCore.version()` (static) | `{ binding, flm_core }`: this crate's version and the `flm-core` version it was built against (read from `Cargo.lock` by `build.rs`) |
 | `ZooFlmCore.features()` (static) | `[{ name, schema }]`, `schema` the JSON Schema of the feature's settings or `null` |
 | `build_diagnostics()` | `[CoreDiagnostic]` |
@@ -61,18 +63,32 @@ core.
 | `with_layout(handle, layout)` | a new handle sharing the tree, source and parse diagnostics of `handle`, with another layout (not parsed again) |
 | `release(handles)` | nothing; every handle is checked first (unknown or already released: an error, nothing released), and a released handle used later is an error; handles are never reused |
 | `html_definitions()` | every style and script definition the registry declares, `[{ id, kind: 'style'\|'script', owner, parts: [{ kind: 'inline'\|'file'\|'url'\|'table', text }] }]`, the styles first, each in registration order (the order of a run's definitions table) |
-| `render_html(handles, { title?, unresolved_refs_warning? })` | `{ trees: [html], tree_requires: [[definition id]], pieces: [{ name, place: 'before-content'\|'after-content', html, requires }], requires, definitions: [Definition], diagnostics, has_errors }`, one tree per handle in order; `requires` the union of `tree_requires`; `definitions` what the run's document requires, resolved (parts `inline`, `file`, `url`, or `host` for a definition the host supplies), the backend's page style included |
-| `render_text(handles, { width?, link_addresses?, unresolved_refs_warning?, per_tree?, pieces? })` | `{ text, trees, tree_diagnostics, diagnostics, has_errors }`; with `per_tree`, `trees` and `tree_diagnostics` hold each tree rendered alone and that run's diagnostics (a reference to another tree does not resolve there) |
-| `render_latex(handles, { raw_label_types?, drop_comments?, unresolved_refs_warning? })` | `{ trees, style_name, style, document, diagnostics, has_errors }` |
+| `render_html(handles, { title?, unresolved_refs_warning?, render_options? })` | `{ trees: [html], tree_requires: [[definition id]], pieces: [{ name, place: 'before-content'\|'after-content', html, requires }], requires, definitions: [Definition], diagnostics, has_errors }`, one tree per handle in order; `requires` the union of `tree_requires`; `definitions` what the run's document requires, resolved (parts `inline`, `file`, `url`, or `host` for a definition the host supplies), the backend's page style included |
+| `render_text(handles, { width?, link_addresses?, unresolved_refs_warning?, per_tree?, pieces?, render_options? })` | `{ text, trees, tree_diagnostics, diagnostics, has_errors }`; with `per_tree`, `trees` and `tree_diagnostics` hold each tree rendered alone and that run's diagnostics (a reference to another tree does not resolve there) |
+| `render_latex(handles, { raw_label_types?, drop_comments?, unresolved_refs_warning?, render_options? })` | `{ trees, style_name, style, document, diagnostics, has_errors }` |
 | `scan(handles, standalone_handles)` | `{ trees: [{ labels: [{ label, anchor, display }], refs: [{ label, resolved }], graphics: [{ path, origin }], terms: [{ labels, anchor, display, body_start, body_end }], cited: [key] }], cited: [[key, origin]], duplicate_labels: [{ label, origin, start, end }], standalone_violations, diagnostics, has_errors }`; per label the anchor of its point when one of the labels of its point forms it (`label_anchor`: `type-label`, the same in every document; `null` for a point anchored on its number, a renumbered title or after a collision) and the FLM source of the content its point shows (`null` for a point shown by its number alone; one braced group without its braces); per tree its reference sites as labels, its term definitions with the byte range of their bodies, and the keys it cites, each once; a duplicate with the later point's origin and byte range |
 | `truncate(text, origin, layout, { chars, min_chars?, marker?, first_paragraph? })` | `{ source, truncated, cut_at, diagnostics }`: the shortened FLM source, to be parsed again |
 | `parse_fields(text, origin)` | `{ fields: [{ name, start, end, text }], diagnostics }`: the `\begin{field}{name} … \end{field}` of an FLM data file |
 | `set_external_index([{ label, href, display }])` | `[CoreDiagnostic]` of the display texts (FLM, parsed inline; origin `index:LABEL`) |
 | `set_citations([{ key, text }])`, `set_graphics([GraphicsEntry])` | nothing (see Host tables) |
-| `fragment_count()` (live fragments), `external_index_len()`, `citations_len()`, `graphics_len()` | numbers |
+| `fragment_count()` (live fragments), `variant_count()` (variants built), `external_index_len()`, `citations_len()`, `graphics_len()` | numbers |
 
 A run's diagnostics include the parse diagnostics of the fragments it places
 (flm-core's `Run::diagnostics`), as well as the stages'.
+
+`render_options` (all three render methods) gives values of settings for that
+run only, in the shape of `settings`, over the settings key by key (a key's
+value replaces the settings' whole): the render-bound keys go to the run's
+render options, the document-bound ones (and those bound to either) to its
+document. A key bound to the registry makes the run use a variant: a registry
+built from the configuration with the call's registry-bound values over the
+settings, built once per distinct set of such values (compared as JSON with
+sorted keys) and kept with its plans; the run's fragments are parsed again
+with the variant's language (from their sources and layouts), the variant's
+external index is built from the entries last given to `set_external_index`
+(once per variant and index), and its services read the core's host tables. A
+key that is unknown or set by the call's own options, and a value the feature
+cannot read, are refused with their names.
 
 `unresolved_refs_warning` defaults to `false` (an unresolved reference is an
 Error) for html and LaTeX, `true` for text. The scan is a bare plan request
@@ -112,6 +128,20 @@ labels of zoo objects (`person:alice`), their link target and display.
   external table `zoodb.standalone.trees` (the handles given as
   `standalone_handles`) and reports every reference point, reference,
   citation and image in those trees as `zoodb.standalone.violation`.
+- The rule `zoodb.href.link.lower.html` (brief 14, P1), the default on the
+  `html` backend for `\href`, `\url` and `\email` (the text and LaTeX
+  backends keep flm-core's rules; no lowering selection is set), registered
+  unless `link_target_blank` is `false` or the `href` feature is off. It reads
+  the command, the address and the display as flm-core's `LinkRule` does; for
+  an address outside the site (not `#…`, `/…` other than `//…`, or
+  `javascript:…`) that the HTML address policy accepts, it
+  stages a construct `<a>` with flm-core's class, `href` and
+  `data-flm-kind="url"` (from the backend's convention for `flm.pres.link`)
+  and `target="_blank"`, and records the link's style requirement. Otherwise
+  it stages flm-core's `flm.pres.link`: a local or refused address, a text
+  whose lowered content holds anything that may write a link (a link, an
+  `<a>` tag, an element the backend does not write natively), and a node in
+  the text of another `\href`, a `\hyperref` or a `\term`.
 - The `srcset` publish stage `zoodb.graphics.publish.html` (Q7, R8),
   registered and preferred over `flm.graphics.publish.html` only when the
   configuration has `srcset`. It cannot write its table until flm-core offers

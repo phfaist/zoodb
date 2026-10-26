@@ -36,6 +36,8 @@ export interface CoreConfig {
     settings?: Record<string, Record<string, unknown>> | null;
     /** Standard features switched off by name. */
     off?: string[] | null;
+    /** Whether, in the html output, a `\href`, `\url` or `\email` to an address outside the site opens in a new tab (`target="_blank"`; default `true`). Local addresses (`#…`, `/…` but not `//…`, `javascript:…`), links inside links and addresses the HTML address policy refuses keep flm-core's link. */
+    link_target_blank?: boolean | null;
 }
 
 /** The versions of the module's build: this binding crate's and the `flm-core` version it was built against. */
@@ -86,7 +88,7 @@ export interface GraphicsEntry {
     height_pt?: number | null;
 }
 
-/** Render options of one run, as data in the shape of the settings: one map per feature, of the keys it binds to the render request (`{ pieces: { exclude: ['flm.citations.bibliography'] } }`), over the settings' keys one by one. A key that is unknown, fixed when the core is built, or set by the call's own options is refused with its name. */
+/** Values of settings for one run, as data in the shape of the settings: one map per feature (`{ pieces: { exclude: ['flm.citations.bibliography'] } }`), over the settings' keys one by one (a key's value replaces the settings' whole). A key the feature binds to the render request goes to the run's render options, one bound to the document (or to either) to the run's document; one bound to the registry (`{ citations: { placement: 'in-place' } }`) makes the run use a variant: a registry built from the settings with the call's registry-bound values over them, once per distinct set of such values, the run's fragments parsed again with its language. A key that is unknown or set by the call's own options, and a value the feature cannot read, are refused with their names. */
 export type RunRenderOptions = Record<string, Record<string, unknown>>;
 
 export interface RenderHtmlOptions {
@@ -355,6 +357,11 @@ export class ZooFlmCore {
      */
     truncate(text: string, origin: string, layout: FragmentLayoutName, options: TruncateOptions): TruncateOut;
     /**
+     * The number of variants built for the registry-bound values that
+     * render calls gave (each built once).
+     */
+    variant_count(): number;
+    /**
      * The versions of the module's build: `{ binding, flm_core }` (this
      * crate's version and the `flm-core` version it was built against).
      */
@@ -393,6 +400,7 @@ export interface InitOutput {
     readonly zooflmcore_set_external_index: (a: number, b: any) => [number, number, number];
     readonly zooflmcore_set_graphics: (a: number, b: any) => [number, number];
     readonly zooflmcore_truncate: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: any) => [number, number, number];
+    readonly zooflmcore_variant_count: (a: number) => number;
     readonly zooflmcore_version: () => [number, number, number];
     readonly zooflmcore_with_layout: (a: number, b: number, c: number, d: number) => [number, number, number];
     readonly __wbindgen_malloc: (a: number, b: number) => number;

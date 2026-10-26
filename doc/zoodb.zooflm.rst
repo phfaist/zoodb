@@ -112,7 +112,7 @@ which every call throws.
 The core's settings as data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The core configuration has four keys; a key left out, or ``null``, takes its
+The core configuration has five keys; a key left out, or ``null``, takes its
 default:
 
 - ``settings`` -- the settings of flm-rs's standard features, one map per
@@ -141,6 +141,14 @@ default:
   (the standard setup does not pass it): the ZooDb stage that writes them
   needs a change in flm-rs that is not available yet, and under this option
   every image is the Error ``zoodb.graphics.publish-failed``.
+
+- ``link_target_blank`` -- whether links of ``\href``, ``\url`` and
+  ``\email`` in the HTML output open in a new tab (default ``true``).  Such a
+  link gets ``target="_blank"`` unless its address is within the site, that
+  is, starts with ``#``, or with ``/`` but not ``//``.  A link that contains
+  another link, or that is written inside one (such as an ``\href`` in the
+  text of a ``\hyperref``), is written without it, because HTML does not allow
+  a link inside a link.  The text and LaTeX outputs are not affected.
 
 The standard features are ``textstyles``, ``literals``, ``blocks``,
 ``index``, ``refpoints``, ``numbering``, ``math``, ``refs``, ``headings``,
@@ -344,15 +352,14 @@ stylesheet and the scripts`_).  ``render_document()`` also takes
 ``context`` (default ``'default'``), ``unresolved``, ``error_policy``,
 ``render_value_options`` (over the engine's) and ``render_options``.
 
-``render_options`` are flm-rs's render options for this run only, in the
-shape of the core's ``settings`` (one object per feature), limited to the
-keys a feature binds to the render request; they are set over the settings'
-keys one by one.  A key that is unknown, that is fixed when the engine is
-created (such as ``citations.placement``), or that a call's own option sets
-(``refs.unresolved``: use ``unresolved``) throws a plain ``Error`` that names
-it.  For instance, a preview that places no endnotes can leave out the lists
-it would not place, which then are not built and draw no
-``zoodb.compose.piece-not-placed``:
+``render_options`` overrides the engine's ``settings`` for this call only.  It
+has the same shape (one object per feature), and each key it gives replaces
+the corresponding setting as a whole (an ``xnotes.kinds`` map replaces the
+whole map of kinds).  An unknown key, a value the feature cannot read, or a
+key that another option of the call sets (``refs.unresolved``: use
+``unresolved``) throws an ``Error`` that names it.  For instance, a preview
+that places no endnotes can leave out the lists it would not place, which then
+are not built and draw no ``zoodb.compose.piece-not-placed``:
 
 .. code::
 
@@ -365,6 +372,29 @@ it would not place, which then are not built and draw no
 
 The footnote and citation marks stay, linking to notes that are not on the
 page: flm-rs has no render option that leaves them out.
+
+Some settings, such as ``citations.placement``, ``citations.heading_title``
+and ``xnotes.kinds``, are fixed when the engine is created (their schemas in
+``ZooFlmEngine.features()`` mark them ``"x-flm-bind": "registry"``).  You can
+still give them in ``render_options``, at a cost: the first call with a given
+set of such values makes the engine build a second configuration for them (a
+few milliseconds), which it keeps for later calls, and each such call parses
+its fragments again.  For instance, a pane that shows the lists of notes and
+cited works without their headings:
+
+.. code::
+
+   engine.render_document({
+       compose: ({ rdrblock, endnotes }) => rdrblock(description) + endnotes(),
+       render_options: {
+           citations: { heading_title: null },
+           xnotes: { kinds: { ...kinds, footnote: { ...kinds.footnote, title: null } } },
+       },
+   });
+
+where ``kinds`` holds the engine's own settings of ``xnotes.kinds`` (or, for
+the default settings, ``{ footnote: { commands: ['footnote'], label_type:
+'fn', words: { base: { one: 'Footnote~', other: 'Footnotes~' } } } }``).
 
 :js:meth:`ZooFlmEngine.render_fragment` renders one fragment alone, as one
 tree, without a composer and without placing the pieces: ``{ html | text,
@@ -511,8 +541,11 @@ places them after each run's text (the footnotes and the list of cited works,
 under their headings; with ``per_fragment``, each tree gets its own).  The
 other options are ``width`` (``null``, the default, never wraps),
 ``link_addresses`` (print the address after a link's text), ``context``,
-``unresolved`` and ``error_policy``.  The searchable-text processor uses it for
-the search index.
+``unresolved``, ``error_policy`` and ``render_options`` (as for
+``render_document()``; ``text.width`` and ``text.link_addresses`` are refused
+as well).  With ``render_options: { citations: { placement: 'in-place' } }``,
+each citation is replaced by its entry between brackets; the searchable text
+processor renders the search text this way.
 
 :js:meth:`ZooFlmEngine.render_latex` renders fragments as one document of
 recomposed LaTeX, LaTeX code written back from the FLM content for a printed

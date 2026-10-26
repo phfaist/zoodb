@@ -57,9 +57,9 @@ function check_output(output)
     return output;
 }
 
-// The render options of one run as the core takes them (`{ feature: { key:
-// value } }`), checked for their shape here; the core refuses what is not a
-// render option, naming it.
+// The values of settings for one run as the core takes them (`{ feature: {
+// key: value } }`), checked for their shape here; the core refuses an unknown
+// key or a value it cannot read, naming it.
 function check_render_options(render_options, what)
 {
     if (render_options == null) {
@@ -121,7 +121,7 @@ function canonical_json(value)
     return JSON.stringify(value) ?? 'null';
 }
 
-// The core configuration with the defaults of its four keys filled in (`null`
+// The core configuration with the defaults of its five keys filled in (`null`
 // and a missing key take the default, as the core reads them), `off` sorted.
 function normalized_core_config(core)
 {
@@ -130,6 +130,7 @@ function normalized_core_config(core)
     c.srcset = c.srcset ?? null;
     c.settings = c.settings ?? {};
     c.off = [...(c.off ?? [])].sort();
+    c.link_target_blank = Boolean(c.link_target_blank ?? true);
     return c;
 }
 
@@ -171,9 +172,13 @@ export class ZooFlmEngine
      *     ``./_load_wasm.js``, which fetches the module (a browser); under Node,
      *     pass ``load_zoodb_flm_wasm_node`` of ``./_load_wasm_node.js``
      * @param {object} [options.core] - the core's configuration as data:
-     *     ``{ dollar_math, srcset, settings, off }`` (``settings`` one map per
-     *     standard feature, user definitions under ``userdefs``; ``off`` the
-     *     features switched off). An unknown key, feature or setting throws,
+     *     ``{ dollar_math, srcset, settings, off, link_target_blank }``
+     *     (``settings`` one map per standard feature, user definitions under
+     *     ``userdefs``; ``off`` the features switched off;
+     *     ``link_target_blank`` (default ``true``): in the HTML output, links
+     *     of ``\href``, ``\url`` and ``\email`` open in a new tab
+     *     (``target="_blank"``) unless their address starts with ``#`` or
+     *     with a single ``/``). An unknown key, feature or setting throws,
      *     naming it.
      * @param {string} [options.error_policy='abort'] - the default of every call
      * @param {string} [options.unresolved='error'] - the default of every call
@@ -302,8 +307,9 @@ export class ZooFlmEngine
 
     /**
      * The hash of the core configuration the engine was created with
-     * (``dollar_math``, ``srcset``, ``settings``, ``off``; a missing key and
-     * ``null`` count as the default) and of the module's versions
+     * (``dollar_math``, ``srcset``, ``settings``, ``off``,
+     * ``link_target_blank``; a missing key and ``null`` count as the
+     * default) and of the module's versions
      * (:js:attr:`core_version`): two engines with the same hash read and
      * render FLM alike. A dump (:js:meth:`dump`) carries it, and
      * :js:meth:`load` refuses a dump made under another configuration or by
@@ -881,9 +887,9 @@ export class ZooFlmEngine
      * @param {string} [options.context='default'] - the index of the run
      * @param {string} [options.unresolved]
      * @param {string} [options.error_policy]
-     * @param {object} [options.render_options] - the core's render options
-     *     of this run only, as for :js:meth:`render_document` (for text,
-     *     ``text.width`` and ``text.link_addresses`` are refused as well)
+     * @param {object} [options.render_options] - settings for this call
+     *     only, as for :js:meth:`render_document` (for text, ``text.width``
+     *     and ``text.link_addresses`` are refused as well)
      * @returns {object} ``{ html | text, definitions, requires, diagnostics,
      *     has_errors }`` (``definitions`` and ``requires`` empty for text)
      */
@@ -1155,15 +1161,14 @@ export class ZooFlmEngine
      * @param {string} [options.error_policy]
      * @param {object} [options.render_value_options] - over the engine's
      *     (how ``rdr()`` renders an array)
-     * @param {object} [options.render_options] - the core's render options
-     *     of this run only, in the shape of the core's settings: one object
-     *     per feature, of the keys the feature binds to the render request
-     *     (``{ pieces: { exclude: ['flm.citations.bibliography',
-     *     'flm.xnotes.list.footnote'] } }`` builds no list of cited works and
-     *     no footnote list; the marks stay), set over the settings' keys one
-     *     by one; a key that is unknown, fixed when the engine is created, or
-     *     ``refs.unresolved`` (``unresolved`` sets it) throws a plain
-     *     ``Error`` naming it
+     * @param {object} [options.render_options] - settings for this call
+     *     only, in the shape of the engine's settings (one object per
+     *     feature); each key replaces the engine's setting as a whole. For
+     *     instance, ``{ pieces: { exclude: ['flm.citations.bibliography'] }
+     *     }`` builds no list of cited works. Settings fixed when the engine
+     *     is created, such as ``citations.heading_title``, are accepted too
+     *     (see :doc:`zoodb.zooflm`). An unknown key, an invalid value, or
+     *     ``refs.unresolved`` (use ``unresolved``) throws an ``Error``
      * @returns {object} ``{ html, definitions, requires, diagnostics,
      *     has_errors }``: ``requires`` what the page's content requires (the
      *     substituted trees and pieces and the snippets), ``definitions``
@@ -1233,21 +1238,27 @@ export class ZooFlmEngine
      * @param {string} [options.context='default']
      * @param {string} [options.unresolved]
      * @param {string} [options.error_policy]
+     * @param {object} [options.render_options] - settings for this call
+     *     only, as for :js:meth:`render_document` (``text.width`` and
+     *     ``text.link_addresses`` are refused as well: use ``width`` and
+     *     ``link_addresses``). With ``{ citations: { placement: 'in-place' }
+     *     }``, each citation is replaced by its entry between brackets
      * @returns {object} ``{ text, trees, tree_diagnostics, diagnostics,
      *     has_errors }``, the texts without a trailing newline
      */
     render_text(fragments, {
         width = null, link_addresses = false, pieces = false, per_fragment = true,
-        context = DEFAULT_CONTEXT, unresolved = null, error_policy = null,
+        context = DEFAULT_CONTEXT, unresolved = null, error_policy = null, render_options = null,
     } = {})
     {
         const list = this._fragment_list(fragments);
         const policy = this._policy(error_policy);
         unresolved = this._unresolved_of(unresolved);
+        render_options = check_render_options(render_options, 'render_text()');
         this._ensure_context(context);
         const out = this._core.render_text(list.map( (f) => f.handle ), {
             width, link_addresses, unresolved_refs_warning: unresolved === 'warn',
-            per_tree: Boolean(per_fragment), pieces: Boolean(pieces),
+            per_tree: Boolean(per_fragment), pieces: Boolean(pieces), render_options,
         });
         const diagnostics = this._map(out.diagnostics, list);
         const tree_diagnostics = out.tree_diagnostics.map( (ds, i) => this._map(ds, [list[i]]) );
@@ -1267,10 +1278,10 @@ export class ZooFlmEngine
      * @param {string} [options.context='default']
      * @param {string} [options.unresolved]
      * @param {string} [options.error_policy]
-     * @param {object} [options.render_options] - the core's render options
-     *     for this run only, as for :js:meth:`render_document`
-     *     (``latex-recomposed.drop_comments`` is refused as well: the option
-     *     ``drop_comments`` sets it)
+     * @param {object} [options.render_options] - settings for this call
+     *     only, as for :js:meth:`render_document`
+     *     (``latex-recomposed.drop_comments`` is refused as well: use
+     *     ``drop_comments``)
      * @returns {object} ``{ trees, style_name, style, document, diagnostics,
      *     has_errors }``, one entry of ``trees`` per fragment
      */

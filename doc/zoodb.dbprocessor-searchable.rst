@@ -47,13 +47,15 @@ turns them into plain text through the engine:
   to a label defined in another field shows the label, which a search index
   does not mind.
 
-A citation and a footnote are their marks alone (``[1]``, ``¹``) by default.
-**THIS IS A BUG OF CLAUDE'S IMPLEMENTATION. ZOODB-FLM SHOULD NOT BEHAVE LIKE THIS. FIX ME!!**
-With the option ``pieces: true``, each field's text ends with its pieces: its
-footnotes and the list of the works it cites, under their headings, so that an
-object is found by the authors and titles of the works it cites (the index is
-then larger; for the Error Correction Zoo's codes, about twice the size).  A
-standalone fragment holds neither, so its snippet serves either way.
+In the search text, each citation is replaced by the cited work's entry,
+between brackets (``a code [A. Author, “A title”, arXiv:1234.5678].``), so
+that an object can be found by the authors and titles of the works it cites.
+With the option ``citations_in_place: false``, a citation is shown by its mark
+alone (``[1]``).  A footnote is shown by its mark alone (``¹``); with the
+option ``pieces: true``, each field's text ends with its footnotes and, if the
+citation marks are kept, with the list of the works it cites.  A standalone
+fragment holds neither a citation nor a footnote, so its snippet serves either
+way.
 
 Its renders use the ``'continue'`` error policy by default, so that the search
 text is made whatever the content holds; the FLM processor and the page renders
@@ -61,11 +63,12 @@ report the content's errors.  The searchable text processor needs the fields
 compiled, so it comes after the FLM processor in the zoo's processors.
 
 In the standard setup, :func:`use_searchable_text_processor` creates the
-assembler over ``zoodb.zoo_flm_engine`` (its option ``pieces`` from
-``searchable_text_options.flm_pieces``, default ``false``), the fieldset (with
-the title under the key ``name`` instead of ``title``, and the object types of
-``searchable_text_options.object_types``) and the processor, after the FLM
-processor.  Without the standard setup:
+assembler over ``zoodb.zoo_flm_engine`` (its option ``citations_in_place``
+from ``searchable_text_options.flm_citations_in_place``, default ``true``, and
+``pieces`` from ``searchable_text_options.flm_pieces``, default ``false``),
+the fieldset (with the title under the key ``name`` instead of ``title``, and
+the object types of ``searchable_text_options.object_types``) and the
+processor, after the FLM processor.  Without the standard setup:
 
 .. code:: javascript
 

@@ -7,6 +7,6 @@
     "flm_core_source": "git+https://github.com/phfaist/flm.git?branch=main-rs#e7b4ba17dc7f892c980cf05c3e32d1c9d8366bad",
     "wasm_bindgen": "0.2.127",
     "paths_remapped": true,
-    "wasm_size_bytes": 5223643,
-    "build_date": "2026-10-26T14:09:53.681Z"
+    "wasm_size_bytes": 5259021,
+    "build_date": "2026-10-26T16:01:59.291Z"
 }

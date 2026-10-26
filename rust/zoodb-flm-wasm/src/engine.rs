@@ -7,8 +7,11 @@
 //! handle; each call places the given handles in one document and runs a plan
 //! over it (cached per options key): the html, text or recomposed-LaTeX
 //! workflow, or the scan (a bare plan request for the tables the host reads).
-//! Diagnostics carry the origin (`path#field`), the byte range and the line
-//! and column within the fragment's text.
+//! A render call that gives values of settings bound to the registry runs on
+//! a variant: a registry built from the settings with those values over them,
+//! cached with its plans (brief 14, P2). Diagnostics carry the origin
+//! (`path#field`), the byte range and the line and column within the
+//! fragment's text.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
@@ -41,6 +44,7 @@ use flm_core::stdcore::backends::pieces::PiecesRenderOptions;
 use flm_core::stdcore::backends::text::{self, TEXT_OUTPUT, TextRenderOptions};
 use flm_core::stdcore::features::citations::{CitationElement, KEYS, Reading, read_chunk};
 use flm_core::stdcore::features::defterm::{DeftermElement, TERM_ARG};
+use flm_core::stdcore::features::href::FEATURE as HREF_FEATURE;
 use flm_core::stdcore::features::refs::{RefsRecomposeOptions, SafeLabelMode};
 use flm_core::core::lowering::chars_at_lowering;
 use flm_core::stdcore::features::graphics::{GraphicsImage, PATH_ARG};
@@ -62,7 +66,7 @@ use flm_core::techy::source::{LineIndexCache, SourceOrigin};
 // ---------------------------------------------------------------------------
 // Configuration and outputs (all serializable: they cross to JavaScript)
 
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct EngineConfig {
     /// Whether `$…$` delimits mathematics (the EC zoo writes `\(…\)`).
@@ -77,6 +81,22 @@ pub struct EngineConfig {
     pub settings: serde_json::Map<String, serde_json::Value>,
     /// Standard features switched off by name.
     pub off: Vec<String>,
+    /// Whether, in the html output, a `\href`, `\url` or `\email` to an
+    /// address outside the site opens in a new tab (`target="_blank"`; the
+    /// rule of [`crate::links`]). Default `true`.
+    pub link_target_blank: bool,
+}
+
+impl Default for EngineConfig {
+    fn default() -> EngineConfig {
+        EngineConfig {
+            dollar_math: false,
+            srcset: None,
+            settings: serde_json::Map::new(),
+            off: Vec::new(),
+            link_target_blank: true,
+        }
+    }
 }
 
 /// One feature of the standard package with its settings schema, for
@@ -128,9 +148,10 @@ pub struct RenderOptions {
     pub title: Option<String>,
     /// Unresolved references are Warnings instead of Errors.
     pub unresolved_refs_warning: bool,
-    /// Render options of this run only, as data (`{ feature: { key: value
-    /// } }`, the shape of the settings): over the settings' render options,
-    /// key by key ([`Engine::run_render_options`]).
+    /// Values of settings for this run only, as data (`{ feature: { key:
+    /// value } }`, the shape of the settings): over the settings, key by key
+    /// ([`Engine::call_settings`]). A key bound to the registry makes the run
+    /// use a variant.
     pub render_options: serde_json::Map<String, serde_json::Value>,
 }
 
@@ -144,9 +165,10 @@ pub struct LatexOptions {
     pub raw_label_types: Vec<String>,
     pub drop_comments: bool,
     pub unresolved_refs_warning: bool,
-    /// Render options of this run only, as for html ([`RenderOptions`]):
-    /// `refs.unresolved` and `latex-recomposed.drop_comments` are refused
-    /// (this struct's fields set them).
+    /// Values of settings for this run only, as for html
+    /// ([`RenderOptions`]): `refs.unresolved` and
+    /// `latex-recomposed.drop_comments` are refused (this struct's fields set
+    /// them).
     pub render_options: serde_json::Map<String, serde_json::Value>,
 }
 
@@ -183,7 +205,8 @@ pub struct TextOptions {
     /// the text; off, a citation is its mark alone, which is what a search
     /// index and a snippet want (Q11).
     pub pieces: bool,
-    /// Render options of this run only, as for html ([`RenderOptions`]).
+    /// Values of settings for this run only, as for html
+    /// ([`RenderOptions`]).
     pub render_options: serde_json::Map<String, serde_json::Value>,
 }
 
@@ -417,6 +440,10 @@ pub struct Engine {
     /// The external index installed in every render run (Q4): labels of zoo
     /// objects, with their link target and display content.
     external_index: ExternalIndex,
+    /// The entries the external index was last built from, from which a
+    /// variant builds its own, and the number of times they were replaced.
+    external_entries: Vec<ExternalEntry>,
+    external_generation: u64,
     /// The citations and graphics tables the services read (Q6, Q7).
     host: Arc<HostTables>,
     /// Whether the html plan prefers the ZooDb publish stage (srcset).
@@ -425,12 +452,37 @@ pub struct Engine {
     /// merged into every plan's render options, before the per-call ones.
     document_options: OptionValues,
     render_options: OptionValues,
-    /// The settings' keys bound to the render request, as data per feature:
-    /// the base of a run's render options given per call (G3).
-    render_settings: serde_json::Map<String, serde_json::Value>,
+    /// The configuration the engine was built from: its settings are the
+    /// base of the values a call gives (G3), and a variant's registry is
+    /// built from all of it.
+    config: EngineConfig,
+    /// The settings as the standard package reads them.
+    package_settings: PackageSettings,
     /// The standard package's factory, whose declarations read the settings
     /// and the per-call render options.
     factory: PackageFactory,
+    /// The variants (P2), by the key (`options_key`) of the registry-bound
+    /// values that made them.
+    variants: BTreeMap<String, Variant>,
+}
+
+/// A registry built from the engine's settings with the registry-bound
+/// values a call gave over them (brief 14, P2), with its own plans and its
+/// own external index (built from the engine's entries with the variant's
+/// language, and the generation of the entries it was built from).
+struct Variant {
+    registry: Arc<FlmRegistry>,
+    plans: BTreeMap<String, Arc<Plan>>,
+    index: Option<(u64, ExternalIndex)>,
+}
+
+/// The option values and the registry of one run ([`Engine::call_settings`]).
+struct CallSettings {
+    render: OptionValues,
+    document: OptionValues,
+    /// The variant the call's registry-bound values make: its key and the
+    /// package settings to build it from; `None` when the call gives none.
+    variant: Option<(String, PackageSettings)>,
 }
 
 /// The value of the render option type `T` in `values`, or its default: the
@@ -440,9 +492,68 @@ fn option_or_default<T: Options + Clone>(values: &OptionValues) -> T {
     values.get::<T>().cloned().unwrap_or_default()
 }
 
+/// The JSON text of `values` with the keys of every map sorted (flm-core
+/// enables `serde_json/preserve_order`): equal data gives equal text.
+fn options_key(values: &serde_json::Map<String, serde_json::Value>) -> String {
+    let mut value = serde_json::Value::Object(values.clone());
+    value.sort_all_objects();
+    value.to_string()
+}
+
+/// Builds the registry of `config` with the standard package from
+/// `package_settings` (the engine's, or a variant's), the services over the
+/// host tables `host`.
+fn build_registry(factory: &PackageFactory, package_settings: &PackageSettings, config: &EngineConfig, host: &Arc<HostTables>) -> Result<Arc<FlmRegistry>, String> {
+    let mut builder = RegistryBuilder::new();
+    builder.use_package(factory.build(package_settings).map_err(|e| e.to_string())?);
+    builder.use_package(flm_core::math_passthrough::package());
+    // The rule of links in a new tab lowers the `href` feature's element: not
+    // registered without it.
+    let link_target_blank = config.link_target_blank && !config.off.iter().any(|f| f == HREF_FEATURE);
+    builder.feature(Arc::new(ZoodbFeature { srcset: config.srcset.clone(), link_target_blank }));
+    // The services are lookups over the host tables (Q6, Q7).
+    builder.contribute_to(PROVIDERS_SLOT, Arc::new(HostCitations(Arc::clone(host))) as Arc<dyn CitationProvider>);
+    builder.contribute_to(RESOLVER_SLOT, Arc::new(HostGraphics(Arc::clone(host))) as Arc<dyn GraphicsResolver>);
+    builder.contribute_to(INSPECTOR_SLOT, Arc::new(HostGraphics(Arc::clone(host))) as Arc<dyn GraphicsInspector>);
+    let mut inputs = RegistryInputs::new();
+    inputs.parsing = FlmParsing { dollar_math: config.dollar_math, ..FlmParsing::default() };
+    inputs.build_identity = Some(String::from(concat!(env!("CARGO_PKG_NAME"), " ", env!("CARGO_PKG_VERSION"))));
+    builder.build(&inputs).map_err(|e| e.render())
+}
+
+/// The external index of `entries` for runs on `registry`: each display text
+/// parsed inline with the registry's language and copied into a synthesized
+/// value, as the `ExternalTarget` documentation prescribes; with the parse
+/// diagnostics of the display texts.
+fn external_index_of(registry: &FlmRegistry, entries: &[ExternalEntry]) -> Result<(ExternalIndex, Vec<DiagOut>), String> {
+    let mut index = ExternalIndex::new();
+    let mut diagnostics = Vec::new();
+    let guard = registry.lang().guard();
+    for entry in entries {
+        let label = Label::parse(&entry.label).ok_or_else(|| format!("`{}` is not a `type:label`", entry.label))?;
+        let source = Arc::new(FlmSource::new(&entry.display).with_origin(FlmOrigin::synthetic(format!("index:{}", entry.label))));
+        let fragment = parse_fragment(registry.lang(), source, FragmentLayout::Inline, &ParseOptions::default())
+            .map_err(|e| e.diagnostic().message().to_string())?;
+        diagnostics.extend(diags_out(fragment.diags().iter()));
+        let root = fragment.tree().root();
+        let children: Vec<_> = root.children().iter().collect();
+        let display = value_of(&children, &root, guard).map_err(|e| format!("display of `{}`: {e:?}", entry.label))?;
+        index = index.with(label, ExternalTarget { href: entry.href.clone(), display });
+    }
+    Ok((index, diagnostics))
+}
+
+/// The document of a run: `fragments` placed in order, with the run's
+/// document option values; the trees' identifiers in the same order.
+fn place(fragments: &[Arc<Fragment>], document_options: &OptionValues) -> (Arc<Doc>, Vec<TreeId>) {
+    let mut content = DocContent::new();
+    let ids = fragments.iter().map(|fragment| content.place(Arc::clone(fragment))).collect();
+    (Arc::new(Doc::with_options(content, document_options.clone())), ids)
+}
+
 /// The keys of the render options that a run sets through the call's own
 /// options, as `(feature, key, the option that sets it)`: refused per call
-/// ([`Engine::run_render_options`]) and in the settings ([`Engine::new`]),
+/// ([`Engine::call_settings`]) and in the settings ([`Engine::new`]),
 /// so that a value never silently loses to the call's. A LaTeX run takes
 /// no per-call render options: its list is checked against the settings.
 const HTML_RESERVED: &[(&str, &str, &str)] = &[("refs", "unresolved", "the call's `unresolved`")];
@@ -591,7 +702,6 @@ impl Engine {
         let mut package_settings = PackageSettings::new();
         let mut document_options = OptionValues::new();
         let mut render_options = OptionValues::new();
-        let mut render_settings = serde_json::Map::new();
         // The keys every run sets itself are refused by name.
         let mut refused: Vec<String> = Vec::new();
         for (feature, key, by) in HTML_RESERVED.iter().chain(TEXT_RESERVED).chain(LATEX_RESERVED) {
@@ -613,61 +723,55 @@ impl Engine {
             document_options.merge_from(read.document_options());
             render_options.merge_from(read.render_options());
             package_settings.insert(read);
-            let render: serde_json::Map<String, serde_json::Value> = values
-                .iter()
-                .filter(|(key, _)| decl.key(key).is_some_and(|k| k.bind == Bind::Render))
-                .map(|(key, value)| (key.clone(), value.clone()))
-                .collect();
-            if !render.is_empty() {
-                render_settings.insert(feature.clone(), serde_json::Value::Object(render));
-            }
         }
         for feature in &config.off {
             package_settings.switch_off(feature.as_str());
         }
-        let mut builder = RegistryBuilder::new();
-        builder.use_package(factory.build(&package_settings).map_err(|e| e.to_string())?);
-        builder.use_package(flm_core::math_passthrough::package());
-        builder.feature(Arc::new(ZoodbFeature { srcset: config.srcset.clone() }));
-        // The services are lookups over the host tables (Q6, Q7).
-        builder.contribute_to(PROVIDERS_SLOT, Arc::new(HostCitations(Arc::clone(&host))) as Arc<dyn CitationProvider>);
-        builder.contribute_to(RESOLVER_SLOT, Arc::new(HostGraphics(Arc::clone(&host))) as Arc<dyn GraphicsResolver>);
-        builder.contribute_to(INSPECTOR_SLOT, Arc::new(HostGraphics(Arc::clone(&host))) as Arc<dyn GraphicsInspector>);
-        let mut inputs = RegistryInputs::new();
-        inputs.parsing = FlmParsing { dollar_math: config.dollar_math, ..FlmParsing::default() };
-        inputs.build_identity = Some(String::from(concat!(env!("CARGO_PKG_NAME"), " ", env!("CARGO_PKG_VERSION"))));
-        let registry = builder.build(&inputs).map_err(|e| e.render())?;
+        let registry = build_registry(&factory, &package_settings, config, &host)?;
         Ok(Engine {
             registry,
             fragments: Vec::new(),
             plans: BTreeMap::new(),
             external_index: ExternalIndex::new(),
+            external_entries: Vec::new(),
+            external_generation: 0,
             host,
             prefer_zoodb_publish: config.srcset.is_some(),
             document_options,
             render_options,
-            render_settings,
+            config: config.clone(),
+            package_settings,
             factory,
+            variants: BTreeMap::new(),
         })
     }
 
-    /// The render options of one run (G3): the settings' render options, or,
-    /// with render options given for the call (`{ feature: { key: value }
-    /// }`), the settings' render-bound keys with the call's over them key by
-    /// key, read through each feature's settings declaration. A key of the
-    /// call must be one its feature binds to the render request; `reserved`
-    /// lists those the call sets through its own options. Every problem is
-    /// named in the error.
-    fn run_render_options(
+    /// The option values and the registry of one run (G3; brief 14, P2): the
+    /// settings' own, or, with values given for the call (`{ feature: { key:
+    /// value } }`), the settings of each feature the call names with the
+    /// call's keys over them key by key (a key's value replaces the
+    /// settings' whole, as one source of settings replaces another: an
+    /// `xnotes.kinds` map replaces the settings' map), read through the
+    /// feature's settings declaration. The render-bound values go to the
+    /// run's render options, the document-bound ones (and those bound to
+    /// either) to its document; a key bound to the registry makes the run use
+    /// a variant, built from the settings with the call's registry-bound
+    /// values over them. `reserved` lists the keys the call sets through its
+    /// own options. Every problem is named in the error.
+    fn call_settings(
         &self,
         per_call: &serde_json::Map<String, serde_json::Value>,
         reserved: &[(&str, &str, &str)],
-    ) -> Result<OptionValues, String> {
+    ) -> Result<CallSettings, String> {
+        let mut call = CallSettings { render: self.render_options.clone(), document: self.document_options.clone(), variant: None };
         if per_call.is_empty() {
-            return Ok(self.render_options.clone());
+            return Ok(call);
         }
         let mut errors = Vec::new();
-        let mut data = self.render_settings.clone();
+        // Per feature the call names: the settings with the call's keys over
+        // them; and the call's registry-bound keys.
+        let mut data: Vec<(&str, serde_json::Map<String, serde_json::Value>)> = Vec::new();
+        let mut registry_bound = serde_json::Map::new();
         for (feature, values) in per_call {
             let Some(decl) = self.factory.settings(feature) else {
                 errors.push(format!("the feature `{feature}` takes no settings (or does not exist)"));
@@ -677,6 +781,8 @@ impl Engine {
                 errors.push(format!("the render options of `{feature}` must be a map"));
                 continue;
             };
+            let mut merged = self.config.settings.get(feature).and_then(|v| v.as_object()).cloned().unwrap_or_default();
+            let mut bound = serde_json::Map::new();
             for (key, value) in values {
                 if let Some((_, _, by)) = reserved.iter().find(|(f, k, _)| f == feature && k == key) {
                     errors.push(format!("the render option `{feature}.{key}` is set by {by}, not per call"));
@@ -684,34 +790,84 @@ impl Engine {
                 }
                 match decl.key(key) {
                     None => errors.push(format!("the feature `{feature}` has no setting `{key}`")),
-                    Some(k) if k.bind != Bind::Render => errors.push(format!(
-                        "the setting `{feature}.{key}` is not a render option: it is fixed when the engine is created (its settings)"
-                    )),
-                    Some(_) => {
-                        let entry = data.entry(feature.clone()).or_insert_with(|| serde_json::Value::Object(serde_json::Map::new()));
-                        if let Some(map) = entry.as_object_mut() {
-                            map.insert(key.clone(), value.clone());
+                    Some(k) => {
+                        if k.bind == Bind::Registry {
+                            bound.insert(key.clone(), value.clone());
                         }
+                        merged.insert(key.clone(), value.clone());
                     }
                 }
             }
+            if !bound.is_empty() {
+                registry_bound.insert(feature.clone(), serde_json::Value::Object(bound));
+            }
+            data.push((feature.as_str(), merged));
         }
-        let mut options = self.render_options.clone();
-        if errors.is_empty() {
-            for (feature, values) in &data {
-                // Only the features the call names: the others keep the
-                // settings' values, already in `options`.
-                if !per_call.contains_key(feature) {
-                    continue;
+        if !errors.is_empty() {
+            return Err(format!("the render options: {}", errors.join("; ")));
+        }
+        let mut package_settings = (!registry_bound.is_empty()).then(|| self.package_settings.clone());
+        for (feature, values) in &data {
+            let Some(decl) = self.factory.settings(feature) else { continue };
+            match decl.read(values) {
+                Ok(read) => {
+                    call.render.merge_from(read.render_options());
+                    call.document.merge_from(read.document_options());
+                    if let Some(package_settings) = package_settings.as_mut().filter(|_| registry_bound.contains_key(*feature)) {
+                        package_settings.insert(read);
+                    }
                 }
-                let (Some(decl), Some(values)) = (self.factory.settings(feature), values.as_object()) else { continue };
-                match decl.read(values) {
-                    Ok(read) => options.merge_from(read.render_options()),
-                    Err(problems) => errors.extend(problems.iter().map(|e| e.to_string())),
-                }
+                Err(problems) => errors.extend(problems.iter().map(|e| e.to_string())),
             }
         }
-        if errors.is_empty() { Ok(options) } else { Err(format!("the render options: {}", errors.join("; "))) }
+        if !errors.is_empty() {
+            return Err(format!("the render options: {}", errors.join("; ")));
+        }
+        call.variant = package_settings.map(|settings| (options_key(&registry_bound), settings));
+        Ok(call)
+    }
+
+    /// The variant of a call's registry-bound values (P2), built and cached
+    /// on first use, its external index brought up to date with the engine's
+    /// entries; returns its key, `None` for a call without such values. A
+    /// variant whose build reports an Error the engine's registry does not
+    /// have is refused, with the call.
+    fn variant_for(&mut self, variant: Option<(String, PackageSettings)>) -> Result<Option<String>, String> {
+        let Some((key, package_settings)) = variant else { return Ok(None) };
+        if !self.variants.contains_key(&key) {
+            let registry = build_registry(&self.factory, &package_settings, &self.config, &self.host)
+                .map_err(|e| format!("the render options {key}: {e}"))?;
+            let known: BTreeSet<(String, String)> = self
+                .registry
+                .build_diagnostics()
+                .iter()
+                .map(|d| (d.identifier().to_string(), d.message().to_string()))
+                .collect();
+            let errors: Vec<String> = registry
+                .build_diagnostics()
+                .iter()
+                .filter(|d| d.severity() == Severity::Error && !known.contains(&(d.identifier().to_string(), d.message().to_string())))
+                .map(|d| d.message().to_string())
+                .collect();
+            if !errors.is_empty() {
+                return Err(format!("the render options {key}: {}", errors.join("; ")));
+            }
+            self.variants.insert(key.clone(), Variant { registry, plans: BTreeMap::new(), index: None });
+        }
+        let generation = self.external_generation;
+        let Some(variant) = self.variants.get_mut(&key) else { return Err(format!("no variant {key}")) };
+        if variant.index.as_ref().map(|(g, _)| *g) != Some(generation) {
+            // The engine's display texts reported their diagnostics when the
+            // index was set.
+            let (index, _) = external_index_of(&variant.registry, &self.external_entries)?;
+            variant.index = Some((generation, index));
+        }
+        Ok(Some(key))
+    }
+
+    /// The number of variants built (P2).
+    pub fn variant_count(&self) -> usize {
+        self.variants.len()
     }
 
     /// The standard features and, for each that takes settings, the JSON
@@ -823,23 +979,13 @@ impl Engine {
     /// Replaces the external index. Each display text is parsed inline with
     /// the registry's language and copied into a synthesized value, as the
     /// `ExternalTarget` documentation prescribes. Returns the parse
-    /// diagnostics of the display texts.
+    /// diagnostics of the display texts. The entries are kept: a variant
+    /// builds its own index from them with its own language (P2).
     pub fn set_external_index(&mut self, entries: &[ExternalEntry]) -> Result<Vec<DiagOut>, String> {
-        let mut index = ExternalIndex::new();
-        let mut diagnostics = Vec::new();
-        let guard = self.registry.lang().guard();
-        for entry in entries {
-            let label = Label::parse(&entry.label).ok_or_else(|| format!("`{}` is not a `type:label`", entry.label))?;
-            let source = Arc::new(FlmSource::new(&entry.display).with_origin(FlmOrigin::synthetic(format!("index:{}", entry.label))));
-            let fragment = parse_fragment(self.registry.lang(), source, FragmentLayout::Inline, &ParseOptions::default())
-                .map_err(|e| e.diagnostic().message().to_string())?;
-            diagnostics.extend(diags_out(fragment.diags().iter()));
-            let root = fragment.tree().root();
-            let children: Vec<_> = root.children().iter().collect();
-            let display = value_of(&children, &root, guard).map_err(|e| format!("display of `{}`: {e:?}", entry.label))?;
-            index = index.with(label, ExternalTarget { href: entry.href.clone(), display });
-        }
+        let (index, diagnostics) = external_index_of(&self.registry, entries)?;
         self.external_index = index;
+        self.external_entries = entries.to_vec();
+        self.external_generation += 1;
         Ok(diagnostics)
     }
 
@@ -847,45 +993,79 @@ impl Engine {
         self.external_index.targets.len()
     }
 
-    fn externals(&self) -> Externals {
-        if self.external_index.targets.is_empty() {
-            Externals::none()
-        } else {
-            Externals::none().install_unstamped(EXTERNAL_INDEX, self.external_index.clone())
+    /// The externals of a run on the engine's registry or on `variant`: its
+    /// external index, when it has entries.
+    fn externals(&self, variant: Option<&str>) -> Result<Externals, String> {
+        let index = match variant {
+            None => &self.external_index,
+            Some(key) => match self.variants.get(key).and_then(|v| v.index.as_ref()) {
+                Some((_, index)) => index,
+                None => return Err(format!("the variant {key} has no external index")),
+            },
+        };
+        Ok(if index.targets.is_empty() { Externals::none() } else { Externals::none().install_unstamped(EXTERNAL_INDEX, index.clone()) })
+    }
+
+    /// The registry of a run: the engine's, or `variant`'s.
+    fn registry_of(&self, variant: Option<&str>) -> Result<&Arc<FlmRegistry>, String> {
+        match variant {
+            None => Ok(&self.registry),
+            Some(key) => self.variants.get(key).map(|v| &v.registry).ok_or_else(|| format!("no variant {key}")),
         }
     }
 
-    fn place(&self, handles: &[u32]) -> Result<(Arc<Doc>, Vec<TreeId>), String> {
-        let mut content = DocContent::new();
-        let mut ids = Vec::with_capacity(handles.len());
-        for &h in handles {
-            let fragment = self.fragment(h)?;
-            ids.push(content.place(Arc::clone(fragment)));
-        }
-        Ok((Arc::new(Doc::with_options(content, self.document_options.clone())), ids))
+    /// The fragments of `handles` for a run: the engine's own, or, on a
+    /// variant, each parsed again from its source with the variant's language
+    /// and its layout (a tree is never run under a registry other than the
+    /// one that parsed it: its nodes hold the elements of their parse).
+    fn run_fragments(&self, handles: &[u32], variant: Option<&str>) -> Result<Vec<Arc<Fragment>>, String> {
+        let registry = self.registry_of(variant)?;
+        handles
+            .iter()
+            .map(|&h| {
+                let fragment = self.fragment(h)?;
+                if variant.is_none() {
+                    return Ok(Arc::clone(fragment));
+                }
+                parse_fragment(registry.lang(), Arc::clone(fragment.source()), fragment.layout(), &ParseOptions::default())
+                    .map(Arc::new)
+                    .map_err(|e| e.diagnostic().message().to_string())
+            })
+            .collect()
     }
 
-    fn plan(&mut self, key: String, make: impl FnOnce(&Arc<FlmRegistry>) -> Result<Plan, String>) -> Result<Arc<Plan>, String> {
-        if let Some(plan) = self.plans.get(&key) {
+    /// The plan of `key` on the engine's registry or on `variant`, made by
+    /// `make` and cached on first use.
+    fn plan(&mut self, variant: Option<&str>, key: String, make: impl FnOnce(&Arc<FlmRegistry>) -> Result<Plan, String>) -> Result<Arc<Plan>, String> {
+        let (registry, plans) = match variant {
+            None => (&self.registry, &mut self.plans),
+            Some(name) => match self.variants.get_mut(name) {
+                Some(Variant { registry, plans, .. }) => (&*registry, plans),
+                None => return Err(format!("no variant {name}")),
+            },
+        };
+        if let Some(plan) = plans.get(&key) {
             return Ok(Arc::clone(plan));
         }
-        let plan = Arc::new(make(&self.registry)?);
-        self.plans.insert(key, Arc::clone(&plan));
+        let plan = Arc::new(make(registry)?);
+        plans.insert(key, Arc::clone(&plan));
         Ok(plan)
     }
 
     pub fn render_html(&mut self, handles: &[u32], options: &RenderOptions) -> Result<HtmlOut, String> {
-        // The per-call render options are part of the plan's key (the JSON
-        // of a map with sorted keys).
+        // The per-call values are part of the plan's key.
         let key = format!(
             "html:{}:{}:{}",
             options.unresolved_refs_warning,
             options.title.as_deref().unwrap_or(""),
-            serde_json::Value::Object(options.render_options.clone()),
+            options_key(&options.render_options),
         );
         let prefer_zoodb_publish = self.prefer_zoodb_publish;
-        let run_render_options = self.run_render_options(&options.render_options, HTML_RESERVED)?;
-        let plan = self.plan(key, |registry| {
+        let call = self.call_settings(&options.render_options, HTML_RESERVED)?;
+        let variant = self.variant_for(call.variant)?;
+        let variant = variant.as_deref();
+        let run_render_options = call.render;
+        let plan = self.plan(variant, key, |registry| {
             // The call's own fields over the settings' (and the per-call)
             // values of the same option types, whose other fields are kept.
             let mut html_options: HtmlRenderOptions = option_or_default(&run_render_options);
@@ -910,8 +1090,8 @@ impl Engine {
             };
             Plan::for_workflow(registry, html::WORKFLOW, &overrides).map_err(|e| e.to_string())
         })?;
-        let (doc, ids) = self.place(handles)?;
-        let mut run = Run::new(doc, plan, self.externals()).map_err(|e| e.to_string())?;
+        let (doc, ids) = place(&self.run_fragments(handles, variant)?, &call.document);
+        let mut run = Run::new(doc, plan, self.externals(variant)?).map_err(|e| e.to_string())?;
         run.execute(&RunOptions::sequential()).map_err(|e| e.to_string())?;
 
         let fragments = run.table(OUTPUT_TABLE).map_err(|e| e.to_string())?.ok_or("the html workflow wrote no output table")?;
@@ -1053,17 +1233,19 @@ impl Engine {
     /// `latex-recomposed` workflow (Q12): the handbook composes the LaTeX
     /// around the per-tree texts.
     pub fn render_latex(&mut self, handles: &[u32], options: &LatexOptions) -> Result<LatexOut, String> {
-        // The per-call render options are part of the plan's key, as for
-        // html (G12).
+        // The per-call values are part of the plan's key, as for html (G12).
         let key = format!(
             "latex:{}:{}:{}:{}",
             options.unresolved_refs_warning,
             options.drop_comments,
             options.raw_label_types.join(","),
-            serde_json::Value::Object(options.render_options.clone()),
+            options_key(&options.render_options),
         );
-        let run_render_options = self.run_render_options(&options.render_options, LATEX_RESERVED)?;
-        let plan = self.plan(key, |registry| {
+        let call = self.call_settings(&options.render_options, LATEX_RESERVED)?;
+        let variant = self.variant_for(call.variant)?;
+        let variant = variant.as_deref();
+        let run_render_options = call.render;
+        let plan = self.plan(variant, key, |registry| {
             // The call's own fields over the settings' (and the per-call)
             // values of the same option types, whose other fields are kept.
             let mut latex_options: LatexRecomposedRenderOptions = option_or_default(&run_render_options);
@@ -1082,8 +1264,8 @@ impl Engine {
             let overrides = Overrides { render_options, unsupported, ..Overrides::none() };
             Plan::for_workflow(registry, latex_recomposed::WORKFLOW, &overrides).map_err(|e| e.to_string())
         })?;
-        let (doc, ids) = self.place(handles)?;
-        let mut run = Run::new(doc, plan, self.externals()).map_err(|e| e.to_string())?;
+        let (doc, ids) = place(&self.run_fragments(handles, variant)?, &call.document);
+        let mut run = Run::new(doc, plan, self.externals(variant)?).map_err(|e| e.to_string())?;
         run.execute(&RunOptions::sequential()).map_err(|e| e.to_string())?;
         let fragments = run.table(LATEX_OUTPUT_TABLE).map_err(|e| e.to_string())?.ok_or("the latex-recomposed workflow wrote no output table")?;
         let trees: Vec<String> = ids.iter().map(|id| fragments.trees.get(id).map(|f| f.text.clone()).unwrap_or_default()).collect();
@@ -1101,32 +1283,19 @@ impl Engine {
     /// (Q11); with `per_tree`, each tree is also rendered alone for its own
     /// text.
     pub fn render_text(&mut self, handles: &[u32], options: &TextOptions) -> Result<TextOut, String> {
-        let mut out = self.render_text_once(handles, options)?;
-        if options.per_tree {
-            let mut trees = Vec::with_capacity(handles.len());
-            let mut tree_diagnostics = Vec::with_capacity(handles.len());
-            for &h in handles {
-                let one = self.render_text_once(&[h], options)?;
-                trees.push(one.text.trim_end_matches('\n').to_string());
-                tree_diagnostics.push(one.diagnostics);
-            }
-            out.trees = trees;
-            out.tree_diagnostics = tree_diagnostics;
-        }
-        Ok(out)
-    }
-
-    fn render_text_once(&mut self, handles: &[u32], options: &TextOptions) -> Result<TextOut, String> {
         let key = format!(
             "text:{:?}:{}:{}:{}:{}",
             options.width,
             options.link_addresses,
             options.unresolved_refs_warning,
             options.pieces,
-            serde_json::Value::Object(options.render_options.clone()),
+            options_key(&options.render_options),
         );
-        let run_render_options = self.run_render_options(&options.render_options, TEXT_RESERVED)?;
-        let plan = self.plan(key, |registry| {
+        let call = self.call_settings(&options.render_options, TEXT_RESERVED)?;
+        let variant = self.variant_for(call.variant)?;
+        let variant = variant.as_deref();
+        let run_render_options = call.render;
+        let plan = self.plan(variant, key, |registry| {
             // The call's own fields over the settings' (and the per-call)
             // values of the same option types, whose other fields are kept.
             let mut text_options: TextRenderOptions = option_or_default(&run_render_options);
@@ -1148,8 +1317,28 @@ impl Engine {
             let overrides = Overrides { render_options, unsupported, ..Overrides::none() };
             Plan::for_workflow(registry, text::WORKFLOW, &overrides).map_err(|e| e.to_string())
         })?;
-        let (doc, _) = self.place(handles)?;
-        let mut run = Run::new(doc, plan, self.externals()).map_err(|e| e.to_string())?;
+        // The fragments are parsed again once for all the runs on a variant.
+        let fragments = self.run_fragments(handles, variant)?;
+        let mut out = self.text_run(&fragments, &call.document, &plan, variant)?;
+        if options.per_tree {
+            let mut trees = Vec::with_capacity(handles.len());
+            let mut tree_diagnostics = Vec::with_capacity(handles.len());
+            for fragment in &fragments {
+                let one = self.text_run(std::slice::from_ref(fragment), &call.document, &plan, variant)?;
+                trees.push(one.text.trim_end_matches('\n').to_string());
+                tree_diagnostics.push(one.diagnostics);
+            }
+            out.trees = trees;
+            out.tree_diagnostics = tree_diagnostics;
+        }
+        Ok(out)
+    }
+
+    /// One run of the text workflow's `plan` over `fragments` as one
+    /// document.
+    fn text_run(&self, fragments: &[Arc<Fragment>], document_options: &OptionValues, plan: &Arc<Plan>, variant: Option<&str>) -> Result<TextOut, String> {
+        let (doc, _) = place(fragments, document_options);
+        let mut run = Run::new(doc, Arc::clone(plan), self.externals(variant)?).map_err(|e| e.to_string())?;
         run.execute(&RunOptions::sequential()).map_err(|e| e.to_string())?;
         let output = run.table(TEXT_OUTPUT).map_err(|e| e.to_string())?.ok_or("the text workflow wrote no output table")?;
         let view = run.diagnostics();
@@ -1183,7 +1372,7 @@ impl Engine {
         // retrieved, no image is resolved and no output is produced (R13).
         // Images are listed from the element index (Q7), not from
         // `flm.graphics.info`, whose stage would ask the resolver.
-        let plan = self.plan(String::from("scan"), |registry| {
+        let plan = self.plan(None, String::from("scan"), |registry| {
             let request = PlanRequest {
                 demands: vec![
                     "flm.citations.keys".into(),
@@ -1198,7 +1387,7 @@ impl Engine {
             };
             Plan::build(registry, &request).map_err(|e| e.to_string())
         })?;
-        let (doc, ids) = self.place(handles)?;
+        let (doc, ids) = place(&self.run_fragments(handles, None)?, &self.document_options);
         let standalone_trees = StandaloneTrees {
             trees: handles.iter().zip(ids.iter()).filter(|(h, _)| standalone.contains(h)).map(|(_, id)| *id).collect(),
         };
@@ -1915,8 +2104,8 @@ mod tests {
     /// G3: render options given for one html or text run, over the
     /// settings' key by key; the settings' render options of the types the
     /// engine sets fields of reach every run (they were replaced by the
-    /// types' defaults before); unknown, registry-bound and reserved keys
-    /// are refused with their names.
+    /// types' defaults before); unknown and reserved keys and values that
+    /// cannot be read are refused with their names.
     #[test]
     fn render_options_per_call_over_the_settings() {
         let config: EngineConfig = serde_json::from_value(serde_json::json!({
@@ -1969,7 +2158,8 @@ mod tests {
         };
         refused(&mut engine, serde_json::json!({ "nosuchfeature": { "x": 1 } }), "`nosuchfeature`");
         refused(&mut engine, serde_json::json!({ "html": { "no_such_key": 1 } }), "`no_such_key`");
-        refused(&mut engine, serde_json::json!({ "citations": { "placement": "in-place" } }), "`citations.placement` is not a render option");
+        // A registry-bound value that the feature cannot read is named too.
+        refused(&mut engine, serde_json::json!({ "citations": { "placement": "sideways" } }), "citations.placement");
         refused(&mut engine, serde_json::json!({ "refs": { "unresolved": "allow" } }), "`refs.unresolved` is set by");
         refused(&mut engine, serde_json::json!({ "pieces": { "exclude": 3 } }), "pieces.exclude");
         refused(&mut engine, serde_json::json!({ "html": [] }), "must be a map");
@@ -1983,7 +2173,8 @@ mod tests {
     /// handbook's), over the settings' key by key: the display-math
     /// environments through `\flmMathEnvironment`, a character's spelling,
     /// the settings' style stem kept; a later call without them is as
-    /// before; reserved and registry-bound keys are refused, each named.
+    /// before; reserved keys and values that cannot be read are refused,
+    /// each named.
     #[test]
     fn render_latex_options_per_call() {
         let config: EngineConfig = serde_json::from_value(serde_json::json!({
@@ -2019,7 +2210,7 @@ mod tests {
         };
         refused(&mut engine, serde_json::json!({ "latex-recomposed": { "drop_comments": true } }), "`latex-recomposed.drop_comments` is set by");
         refused(&mut engine, serde_json::json!({ "refs": { "unresolved": "allow" } }), "`refs.unresolved` is set by");
-        refused(&mut engine, serde_json::json!({ "math": { "numbered_equations": false } }), "`math.numbered_equations` is not a render option");
+        refused(&mut engine, serde_json::json!({ "math": { "numbered_equations": "yes" } }), "math.numbered_equations");
     }
 
     /// The settings keys a run always sets itself are refused when the
@@ -2045,4 +2236,199 @@ mod tests {
         assert!(Engine::new(&config).is_ok());
     }
 
+    /// The deepest nesting of `<a` elements in `html`.
+    fn link_depth(html: &str) -> usize {
+        let (mut depth, mut deepest) = (0usize, 0usize);
+        let mut rest = html;
+        while let Some(at) = rest.find("<a ").into_iter().chain(rest.find("</a>")).min() {
+            if rest[at..].starts_with("<a ") {
+                depth += 1;
+                deepest = deepest.max(depth);
+            } else {
+                depth = depth.saturating_sub(1);
+            }
+            rest = &rest[at + 3..];
+        }
+        deepest
+    }
+
+    /// Brief 14, P1: on html, a `\href`, `\url` or `\email` to an address
+    /// outside the site opens in a new tab ([`crate::links::is_local`]), and is
+    /// otherwise what flm-core writes (the engine without the rule, byte for
+    /// byte); local and refused addresses, an address that is not
+    /// characters, links in links and the text and LaTeX outputs are
+    /// flm-core's.
+    #[test]
+    fn links_outside_the_site_open_in_a_new_tab() {
+        let on: EngineConfig = serde_json::from_value(serde_json::json!({
+            "settings": { "userdefs": { "macros": { "doi": { "args": "{", "content": "\\href{https://doi.org/#1}{#1}" } } } }
+        }))
+        .unwrap();
+        let off = EngineConfig { link_target_blank: false, ..on.clone() };
+        assert!(on.link_target_blank && EngineConfig::default().link_target_blank);
+        // (the source, the number of links in a new tab)
+        let cases: [(&str, usize); 9] = [
+            ("See \\href{https://example.org/a?b=1&c=2}{the \\emph{site}}, \\url{https://example.org/x/}, \\email{a@b.org} and \\href{https://a.org}{\\(x^2\\)}.", 4),
+            ("Here: \\href{#sec-s}{here}, \\href{/c/steane}{Steane}; elsewhere: \\href{//cdn.example.org/x}{another host}, \\href{figures/x.png}{relative}.", 2),
+            ("Refused: \\href{javascript:alert(1)}{js}.", 0),
+            ("A definition: \\doi{10.1/x}; not characters: \\doi{\\emph{x}}.", 1),
+            // A link inside the text: the standard link around it.
+            ("\\href{https://a.org}{see \\ref{person:bob}} and \\href{https://a.org}{a note\\footnote{N.}} and \\href{https://a.org}{\\cite{arxiv:1}}", 0),
+            ("\\href{https://a.org}{\\href{https://b.org}{y}}", 0),
+            ("\\href{https://a.org}{\\(\\text{see \\href{https://b.org}{b}}\\)}", 0),
+            ("\\hyperref[sec:s]{see \\href{https://b.org}{z}}", 0),
+            ("\\section{S}\\label{sec:s} The section.", 0),
+        ];
+        let mut outs = Vec::new();
+        for config in [&on, &off] {
+            let mut engine = Engine::new(config).unwrap();
+            engine.set_external_index(&[ExternalEntry { label: "person:bob".into(), href: "/person/bob".into(), display: "Bob".into() }]).unwrap();
+            engine.set_citations(vec![CitationEntry {
+                key: "arxiv:1".into(),
+                text: "A. Author, \\emph{A title}, \\href{https://arxiv.org/abs/1}{arXiv:1}".into(),
+            }]);
+            let handles: Vec<u32> = cases
+                .iter()
+                .enumerate()
+                .map(|(i, (text, _))| engine.parse(text, &format!("a.yml#f{i}"), FragmentLayout::InlineOrBlocks).unwrap().handle)
+                .collect();
+            let html = engine.render_html(&handles, &RenderOptions::default()).unwrap();
+            let text = engine.render_text(&handles, &TextOptions { per_tree: true, ..TextOptions::default() }).unwrap();
+            let latex = engine.render_latex(&handles, &LatexOptions::default()).unwrap();
+            outs.push((html, text, latex));
+        }
+        let [(html, text, latex), (std_html, std_text, std_latex)] = &outs[..] else { unreachable!() };
+        let blank = " target=\"_blank\"";
+        for (i, (source, count)) in cases.iter().enumerate() {
+            let tree = &html.trees[i];
+            assert_eq!(tree.matches(blank).count(), *count, "{source}\n{tree}");
+            assert_eq!(tree.replace(blank, ""), std_html.trees[i], "{source}");
+            assert!(link_depth(tree) <= 1, "{tree}");
+        }
+        assert!(
+            html.trees[0].contains("<a class=\"flm-pres-link\" href=\"https://example.org/a?b=1&amp;c=2\" data-flm-kind=\"url\" target=\"_blank\">the <em"),
+            "{}",
+            html.trees[0]
+        );
+        assert!(html.trees[0].contains("href=\"mailto:a@b.org\" data-flm-kind=\"url\" target=\"_blank\">a@b.org</a>"), "{}", html.trees[0]);
+        // The citation entry's link in the list of cited works.
+        let bib = |out: &HtmlOut| out.pieces.iter().find(|p| p.name == "flm.citations.bibliography").map(|p| p.html.clone()).unwrap();
+        assert!(bib(html).contains("href=\"https://arxiv.org/abs/1\" data-flm-kind=\"url\" target=\"_blank\">arXiv:1</a>"), "{}", bib(html));
+        assert_eq!(bib(html).replace(blank, ""), bib(std_html));
+        // The same requirements and diagnostics: the refused address and the
+        // address that is not characters reported as flm-core reports them.
+        assert_eq!((&html.requires, &html.tree_requires), (&std_html.requires, &std_html.tree_requires));
+        // (flm-core reports the refused address in the source of the rule
+        // that staged the link, which names the rule.)
+        let ids = |out: &HtmlOut| out.diagnostics.iter().map(|d| (d.identifier.clone(), d.severity)).collect::<Vec<_>>();
+        assert_eq!(ids(html), ids(std_html), "{:?}\n{:?}", html.diagnostics, std_html.diagnostics);
+        let names: Vec<String> = ids(html).into_iter().map(|(id, _)| id).collect();
+        assert_eq!(names, ["flm.href.address-not-characters", "flm.html.refused-address"]);
+        // Text and LaTeX: flm-core's rules.
+        assert_eq!((&text.text, &text.trees), (&std_text.text, &std_text.trees));
+        assert_eq!(latex.trees, std_latex.trees);
+    }
+
+    /// Brief 14, P2: values of settings bound to the registry or to the
+    /// document for one run. The run uses a variant, built once per distinct
+    /// set of registry-bound values (in any key order), its fragments parsed
+    /// again with the variant's language and its external index built from
+    /// the engine's entries; the next run without them is as before; a value
+    /// the feature cannot read is refused by name; a released fragment is
+    /// refused on a variant as on the engine.
+    #[test]
+    fn registry_bound_values_per_call_run_on_a_variant() {
+        let mut engine = Engine::new(&EngineConfig::default()).unwrap();
+        engine.set_citations(vec![CitationEntry {
+            key: "arxiv:1".into(),
+            text: "A. Author, \\emph{A title}, \\href{https://arxiv.org/abs/1}{arXiv:1}".into(),
+        }]);
+        engine.set_external_index(&[ExternalEntry { label: "person:bob".into(), href: "/person/bob".into(), display: "Bob \\emph{Bee}".into() }]).unwrap();
+        let a = engine.parse("Friend of \\ref{person:bob}, cites \\cite{arxiv:1}.\\footnote{A note.}", "a.yml#d", FragmentLayout::InlineOrBlocks).unwrap();
+        let b = engine.parse("Also \\cite{arxiv:1}.", "a.yml#e", FragmentLayout::InlineOrBlocks).unwrap();
+        let text_options = |render_options: serde_json::Value| TextOptions { per_tree: true, render_options: per_call(render_options), ..TextOptions::default() };
+
+        // The citation entries in place, in a text run.
+        let in_place = serde_json::json!({ "citations": { "placement": "in-place" } });
+        let text = engine.render_text(&[a.handle, b.handle], &text_options(in_place.clone())).unwrap();
+        assert!(text.diagnostics.is_empty(), "{:?}", text.diagnostics);
+        assert_eq!(text.trees[0], "Friend of Bob Bee, cites\u{a0}[A. Author, A title, arXiv:1].¹", "{:?}", text.trees);
+        assert_eq!(text.trees[1], "Also\u{a0}[A. Author, A title, arXiv:1].");
+        assert_eq!(engine.variant_count(), 1);
+        // The same values again, in html: no second variant.
+        let html = engine.render_html(&[a.handle], &RenderOptions { render_options: per_call(in_place.clone()), ..RenderOptions::default() }).unwrap();
+        assert!(html.trees[0].contains("A title") && !html.pieces.iter().any(|p| p.name == "flm.citations.bibliography"), "{:?}", html);
+        assert_eq!(engine.variant_count(), 1);
+        // Without them: the marks, the engine's registry.
+        let marks = engine.render_text(&[a.handle], &text_options(serde_json::json!({}))).unwrap();
+        assert_eq!(marks.trees[0], "Friend of Bob Bee, cites\u{a0}[1].¹");
+
+        // The lists without their headings, in an html run; then with them
+        // again. An xnote kind replaces the settings' map of kinds whole.
+        let headings = |out: &HtmlOut| out.pieces.iter().map(|p| p.html.contains("<h")).collect::<Vec<_>>();
+        let with = engine.render_html(&[a.handle], &RenderOptions::default()).unwrap();
+        assert_eq!(headings(&with), vec![true, true], "{:?}", with.pieces);
+        let no_headings = serde_json::json!({
+            "xnotes": { "kinds": { "footnote": { "commands": ["footnote"], "label_type": "fn", "words": { "base": { "one": "Footnote~", "other": "Footnotes~" } }, "title": null } } },
+            "citations": { "heading_title": null },
+        });
+        let without = engine.render_html(&[a.handle], &RenderOptions { render_options: per_call(no_headings.clone()), ..RenderOptions::default() }).unwrap();
+        assert!(without.diagnostics.is_empty(), "{:?}", without.diagnostics);
+        assert_eq!(without.pieces.len(), 2);
+        assert_eq!(headings(&without), vec![false, false], "{:?}", without.pieces);
+        assert_eq!(without.trees, with.trees);
+        assert_eq!(engine.variant_count(), 2);
+        let again = engine.render_html(&[a.handle], &RenderOptions::default()).unwrap();
+        assert_eq!(headings(&again), vec![true, true]);
+        // The same values in another key order: the same variant.
+        let reordered = serde_json::json!({
+            "citations": { "heading_title": null },
+            "xnotes": { "kinds": { "footnote": { "title": null, "words": { "base": { "other": "Footnotes~", "one": "Footnote~" } }, "commands": ["footnote"], "label_type": "fn" } } },
+        });
+        engine.render_html(&[a.handle], &RenderOptions { render_options: per_call(reordered), ..RenderOptions::default() }).unwrap();
+        assert_eq!(engine.variant_count(), 2);
+
+        // A value bound to the document or to either site (`toc.depth`): on
+        // the run's document, with no variant.
+        let toc = engine.parse("\\section{Sec}\n\n\\subsection{Sub}\n\nText.", "a.yml#t", FragmentLayout::Blocks).unwrap();
+        let mut entries = |depth: serde_json::Value| {
+            let mut values = serde_json::json!({ "pieces": { "include": ["flm.toc"] } });
+            if !depth.is_null() {
+                values["toc"] = serde_json::json!({ "depth": depth });
+            }
+            let options = RenderOptions { render_options: per_call(values), ..RenderOptions::default() };
+            let out = engine.render_html(&[toc.handle], &options).unwrap();
+            let piece = out.pieces.iter().find(|p| p.name == "flm.toc").map(|p| p.html.clone()).unwrap_or_default();
+            (piece.contains("Sec"), piece.contains("Sub"))
+        };
+        assert_eq!(entries(serde_json::Value::Null), (true, true));
+        assert_eq!(entries(serde_json::json!(1)), (true, false));
+        assert_eq!(engine.variant_count(), 2);
+
+        // The external index of a variant follows the engine's.
+        engine.set_external_index(&[ExternalEntry { label: "person:bob".into(), href: "/b".into(), display: "Robert".into() }]).unwrap();
+        let text = engine.render_text(&[a.handle], &text_options(in_place.clone())).unwrap();
+        assert!(text.trees[0].starts_with("Friend of Robert, cites\u{a0}[A. Author"), "{:?}", text.trees);
+
+        // Refused, by name; a released fragment on a variant.
+        let err = engine.render_text(&[a.handle], &text_options(serde_json::json!({ "citations": { "placement": "sideways" } }))).unwrap_err();
+        assert!(err.contains("citations.placement"), "{err}");
+        let err = engine.render_text(&[a.handle], &text_options(serde_json::json!({ "citations": { "no_such_key": 1 } }))).unwrap_err();
+        assert!(err.contains("`no_such_key`"), "{err}");
+        engine.release(&[b.handle]).unwrap();
+        let err = engine.render_text(&[a.handle, b.handle], &text_options(in_place.clone())).unwrap_err();
+        assert!(err.contains("released"), "{err}");
+        assert!(engine.render_text(&[a.handle], &text_options(in_place)).is_ok());
+        assert_eq!(engine.variant_count(), 2);
+    }
+
+    /// The key of per-call values is the same in any key order.
+    #[test]
+    fn options_key_sorts_the_keys() {
+        let a = serde_json::json!({ "b": 1, "a": { "y": [1, { "q": null, "p": "x" }], "x": true } });
+        let b = serde_json::json!({ "a": { "x": true, "y": [1, { "p": "x", "q": null }] }, "b": 1 });
+        let (a, b) = (a.as_object().unwrap(), b.as_object().unwrap());
+        assert_eq!(options_key(a), options_key(b));
+        assert_eq!(options_key(a), r#"{"a":{"x":true,"y":[1,{"p":"x","q":null}]},"b":1}"#);
+    }
 }

@@ -403,13 +403,13 @@ describe('ZooFlmEngine', function () {
             // The next run without them builds the lists again.
             const again = engine.render_document({ compose: ({ rdrblock, endnotes }) => rdrblock(F.bob.biography) + endnotes() });
             assert.match(again.html, /flm-citations-bibliography/);
-            // A key that is unknown, fixed when the engine is created, or set by
-            // the call's own options is refused with its name.
+            // A key that is unknown or set by the call's own options, and a
+            // value the feature cannot read, are refused with their names.
             const compose = ({ rdrblock }) => rdrblock(F.bob.biography);
             assert.throws( () => engine.render_document({ compose, render_options: { pieces: { exclud: [] } } }),
                            /the feature `pieces` has no setting `exclud`/ );
-            assert.throws( () => engine.render_document({ compose, render_options: { citations: { placement: 'in-place' } } }),
-                           /`citations\.placement` is not a render option/ );
+            assert.throws( () => engine.render_document({ compose, render_options: { citations: { placement: 'sideways' } } }),
+                           /citations\.placement/ );
             assert.throws( () => engine.render_document({ compose, render_options: { refs: { unresolved: 'allow' } } }),
                            /`refs\.unresolved` is set by/ );
             assert.throws( () => engine.render_document({ compose, render_options: [] }), TypeError );
@@ -648,12 +648,173 @@ describe('ZooFlmEngine', function () {
                 assert.strictEqual(engine.render_latex([f], { error_policy: 'continue' }).trees[0], plain.trees[0]);
                 assert.throws( () => engine.render_latex([f], { render_options: { 'latex-recomposed': { drop_comments: true } } }),
                                /`latex-recomposed\.drop_comments` is set by/ );
-                assert.throws( () => engine.render_latex([f], { render_options: { math: { numbered_equations: false } } }),
-                               /`math\.numbered_equations` is not a render option/ );
+                assert.throws( () => engine.render_latex([f], { render_options: { math: { numbered_equations: 'yes' } } }),
+                               /math\.numbered_equations/ );
                 assert.throws( () => engine.render_latex([f], { render_options: [] }), TypeError );
             } finally {
                 engine.release(f);
             }
+        });
+    });
+
+    describe('links in a new tab', function () {
+
+        // The engine without the rule: flm-core's own links.
+        let off;
+        const INDEX = [{ label: 'person:alice', href: '/person/alice', display: 'Alice' }];
+
+        before(async function () {
+            off = await ZooFlmEngine.create({ load_wasm, core: { ...CORE, link_target_blank: false } });
+            off.set_citations(CITATIONS);
+            for (const e of [engine, off]) {
+                e.set_index(INDEX, { context: 'links' });
+            }
+        });
+
+        after(function () {
+            off?.free();
+        });
+
+        const LINKS = 'Out: \\href{https://example.org/?a=1&b=2}{the \\emph{site}}, \\url{https://example.org/x/}, '
+            + '\\email{a@b.org}, \\href{//cdn.example.org/x}{another host}, \\href{figures/x.png}{relative}. '
+            + 'In: \\href{#sec-x}{here}, \\href{/person/alice}{Alice}, \\href{javascript:alert(1)}{script}. '
+            + 'Nested: \\href{https://a.org}{see \\ref{person:alice}}, \\href{https://a.org}{\\href{https://b.org}{y}}.';
+        const BLANK = / target="_blank"/g;
+
+        // The deepest nesting of <a> elements in `html`.
+        const link_depth = (html) => {
+            let depth = 0, deepest = 0;
+            for (const [tag] of html.matchAll(/<a\b|<\/a>/g)) {
+                depth += (tag === '</a>') ? -1 : 1;
+                deepest = Math.max(deepest, depth);
+            }
+            return deepest;
+        };
+
+        // `render(e, f)` for a fragment of LINKS made in each engine.
+        const in_both = (render) => [engine, off].map( (e) => {
+            const f = e.make_fragment(LINKS, { origin: origin('erin', 'links') });
+            try {
+                return render(e, f);
+            } finally {
+                e.release(f);
+            }
+        } );
+
+        it('a link to an address outside the site opens in a new tab', function () {
+            const [on, std] = in_both( (e, f) => e.render_fragment(f, { context: 'links', error_policy: 'continue' }) );
+            // \href, \url and \email to another site, another host, a relative address
+            assert.strictEqual(on.html.match(BLANK).length, 5);
+            assert.ok(on.html.includes('<a class="flm-pres-link" href="https://example.org/?a=1&amp;b=2" '
+                                       + 'data-flm-kind="url" target="_blank">the <em'), on.html);
+            assert.match(on.html, /href="mailto:a@b\.org" data-flm-kind="url" target="_blank">a@b\.org<\/a>/);
+            // otherwise flm-core's markup, byte for byte: the local addresses,
+            // the refused one, the links inside links
+            assert.strictEqual(on.html.replace(BLANK, ''), std.html);
+            assert.match(on.html, /href="#sec-x" data-flm-kind="url">here<\/a>/);
+            assert.match(on.html, /href="\/person\/alice" data-flm-kind="url">Alice<\/a>/);
+            assert.strictEqual(link_depth(on.html), 1);
+            assert.deepStrictEqual(on.requires, std.requires);
+            assert.deepStrictEqual([on, std].map( (r) => r.diagnostics.map( (d) => d.identifier ) ),
+                                   [['flm.html.refused-address'], ['flm.html.refused-address']]);
+        });
+
+        it('a formula in the text of a link keeps the new tab; a link inside the formula does not', function () {
+            const [on, std] = [engine, off].map( (e) => {
+                const f = e.make_fragment('\\href{https://a.org}{the \\(x^2\\) code} and '
+                                          + '\\href{https://a.org}{\\(\\text{see \\href{https://b.org}{b}}\\)}',
+                                          { origin: origin('erin', 'math') });
+                try {
+                    return e.render_fragment(f).html;
+                } finally {
+                    e.release(f);
+                }
+            } );
+            assert.match(on, /^<a class="flm-pres-link" href="https:\/\/a\.org" data-flm-kind="url" target="_blank">the <span class="flm-pres-math--passthrough"/);
+            assert.strictEqual(on.match(BLANK).length, 1);
+            assert.strictEqual(on.replace(BLANK, ''), std);
+            assert.strictEqual(link_depth(on), 1);
+        });
+
+        it("and so does the link of a citation's entry, in the list of cited works", function () {
+            const r = engine.render_document({ compose: ({ rdrblock, endnotes }) => rdrblock(F.bob.biography) + endnotes() });
+            assert.match(r.html, /<a class="flm-pres-link" href="https:\/\/arxiv\.org\/abs\/1234\.5678" data-flm-kind="url" target="_blank">arXiv:1234\.5678<\/a>/);
+        });
+
+        it('the text and the LaTeX are as flm-core writes them', function () {
+            const [on, std] = in_both( (e, f) => [
+                e.render_text([f], { context: 'links', error_policy: 'continue' }).trees,
+                e.render_latex([f], { context: 'links', error_policy: 'continue', raw_label_types: ['person'] }).trees,
+            ] );
+            assert.deepStrictEqual(on, std);
+            assert.match(on[0][0], /^Out: the site, example\.org\/x, a@b\.org, another host, relative\./);
+        });
+    });
+
+    describe('values of registry-bound settings for one run', function () {
+
+        const IN_PLACE = { citations: { placement: 'in-place' } };
+        const NO_HEADINGS = {
+            citations: { heading_title: null },
+            // a map of xnote kinds replaces the settings' whole
+            xnotes: { kinds: { footnote: {
+                commands: ['footnote'], label_type: 'fn', title: null,
+                words: { base: { one: 'Footnote~', other: 'Footnotes~' } },
+            } } },
+        };
+
+        it('render_text shows the citations in place; the variant is built once', function () {
+            const count = engine.core.variant_count();
+            const out = engine.render_text([F.bob.biography, F.bob.notes], { render_options: IN_PLACE });
+            assert.deepStrictEqual(out.diagnostics, []);
+            assert.match(out.trees[0], /^Bob is a friend of Alice Aaliz\.¹ He wrote\u00a0\[A\. Author, A title, arXiv:1234\.5678 \(2020\)\]\./);
+            assert.strictEqual(engine.core.variant_count(), count + 1);
+            const again = engine.render_text([F.bob.biography], { render_options: { citations: { placement: 'in-place' } } });
+            assert.strictEqual(again.trees[0], out.trees[0]);
+            assert.strictEqual(engine.core.variant_count(), count + 1);
+            // the next run without them: the marks
+            assert.match(engine.render_text([F.bob.biography]).trees[0], /He wrote\u00a0\[1\]\./);
+        });
+
+        it("render_document without the lists' headings; the next run has them again", function () {
+            const compose = ({ rdrblock, endnotes }) => rdrblock(F.bob.biography) + endnotes();
+            const headings = (html) => (html.match(/<h[1-6]\b/g) ?? []).length;
+            const before = engine.render_document({ compose });
+            const without = engine.render_document({ compose, render_options: NO_HEADINGS });
+            const again = engine.render_document({ compose });
+            assert.deepStrictEqual([headings(before.html), headings(without.html), headings(again.html)], [2, 0, 2]);
+            assert.deepStrictEqual(without.diagnostics, []);
+            assert.match(without.html, /flm-citations-bibliography/);
+            assert.match(without.html, /Since the Zoo opened\./);
+            assert.strictEqual(again.html, before.html);
+        });
+
+        it('render_latex runs on a variant too', function () {
+            // the LaTeX command of the footnote kind, in the style file
+            const ENDNOTES = { xnotes: { kinds: { footnote: {
+                commands: ['footnote'], label_type: 'fn', latex_command: 'endnote',
+                words: { base: { one: 'Footnote~', other: 'Footnotes~' } },
+            } } } };
+            const before = engine.render_latex([F.bob.biography]);
+            const count = engine.core.variant_count();
+            const out = engine.render_latex([F.bob.biography], { render_options: ENDNOTES });
+            assert.strictEqual(engine.core.variant_count(), count + 1);
+            assert.ok(before.style.includes('\\flmXNfootnote{+O{} +m}{\\footnote{#1#2}}'), before.style);
+            assert.ok(out.style.includes('\\flmXNfootnote{+O{} +m}{\\endnote{#1#2}}'), out.style);
+            assert.deepStrictEqual(out.trees, before.trees);
+            assert.deepStrictEqual(out.diagnostics, []);
+            engine.render_latex([F.bob.biography], { render_options: ENDNOTES });
+            assert.strictEqual(engine.core.variant_count(), count + 1);
+        });
+
+        it('a value the feature cannot read is refused by name; a released fragment is refused', function () {
+            const f = engine.make_fragment('Cites \\cite{arXiv:1234.5678}.', { origin: origin('frank', 'cites') });
+            assert.match(engine.render_fragment(f, { render_options: IN_PLACE }).html, /A title/);
+            assert.throws( () => engine.render_fragment(f, { render_options: { xnotes: { kinds: 3 } } }), /xnotes\.kinds/ );
+            const handle = f.handle;
+            engine.release(f);
+            assert.throws( () => engine.core.render_text([handle], { render_options: IN_PLACE }), /released/ );
+            assert.throws( () => engine.render_fragment(f, { render_options: IN_PLACE }), /was released/ );
         });
     });
 
@@ -805,18 +966,23 @@ describe('ZooFlmEngine', function () {
             const settings = { userdefs: { macros: { zoo: { content: 'the Zoo' } } } };
             const a = await ZooFlmEngine.create({ load_wasm, core: { off: ['annotations', 'quote'], settings } });
             const b = await ZooFlmEngine.create({
-                load_wasm, core: { settings, srcset: null, dollar_math: null, off: ['quote', 'annotations'] },
+                load_wasm,
+                core: { settings, srcset: null, dollar_math: null, off: ['quote', 'annotations'], link_target_blank: null },
             });
             const c = await ZooFlmEngine.create({ load_wasm, core: { off: ['annotations', 'quote'], settings, dollar_math: true } });
+            const d = await ZooFlmEngine.create({
+                load_wasm, core: { off: ['annotations', 'quote'], settings, link_target_blank: false },
+            });
             try {
                 assert.deepStrictEqual(Object.keys(a.core_version).sort(), ['binding', 'flm_core']);
                 assert.match(a.core_version.flm_core, /^\d+\.\d+\.\d+/);
                 assert.match(a.settings_hash, /^[0-9a-f]{16}$/);
                 assert.strictEqual(a.settings_hash, b.settings_hash);
                 assert.notStrictEqual(a.settings_hash, c.settings_hash);
+                assert.notStrictEqual(a.settings_hash, d.settings_hash);
                 assert.notStrictEqual(a.settings_hash, engine.settings_hash);
             } finally {
-                [a, b, c].forEach( (e) => e.free() );
+                [a, b, c, d].forEach( (e) => e.free() );
             }
         });
 

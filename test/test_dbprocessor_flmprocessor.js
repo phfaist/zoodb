@@ -288,8 +288,12 @@ describe('ZooFlmProcessor', function () {
             const doc = zoodb.objects.person.bob._zoodb.searchable_text_doc;
             assert.strictEqual(doc.name, 'Bob \\(B_0\\)');
             assert.match(doc.biography, /^Bob is a friend of Alice Aaliz, whose early life is told in Early life\.¹/);
-            // by default, a citation and a footnote are their marks alone
-            assert.doesNotMatch(doc.biography, /Custom reference|Bob says so|References/);
+            // by default, each citation is the cited work's entry in place
+            // of its mark, between the citation style's brackets (ZooDb
+            // 0.2.1's form), and a footnote is its mark alone
+            assert.match(doc.biography, / and cites\u00a0\[Custom reference xyz\]\.\n/);
+            assert.match(doc.biography, /\nFigure\u00a01: Bob’s dot, after\u00a0\[Custom reference xyz\]\.$/);
+            assert.doesNotMatch(doc.biography, /Bob says so|References|\[1\]/);
             assert.match(zoodb.objects.person.alice._zoodb.searchable_text_doc.topics_detail, /^Since /);
         });
 
@@ -489,8 +493,34 @@ describe('ZooFlmProcessor', function () {
             }
         });
 
-        it('searchable_text_options.flm_pieces puts the cited works and the footnotes in the search text', async function () {
+        it('searchable_text_options.flm_citations_in_place: false keeps the citation marks', async function () {
+            const zoodb = await load_zoo({ searchable_text_options: { flm_citations_in_place: false } });
+            try {
+                const bob = zoodb.objects.person.bob._zoodb.searchable_text_doc;
+                assert.match(bob.biography, / and cites\u00a0\[1\]\.\n/);
+                assert.doesNotMatch(bob.biography, /Custom reference|Bob says so|References/);
+            } finally {
+                zoodb.zoo_flm_engine.free();
+            }
+        });
+
+        it('searchable_text_options.flm_pieces puts the footnotes in the search text', async function () {
             const zoodb = await load_zoo({ searchable_text_options: { flm_pieces: true } });
+            try {
+                const bob = zoodb.objects.person.bob._zoodb.searchable_text_doc;
+                // the citations in place, then the field's footnotes; no
+                // list of cited works
+                assert.match(bob.biography, / and cites\u00a0\[Custom reference xyz\]\./);
+                assert.match(bob.biography, /\nFootnotes\n-+\n\n¹ Bob says so\.$/);
+                assert.doesNotMatch(bob.biography, /References/);
+                assert.strictEqual(bob.name, 'Bob \\(B_0\\)');
+            } finally {
+                zoodb.zoo_flm_engine.free();
+            }
+        });
+
+        it('searchable_text_options.flm_pieces with the marks kept puts the cited works and the footnotes in the search text', async function () {
+            const zoodb = await load_zoo({ searchable_text_options: { flm_pieces: true, flm_citations_in_place: false } });
             try {
                 const bob = zoodb.objects.person.bob._zoodb.searchable_text_doc;
                 // the same text, then the field's footnotes and cited works

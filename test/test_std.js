@@ -323,16 +323,21 @@ describe('zoodb.test_std', function() {
             createMyZooDb({ flm_options: { ...flm_options, engine: { dolar_math: true } } }),
             {
                 message: 'use_flm_engine: unknown key ‘dolar_math’ in flm_options.engine, '
-                    + 'expected one of dollar_math, settings, off, render_value_options',
+                    + 'expected one of dollar_math, settings, off, link_target_blank, render_value_options',
             },
         );
         // no engine options at all, or a key set to null: the defaults
         const zoodb = await createMyZooDb({ flm_options: { ...flm_options, engine: null } });
         assert.ok(zoodb.zoo_flm_engine);
         const zoodb2 = await createMyZooDb({
-            flm_options: { ...flm_options, engine: { dollar_math: null, off: undefined } },
+            flm_options: { ...flm_options, engine: { dollar_math: null, off: undefined, link_target_blank: null } },
         });
-        assert.ok(zoodb2.zoo_flm_engine);
+        assert.strictEqual(zoodb2.zoo_flm_engine.settings_hash, zoodb.zoo_flm_engine.settings_hash);
+        // link_target_blank reaches the engine
+        const zoodb3 = await createMyZooDb({
+            flm_options: { ...flm_options, engine: { link_target_blank: false } },
+        });
+        assert.notStrictEqual(zoodb3.zoo_flm_engine.settings_hash, zoodb.zoo_flm_engine.settings_hash);
     });
 
 });

@@ -272,6 +272,15 @@ export class ZooFlmCore {
         return takeFromExternrefTable0(ret[0]);
     }
     /**
+     * The number of variants built for the registry-bound values that
+     * render calls gave (each built once).
+     * @returns {number}
+     */
+    variant_count() {
+        const ret = wasm.zooflmcore_variant_count(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
      * The versions of the module's build: `{ binding, flm_core }` (this
      * crate's version and the `flm-core` version it was built against).
      * @returns {CoreVersion}

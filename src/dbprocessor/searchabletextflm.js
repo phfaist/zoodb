@@ -4,6 +4,11 @@ const debug = debug_module('zoodb.dbprocessor.searchabletextflm');
 import { check_error_policy, is_fragment } from '../zooflm/engine.js';
 
 
+// The core's settings for the text runs that show each citation's entry in
+// place of its mark.
+const CITATIONS_IN_PLACE = Object.freeze({ citations: Object.freeze({ placement: 'in-place' }) });
+
+
 // -----------------------------------------------------------------------------
 
 
@@ -14,8 +19,10 @@ import { check_error_policy, is_fragment } from '../zooflm/engine.js';
  * alone: a standalone fragment through the snippet cache, the others through
  * one `engine.render_text()` over the object's fragments, each field's text
  * from ``trees`` (a fragment rendered alone, in which a reference to a label
- * of another field shows the label; the search index does not mind), with
- * its pieces when the option `pieces` is set.
+ * of another field shows the label; the search index does not mind), each
+ * citation shown as its entry in place of its mark unless the option
+ * `citations_in_place` is `false`, with its pieces when the option `pieces`
+ * is set.
  *
  * Pass an instance's `assemble_doc_text_values` method as the
  * `assemble_doc_text_values` option of :class:`SearchableTextFieldset` when
@@ -32,17 +39,22 @@ import { check_error_policy, is_fragment } from '../zooflm/engine.js';
  *   ``'continue'``: the search text is made whatever the content holds; the
  *   FLM processor and the page renders report the content's errors).
  *
- * - `pieces` — if `true`, the text of each fragment that is not standalone
- *   ends with its pieces, as `engine.render_text()` places them: the list of
- *   the works it cites (under the citations' heading) and its footnotes, so
- *   that an object is found by the authors and titles of the works it cites.
- *   Default `false`: a citation or a footnote is its mark alone (``[1]``),
- *   which makes a smaller index.  A standalone fragment holds neither (the
- *   FLM processor's standalone check), so its snippet is used either way.
+ * - `citations_in_place` — if `true` (the default), each citation is
+ *   replaced by the cited work's entry, in brackets (``a code [A. Author, “A
+ *   title”, arXiv:1234.5678].``), so that an object can be found by the
+ *   authors and titles of the works it cites; the assembler renders with the
+ *   engine setting ``citations.placement: 'in-place'``.  If `false`, a
+ *   citation is shown by its mark alone (``[1]``).
+ *
+ * - `pieces` — if `true`, the text of each field ends with its footnotes
+ *   and, when `citations_in_place` is `false`, with the list of the works it
+ *   cites.  Default `false`: a footnote is shown by its mark alone, which
+ *   keeps the index smaller.  A standalone fragment holds neither, so its
+ *   snippet is used either way.
  */
 export class FLMSearchableDocTextValuesAssembler
 {
-    constructor({ engine, render_value_fn, error_policy, pieces } = {})
+    constructor({ engine, render_value_fn, error_policy, citations_in_place, pieces } = {})
     {
         this.engine = engine;
         if (this.engine == null) {
@@ -50,6 +62,7 @@ export class FLMSearchableDocTextValuesAssembler
         }
         this.render_value_fn = render_value_fn ?? ( (v) => String(v) );
         this.error_policy = check_error_policy(error_policy ?? 'continue');
+        this.citations_in_place = Boolean(citations_in_place ?? true);
         this.pieces = Boolean(pieces ?? false);
     }
 
@@ -75,6 +88,7 @@ export class FLMSearchableDocTextValuesAssembler
         if (fragments.length > 0) {
             const out = this.engine.render_text(fragments, {
                 per_fragment: true, pieces: this.pieces, error_policy: this.error_policy,
+                render_options: this.citations_in_place ? CITATIONS_IN_PLACE : null,
             });
             if (out.diagnostics.length > 0) {
                 debug(`search text: ${out.diagnostics.length} diagnostic(s)`);

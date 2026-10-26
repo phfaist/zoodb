@@ -173,8 +173,9 @@ boilerplate code:
           searchable_text_options: {
               // which DB object types to search
               object_types: ['myfancyobject',....],
-              // true: the search text of an FLM field also holds its
-              // footnotes and the works it cites (default: their marks alone)
+              // show each citation's entry in place of its mark in the search text (false: the mark alone, e.g. [1])
+              flm_citations_in_place: true,
+              // true: the search text of an FLM field also includes its footnotes (and, if flm_citations_in_place is false, the works it cites)
               flm_pieces: false,
           },
     
@@ -322,7 +323,9 @@ The configuration keys of the FLM features, all optional except where noted
    The core's configuration, as data: ``dollar_math`` (whether ``$…$``
    delimits math; default ``false``), ``settings`` (the settings of the
    standard features, one map per feature; user definitions such as macros
-   under ``userdefs``), ``off`` (standard features switched off, by name), and
+   under ``userdefs``), ``off`` (standard features switched off, by name),
+   ``link_target_blank`` (default ``true``: in the HTML output, a link to an
+   address outside the site opens in a new tab, see :doc:`zoodb.zooflm`), and
    ``render_value_options`` (how the composer's ``rdr()`` renders a list).  An
    unknown key, feature or setting is an error that names it.  A browser app
    that renders the zoo's data dump creates its engine with the same
