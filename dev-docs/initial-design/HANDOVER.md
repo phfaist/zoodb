@@ -61,8 +61,9 @@ in `README.md` of this folder.
   the tarball, install, build, restore `website/package.json` and `yarn.lock`) is spelled
   out in 11, Results, Part C; also clear the clone's root `.parcel-cache` first (the
   build script clears only `website/.parcel-cache`, and the root one puts an earlier
-  build's bundles back into `_site/`). Last rebuilt on 2026-10-26 with flm-core
-  `e7b4ba17`. The original `../zoodb-example` is read-only.
+  build's bundles back into `_site/`). Last rebuilt on 2026-10-26 (night) on the
+  package with brief 14 (citations in place in the search text, external links in a
+  new tab) and flm-core `e7b4ba17`. The original `../zoodb-example` is read-only.
 - **The EC zoo port** (step 6, brief 13) lives in three clones under `scratch/eczoo/`
   (ignored through `scratch/.gitignore`): `eczoo_sitegen`, `eczoo_data`,
   `eczoo_handbook`, each on a branch `zoodb-flmrs` with its push URL disabled, never
@@ -296,7 +297,9 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
     `zoodb-example` branch goes live with zoodb's (below);
   - F1 is fixed upstream (`e7b4ba17`); whether the sitegen's switch stays (question 10),
     and whether F2 to F5 and the space of question 29 go upstream;
-  - outside the worktree: the two archives B1's install wrote in `~/.yarn/berry/cache`
+  - outside the worktree: the five `@phfaist-zoodb-file-*-10c0.zip` archives the
+    example's installs wrote in `~/.yarn/berry/cache` (2026-10-16 and 2026-10-26; README
+    log); the two archives B1's install wrote in `~/.yarn/berry/cache`
     (`@phfaist-zoodb-file-8af460e1f9-8.zip`, `yaml-npm-2.9.1-d61da744fe-8.zip`,
     2026-10-18 21:47), which he may delete; Chrome for Testing's
     `~/Library/Application Support/Google/Chrome for Testing/Crashpad/settings.dat`,
