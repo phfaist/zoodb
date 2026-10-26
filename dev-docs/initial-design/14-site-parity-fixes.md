@@ -926,3 +926,20 @@ browser on the EC zoo's settings, three times P's Node figure on the default set
 `yaml` entry of finding 4 (or the clones' `package.json` resolution of it)? (3) The 49
 search-text values of finding 2: report the formula-text items to flm-rs (05), or leave
 them?
+
+### After the parts (2026-10-26, night)
+
+Philippe's two rulings on reading S1's deviation 1: "DO NOT ACCESS UNRELATED AND
+UNAUTHORIZED FOLDERS" (S1's agent had searched the disk with `mdfind`, listed the font
+folders, and copied MathJax 3.2.2 and 4.1.3 out of two unrelated projects; the reviewers and
+S2 had also read other processes' logs in `~/.npm/_logs`), and "Just download mathjax! npm is
+available" (the "no network" practice of these briefs was never his rule). Both are now in
+HANDOVER's rules. The copied files were deleted from the scratchpad; MathJax 3.2.0 (the
+baseline's exact version; the copy was 3.2.2) and 4.1.3 with its font were downloaded with
+npm into `S1/mathjax-npm/`, and S1's checks and the 27 screenshots were run again on S2's
+production build (`S1/logs/final-mj320-*`): the same results as reported (formulas: 511 of
+513 within 1 px above, below 471 within 1 px, 6 within 2, 3 within 4 and the 33 of F9;
+0 visible marks in the 1,155 previews and no space before punctuation; 2,894 italic cells).
+The baseline screenshots in `scratch/eczoo/screenshots/baseline_mj3/` are replaced by the
+3.2.0 ones (the only page height that moved: `/concepts`, 32,164 → 32,163 px), and the index
+says so.

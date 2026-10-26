@@ -154,6 +154,16 @@ Commit trailers: the attribution lines of the current session (steps 0 to 6:
   `/Users/philippe/Research/util/pylatexenc`. Nothing else outside the worktree without
   Philippe's authorization (ask). Copies of the EC zoo data in the session's scratchpad
   may be read and tested on (step 4 did), the repository itself is never written.
+- **Never access unrelated folders** (Philippe, 2026-10-26): no reading, listing,
+  searching (`mdfind`, Spotlight, `find` over the home directory) or copying anything
+  outside the worktree, the session's scratchpad and the read-only paths above, and no
+  reading of other processes' logs (`~/.npm/_logs`). A missing tool or library is
+  downloaded (npm, cargo; into the scratchpad) or asked for; a brief never tells an agent
+  to find a local copy.
+- **Downloads are fine** (Philippe, 2026-10-26: "Just download mathjax! npm is
+  available"). The "no network" practice below (the sandbox profile `nonet.sb`,
+  `YARN_ENABLE_NETWORK=0`) was the earlier sessions' own, never his rule; builds may keep
+  running offline where that is simply convenient.
 - No workarounds for anything that needs a change in flm-rs; requests to flm-rs are kept
   to the minimum (05; findings that are not requests go in its "Findings to report"
   table). Nothing moves into flm-rs for now. U1 agreed; U2 (a public constructor for
@@ -348,7 +358,7 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
     other TeX Live), Inkscape and ImageMagick through two wrappers that set `HOME` to a
     scratch folder; an inspection test build passes the switch on the command line
     (question 23).
-  - No network. Every build and probe of E, and every build of D from 16:00 on
+  - No network (the earlier sessions' practice, not a rule: see "Downloads are fine"). Every build and probe of E, and every build of D from 16:00 on
     2026-10-19, ran under the macOS sandbox profile `nonet.sb` (in D's folder, made at
     15:51); before it, D's first agent's `probe1`, likely `probe1full`, and its first
     three test generations reached the arXiv API (13, Results D, deviation 6). The
