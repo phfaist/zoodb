@@ -7,7 +7,7 @@ of the package never need Rust:
 | crate | what | generated module | the binary ships as | loaded through |
 |---|---|---|---|---|
 | [`zoodb-autocitefetch-wasm/`](zoodb-autocitefetch-wasm/README.md) | the citation retriever [`autocitefetch`](https://crates.io/crates/autocitefetch); all host I/O over JavaScript callbacks | `src/citationmanager/_wasm/` | base64 inlined in a JavaScript module (about 0.84 MB) | `src/citationmanager/_load_wasm.js` |
-| [`zoodb-flm-wasm/`](zoodb-flm-wasm/README.md) | the FLM engine `flm-core` with the ZooDb feature; no I/O of its own | `src/zooflm/_wasm/` | the `.wasm` file itself (about 5.1 MB), fetched by the browser or read from disk under Node | `src/zooflm/_load_wasm.js` (any environment, given the bytes or a URL) and `src/zooflm/_load_wasm_node.js` (Node) |
+| [`zoodb-flm-wasm/`](zoodb-flm-wasm/README.md) | the FLM engine `flm-core` with the ZooDb feature; no I/O of its own | `src/zooflm/_wasm/` | the `.wasm` file itself (about 5.2 MB), fetched by the browser or read from disk under Node | `src/zooflm/_load_wasm.js` (any environment, given the bytes or a URL) and `src/zooflm/_load_wasm_node.js` (Node) |
 
 Layout: `Cargo.toml` is the virtual workspace (`resolver = "3"`, the two
 members, and the one `[profile.release]`: cargo ignores profiles in member

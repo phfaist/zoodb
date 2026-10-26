@@ -94,7 +94,7 @@ dependencies = [
 [[package]]
 name = "flm-core"
 version = "0.5.0"
-source = "git+https://github.com/phfaist/flm.git?branch=main-rs#602b99057fe9d8fdfc2c42473667413bfaef7e08"
+source = "git+https://github.com/phfaist/flm.git?branch=main-rs#e7b4ba17dc7f892c980cf05c3e32d1c9d8366bad"
 dependencies = [
  "base64",
  "fixed",

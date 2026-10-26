@@ -1,4 +1,4 @@
-# Handover note for continuing the build (written 2026-10-17, updated 2026-10-20)
+# Handover note for continuing the build (written 2026-10-17, updated 2026-10-26)
 
 Read this first when continuing the ZooDb FLM redesign around flm-rs in a fresh session.
 It says where things are, how each build step is run, the rules that bind, and what comes
@@ -30,10 +30,10 @@ in `README.md` of this folder.
 - **What exists now.** `rust/` is a cargo workspace (`zoodb-autocitefetch-wasm`,
   `zoodb-flm-wasm`; flm-core since 2026-10-20 a git dependency on the branch `main-rs`
   of the public `https://github.com/phfaist/flm.git`, before by path from
-  `/Users/philippe/projects/flm-rs/flm-core`; the committed module is still the one
-  built by path from `9ccaa871`);
-  the FLM module is committed as `src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` (5,160,404
-  bytes since D) with its glue, loaders `src/zooflm/_load_wasm.js` (neutral) and
+  `/Users/philippe/projects/flm-rs/flm-core`; since 2026-10-26 the lock pins
+  `e7b4ba17` and the committed module is built from it);
+  the FLM module is committed as `src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` (5,223,643
+  bytes since 2026-10-26) with its glue, loaders `src/zooflm/_load_wasm.js` (neutral) and
   `_load_wasm_node.js`;
   the engine `src/zooflm/engine.js` (+ `compose.js`, `fragment.js`, `diagnostics.js`;
   package export `./zooflm/engine`; since step 4 also `parse_fields()` and
@@ -50,9 +50,9 @@ in `README.md` of this folder.
   and the neutral loader (not the Node one); package `0.3.0` with `CHANGELOG.md` (new),
   `engines` `node >=20` and a `files` list (75 packed files); the API sample
   `playground/play_example.mjs`; `tools/build_wasm.mjs` remaps the build machine's
-  paths, byte-checks the binaries and records `paths_remapped` and
-  `flm_core_git: { commit, dirty }` (flm-rs `9ccaa871`, D's rebuild for G12) in
-  `BUILD_INFO.json`; `doc/` rewritten.
+  paths, byte-checks the binaries and records `paths_remapped` and the flm-core
+  source in `BUILD_INFO.json` (`flm_core_source`, the lock's git URL with the commit;
+  a build by path records `flm_core_git: { commit, dirty }` instead); `doc/` rewritten.
 - **The `zoodb-example` port** lives in a clone at `scratch/zoodb-example/` (ignored
   through `scratch/.gitignore`, with `*.tgz`), branch `zoodb-flmrs` there, commits
   `bc0a6ce`, `5cc0c68`, `2242062`, never pushed; its `website/_site/`, `node_modules/`
@@ -79,7 +79,7 @@ in `README.md` of this folder.
   caches), and a repack needs three stale copies removed first (13, Setup). Its
   full-data builds use the cache copy `_zoodb_citations_cache_LOCAL`
   (`ECZOO_CITATIONS_CACHE_DIR`), and `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` gives inspection
-  builds under `'continue'` while F1 is open (below). The handbook clone installs the
+  builds under `'continue'`, needed while F1 was open (below). The handbook clone installs the
   same tarball and the sitegen's four packages through a root overlay of its own (six
   resolutions, `yaml` 2.9.1 among them, put back by `reinstall_handbook.sh`) and builds
   offline under the sandbox profile `nonet.sb`, both in D's folder
@@ -248,11 +248,12 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
   for a fresh baseline build on zoodb 0.2.1), and its pages, exports, code graphs and
   apps were compared with that baseline, every difference classified (13, Results E,
   both halves; the screenshots for Philippe in `scratch/eczoo/screenshots/index.html`,
-  a copy of E's `E/screenshots/`). The handbook builds (728 pages, 0 diagnostics). F1 is
-  the one open blocker: until flm-rs reads a citation key the same way for the scan and
-  for the render, the default full build exits 1 at gray's meta description (in
-  production mode it then hangs, question 30), and inspection builds pass
-  `ECZOO_FLM_CONTINUE_WITH_ERRORS=1`.
+  a copy of E's `E/screenshots/`). The handbook builds (728 pages, 0 diagnostics). F1 was
+  the one open blocker: the default full build exited 1 at gray's meta description (in
+  production mode it then hangs, question 30), and inspection builds passed
+  `ECZOO_FLM_CONTINUE_WITH_ERRORS=1`. flm-core `e7b4ba17` fixes F1 (2026-10-26, checked
+  with a probe on the rebuilt module); the EC zoo's full build has not been re-run on
+  it, and the tarball `scratch/zoodb-flmrs.tgz` still holds the older module.
 - **Philippe's decisions** (no agent work is pending):
   - the consolidated questions of 13 ("Questions for Philippe": 34 numbers in six
     groups, the main session's rulings among them marked "ruling to confirm");
@@ -262,7 +263,7 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
     its lock refreshed (questions 2 and 3); their push URLs are disabled
     (`no-push-from-this-clone`) and their `origin` is the local original; the
     `zoodb-example` branch goes live with zoodb's (below);
-  - the flm-rs fix for F1 (05, "Findings to report"; the sitegen's switch, question 10),
+  - F1 is fixed upstream (`e7b4ba17`); whether the sitegen's switch stays (question 10),
     and whether F2 to F5 and the space of question 29 go upstream;
   - outside the worktree: the two archives B1's install wrote in `~/.yarn/berry/cache`
     (`@phfaist-zoodb-file-8af460e1f9-8.zip`, `yaml-npm-2.9.1-d61da744fe-8.zip`,
@@ -313,8 +314,8 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
     committed lock, `main.js`'s version lookup runs `git fetch` on GitHub) and restore
     the root files after.
   - Builds. The site's full-data builds with
-    `ECZOO_CITATIONS_CACHE_DIR=_zoodb_citations_cache_LOCAL` and, while F1 is open,
-    `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` (then F1's 43 `flm.citations.no-entry` lines are
+    `ECZOO_CITATIONS_CACHE_DIR=_zoodb_citations_cache_LOCAL` and, on a module older
+    than flm-core `e7b4ba17` (F1), `ECZOO_FLM_CONTINUE_WITH_ERRORS=1` (then F1's 43 `flm.citations.no-entry` lines are
     the only diagnostics); the production build is `cd site && yarn build`; remove
     `site/.11ty-parcel-temp/` after any `yarn dev`, and the root's `.parcel-cache`
     before `yarn build` in `jscomponents`. The handbook:

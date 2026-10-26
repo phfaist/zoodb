@@ -4,13 +4,9 @@
         "version": "0.1.0"
     },
     "flm_core": "0.5.0",
-    "flm_core_source": "path",
-    "flm_core_git": {
-        "commit": "9ccaa87100d5d114ede252045e13f10434460880",
-        "dirty": false
-    },
+    "flm_core_source": "git+https://github.com/phfaist/flm.git?branch=main-rs#e7b4ba17dc7f892c980cf05c3e32d1c9d8366bad",
     "wasm_bindgen": "0.2.127",
     "paths_remapped": true,
-    "wasm_size_bytes": 5160404,
-    "build_date": "2026-10-19T13:30:43.134Z"
+    "wasm_size_bytes": 5223643,
+    "build_date": "2026-10-26T14:09:53.681Z"
 }
