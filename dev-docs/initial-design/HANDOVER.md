@@ -59,7 +59,10 @@ in `README.md` of this folder.
   and the citations cache copy (TTL of the arXiv entry extended) are left in place for
   quick rebuilds. The build check (pack the worktree, point the example's dependency at
   the tarball, install, build, restore `website/package.json` and `yarn.lock`) is spelled
-  out in 11, Results, Part C. The original `../zoodb-example` is read-only.
+  out in 11, Results, Part C; also clear the clone's root `.parcel-cache` first (the
+  build script clears only `website/.parcel-cache`, and the root one puts an earlier
+  build's bundles back into `_site/`). Last rebuilt on 2026-10-26 with flm-core
+  `e7b4ba17`. The original `../zoodb-example` is read-only.
 - **The EC zoo port** (step 6, brief 13) lives in three clones under `scratch/eczoo/`
   (ignored through `scratch/.gitignore`): `eczoo_sitegen`, `eczoo_data`,
   `eczoo_handbook`, each on a branch `zoodb-flmrs` with its push URL disabled, never
@@ -253,7 +256,8 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
   production mode it then hangs, question 30), and inspection builds passed
   `ECZOO_FLM_CONTINUE_WITH_ERRORS=1`. flm-core `e7b4ba17` fixes F1 (2026-10-26, checked
   with a probe on the rebuilt module); the EC zoo's full build has not been re-run on
-  it, and the tarball `scratch/zoodb-flmrs.tgz` still holds the older module.
+  it. The tarball `scratch/zoodb-flmrs.tgz` was repacked with this module the same day,
+  so the clones' next install needs the stale copies removed first (13, Setup).
 - **Philippe's decisions** (no agent work is pending):
   - the consolidated questions of 13 ("Questions for Philippe": 34 numbers in six
     groups, the main session's rulings among them marked "ruling to confirm");
