@@ -1,4 +1,4 @@
-# Handover note for continuing the build (written 2026-10-17, updated 2026-10-26)
+# Handover note for continuing the build (written 2026-10-17, updated 2026-10-26, evening)
 
 Read this first when continuing the ZooDb FLM redesign around flm-rs in a fresh session.
 It says where things are, how each build step is run, the rules that bind, and what comes
@@ -137,8 +137,11 @@ on the **Opus model**, each dimensioned to stay well under about 500k tokens of 
    in its `Co-Authored-By`). A usage-limit interruption of a workflow is resumed with
    `resumeFromRunId`.
 
-Commit trailers: `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>` and
-`Claude-Session: https://claude.ai/code/session_014E8o5tjoMsVYDAGRKzyvwU`.
+Commit trailers: the attribution lines of the current session (steps 0 to 6:
+`Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>` and
+`Claude-Session: https://claude.ai/code/session_014E8o5tjoMsVYDAGRKzyvwU`; brief 14:
+`Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` and
+`Claude-Session: https://claude.ai/code/session_01VvdThGsvMMSWmKY2D6CsRM`).
 
 ## Rules that bind (from Philippe; see also the memory files)
 
@@ -238,6 +241,20 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
 ## Next
 
 - **Step 5** done (12, `e8f7c00`).
+- **Brief 14** done (2026-10-26, `14-site-parity-fixes.md`): Philippe's ruling that the
+  EC zoo site looks and behaves as on 0.2.1. Package (`f23cb2c`): `\href`/`\url`/`\email`
+  outside the site get `target="_blank"` (ZooDb lowering rule, `link_target_blank`);
+  per-call `render_options` take registry-bound keys (a variant registry per set of
+  values); the search text has the citations in place. Sitegen clone, 7 commits over
+  `793f2bf` (now at `a744cc1`): random code previews hide the marks, displayed formulas
+  spaced as before, `\paragraph` with its dash, `.textit`/`.textbf` back, the pane's lists
+  without headings, the search text without the pieces, the exporter bundle rebuilt. The
+  production build exits 0 **without** the switch (F1 fixed), 340.8 s, no FLM diagnostic;
+  42,445 `target="_blank"` links as the baseline, page by page; the six search queries
+  give the baseline's results. Screenshots retaken (`scratch/eczoo/screenshots/index.html`:
+  baseline, before, after). Findings F6 to F10 added to 05. The previous session's
+  scratchpad scripts are gone; brief 14's harness is in this session's scratchpad
+  (`…/20fdef06-…/scratchpad/14/S1/harness/`, S2's copies in `14/S2/`), while it lasts.
 - **Step 6** done (13): the EC zoo on 0.3.0, ported in the three clones above, in the
   parts 0, A, B1, B2, C, D and E; commits `c6b11b9` (part 0 and A), `1d7230c` (B1, G6),
   `cca3628` (B2, G7 to G9), `6105fcb` (C, G10), `1574e62` (D, G12) and the main
@@ -297,8 +314,8 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
     `5281597`, is `E/sites/new_site/`). To make them again: 13, Setup
     (`git clone --no-local` from the read-only originals, the push URL disabled, branch
     `zoodb-flmrs`, the caches copied, never moved).
-  - The install form. Pack the worktree (`yarn pack --out scratch/zoodb-flmrs.tgz`, 75
-    files). In the sitegen clone a root
+  - The install form. Pack the worktree (`yarn pack --out scratch/zoodb-flmrs.tgz`, 74
+    files since `CHANGELOG.md` was deleted). In the sitegen clone a root
     `"resolutions": { "@phfaist/zoodb": "file:<worktree>/scratch/zoodb-flmrs.tgz" }` in
     `package.json`, then
     `YARN_GLOBAL_FOLDER=<a folder outside ~/.yarn> YARN_ENABLE_NETWORK=0 yarn install`
@@ -307,7 +324,9 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
     the tarball (`<folder>/cache/@phfaist-zoodb-file-*.zip`), the lock's
     `@phfaist/zoodb@file:` entry and `node_modules/@phfaist/zoodb`. Check one
     `node_modules/@phfaist/zoodb`, version 0.3.0, its `src/` equal to the worktree's
-    (`diff -rq`). Restore `package.json` and `yarn.lock` (`git checkout --`) before any
+    (`diff -rq`). The committed lock has no `yaml@npm:^2.9.1` entry, so the offline
+    install also needs that entry added to the overlay lock (brief 14's
+    `S2/install.sh` wrote it from the archive in the project cache). Restore `package.json` and `yarn.lock` (`git checkout --`) before any
     commit. The handbook clone (Yarn 4.6.0) likewise, with six resolutions:
     `@phfaist/zoodb` the tarball; `@errorcorrectionzoo/eczoodb`,
     `@errorcorrectionzoo/eczoohelpers_eczcollectbib`, `@errorcorrectionzoo/jscomponents`

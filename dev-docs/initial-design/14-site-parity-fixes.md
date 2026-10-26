@@ -666,3 +666,263 @@ S1d: acceptable for the site's browsers? (3) Should the text backend's `run_in_s
 follow (the search text, S2b)?
 
 ### Part S2
+
+Done by the implementer on 2026-10-26, on the worktree at `aea2dea` (its `src/` that of
+`f23cb2c`). Three commits in the sitegen clone over `f1e73c7`: `5d473b1` (S2a), `8aa472c`
+(S2b), `a744cc1` (the exporter's bundle, on its own: it does not hold the pane); S2c needed
+no change. The clone's status is clean, its root `package.json` and `yarn.lock` as
+committed; its `site/_site/` is the production build of `a744cc1`. Scratch folder
+`scratchpad/14/S2/` (below `S2/`): `env.sh` (S1's without the switch, with `TMPDIR` and
+`YARN_GLOBAL_FOLDER` in `S2/`), `nonet.sb` (S1's), `install.sh`, `restore.sh` and
+`overlay.sh` (the root files committed or overlaid), `build_simple.sh`, `prod_build.sh`,
+`cmp/` (comparison scripts), `harness/` (browser scripts over S1's `lib.mjs`, and
+`run_checks.sh`: S1's checks run from S1's folder, logs in `S2/logs/`), `sites/` (copies of
+the builds `A`, `C` and `final`), `shots/`, `logs/`.
+
+**Install.** `yarn pack --out scratch/zoodb-flmrs.tgz` (offline, under the sandbox): 74
+files (75 before: `CHANGELOG.md` is gone since `3d12c9b`), 2,381,832 bytes, SHA-256
+`22d8229f…`. The Yarn folder is a new `S2/yarn-global/` (B1close's is empty, nothing to
+copy); the stale copies: `node_modules/@phfaist/zoodb` removed, no mirror copy, no
+`@phfaist/zoodb@file:` entry in the committed lock. *Deviation:* the committed lock has no
+entry for the package's `yaml@npm:^2.9.1`, which the earlier overlay locks carried (B1
+resolved it online), so the offline install stopped (`YN0001 … Request to
+'https://registry.yarnpkg.com/yaml' has been blocked`); `install.sh` adds that entry to the
+overlay lock as Yarn writes it, from the archive the project's cache holds
+(`yaml-npm-2.9.1-d61da744fe-583253ce00.zip`, `checksum` its SHA-512). Then
+`YARN_ENABLE_NETWORK=0 yarn install` (Yarn 3.3.0): exit 0 in 1.7 s, the only `YN0013` the
+tarball, the old tarball's archive dropped from the project's cache (`YN0019`), the mirror
+copy written in `S2/yarn-global/cache/`; one `node_modules/@phfaist/zoodb`, 0.3.0, its
+`src/` equal to the worktree's (`diff -rq` empty), with its own `yaml` 2.9.1. The overlay is
+saved in `S2/overlay/`; the root files were restored before each commit and put back for
+the builds.
+
+**S2a, the pane's lists without headings** (`5d473b1`). `CodeGraphInformationPane.jsx`:
+every render of the pane (the shared `render` of `mkRenderWrapUtils`, as 0.2.1 passed its
+endnote options there) gives `render_options` from `mkPaneRenderOptions()`:
+`citations: { heading_title: null }` and `xnotes.kinds` the zoo's own map with
+`footnote: { …, title: null }`. The kinds are read from the zoo's configuration,
+`eczoodb.config.flm_options.engine.settings.xnotes.kinds`, which is
+`eczoo_flm_engine_settings` merged into the config that `use_flm_engine` creates the engine
+from, so nothing is copied and no new export is needed (*deviation* from "exported if
+needed": the clone's `CLAUDE.md` asks for no new API, and the config is what the engine
+really has). The rule for `> .flm-pres-block--heading` is gone from
+`CodeGraphInformationPane_style.scss` (the lists keep their font size and color). Measured
+in chrome-headless-shell on build C (`yarn build-simple` with S2a and S2b; `S2/harness/
+pane_timing.mjs`: `/code_graph#code_<id>` in a fresh page per round, the engine's
+`render_document()` wrapped as soon as the page sets `window.eczCodeGraph`, before the
+pane's first render; "without" = the same bundle with the options taken out of each call;
+the two modes alternated, 10 rounds each; `logs/pane_timing-summary.txt`):
+
+| | without the options | with them (variant) |
+|---|---|---|
+| steane, first pane render | 35.0 ms (33.3–42.0) | 56.2 ms (54.1–66.4) |
+| qubit_stabilizer, first pane render | 47.3 ms (46.4–56.7) | 69.1 ms (64.4–89.2) |
+| the next pane (a relation's code clicked in the pane) | 10.6 / 9.2 ms | 10.4 / 11.0 ms |
+| the pane's HTML in the page, from the navigation | 878 ms | 880 / 888 ms |
+| headings in the pane | 1 (the citations' list) | 0 |
+
+Directly in the page (steane's description and its endnotes, `context: 'codegraph'`): 3.2 to
+3.7 ms without options, 25.5 and 27.1 ms with a set of registry-bound values not used yet
+(the variant's build, about 22 ms; P measured 7 to 8 ms in Node on the default settings),
+3.5 to 3.8 ms for that set again. So the variant costs about 21 ms once, at the first pane;
+the time to the pane is the data's load and the graph's layout either way.
+
+**S2b, the search text** (`8aa472c`). Build A (`yarn build-simple` on the new package at
+`f1e73c7`, still with `flm_pieces: true`) against the baseline's index (`S1/baseline_site/`;
+`cmp/searchidx.py`, `cmp/searchidx_classes.py`, characters counted as code points over the
+24 fields of the 1,155 documents, so B2's figures, counted otherwise, are not comparable):
+
+| | baseline | before brief 14 (S1's build) | A, final |
+|---|---|---|---|
+| `searchindex.json` | 4,443,321 bytes | 4,605,733 | 4,461,214 |
+| characters, all fields | 4,193,135 | 4,299,122 | 4,199,254 |
+| `description` | 1,135,802 | 1,104,256 | 1,140,535 |
+| `introduced` | 232,303 | 264,235 | 233,232 |
+| fields equal to the baseline's (of 27,720) | | 22,636, and 343 up to white space | 22,637, and 4,617 up to white space |
+
+The same `info`, store fields and ids in the same order. The 5,083 field values that are not
+equal fall into these classes, taken out one after the other: white space (4,617: the
+engine's no-break space before the bracket where the baseline has a plain space, P's
+finding, and runs of white space); the end of a displayed formula's source (258: `~.
+\tag*{(1)}\end{align}` → `~.\tag*{(1)} \end{align}`, and the numbers of equations, which the
+baseline counted over all the fields of a code and the engine per field); the order of the
+entries of one `\cite` with several keys (123: the engine writes them in the order of their
+numbers, the baseline in the source's; the same words); figure placeholders (24: `[figure]
+[/fig/…]` → `[image: /fig/…]`); heading underlines (12: `~~~` → `---`); and 49 left, every
+one of a class already in the index before brief 14 (checked there): the text of formulas
+(spaces at the edges of `\text{ … }` lost, `\text{ Paulis }P` → `\text{Paulis}P`; a formula
+inside a text command of a formula dropped, `\textup{\(\alpha\)-dits}` → `\textup{-dits}`;
+`\label{…}` left out of the source; the term of a `defterm` written without its formula's
+delimiters, `\(\mathbb{F}_4\) representation` → `{F}_4 representation`), table floats as
+text tables in place of `[figure]`, `melas`'s corrected quotation mark, and the no-break
+space before a citation attached in the source (`Ref.[M.` → `Ref. [M.`, `([T.` → `( [T.`).
+The 39 sample codes (`logs/search_sample.txt`: steane, approximate_qecc,
+qubits_into_qubits, golay, binary_linear, qubit_stabilizer, w_state, gray, melas,
+chuang-leung-yamamoto, ira and every 40th code) were read in full
+(`logs/searchidx-baseline-A.txt`): the citation texts stand in place in brackets as on the
+baseline, `… a single-qubit error [B. Shaw, …, Physical Review A 78, (2008) arXiv:0803.1495
+DOI]. The code is …`. Queried with the site's own code (`cmp/search_query.mjs`:
+`SearchIndex.load()` with the site's lunr options, `query()` as the widget calls it), B2's
+five queries and "references" give the baseline's result lists, the same codes in the same
+order (before brief 14: the same numbers, but `Cao Zeng Laflamme`, `Surviving` and
+`Gottesman Surviving` one rank off, and `references` 1,115 results):
+
+| query | baseline | A, final |
+|---|---|---|
+| `Zeng` | 53, `approximate_qecc` 14th | 53, 14th |
+| `valence-bond-solid` | 27, `approximate_qecc` 2nd | 27, 2nd |
+| `Cao Zeng Laflamme` | 89, `approximate_qecc` 4th | 89, 4th |
+| `Surviving` | 34, `qubits_into_qubits` 2nd | 34, 2nd |
+| `Gottesman Surviving` | 86, `qubits_into_qubits` 2nd | 86, 2nd |
+| `references` | 54 | 54 |
+
+*Decision:* `flm_pieces` dropped, the line back to the original's. With the citations in
+place the option adds only the footnotes, under a heading "Footnotes"; the baseline's search
+text had their marks only (probe: 0.2.1's assembler writes `A code with a note.a The code is
+good.b End.`, `S2/probe021/text021.mjs`; the new engine without pieces `note.ᵃ … good.ᵇ`, with
+them the same followed by `Footnotes`, `---------` and the notes' texts,
+`S2/probes/footnote_text.mjs`). The data has no footnote: a `yarn build-simple-noparcel`
+without the option wrote a `searchindex.json` byte-identical to A's, and so did the
+production build. No `\paragraph` either, so the text backend's run-in stop (S1's open
+question 3) does not reach the index.
+
+**S2c, links in a new tab** (no change). `cmp/links.py` (Python's HTML tokenizer over every
+page) on the production build against the baseline:
+
+| | baseline | before Part P (S1's build) | final |
+|---|---|---|---|
+| `target="_blank"` (the text, all pages) | 42,445 | 9,708 | 42,445 |
+| on links of FLM content (0.2.1 `href-href`; the engine's `flm-pres-link`, kind `url`) | 32,737 | 0 (32,730 without) | 32,737 |
+| on the site's own links (6,236 without class, 3 × 1,155 on the code pages, 7 on the team page) | 9,708 | 9,708 | 9,708 |
+| `<a>` inside another `<a>` | 0 | 0 | 0 |
+
+Per page, the counts by kind and the multiset of the addresses that carry the target are
+the baseline's on all 1,276 common pages; no local address has it, no external link of FLM
+content lacks it, no `rel` (the 1,274 `rel="license"` are the site's own links). The
+difference with the build before Part P is wholly P1's: its 32,730 FLM links plus the 7 of
+the reference entries that F1 dropped there.
+
+**The exporter's bundle** (`a744cc1`). The package's `settings_hash` includes
+`link_target_blank` and the module changed, so the committed bundle refused the new dump
+(`engine.load()`: "settings hash d65b5461a77786b0 instead of this engine's
+bdc71f68567c821c"). `yarn build` in `jscomponents` (the root's `.parcel-cache` removed
+first, offline, the overlay in place): exit 0 in 7.3 s, peak 847 MB;
+`_headless_exporter_browser_page.651c1379.js` 893,139 bytes (was 892,904), its map, the
+page, and `zoodb_flm_wasm_bg.2e7f930a.wasm` 5,259,021 bytes, the package's byte for byte; it
+differs from the previous one by the engine module's new code (`variant_count`,
+`link_target_blank`, `render_text`'s `render_options`), the hashed names and the zoo's
+configuration without `flm_pieces` (built after S2b, since the bundle carries
+`default_config`). It does not hold the pane. S1's `check_exporter.mjs` (copied to
+`S2/harness/`, its scratch folder in `S2/tmp/`): from the new dump the qubits_into_qubits
+kingdom graph exports to an SVG byte-identical to S1d's export (322,366 characters); the
+previous bundle refuses the dump.
+
+**The production build** (`S2/prod_build.sh final`: `cd site && yarn build` with the
+LOCAL cache, without `ECZOO_FLM_CONTINUE_WITH_ERRORS`, under the sandbox and
+`/usr/bin/time -l`, the root's `.parcel-cache` removed first): **exit 0**, 340.8 s wall,
+618.3 s user (E: 358.9 s with the switch), peak resident size 3,472,097,280 bytes (the
+largest process; E: 3,518,578,688); load average 7.1 at its start, 17.1 at its end. 1,424
+files written in 338.4 s; `_site/` 1,532 files, 1,276 HTML pages, 131,394,918 bytes (E:
+130,913,156); the 108 graph SVGs (87 lists, 18 kingdoms, 3 domains). The zoo loaded in
+25.5 s (the FLM processor 3.8 s, then the search text and the last processors 8.9 s);
+`Pass 1: 4739 cached, 478 to fetch`, `Pass 2: 2124 cached, 0 to fetch`, `7341 considered,
+0 failed`, 5,217 citations installed. Its
+`dat/` files are byte-identical to build A's and its 1,276 pages to build C's (hashed bundle
+names made equal). Diagnostics (`cmp/diag_lines.py`, `logs/prod-final-diag.txt`): **no FLM
+diagnostic** (F1's 43 `flm.citations.no-entry` lines are gone, and no other Error or
+Warning); no recovery markup (`flm-pres-dropped`, `-unknown`, `-unsupported`) on any page
+(41 dropped entries before); no `<flm:` or `flm:` followed by a digit in any HTML, JSON, CSS
+or XML file. The warning and error lines, all known: 1 Eleventy warning (the Parcel
+plugin's version range, as in every build); 9 `generatebibtex WARNING` (brace balance of 9
+BibTeX texts) and 8 `flm.latex-recomposed.unknown-character` lines (the BibTeX
+generation's speller has no spelling for U+01CE, U+1EAF, U+1EC5, U+202F, U+FFFD and the
+combining U+0301, U+0303, U+0308; G4's class), the same 17 lines as in S1's builds; 108 `[Cannot stringify value for debug message!]`
+debug lines of the exporter's page, one per export (`jscomponents/codegraph/style.js`
+lines 318 to 323, unchanged since the original, catching a debug value it cannot
+stringify); 1 `Failed to load resource: … 404` in the exporter's page (its
+`/favicon.ico`). Chrome for Testing rewrote its Crashpad `settings.dat` (18:00; ruled,
+disclosed). The `yarn build-simple` builds, all without the switch and without an FLM
+diagnostic: A (the new package at `f1e73c7`) 144.8 s, peak 3,225,223,168 bytes; the
+no-parcel build without `flm_pieces` 47 s; C (`5d473b1` + `8aa472c`) 135.3 s, peak
+3,207,348,224 bytes.
+
+Against S1's build (the old module), once the new tab is taken out of the engine's links,
+38 pages differ, by two causes of the new flm-core: the 41 reference entries that F1
+dropped are rendered (30 pages), and a `~\cite` no longer gets two no-break spaces (17
+places on 10 pages before, none now: `W state~\cite{…}` reads `W state [1]` as on the
+baseline; 05's `~\cite` finding). `randomcodedata.json`: 443 previews still hold 652
+citation marks in their HTML (hidden by the widget since S1a), the same as before but for
+w_state's preview, whose tie's double space is gone.
+
+**Screenshots** (`scratch/eczoo/screenshots/`). The 27 new-site images renamed
+`<name>.before-14.png` and their log `new/_log.before-14.json` (the `.before-f8` files left
+alone); the 27 retaken on the production build by S1's harness (`S2/harness/run_checks.sh
+S2/sites/final after --shots S2/shots`, one run for the baseline and the new site), the two
+random code rows again with the widget's box alone as brief 13 showed it (`S2/harness/
+pages.mjs`, S1's with that change); the new site's into `new/<name>.png` with `new/_log.json`,
+the baseline's (MathJax 3.2.2, its own major version, where brief 13's baseline column had
+MathJax 4.1.3) into a new folder `baseline_mj3/` with its `_log.json`. `index.html` is
+regenerated (`S2/cmp/make_index.py`; the previous one in `S2/logs/index.before-14.html`):
+per row the baseline, before and after images with each run's measures under them, and
+links to brief 13's baseline image (MathJax 4), the baseline without MathJax and the
+`.before-f8` image where there is one; the notes say what each column is and what to look
+for. Checked in chrome-headless-shell (`S2/harness/check_index.mjs`): the 81 images load,
+the 158 links (131 files) answer 200, the 27 anchors resolve; no horizontal scroll at 400
+px.
+
+**S1's checks on the production build** (`S2/logs/after-*`). Formulas: the 513 displayed
+formulas of the 311 pages against the baseline, the same distribution as S1's final build
+(above: 511 within 1 px, 2 more than 4 px lower; below: 471 within 1 px, 6 within 2 px, 3
+within 4 px, 33 more than 4 px closer, the formulas that end a paragraph; the summary file
+equal to S1's line for line). Random code widget: 1,155 previews, 443 with marks in their
+HTML, none shown, and no space before punctuation (S1's final: 1, w_state's tie, gone with
+the tie's double space). Code lists: 2,894 `textit` cells on the 72 pages, all italic (the
+baseline 3,427 of 3,427, its FLM `\textit` included). Heights of the 27 pages and panes
+against S1's final build: equal but for `/list/quantum_cyclic` (4,162 against 3,874;
+baseline 4,159) and the kingdom page (986 against 1,076; baseline 1,017), whose production
+pages hold the code graph where `build-simple` has a placeholder, and `/search?q=golay`
+(14,233 against 14,221; baseline 14,135; the result snippets come from the search text,
+now with the citations in place; 34 results on all three); the panes' content is 25 to
+26 px shorter in the 15 panes that place a list (the heading), polygon's (no list)
+unchanged. Pane headings (`S2/harness/pane_headings.mjs`, 20 codes): before brief 14 a
+"References" `h2` above the list in the 19 panes with one, now none, the same lists and
+entries; on the baseline none (4 codes without a figure; its panes of the 16 others show
+its "FLM ERROR" box).
+
+**Checks.** The three commits each made with the root files in their committed form; the
+clone's status clean at the end, the overlay removed; no
+`site/.11ty-parcel-temp/`; no background process left. Nothing written under `~/.yarn` or
+`~/.cache` (`find -newer` the start marker); under `~/.npm/_logs` only 22 logs of the
+unrelated `npm root --global` (cwd `/Users/philippe/Research/lecturenotes/QEC`) and one of
+`npm install types-registry@latest` (cwd `~/Library/Caches/typescript/5.9`: an editor's
+TypeScript server), neither mine. Chrome for Testing's Crashpad `settings.dat` rewritten by
+the production exporter (ruled). Nothing changed in the worktree but
+`scratch/zoodb-flmrs.tgz`, the screenshots folder and this section.
+
+**Deviations.** (1) The overlay lock's `yaml@npm:^2.9.1` entry written by `install.sh` (Yarn
+could not resolve the range offline). (2) The pane reads the zoo's xnote kinds from its
+configuration instead of an export of `eczoo_flm_engine_settings`. (3) The baseline column
+of the screenshots now has MathJax 3.2.2 (S1's harness), brief 13's MathJax-4 images linked.
+(4) The random code rows shot by a copy of S1's `pages.mjs` that shoots the widget's box
+alone. (5) The exporter's bundle committed on its own, after S2b (it carries the zoo's
+configuration, not the pane).
+
+**Findings.** (1) flm-core `e7b4ba17` also ends the doubled no-break space of `~\cite` (05's
+`~\cite` finding): 17 places on 10 pages before, none now, w_state's preview included. (2)
+The text output of formulas, in the search text since step 6 (not new, not of S2b's
+making; candidates for 05's table): spaces at the edges of `\text{ … }` dropped, a formula
+inside a text command of a formula dropped (`\textup{\(\alpha\)-dits}` → `\textup{-dits}`, content lost), `\label{…}`
+left out, a defterm's term with a formula written as `{F}_4 representation`. (3) A
+footnote mark in the search text is a superscript letter (`ᵃ`, U+1D43), where 0.2.1 wrote a
+plain `a` (no data has a footnote). (4) The committed lock lacks
+`yaml@npm:^2.9.1`, so HANDOVER's install form, offline, needs that entry (or a resolution to
+`scratch/eczoo/pack/yaml-2.9.1.tgz`, as the handbook has). (5) The tarball has 74 files
+(HANDOVER says 75: `CHANGELOG.md` is gone). (6) The variant costs about 22 ms in the
+browser on the EC zoo's settings, three times P's Node figure on the default settings.
+
+**Open questions.** (1) The xnote kinds read from the zoo's configuration
+(`eczoodb.config.flm_options.engine.settings`) rather than an exported
+`eczoo_flm_engine_settings`: acceptable? (2) Should HANDOVER's install form record the
+`yaml` entry of finding 4 (or the clones' `package.json` resolution of it)? (3) The 49
+search-text values of finding 2: report the formula-text items to flm-rs (05), or leave
+them?
