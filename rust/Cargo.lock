@@ -94,7 +94,7 @@ dependencies = [
 [[package]]
 name = "flm-core"
 version = "0.5.0"
-source = "git+https://github.com/phfaist/flm.git?branch=main-rs#e7b4ba17dc7f892c980cf05c3e32d1c9d8366bad"
+source = "git+https://github.com/phfaist/flm.git?branch=main-rs#890091ac2c89e104b3ce34d71c2f35eb098785cb"
 dependencies = [
  "base64",
  "fixed",
@@ -407,9 +407,9 @@ dependencies = [
 
 [[package]]
 name = "techy"
-version = "0.1.2"
+version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd26b85b308db0731fbc51701d6ddf07fef346169981500ca21cc281afdb567c"
+checksum = "281655e03fb33837b42232108a96894ed7ac21a3d97b04917726c54c08e1ef5d"
 dependencies = [
  "hashbrown 0.15.5",
  "serde",
@@ -418,9 +418,9 @@ dependencies = [
 
 [[package]]
 name = "techy-derive"
-version = "0.1.2"
+version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b9c91cd518dd95dbd4ec2db0d19a6fbbee0780755b408c41131012798508cb5"
+checksum = "2e9617266e675484b455e3b19cde3ae33ff2966240b918343c4b9e6f5758606c"
 dependencies = [
  "proc-macro2",
  "quote",
