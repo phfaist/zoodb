@@ -1,0 +1,12 @@
+{
+    "binding": {
+        "name": "zoodb-flm-wasm",
+        "version": "0.1.0"
+    },
+    "flm_core": "0.5.0",
+    "flm_core_source": "git+https://github.com/phfaist/flm.git?branch=main-rs#890091ac2c89e104b3ce34d71c2f35eb098785cb",
+    "wasm_bindgen": "0.2.127",
+    "paths_remapped": true,
+    "wasm_size_bytes": 5296941,
+    "build_date": "2026-11-03T11:40:44.545Z"
+}

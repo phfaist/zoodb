@@ -1,0 +1,11 @@
+topic_id: drawing
+
+name: 'Drawing'
+
+description: |
+  The art of drawing, see \ref{person:alice}.
+
+  \section{Basics\footnote{As taught by Alice.}}
+  \label{sec:drawing-basics}
+
+  Start with a dot.

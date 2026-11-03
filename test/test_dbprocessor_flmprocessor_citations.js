@@ -1,9 +1,9 @@
 // Integration test (WP4): a standard zoo whose FLM content cites arXiv, DOI,
 // manual, preset (bibliography file) and custom (JavaScript source)
 // citations, retrieved through the autocitefetch-backed citation manager with
-// a mock fetch (no network), compiled by the CitationCompiler, and registered
-// in the FLM environment's citations provider.  Also covers the handling of
-// citations that cannot be retrieved under both `flm_error_policy` values.
+// a mock fetch (no network), compiled by the CitationCompiler, and installed
+// in the FLM engine's citations table.  Also covers the handling of
+// citations that cannot be retrieved under both error policies.
 
 import * as assert from 'assert';
 import fs from 'fs';
@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url';
 import { ZooDbDataLoaderHandler } from '../src/index.js';
 
 import { use_relations_populator } from '../src/std/use_relations_populator.js';
-import { use_flm_environment } from '../src/std/use_flm_environment.js';
+import { use_flm_engine } from '../src/std/use_flm_engine.js';
 import { use_flm_processor } from '../src/std/use_flm_processor.js';
 import { makeStandardZooDb } from '../src/std/stdzoodb.js';
 import { makeStandardYamlDbDataLoader } from '../src/std/stdyamldbdataloader.js';
@@ -26,7 +26,7 @@ import { make_mock_host, make_mock_fetch_api } from './_helpers/citation_mock_ho
 const test_data_dir = fileURLToPath(new URL('./test_data/', import.meta.url));
 const csl_filename = path.join(test_data_dir, 'american-physical-society-et-al--patched.csl');
 
-// (the FLM scanner keeps the braces of \cite{manual:{...}} in the key)
+// (the scan keeps the braces of \cite{manual:{...}} in the key)
 const MANUAL_KEY = '{A. Author, \\emph{Some Manual Book} (2020)}';
 
 
@@ -60,7 +60,7 @@ class CitationSourceCustomTest extends CitationSourceBase
 }
 
 
-async function make_zoo({ data_file, flm_error_policy, host })
+async function make_zoo({ data_file, flm_error_policy, host, allow_unresolved_citations = false })
 {
     const zoodb = await makeStandardZooDb({
         fs,
@@ -68,12 +68,13 @@ async function make_zoo({ data_file, flm_error_policy, host })
         continue_with_errors: (flm_error_policy === 'continue'),
 
         use_relations_populator,
-        use_flm_environment,
+        use_flm_engine,
         use_flm_processor,
         use_gitlastmodified_processor: false,
         use_searchable_text_processor: false,
 
         flm_options: {
+            allow_unresolved_citations,
             citations: {
                 csl_style: fs.readFileSync(csl_filename, { encoding: 'utf-8' }),
                 preset_bibliography_files: [ '../_fixtures/bib_preset.yml' ],
@@ -91,15 +92,6 @@ async function make_zoo({ data_file, flm_error_policy, host })
                     fetch: make_mock_fetch_api(host),
                     sleep: host.sleep,
                     now: host.now,
-                },
-            },
-            environment_options: {
-                enable_features: {
-                    default: false,
-                    baseformatting: true,
-                    href: true,
-                    math: true,
-                    citations: true,
                 },
             },
         },
@@ -135,9 +127,28 @@ async function make_zoo({ data_file, flm_error_policy, host })
     return zoodb;
 }
 
+// The engine's citations table, as { prefix: { key: text } }.
 function provider_citations(zoodb)
 {
-    return zoodb.zoo_flm_environment.citations_provider.dump_database().citations_database;
+    const db = {};
+    for (const { key, text } of zoodb.zoo_flm_engine.tables.citations) {
+        const i = key.indexOf(':');
+        const prefix = key.slice(0, i);
+        db[prefix] ??= {};
+        db[prefix][key.slice(i + 1)] = text;
+    }
+    return db;
+}
+
+// The page of a dish: its description and the bibliography.
+function render_dish(zoodb, dish_id, options = {})
+{
+    const dish = zoodb.objects.dish[dish_id];
+    return zoodb.zoo_flm_engine.render_document({
+        ...options,
+        compose: ({ rdr, rdrblock, endnotes }) =>
+            `<h1>${rdr(dish.name)}</h1>\n${rdrblock(dish.description)}\n${endnotes()}`,
+    });
 }
 
 function get_flm_processor(zoodb)
@@ -156,11 +167,11 @@ function capture_console_error()
 }
 
 
-describe('ZooFLMProcessor citations (integration)', function () {
+describe('ZooFlmProcessor citations (integration)', function () {
 
     this.timeout(20000);
 
-    it('compiled citation text reaches the environment citations provider', async function () {
+    it('compiled citation text reaches the engine\'s citations table and the bibliography', async function () {
         const host = make_mock_host();
         const zoodb = await make_zoo({ data_file: 'citations_test/dishes.json', host });
         await zoodb.load();
@@ -183,9 +194,15 @@ describe('ZooFLMProcessor citations (integration)', function () {
         // custom JS source (ready-formatted FLM)
         assert.strictEqual(db.custom.xyz, 'Custom reference \\emph{xyz} from the test source');
 
-        // the provider serves them to FLM
-        const provider = zoodb.zoo_flm_environment.citations_provider;
-        assert.ok(provider.has_citation({ cite_prefix: 'custom', cite_key: 'xyz' }));
+        // the engine renders them in a page's bibliography
+        const page = render_dish(zoodb, 'cited');
+        assert.deepStrictEqual(page.diagnostics, []);
+        assert.match(page.html, /<div class="flm-pres-block flm-citations-bibliography"/);
+        assert.match(page.html, /P\. Faist <i\b[^>]*>et al\.<\/i>, Physical Review X/);
+        assert.match(page.html, /Custom reference <em\b[^>]*>xyz<\/em> from the test source/);
+        assert.match(page.html, /A\. Author, <em\b[^>]*>Some Manual Book<\/em> \(2020\)/);
+        assert.match(page.html, /Journal of Test Fixtures/);
+        assert.doesNotMatch(page.html, /<flm:/);
 
         // everything was served by the mock host
         const urls = host.requests.map( (r) => r.url );
@@ -194,6 +211,13 @@ describe('ZooFLMProcessor citations (integration)', function () {
 
         const mgr = get_flm_processor(zoodb).citation_manager;
         assert.deepStrictEqual(mgr.last_failures, []);
+
+        // the cited keys of the object, from the scan
+        const scan = get_flm_processor(zoodb).object_scan('dish', 'cited');
+        assert.deepStrictEqual(scan.cited.map( (c) => c.key ), [
+            'arxiv:1902.07714', 'doi:10.1103/physrevx.10.041018', `manual:${MANUAL_KEY}`,
+            'preset:Doe2021', 'custom:xyz',
+        ]);
     });
 
     it("flm_error_policy 'abort': processing rejects before compiling", async function () {
@@ -218,6 +242,28 @@ describe('ZooFLMProcessor citations (integration)', function () {
         assert.deepStrictEqual(provider_citations(zoodb), {});
     });
 
+    it("flm_error_policy 'continue' with allow_unresolved_citations: a placeholder", async function () {
+        const host = make_mock_host();
+        const zoodb = await make_zoo({
+            data_file: 'citations_test/dishes_with_failure.json',
+            flm_error_policy: 'continue',
+            allow_unresolved_citations: true,
+            host,
+        });
+        const cap = capture_console_error();
+        try {
+            await zoodb.load();
+        } finally {
+            cap.restore();
+        }
+        const db = provider_citations(zoodb);
+        assert.strictEqual(db.doi['10.9999/nonexistent'],
+                           '\\begin{verbatimtext}doi:10.9999/nonexistent\\end{verbatimtext}');
+        const page = render_dish(zoodb, 'badly_cited');
+        assert.deepStrictEqual(page.diagnostics, []);
+        assert.match(page.html, /<code class="flm-pres-verbatim"[^>]*>doi:10\.9999\/nonexistent<\/code>/);
+    });
+
     it("flm_error_policy 'continue': the other citations are compiled", async function () {
         const host = make_mock_host();
         const zoodb = await make_zoo({
@@ -238,6 +284,10 @@ describe('ZooFLMProcessor citations (integration)', function () {
         assert.match(db.preset.Doe2021, /Journal of Test Fixtures/);
         assert.strictEqual(db.custom.xyz, 'Custom reference \\emph{xyz} from the test source');
         assert.ok( ! Object.hasOwn(db.doi ?? {}, '10.9999/nonexistent') );
+        // the page reports the citation without an entry
+        const page = render_dish(zoodb, 'badly_cited', { error_policy: 'continue' });
+        assert.ok(page.diagnostics.some( (d) => d.identifier === 'flm.citations.no-entry' ),
+                  JSON.stringify(page.diagnostics));
 
         const failures = get_flm_processor(zoodb).citation_manager.last_failures;
         assert.strictEqual(failures.length, 1);

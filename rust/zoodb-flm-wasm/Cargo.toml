@@ -1,0 +1,38 @@
+[package]
+name = "zoodb-flm-wasm"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.86"
+license = "MIT"
+publish = false
+description = "wasm-bindgen binding of the FLM engine flm-core, with the ZooDb feature, for @phfaist/zoodb"
+build = "build.rs"
+
+[lib]
+crate-type = ["cdylib", "rlib"]     # rlib so `cargo test` can link unit tests on the host
+
+[dependencies]
+# flm-rs, from the branch `main-rs` of the public FLM repository; Cargo.lock
+# records the commit a build uses (`cargo update -p flm-core` moves it).
+flm-core = { git = "https://github.com/phfaist/flm.git", branch = "main-rs", default-features = false }
+wasm-bindgen = "0.2"
+js-sys = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde-wasm-bindgen = "0.6"
+# The `DiagnosticInfo` derive expands to `::techy::…` paths, so the crate that
+# declares a diagnostic needs techy in its extern prelude (same version as flm-core's).
+techy = "0.1"
+console_error_panic_hook = { version = "0.1", optional = true }
+
+[features]
+default = []
+debug-panics = ["dep:console_error_panic_hook"]
+# Names the `GraphicsPublished` constructor requested upstream (U2); does not build today.
+published-insert = []
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["-Os"]
+
+[package.metadata.wasm-pack.profile.release.wasm-bindgen]
+omit-default-module-path = true

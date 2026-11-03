@@ -1,0 +1,16 @@
+# The pattern inside list items, as in the relations of the EC zoo.
+code_id: pattern_in_list
+relations:
+  parents:
+    - code_id: parent_a
+      detail: 'This code is a special case
+      where the detail continues at the key''s column.'
+    - code_id: parent_b
+      detail: 'A detail indented correctly
+        on its second line.'
+    - detail: 'A detail that is the first key of its item
+      continued at the key''s column'
+      code_id: parent_c
+  cousins:
+    - 'A bare list item
+    continued at the dash''s column'

@@ -1,44 +1,20 @@
 //
-// ZooDB/ZooFLM code base
+// ZooDb's FLM layer (package export `./zooflm`): the engine over the wasm
+// core of flm-rs and the citation compiler.
+//
+// Browser code may import it. The engine loads its core through the internal
+// default loader (./_load_wasm_default.js), which reads the module's file
+// with `node:fs/promises` under Node; a bundler building for a browser
+// substitutes its browser variant, which fetches the file, through the
+// `browser` field of the package's package.json. Nothing else here imports a
+// `node:` module (the citation compiler imports the builtin `path` through
+// `../util/atomicfilewrite.js`).
 //
 
+// ZooFlmEngine, and the modules it re-exports: fragments and origins
+// (fragment.js), diagnostics and the error policy (diagnostics.js), the
+// composer protocol's helpers (compose.js)
+export * from './engine.js';
 
-// in particular, decode_kwargs(...) and get_zooflm_error_string(err)
-export * from './_flmutils.js';
-
-// provide $$kw({...}) and repr() to importers
-export { $$kw, repr } from './_flm-js/py.js';
-
-// provide ability to create derived classes of transcrypt/py classes, if necessary ...
-export {
-    __class__, __super__, __get__, isinstance
-} from './_flm-js/org.transcrypt.__runtime__.js';
-
-// ZooFLMResourceInfo
-export * from './_resourceinfo.js';
-
-
-// includes: make_zoo_flm_environment, prep_flm_environ_features,
-// zooflm_default_environment_options,
-// SectionCommandSpec, EndnoteCategory, RefInstance,
-// FloatType, GraphicsResource
-export * from './_environment.js';
-
-
-//
-// Easily dump and reload compiled FLM to/from data/JSON
-//
-export { FLMDataDumper, FLMDataLoader } from './_flm-js/flm.flmdump.js';
-
-
-
-// ZooHtmlFragmentRenderer
-export * from './_fragmentrenderers.js';
-
-
-// fn_unique_object_id utility
-export { fn_unique_object_id } from './_flm-js/unique_object_id.js';
-
-
-// utilities for rendering:
-export * from './_renderutils.js';
+// CitationCompiler, install_csl_flm_output_format
+export * from './citationcompiler.js';

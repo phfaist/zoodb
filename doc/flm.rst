@@ -121,7 +121,8 @@ Bullet-point and enumeration lists
 Bibliographic citations
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-- If the relevant citation source retrievers are installed, you can cite
+- If the relevant citation source retrievers are installed (see
+  :doc:`zoodb.citationmanager`), you can cite
   relevant papers directly e.g. with their arXiv number as
   ``\cite{arxiv:XXXX.XXXXX}`` or ``\cite{arxiv:quant-ph/XXXXXXX}``, or using their
   DOI as ``\cite{doi:10.ZZZZZZ}``.
@@ -137,6 +138,10 @@ Bibliographic citations
   a citation manually as ``\cite{manual:{A. Smith et al., \emph{Journal of Weird
   Stuff} 12:\textbf{A}, 1003--1592 (1943)}}``.
   
+  Typing “Ref.~[3]”: Use ``\R\cite{...}`` to type a citation as a noun to be used
+  in a sentence: “ref. [1]”, “refs. [1,2]”;
+  ``\R[S]\cite{...}`` capitalizes it, for the start of a sentence.
+
 
 References to other objects and external links
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,0 +1,11 @@
+{
+    "_zoo_primarykey": "note_id",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["note_id", "name"],
+    "properties": {
+        "note_id": { "type": "string" },
+        "name": { "type": "string", "_flm": "full" },
+        "text": { "type": "string", "_flm": "full" }
+    }
+}

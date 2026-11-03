@@ -3,13 +3,13 @@ const debug = debug_module('zoodb.dbdataloader.yamldb');
 
 import path from 'path';
 
-import jsyaml from 'js-yaml';
-
 import sha256 from 'hash.js/lib/hash/sha/256.js';
 
 
 import { promisifyMethods } from '../util/prify.js';
 import { escapeRegExp } from '../util/rx.js';
+
+import { decode_text, parse_yaml_text } from './_yamlparse.js';
 
 
 // -----------------------------------------------------------------------------
@@ -107,6 +107,17 @@ const dbdata = zoodbdataloader.load();
  *
  * Includes validation of the input object data against the provided schemas.
  *
+ * YAML files are read with the ``yaml`` package, strict YAML 1.2 (core
+ * schema), see :js:meth:`parse_file_data`. The positions of the string values
+ * of a YAML file are recorded on its object as
+ * ``obj._zoodb.flm_field_positions`` (field path → ``{ line, col, style,
+ * indent, approx }``, see
+ * :js:meth:`~YamlDbDataLoader.parse_file_data_with_positions`) when
+ * the file's data is the object itself (the default ``load_objects``; a
+ * custom ``load_objects`` that returns other objects gets no positions): the
+ * FLM field compiler places its diagnostics in the file with them. JSON
+ * files have no positions.
+ *
  * Configuration options:
  *
  * - ``root_data_dir`` *(required)* — the root directory on the filesystem
@@ -137,6 +148,10 @@ const dbdata = zoodbdataloader.load();
  *
  * - ``resource_file_extensions`` — array of file extensions that should be
  *   ignored when scanning data directories (e.g. `['.svg', '.png']`).
+ *
+ * - ``engine`` — not used by this class (the standard setup passes the
+ *   zoo's FLM engine to any loader class; :js:class:`FlmFilesDbDataLoader`
+ *   needs it).
  *
  * See also :func:`makeStandardZooDb` for a higher-level setup.
  */
@@ -274,15 +289,50 @@ export class YamlDbDataLoader
     // -------------------------------------------
 
 
+    /**
+     * Parses the content of a data file into plain data: a ``.yml`` or
+     * ``.yaml`` file with the ``yaml`` package (YAML 1.2, core schema: a
+     * date stays a string, a duplicate key is an error), a ``.json`` file
+     * with ``JSON.parse``. The positions of a YAML file's string values are
+     * kept for :js:meth:`~YamlDbDataLoader.parse_file_data_with_positions`
+     * (see there).
+     *
+     * A parse error throws an ``Error`` whose message names the file, the
+     * line and the column (``Parse error in ‘FILE’ at line L, column C:
+     * …``). A quoted value continued on a line that is not indented more
+     * than its key (which ``js-yaml``, used before 0.3, accepted) is refused
+     * with the message "a quoted value that continues on the next line must
+     * be indented more than the key; run ``zoodb-reindent-yaml`` on the
+     * file" at the opening quote; the tool ``zoodb-reindent-yaml``
+     * (``tools/reindent_yaml.mjs``) fixes such files.
+     *
+     * Subclasses may override it (:js:class:`FlmFilesDbDataLoader` does).
+     *
+     * @param {string|Uint8Array} file_content - the file's content (bytes
+     *     are decoded as UTF-8)
+     * @param {Object} objectconfig - the object type's configuration
+     * @param {string} root_path - the directory the file was found in
+     * @param {string} rel_path - the file's path relative to ``root_path``
+     * @returns {Promise<*>} the file's data
+     */
     async parse_file_data(file_content, objectconfig, root_path, rel_path)
     {
         // in case root_path is already a JSON/YAML file and rel_path is empty
         const fullpath = path.join(root_path, rel_path);
+        if ( /\.ya?ml$/i.test(fullpath) ) {
+            let parsed;
+            try {
+                parsed = parse_yaml_text(decode_text(file_content), { file: fullpath });
+            } catch (err) {
+                console.error(err.message);
+                throw err;
+            }
+            this._remember_positions(parsed.data, parsed.positions);
+            return parsed.data;
+        }
         try {
-            if ( /\.ya?ml$/i.test(fullpath) ) {
-                return jsyaml.load( file_content );
-            } else if ( /\.json$/i.test(fullpath) ) {
-                return JSON.parse( file_content );
+            if ( /\.json$/i.test(fullpath) ) {
+                return JSON.parse( decode_text(file_content) );
             } else {
                 throw new Error(`Unknown file type for path ‘${fullpath}’`);
             }
@@ -292,6 +342,61 @@ export class YamlDbDataLoader
             );
             throw new Error(`Parse error in ‘${fullpath}’: ${err}`);
         }
+    }
+
+    /**
+     * Parses the content of a data file into its data and the positions of
+     * its string values: ``{ data, positions }``. ``parse_file_into_objects()``
+     * calls it; it calls :js:meth:`parse_file_data`, so that a subclass that
+     * overrides only that one still loads (its files then have no positions,
+     * unless it returns the data its ``super.parse_file_data()`` returned).
+     *
+     * ``positions`` maps each string value's field path (keys and list
+     * indexes joined with dots, ``relations.parents.0.detail``, the form of
+     * ``obj._zoodb.flm_fields``) to ``{ line, col, style }`` in the file
+     * (1-based, ``col`` in characters): ``style`` ``'literal'`` or
+     * ``'folded'`` for a block scalar, whose ``line`` is the first line
+     * after the ``|`` or ``>`` header and ``col`` is ``indent + 1``, with
+     * ``indent`` the columns removed from each line (line ``i`` of a literal
+     * value is the file's line ``line + i``); ``'plain'``, the value's first
+     * character; ``'quoted'``, the character after the opening quote;
+     * ``'field'``, the first character of a field of an FLM file (after the
+     * trim). A folded, plain or quoted value that spans several lines of the
+     * file has ``approx: true`` (the lines are folded, positions inside the
+     * value are approximate), and so has a one-line quoted value with an
+     * escape (``'it''s'``, ``"a\tb"``: columns after the escape are off).
+     * ``positions`` is ``null`` for a JSON file.
+     *
+     * @param {string|Uint8Array} file_content
+     * @param {Object} objectconfig
+     * @param {string} root_path
+     * @param {string} rel_path
+     * @returns {Promise<{data: *, positions: (Object|null)}>}
+     */
+    async parse_file_data_with_positions(file_content, objectconfig, root_path, rel_path)
+    {
+        const data = await this.parse_file_data(file_content, objectconfig, root_path, rel_path);
+        return { data, positions: this._take_positions(data) };
+    }
+
+    // The positions found by parse_file_data(), by the data object it
+    // returned, until parse_file_data_with_positions() takes them.
+    _remember_positions(data, positions)
+    {
+        if (positions != null && data != null && typeof data === 'object') {
+            this._data_positions ??= new WeakMap();
+            this._data_positions.set(data, positions);
+        }
+    }
+
+    _take_positions(data)
+    {
+        if (this._data_positions == null || data == null || typeof data !== 'object') {
+            return null;
+        }
+        const positions = this._data_positions.get(data) ?? null;
+        this._data_positions.delete(data);
+        return positions;
     }
 
     // -------------
@@ -503,13 +608,27 @@ export class YamlDbDataLoader
 
         debug(`Loading file ‘${rel_path}’ (from ${root_path})`);
 
-        const file_data = await this.parse_file_data( file_content, objectconfig,
-                                                      root_path, rel_path );
+        const { data: file_data, positions } = await this.parse_file_data_with_positions(
+            file_content, objectconfig, root_path, rel_path
+        );
 
         let objects_data = objectconfig.load_objects( file_data );
 
         debug(`Loaded ${objects_data.length} ${objectconfig.object_type} object(s) `
               +`from ‘${path.join(objectconfig.data_src_path,rel_path)}’`);
+
+        // The positions are the object's when the file's data is the object
+        // itself (the default load_objects); otherwise the loader cannot
+        // follow load_objects' mapping and records none.
+        let object_positions = null;
+        if (positions != null) {
+            if (objects_data.length === 1 && objects_data[0] === file_data) {
+                object_positions = positions;
+            } else {
+                debug(`No field positions recorded for the objects of ‘${source_file_path}’: `
+                      + `load_objects() did not return the file's data as its one object`);
+            }
+        }
 
         // add _zoodb field as appropriate
         for (let obj of objects_data) {
@@ -517,6 +636,9 @@ export class YamlDbDataLoader
                 obj, objectconfig,
                 {root_path, rel_path, source_file_path, source_file_modification_token}
             );
+            if (object_positions != null) {
+                obj._zoodb.flm_field_positions = object_positions;
+            }
 
             existing_dbdata_info.reloaded_objects[objectconfig.object_type][obj._zoodb.id]
                 = obj;

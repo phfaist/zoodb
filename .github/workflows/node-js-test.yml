@@ -19,7 +19,6 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - '18'
           - '20'
           - '22'
           #- '24'
@@ -57,10 +56,20 @@ jobs:
   
       - run: 'yarn'
   
+      - run: 'yarn lint'
+
       - run: 'yarn test'
 
 
       # Try to compile our example zoodb "PeopleDB"
+      #
+      # PENDING: these steps clone the default branch of zoodb-example, which
+      # still uses the FLM API of zoodb 0.2. The port to zoodb 0.3 is on that
+      # repository's branch `zoodb-flmrs`, not merged (nor pushed) yet; until it
+      # reaches the default branch, these steps fail against this version of
+      # zoodb. Once the branch is pushed, the clone can name it
+      # (`git clone --branch zoodb-flmrs ...`); once it is merged, nothing here
+      # needs to change.
 
       - name: 'Clone example ZooDB repo'
         run: 'git clone https://github.com/phfaist/zoodb-example.git'
@@ -69,21 +78,25 @@ jobs:
         run: 'yarn up @phfaist/zoodb@https://github.com/${{ github.repository }}.git#${{ github.sha }}'
         working-directory: ./zoodb-example/
 
-      - name: 'Build example ZooDB (Only for Node ≥ 20)'
+      - name: 'Build example ZooDB'
         run: |
-          if [[ ${{ matrix.node-version }} == "latest" || ${{ matrix.node-version }} -ge 20 ]]; then
-              echo "Building test website [Node $(yarn node --version)]"
-              yarn build
-          else
-              echo "Skipping test build website [Node $(yarn node --version)]"
-          fi
+          echo "Building test website [Node $(yarn node --version)]"
+          yarn build
         working-directory: ./zoodb-example/website
 
 
-  # Build and check the Rust binding of the autocitefetch citation retriever
-  # (rust/).  The generated module in src/citationmanager/_wasm/ is committed
-  # and is not compared with this build's output (wasm-opt is not
-  # byte-reproducible across versions).
+  # Build and check the Rust bindings of the cargo workspace in rust/: the
+  # citation retriever (zoodb-autocitefetch-wasm) and the FLM engine
+  # (zoodb-flm-wasm).  The generated modules in src/citationmanager/_wasm/ and
+  # src/zooflm/_wasm/ are committed and are not compared with this build's
+  # output (wasm-opt is not byte-reproducible across versions).
+  #
+  # Each crate is checked in its own cargo invocation: one invocation over both
+  # would unify serde_json's features and compile the citation crate with
+  # `serde_json/std`, which it must never be built with (see rust/README.md).
+  #
+  # zoodb-flm-wasm takes flm-core from the branch main-rs of
+  # https://github.com/phfaist/flm.git, at the commit pinned in rust/Cargo.lock.
   rust:
 
     runs-on: ubuntu-latest
@@ -117,10 +130,16 @@ jobs:
         run: 'command -v wasm-pack || cargo install wasm-pack --locked'
 
       - name: 'cargo clippy'
-        run: 'cargo clippy --all-targets -- -D warnings'
+        run: |
+          cargo clippy -p zoodb-autocitefetch-wasm --all-targets -- -D warnings
+          cargo clippy -p zoodb-flm-wasm --all-targets -- -D warnings
 
       - name: 'cargo test'
-        run: 'cargo test'
+        run: |
+          cargo test -p zoodb-autocitefetch-wasm
+          cargo test -p zoodb-flm-wasm
 
-      - name: 'Build the wasm module (build only)'
-        run: 'wasm-pack build --release --target web --out-dir target/pkg --out-name autocitefetch_wasm'
+      - name: 'Build the wasm modules (build only)'
+        run: |
+          wasm-pack build zoodb-autocitefetch-wasm --release --target web --out-dir ../target/pkg/zoodb-autocitefetch-wasm --out-name autocitefetch_wasm
+          wasm-pack build zoodb-flm-wasm --release --target web --out-dir ../target/pkg/zoodb-flm-wasm --out-name zoodb_flm_wasm

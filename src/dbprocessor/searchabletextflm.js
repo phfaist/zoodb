@@ -1,4 +1,12 @@
-import { $$kw, render_value, ZooTextFragmentRenderer } from '../zooflm/index.js';
+import debug_module from 'debug';
+const debug = debug_module('zoodb.dbprocessor.searchabletextflm');
+
+import { check_error_policy, is_fragment } from '../zooflm/engine.js';
+
+
+// The core's settings for the text runs that show each citation's entry in
+// place of its mark.
+const CITATIONS_IN_PLACE = Object.freeze({ citations: Object.freeze({ placement: 'in-place' }) });
 
 
 // -----------------------------------------------------------------------------
@@ -6,9 +14,15 @@ import { $$kw, render_value, ZooTextFragmentRenderer } from '../zooflm/index.js'
 
 /**
  * Assembles search-document values from a list of ``[key, value]`` pairs
- * where some values may be compiled FLM fragments.  Each fragment is rendered
- * to plain text inside an FLM document context so that citations and
- * cross-references resolve correctly.
+ * where some values may be fragments of the zoo's FLM engine
+ * (:js:class:`ZooFlmEngine`).  Each fragment becomes its plain text, rendered
+ * alone: a standalone fragment through the snippet cache, the others through
+ * one `engine.render_text()` over the object's fragments, each field's text
+ * from ``trees`` (a fragment rendered alone, in which a reference to a label
+ * of another field shows the label; the search index does not mind), each
+ * citation shown as its entry in place of its mark unless the option
+ * `citations_in_place` is `false`, with its pieces when the option `pieces`
+ * is set.
  *
  * Pass an instance's `assemble_doc_text_values` method as the
  * `assemble_doc_text_values` option of :class:`SearchableTextFieldset` when
@@ -16,64 +30,81 @@ import { $$kw, render_value, ZooTextFragmentRenderer } from '../zooflm/index.js'
  *
  * Constructor parameters:
  *
- * - `zoo_flm_environment` *(required)* — the FLM environment used to create
- *   the rendering document.
+ * - `engine` *(required)* — the zoo's FLM engine.
  *
- * - `render_value_fn` — function called as ``render_value_fn(v,
- *   render_context)`` to convert a single field value to a string.  Defaults
- *   to the `render_value` helper from `zooflm`.
+ * - `render_value_fn` — function called as ``render_value_fn(v)`` to convert
+ *   a value that is not a fragment to a string.  Defaults to ``String(v)``.
  *
- * - `doc_metadata` — metadata object forwarded to
- *   `zoo_flm_environment.make_document()`.  Defaults to `null`.
+ * - `error_policy` — the policy of the text renders (default
+ *   ``'continue'``: the search text is made whatever the content holds; the
+ *   FLM processor and the page renders report the content's errors).
  *
- * - `text_fragment_renderer` — fragment renderer used to produce plain text.
- *   Defaults to a new :class:`ZooTextFragmentRenderer` instance.
+ * - `citations_in_place` — if `true` (the default), each citation is
+ *   replaced by the cited work's entry, in brackets (``a code [A. Author, “A
+ *   title”, arXiv:1234.5678].``), so that an object can be found by the
+ *   authors and titles of the works it cites; the assembler renders with the
+ *   engine setting ``citations.placement: 'in-place'``.  If `false`, a
+ *   citation is shown by its mark alone (``[1]``).
+ *
+ * - `pieces` — if `true`, the text of each field ends with its footnotes
+ *   and, when `citations_in_place` is `false`, with the list of the works it
+ *   cites.  Default `false`: a footnote is shown by its mark alone, which
+ *   keeps the index smaller.  A standalone fragment holds neither, so its
+ *   snippet is used either way.
  */
 export class FLMSearchableDocTextValuesAssembler
 {
-    constructor({zoo_flm_environment, render_value_fn, doc_metadata,
-                 text_fragment_renderer})
+    constructor({ engine, render_value_fn, error_policy, citations_in_place, pieces } = {})
     {
-        this.zoo_flm_environment = zoo_flm_environment;
-        this.doc_metadata = doc_metadata ?? null;
-        this.render_value_fn = render_value_fn ?? render_value;
-
-        this.text_fragment_renderer =
-            text_fragment_renderer ?? new ZooTextFragmentRenderer();
+        this.engine = engine;
+        if (this.engine == null) {
+            throw new Error(`FLMSearchableDocTextValuesAssembler: no engine provided (option ‘engine’)`);
+        }
+        this.render_value_fn = render_value_fn ?? ( (v) => String(v) );
+        this.error_policy = check_error_policy(error_policy ?? 'continue');
+        this.citations_in_place = Boolean(citations_in_place ?? true);
+        this.pieces = Boolean(pieces ?? false);
     }
-    
+
+    _fragment_text(f, trees)
+    {
+        if (f.standalone) {
+            return this.engine.snippet_entry(f, 'text')?.value
+                ?? this.engine.render_fragment(f, { output: 'text', error_policy: this.error_policy }).text;
+        }
+        return trees.get(f) ?? '';
+    }
+
     assemble_doc_text_values(doc_values)
     {
-        const render_doc = (render_context) => {
-            //return render_value(x, render_context);
-            let doc = {}
-            //debug('render search data; doc_values =', doc_values);
-            for (const [k,v] of doc_values) {
-                //debug("v = ", v);
-                const value = this.render_value_fn(v, render_context);
-                if (k in doc) {
-                    doc[k] += '\n' + value;
-                } else {
-                    doc[k] = value;
-                }
+        // the fragments that are not standalone, rendered in one call
+        const fragments = [];
+        for (const [, v] of doc_values) {
+            if (is_fragment(v) && !v.standalone && !fragments.includes(v)) {
+                fragments.push(v);
             }
-            return doc;
-        };
+        }
+        const trees = new Map();
+        if (fragments.length > 0) {
+            const out = this.engine.render_text(fragments, {
+                per_fragment: true, pieces: this.pieces, error_policy: this.error_policy,
+                render_options: this.citations_in_place ? CITATIONS_IN_PLACE : null,
+            });
+            if (out.diagnostics.length > 0) {
+                debug(`search text: ${out.diagnostics.length} diagnostic(s)`);
+            }
+            fragments.forEach( (f, i) => trees.set(f, out.trees[i] ?? '') );
+        }
 
-        const flmdoc = this.zoo_flm_environment.make_document(
-            render_doc,
-            $$kw({
-                feature_document_options: {
-                    citations: {
-                        use_endnotes: false,
-                    },
-                },
-                metadata: this.doc_metadata,
-            }),
-        );
-
-        const [result, /*junk*/] = flmdoc.render(this.text_fragment_renderer);
-        //debug('render field value --> result = ', result);
-        return result;
+        let doc = {};
+        for (const [k, v] of doc_values) {
+            const value = is_fragment(v) ? this._fragment_text(v, trees) : this.render_value_fn(v);
+            if (k in doc) {
+                doc[k] += '\n' + value;
+            } else {
+                doc[k] = value;
+            }
+        }
+        return doc;
     }
 }

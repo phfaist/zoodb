@@ -502,8 +502,8 @@ export class ZooDb
      *    Depending on the options provided and any installed database
      *    processors, **this method may return references to the raw objects
      *    stored inside the database**.  For example, when
-     *    `flm_fragments_keep_instances` is used with :class:`ZooFLMProcessor`,
-     *    the returned objects contain live `FLMFragment` instances from the
+     *    `flm_fragments_keep_instances` is used with :class:`ZooFlmProcessor`,
+     *    the returned objects contain live `ZooFlmFragment` instances from the
      *    database.  **Any mutations will affect the original database content.**
      *
      * Options accepted in the `options` argument:

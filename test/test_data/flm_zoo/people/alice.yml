@@ -1,0 +1,22 @@
+person_id: alice
+
+name: 'Alice \emph{Aaliz}'
+
+biography: |
+  Alice draws dots.\footnote{Mostly red ones.}
+
+  \section{Early life}
+  \label{sec:alice-early}
+
+  Alice drew her first dot early, as seen in Figure~\ref{figure:alice-dot}.
+  Bob drew one too (\ref{figure:bob-dot}).
+
+  \begin{figure}
+    \includegraphics{images/dot}
+    \caption{A red dot.}
+    \label{figure:alice-dot}
+  \end{figure}
+
+topics:
+  - topic_id: drawing
+    detail: 'Since \(t=0\).'

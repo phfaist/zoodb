@@ -132,8 +132,9 @@ options of the ``arxiv`` and ``preset`` sources.
 **Citations that cannot be retrieved** (a malformed arXiv ID, a DOI that does
 not exist, a network failure, …) are printed along with the file and field in
 which they were encountered.  By default the zoo build then fails with an error
-that lists them.  With ``flm_error_policy: 'continue'``, the build proceeds and
-formats the citations that could be retrieved.
+that lists them.  With ``continue_with_errors: true`` in the zoo's
+configuration, the build proceeds and formats the citations that could be
+retrieved.
 
 The other available keys of ``flm_options.citations`` are listed with
 :func:`makeStandardZooDb`.  Options of the citation manager itself, such as

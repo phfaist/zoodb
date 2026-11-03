@@ -1,0 +1,22 @@
+{
+    "_zoo_primarykey": "person_id",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["person_id", "name"],
+    "properties": {
+        "person_id": { "type": "string" },
+        "name": { "type": "string", "_flm": "standalone" },
+        "biography": { "type": "string", "_flm": "full" },
+        "topics": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "topic_id": { "type": "string" },
+                    "detail": { "type": "string", "_flm": "full" }
+                }
+            }
+        }
+    }
+}
