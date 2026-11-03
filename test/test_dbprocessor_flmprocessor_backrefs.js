@@ -15,13 +15,10 @@ import { ZooDb } from '../src/index.js';
 import { RelationsPopulator } from '../src/dbprocessor/relations.js';
 import { ZooFlmProcessor } from '../src/dbprocessor/flmprocessor.js';
 import { copied_field_source } from '../src/dbprocessor/flmsimplecontent.js';
-import { load_zoodb_flm_wasm_node } from '../src/zooflm/_load_wasm_node.js';
 import { ZooFlmEngine, format_diagnostic, is_fragment } from '../src/zooflm/engine.js';
 
 import { schema_validator } from './_helperstest.js';
 
-
-const load_wasm = load_zoodb_flm_wasm_node;
 
 const relation_list = (fields = {}) => ({
     type: 'array',
@@ -96,7 +93,7 @@ const item_c = (detail = 'Under \\ref{item:b}, see \\cite{custom:abc} and \\eqre
 
 async function make_zoo({ error_policy = 'abort', a_detail } = {})
 {
-    const engine = await ZooFlmEngine.create({ load_wasm });
+    const engine = await ZooFlmEngine.create();
     const processor = new ZooFlmProcessor({ engine, error_policy });
     const zoodb = new ZooDb({ processors: [new RelationsPopulator(), processor], schema_validator });
     await zoodb.load_data({
@@ -244,22 +241,24 @@ describe('ZooFlmProcessor, the FLM fields of back-references', function () {
         });
 
         it('gives after a reload with no change the scan results, the fragments and the dump of the first load', async function () {
-            const count = engine.core.fragment_count();
+            // engine._core: the engine's internal accessor to its core, not part of the
+            // package's API (here and below, for the core's fragment counter)
+            const count = engine._core.fragment_count();
             const fragments = processor.zoo_fragments();
             await zoodb.update_objects({});
             assert.deepStrictEqual(scan_snapshot(processor, zoodb), first_load_snapshot);
             assert.deepStrictEqual(processor.zoo_fragments(), fragments);
-            assert.strictEqual(engine.core.fragment_count(), count);
+            assert.strictEqual(engine._core.fragment_count(), count);
             const { a, b } = zoodb.objects.item;
             assert.strictEqual(b.relations.parent_of[0].detail, a.relations.parents[0].detail);
             assert.strictEqual(await dump_json(zoodb), first_dump);
         });
 
         it('likewise after a reload of the holder, and follows a reload of the related object', async function () {
-            const count = engine.core.fragment_count();
+            const count = engine._core.fragment_count();
             await zoodb.update_objects({ item: { b: item_b() } });
             assert.deepStrictEqual(scan_snapshot(processor, zoodb), first_load_snapshot);
-            assert.strictEqual(engine.core.fragment_count(), count);
+            assert.strictEqual(engine._core.fragment_count(), count);
             assert.strictEqual(await dump_json(zoodb), first_dump);
 
             // c replaced: a's copy is c's new fragment, compiled once
@@ -276,7 +275,7 @@ describe('ZooFlmProcessor, the FLM fields of back-references', function () {
             ]);
             assert.deepStrictEqual(snapshot['item:a'].cited, ['custom:xyz @ items/a.yml#relations.parents.0.detail']);
             assert.deepStrictEqual(snapshot['item:c'].refs, ['item:a @ items/c.yml#relations.parents.0.detail']);
-            assert.strictEqual(engine.core.fragment_count(), count);
+            assert.strictEqual(engine._core.fragment_count(), count);
             check_zoo_fragments(processor, zoodb);
         });
 

@@ -29,7 +29,6 @@ import { use_flm_processor } from '../src/std/use_flm_processor.js';
 //import { use_searchable_text_processor } from '../src/std/use_searchable_text_processor.js';
 
 import { makeStandardZooDb } from '../src/std/stdzoodb.js';
-import { load_zoodb_flm_wasm_node } from '../src/zooflm/_load_wasm_node.js';
 import { ZooFlmEngine, is_fragment } from '../src/zooflm/engine.js';
 import { makeStandardYamlDbDataLoader } from '../src/std/stdyamldbdataloader.js';
 
@@ -63,8 +62,6 @@ async function createMyZooDb(more = {})
         use_searchable_text_processor: false,
 
         flm_options: {
-
-            load_wasm: load_zoodb_flm_wasm_node,
 
             refs:  {
                 person: {
@@ -276,7 +273,6 @@ describe('zoodb.test_std', function() {
         // the hash of the configuration: the same configuration given
         // directly gives the same hash
         const same = await ZooFlmEngine.create({
-            load_wasm: load_zoodb_flm_wasm_node,
             core: { off: ['annotations'], dollar_math: true,
                     settings: { userdefs: { macros: { utensilname: { content: 'utensil' } } } } },
         });
@@ -296,7 +292,6 @@ describe('zoodb.test_std', function() {
 
         const zoodb2 = await createMyZooDb({
             flm_options: {
-                load_wasm: load_zoodb_flm_wasm_node,
                 allow_unresolved_references: true,
                 citations: { cache_dir: '_zoodb_TEST_citation_info_cache', cache_dir_create: false },
             },
@@ -316,7 +311,6 @@ describe('zoodb.test_std', function() {
         this.timeout(5000);
 
         const flm_options = {
-            load_wasm: load_zoodb_flm_wasm_node,
             citations: { cache_dir: '_zoodb_TEST_citation_info_cache', cache_dir_create: false },
         };
         await assert.rejects(

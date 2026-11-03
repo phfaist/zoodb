@@ -7,11 +7,13 @@
 // truncates and hands out the stylesheet. It knows nothing about files, the
 // network, the zoo's objects or schemas: that is the processor's.
 //
-// Environment-neutral: the engine takes a loaded module and imports nothing
-// environment-specific (the default loader fetches the module in a browser;
-// Node callers pass `load_zoodb_flm_wasm_node` of ./_load_wasm_node.js).
+// Environment-neutral: the engine's only environment-specific import is the
+// default loader of the module, ./_load_wasm_default.js, which reads the
+// module's file under Node; a bundler building for a browser substitutes its
+// browser variant, ./_load_wasm_default.browser.js, which fetches it (the
+// `browser` field of the package's package.json).
 
-import { load_zoodb_flm_wasm } from './_load_wasm.js';
+import { load_zoodb_flm_wasm } from './_load_wasm_default.js';
 
 import { ZooFlmFragment, LAYOUTS, make_origin, is_fragment, range_origin } from './fragment.js';
 import {
@@ -164,13 +166,10 @@ function is_index_label(label)
 export class ZooFlmEngine
 {
     /**
-     * Loads the module (``load_wasm()``) and builds an engine.
+     * Builds an engine, loading the core's WebAssembly module (flm-rs,
+     * shipped with the package) the first time.
      *
      * @param {object} [options]
-     * @param {function(): Promise<object>} [options.load_wasm] - resolves to the
-     *     module's namespace; default: the environment-neutral loader of
-     *     ``./_load_wasm.js``, which fetches the module (a browser); under Node,
-     *     pass ``load_zoodb_flm_wasm_node`` of ``./_load_wasm_node.js``
      * @param {object} [options.core] - the core's configuration as data:
      *     ``{ dollar_math, srcset, settings, off, link_target_blank }``
      *     (``settings`` one map per standard feature, user definitions under
@@ -187,14 +186,13 @@ export class ZooFlmEngine
      * @returns {Promise<ZooFlmEngine>}
      */
     static async create({
-        load_wasm = load_zoodb_flm_wasm,
         core = null,
         error_policy = 'abort',
         unresolved = 'error',
         render_value_options = null,
     } = {})
     {
-        const ns = await ZooFlmEngine._load(load_wasm);
+        const ns = await load_zoodb_flm_wasm();
         const engine = new ZooFlmEngine({
             core: new ns.ZooFlmCore(core ?? {}),
             core_config: core,
@@ -215,24 +213,12 @@ export class ZooFlmEngine
      * (``[{ name, schema }]``, ``schema`` ``null`` for a feature without
      * settings).
      *
-     * @param {object} [options]
-     * @param {function(): Promise<object>} [options.load_wasm] - as for
-     *     :js:meth:`create`
      * @returns {Promise<object[]>}
      */
-    static async features({ load_wasm = load_zoodb_flm_wasm } = {})
+    static async features()
     {
-        const ns = await ZooFlmEngine._load(load_wasm);
+        const ns = await load_zoodb_flm_wasm();
         return ns.ZooFlmCore.features();
-    }
-
-    static async _load(load_wasm)
-    {
-        const ns = await load_wasm();
-        if (typeof ns?.ZooFlmCore !== 'function') {
-            throw new Error('load_wasm() did not resolve to the FLM module (no ZooFlmCore class)');
-        }
-        return ns;
     }
 
     /**
@@ -295,8 +281,9 @@ export class ZooFlmEngine
     get render_value_options() { return this._render_value_options; }
 
     /**
-     * The versions of the module the engine runs: ``{ binding, flm_core }``
-     * (``ZooFlmCore.version()``).
+     * The version of the engine's core: ``{ binding, flm_core }``, the
+     * versions of ZooDb's binding and of flm-rs's ``flm-core`` it was built
+     * from.
      *
      * @returns {object}
      */
@@ -309,11 +296,11 @@ export class ZooFlmEngine
      * The hash of the core configuration the engine was created with
      * (``dollar_math``, ``srcset``, ``settings``, ``off``,
      * ``link_target_blank``; a missing key and ``null`` count as the
-     * default) and of the module's versions
+     * default) and of the version of the engine's core
      * (:js:attr:`core_version`): two engines with the same hash read and
      * render FLM alike. A dump (:js:meth:`dump`) carries it, and
      * :js:meth:`load` refuses a dump made under another configuration or by
-     * another build of the module.
+     * another version of the core.
      *
      * @returns {string}
      */
@@ -325,19 +312,13 @@ export class ZooFlmEngine
         return this._settings_hash;
     }
 
-    /**
-     * The wasm core (``ZooFlmCore``), for what the engine does not wrap
-     * (the counters). Handles the engine holds are not to be released
-     * through it.
-     */
-    get core() { return this._core; }
-
     /** Whether :js:meth:`free` was called. */
     get freed() { return this._freed; }
 
     /**
-     * Frees the wasm core; the engine and its fragments are unusable after:
-     * any later call throws a plain ``Error`` saying the engine was freed.
+     * Frees the engine's core; the engine and its fragments are unusable
+     * after: any later call throws a plain ``Error`` saying the engine was
+     * freed.
      */
     free()
     {

@@ -48,19 +48,6 @@ With this setup, every template receives a ``data.zoodb`` property containing
 the fully loaded :class:`ZooDb` instance, and its FLM engine as
 ``data.zoodb.zoo_flm_engine``.
 
-As every script that runs under Node, the zoo's configuration must point FLM to
-the WebAssembly module explicitly:
-
-.. code:: javascript
-
-   import { load_zoodb_flm_wasm_node } from '@phfaist/zoodb/zooflm/wasm-node';
-
-   // in the configuration given to makeStandardZooDb():
-   flm_options: {
-       load_wasm: load_zoodb_flm_wasm_node,
-       // ...
-   },
-
 
 The FLM stylesheet and scripts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

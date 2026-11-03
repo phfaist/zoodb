@@ -25,7 +25,6 @@ import {
     makeStandardZooDb, use_flm_engine, use_flm_processor, use_searchable_text_processor,
 } from '@phfaist/zoodb/std';
 import { makeStandardYamlDbDataLoader } from '@phfaist/zoodb/std/stdyamldbdataloader';
-import { load_zoodb_flm_wasm_node } from '@phfaist/zoodb/zooflm/wasm-node';
 import { CitationSourceBase } from '@phfaist/zoodb/citationmanager/source/base';
 
 
@@ -76,8 +75,6 @@ const zoodb = await makeStandardZooDb({
     use_searchable_text_processor,
 
     flm_options: {
-        // Node reads the wasm module from its file; a browser fetches it
-        load_wasm: load_zoodb_flm_wasm_node,
         citations: {
             csl_style,
             sources: { arxiv: false, doi: false, manual: false, custom: new CitationSourceCustom() },

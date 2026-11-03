@@ -6,7 +6,6 @@ import * as assert from 'assert';
 
 import { FLMSimpleContentCompiler, flm_options_layout, field_origin } from '../src/dbprocessor/flmsimplecontent.js';
 
-import { load_zoodb_flm_wasm_node } from '../src/zooflm/_load_wasm_node.js';
 import { ZooFlmEngine, ZooFlmError, is_fragment, format_diagnostic } from '../src/zooflm/engine.js';
 
 import { ZooDb } from '../src/index.js';
@@ -21,7 +20,7 @@ describe('zoodb.dbprocessor.flmsimplecontent', function () {
     let engine;
 
     before(async function () {
-        engine = await ZooFlmEngine.create({ load_wasm: load_zoodb_flm_wasm_node });
+        engine = await ZooFlmEngine.create();
     });
 
     after(function () {
@@ -194,13 +193,15 @@ describe('zoodb.dbprocessor.flmsimplecontent', function () {
 
             // a reload releases the fragments of the objects it replaces
             const old_fragments = [fork.name, fork.description];
-            const count = engine.core.fragment_count();
+            // engine._core: the engine's internal accessor to its core, not part of the
+            // package's API (here and below, for the core's fragment counter)
+            const count = engine._core.fragment_count();
             await zoodb.update_objects({
                 utensil: { fork: { utl_id: 'fork', name: 'Fork 2', description: 'New', _zoodb: {} } },
             });
             assert.ok(old_fragments.every( (f) => f.released ));
             assert.strictEqual(zoodb.objects.utensil.fork.name.source, 'Fork 2');
-            assert.strictEqual(engine.core.fragment_count(), count);
+            assert.strictEqual(engine._core.fragment_count(), count);
             // the fragments of the other objects are kept
             assert.strictEqual(zoodb.objects.utensil.knife.name.released, false);
         });

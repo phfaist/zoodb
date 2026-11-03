@@ -19,7 +19,6 @@ import { makeStandardZooDb } from '../src/std/stdzoodb.js';
 import { makeStandardYamlDbDataLoader } from '../src/std/stdyamldbdataloader.js';
 
 import { CitationSourceBase } from '../src/citationmanager/source/base.js';
-import { load_zoodb_flm_wasm_node } from '../src/zooflm/_load_wasm_node.js';
 
 import { make_mock_host, make_mock_fetch_api } from './_helpers/citation_mock_host.js';
 
@@ -75,7 +74,6 @@ async function make_zoo({ data_file, flm_error_policy, host, allow_unresolved_ci
         use_searchable_text_processor: false,
 
         flm_options: {
-            load_wasm: load_zoodb_flm_wasm_node,
             allow_unresolved_citations,
             citations: {
                 csl_style: fs.readFileSync(csl_filename, { encoding: 'utf-8' }),

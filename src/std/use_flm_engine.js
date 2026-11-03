@@ -2,7 +2,6 @@ import debug_mod from 'debug';
 const debug = debug_mod("zoodb.std.use_flm_engine");
 
 import { ZooFlmEngine } from '../zooflm/engine.js';
-import { load_zoodb_flm_wasm } from '../zooflm/_load_wasm.js';
 
 
 /**
@@ -46,10 +45,6 @@ const ENGINE_OPTION_KEYS = ['dollar_math', 'settings', 'off', 'link_target_blank
  * Reads the following properties from `_this` (the internal state object
  * built by `makeStandardZooDb`):
  *
- * - `_this.config.flm_options.load_wasm` — the loader of the FLM module, a
- *   function resolving to its namespace (default: the environment-neutral
- *   loader, which fetches the module in a browser; under Node, pass
- *   ``load_zoodb_flm_wasm_node`` of ``@phfaist/zoodb/zooflm/wasm-node``).
  * - `_this.config.flm_options.engine` — the core's configuration as data:
  *   ``dollar_math`` (whether ``$…$`` delimits math; default `false`),
  *   ``settings`` (the settings of the standard features, one map per
@@ -108,7 +103,6 @@ export async function use_flm_engine(_this)
     debug(`Creating the FLM engine`, { core });
 
     return await ZooFlmEngine.create({
-        load_wasm: flm_options.load_wasm ?? load_zoodb_flm_wasm,
         core,
         error_policy: _this.flm_error_policy ?? 'abort',
         unresolved: flm_options.allow_unresolved_references ? 'warn' : 'error',

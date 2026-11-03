@@ -1,13 +1,14 @@
 //
 // ZooDb's FLM layer (package export `./zooflm`): the engine over the wasm
-// core of flm-rs, the citation compiler, and the environment-neutral loader of
-// the wasm module.
+// core of flm-rs and the citation compiler.
 //
-// Browser code may import it: nothing here imports a `node:` module (the
-// citation compiler imports the builtin `path` through
-// `../util/atomicfilewrite.js`, as the former `./zooflm` did). The Node loader,
-// which reads the module's file with `node:fs/promises`, is not re-exported:
-// import it from `./zooflm/wasm-node`.
+// Browser code may import it. The engine loads its core through the internal
+// default loader (./_load_wasm_default.js), which reads the module's file
+// with `node:fs/promises` under Node; a bundler building for a browser
+// substitutes its browser variant, which fetches the file, through the
+// `browser` field of the package's package.json. Nothing else here imports a
+// `node:` module (the citation compiler imports the builtin `path` through
+// `../util/atomicfilewrite.js`).
 //
 
 // ZooFlmEngine, and the modules it re-exports: fragments and origins
@@ -17,7 +18,3 @@ export * from './engine.js';
 
 // CitationCompiler, install_csl_flm_output_format
 export * from './citationcompiler.js';
-
-// the environment-neutral loader of the wasm module (the Node loader is the
-// package export `./zooflm/wasm-node`)
-export { load_zoodb_flm_wasm, wasm_url } from './_load_wasm.js';

@@ -3,7 +3,6 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 import { FlmFilesDbDataLoader } from '../src/dbdataloader/flmfilesdb.js';
-import { load_zoodb_flm_wasm_node } from '../src/zooflm/_load_wasm_node.js';
 import { ZooFlmEngine, ZooFlmError, format_diagnostic } from '../src/zooflm/engine.js';
 import { ZooDb, ZooDbDataLoaderHandler } from '../src/index.js';
 import { FLMSimpleContentCompiler } from '../src/dbprocessor/flmsimplecontent.js';
@@ -49,7 +48,7 @@ describe('zoodb.dbdataloader.flmfilesdb', function () {
     // the loader reads the files' bodies through the zoo's FLM engine
     let engine;
     before(async function () {
-        engine = await ZooFlmEngine.create({ load_wasm: load_zoodb_flm_wasm_node });
+        engine = await ZooFlmEngine.create();
     });
     after(function () {
         engine.free();

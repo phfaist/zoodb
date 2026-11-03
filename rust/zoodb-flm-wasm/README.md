@@ -167,14 +167,14 @@ a git dependency; `flm_core_git` only when flm-core is a path dependency in a
 git checkout: `{ commit, dirty }`, the checkout's `HEAD` and whether `git status
 --porcelain` listed anything under the flm-core directory, `wasm_bindgen`,
 `paths_remapped`, `wasm_size_bytes`, `build_date`; the build machine's paths
-are remapped, see `../README.md`). The module is loaded with
-`load_zoodb_flm_wasm(source)` of `src/zooflm/_load_wasm.js` (package export
-`@phfaist/zoodb/zooflm/wasm`; `source` is the bytes, a `WebAssembly.Module`, a
-`Response` or a URL; without it the browser fetches `wasm_url`) or
-`load_zoodb_flm_wasm_node()` of `src/zooflm/_load_wasm_node.js`
-(`@phfaist/zoodb/zooflm/wasm-node`). Both resolve to the glue's namespace
-(`ZooFlmCore`, …), instantiated once; the engine
-`ZooFlmEngine.create({ load_wasm })` takes either.
+are remapped, see `../README.md`). The engine (`src/zooflm/engine.js`) loads
+the module through the package's internal loaders, which are not exported:
+`load_zoodb_flm_wasm()` of `src/zooflm/_load_wasm_default.js` reads the file
+under Node, and a bundler building for a browser substitutes
+`src/zooflm/_load_wasm_default.browser.js` (the `browser` field of
+`package.json`), which fetches it. Both instantiate the module once through
+`instantiate_zoodb_flm_wasm(source)` of `src/zooflm/_load_wasm.js` and resolve
+to the glue's namespace (`ZooFlmCore`, …).
 
 ## Checks
 

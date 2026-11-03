@@ -33,8 +33,11 @@ in `README.md` of this folder.
   `/Users/philippe/projects/flm-rs/flm-core`; since 2026-11-03 the lock pins
   `890091ac` and the committed module is built from it);
   the FLM module is committed as `src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` (5,296,941
-  bytes since 2026-11-03) with its glue, loaders `src/zooflm/_load_wasm.js` (neutral) and
-  `_load_wasm_node.js`;
+  bytes since 2026-11-03) with its glue and internal loaders (since brief 15:
+  `src/zooflm/_load_wasm.js`, the neutral instantiation; `_load_wasm_default.js`, which
+  Node loads and which reads the file; `_load_wasm_default.browser.js`, which bundlers
+  substitute through the `browser` field of `package.json` and which fetches it; no
+  package export of either wasm module, no `load_wasm` option, no public `engine.core`);
   the engine `src/zooflm/engine.js` (+ `compose.js`, `fragment.js`, `diagnostics.js`;
   package export `./zooflm/engine`; since step 4 also `parse_fields()` and
   `html_scripts()`); the processor `src/dbprocessor/flmprocessor.js` with the adapted
@@ -146,7 +149,7 @@ Commit trailers: the attribution lines of the current session (steps 0 to 6:
 `Claude-Session: https://claude.ai/code/session_014E8o5tjoMsVYDAGRKzyvwU`; brief 14:
 `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` and
 `Claude-Session: https://claude.ai/code/session_01VvdThGsvMMSWmKY2D6CsRM`; the flm-core
-update of 2026-11-03: the same model, session `session_01Pmi6FUL3LXkCkJc5VgQSEi`).
+update of 2026-11-03: the same model, session `session_01Pmi6FUL3LXkCkJc5VgQSEi`; brief 15: the same model, session `session_01Pmi6FWXSVT7xfZkQVn6tMh`).
 
 ## Rules that bind (from Philippe; see also the memory files)
 
@@ -251,10 +254,28 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
   checkout, `dirty` for the dependency's own directory; `use_flm_engine` refuses unknown
   keys of `flm_options.engine`; `CHANGELOG.md` is the release notes; the CI example-build
   steps kept, marked pending by a comment (not disabled) until the example's port reaches
-  its default branch.
+  its default branch. (The Node loader export and `CHANGELOG.md` are gone since: brief 15
+  and Philippe's `3d12c9b`.)
+- Brief 15 (Philippe, 2026-11-03): the wasm modules are internal (no loader exports, no
+  `load_wasm`, no public `engine.core`); the default loader is chosen by the `browser`
+  field, not `#…` subpath imports, which Parcel resolves only when the active resolver
+  has package exports on (the EC zoo's `site/` and `previewtool/` use
+  `@phfaist/parcel-resolver-root` alone). Rulings: `CHANGELOG.md` must not exist, no
+  breaking-change notes anywhere, no new test files that are not necessary.
 
 ## Next
 
+- **Brief 15** done (2026-11-03, `15-internal-wasm-loading.md`): the WebAssembly modules
+  are internal. Package: the loader trio above and the `browser` field; the exports
+  `./citationmanager/wasm`, `./zooflm/wasm`, `./zooflm/wasm-node`, the `load_wasm` option
+  (engine and standard setup) and the `core` getter removed; 497 tests; 75 packed files.
+  Example clone `92e4f89` (site identical); sitegen clone `744bcef` (three sources and
+  the exporter bundle; production build exit 0 in 423.5 s, no FLM diagnostic, 1,274 of
+  1,276 pages equal and the other two by the citations cache, the 142 graph SVGs
+  byte-identical to the morning's production build, the code graph page loads the module
+  in headless Chrome). Left for Philippe: older history wording in the docs (15, Review
+  fixes), `doc/zoodb.citationmanager.rst` pointing to the internal `.d.ts`. The clones'
+  installed package is the step's first pack (comments differ from the final tarball).
 - **flm-core `890091ac`** (2026-11-03, worktree `6f01616`): the new head of `main-rs`
   keeps a displayed formula inside its paragraph, as python-flm did, and writes a
   paragraph that holds a list or other blocks as `<div class="flm-pres-par"

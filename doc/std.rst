@@ -38,10 +38,6 @@ boilerplate code:
   } from '@phfaist/zoodb/std/use_searchable_text_processor';
   
   import { makeStandardYamlDbDataLoader } from '@phfaist/zoodb/std/stdyamldbdataloader';
-
-  // Under Node, the FLM engine reads its WebAssembly module from the
-  // package's files with this loader.
-  import { load_zoodb_flm_wasm_node } from '@phfaist/zoodb/zooflm/wasm-node';
   
   const csl_filename = .... // path to CSL citation formatting style to use
   const schemas_root_path = .... // path to folder that contains the 'schemas' folder
@@ -117,10 +113,6 @@ boilerplate code:
           // Specify options for FLM text content:
           //
           flm_options: {
-
-              // How the FLM engine loads its WebAssembly module (leave this
-              // out in a browser: the module is then fetched).
-              load_wasm: load_zoodb_flm_wasm_node,
 
               // The configuration of the FLM engine, as data.
               engine: {
@@ -286,11 +278,6 @@ processor, the searchable text processor, and the ``extra_db_processors`` (by
   object_id)``, from the config's ``zoo_permalinks``.
 - ``zoodb.config``: the configuration, merged with its defaults.
 
-Under Node, you should specify ``flm_options.load_wasm: load_zoodb_flm_wasm_node``
-(from ``@phfaist/zoodb/zooflm/wasm-node``) to load the engine's WebAssembly
-module from the package's files.  This step is not necessary in a browser, since
-the engine then automatically fetches the module from ``wasm_url``
-(``@phfaist/zoodb/zooflm/wasm``) that bundlers are configured to include as an asset.
 Files are read through the config's ``fs`` via ``fs.promises``.
 
 
@@ -315,9 +302,6 @@ The configuration keys of the FLM features, all optional except where noted
    ``'continue'``; the diagnostics stay on the objects
    (``obj._zoodb.flm_diagnostics``) and the renders show the backend's
    recovery markup.
-
-``flm_options.load_wasm``
-   How the engine loads its WebAssembly module (see above).
 
 ``flm_options.engine``
    The core's configuration, as data: ``dollar_math`` (whether ``$…$``

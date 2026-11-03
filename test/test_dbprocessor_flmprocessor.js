@@ -21,7 +21,6 @@ import { makeStandardYamlDbDataLoader } from '../src/std/stdyamldbdataloader.js'
 import { FLMSimpleContentCompiler } from '../src/dbprocessor/flmsimplecontent.js';
 import { ZooFlmProcessor, flm_text_of_plain_text } from '../src/dbprocessor/flmprocessor.js';
 import { CitationSourceBase } from '../src/citationmanager/source/base.js';
-import { load_zoodb_flm_wasm_node } from '../src/zooflm/_load_wasm_node.js';
 import { ZooFlmEngine, ZooFlmError, is_fragment, format_diagnostic } from '../src/zooflm/engine.js';
 
 import { make_mock_host, make_mock_fetch_api } from './_helpers/citation_mock_host.js';
@@ -32,8 +31,6 @@ const test_data_dir = fileURLToPath(new URL('./test_data/', import.meta.url));
 const zoo_dir = path.join(test_data_dir, 'flm_zoo');
 const csl_style = fs.readFileSync(path.join(test_data_dir, 'american-physical-society-et-al--patched.csl'),
                                   { encoding: 'utf-8' });
-
-const load_wasm = load_zoodb_flm_wasm_node;
 
 
 // A JavaScript citation source serving ready-formatted FLM text for any key
@@ -80,7 +77,6 @@ async function make_zoo({
         use_searchable_text_processor,
 
         flm_options: {
-            load_wasm,
             allow_unresolved_references,
             refs,
             contexts: {
@@ -316,7 +312,7 @@ describe('ZooFlmProcessor', function () {
             await assert.rejects(zoodb.data_dump({ flm_include_refs_data: false }), /flm_include_zooflm_data/);
 
             // A browser app: the engine, the dump's tables, the fields compiled on demand.
-            const engine2 = await ZooFlmEngine.create({ load_wasm, core: {} });
+            const engine2 = await ZooFlmEngine.create({ core: {} });
             try {
                 assert.deepStrictEqual(engine2.load(zooflm), { diagnostics: [], has_errors: false });
                 const compiler = new FLMSimpleContentCompiler({ engine: engine2 });
@@ -342,7 +338,7 @@ describe('ZooFlmProcessor', function () {
             }
 
             // another core configuration refuses the dump
-            const engine3 = await ZooFlmEngine.create({ load_wasm, core: { dollar_math: true } });
+            const engine3 = await ZooFlmEngine.create({ core: { dollar_math: true } });
             try {
                 assert.throws( () => engine3.load(zooflm), /another core configuration/ );
             } finally {
@@ -351,7 +347,9 @@ describe('ZooFlmProcessor', function () {
         });
 
         it('compiles ad hoc fragments and processes them with the zoo', async function () {
-            const count = engine.core.fragment_count();
+            // engine._core: the engine's internal accessor to its core, not part of the
+            // package's API (here and below, for the core's fragment counter)
+            const count = engine._core.fragment_count();
             const chapter = processor.compile_flm_fragment(
                 '\\section{Intro}\\label{sec:chapter-intro}\n\nA chapter citing \\cite{custom:chapter}.',
                 { origin: { label: 'handbook/chapter-1', href: 'hb/chapter-1.html' } },
@@ -376,7 +374,7 @@ describe('ZooFlmProcessor', function () {
             processor.release_flm_fragments([chapter, loose]);
             assert.ok(chapter.released && loose.released);
             // (the blocks sibling of the chapter, made by the render, is released with it)
-            assert.strictEqual(engine.core.fragment_count(), count);
+            assert.strictEqual(engine._core.fragment_count(), count);
             await processor.process_auxiliary_resources();
             assert.ok(!engine.tables.citations.some( (c) => c.key === 'custom:chapter' ));
             assert.deepStrictEqual(processor.diagnostics, []);
@@ -387,7 +385,7 @@ describe('ZooFlmProcessor', function () {
             const old_name = alice.name;
             const bob_name = bob.name;
             const bob_snippet = engine.snippet_entry(bob_name, 'html');
-            const count = engine.core.fragment_count();
+            const count = engine._core.fragment_count();
             await zoodb.update_objects({
                 person: {
                     alice: alice_raw({
@@ -405,7 +403,7 @@ describe('ZooFlmProcessor', function () {
             assert.ok(engine.snippet_entry(new_alice.name, 'html') != null);
             // alice's name, biography and its blocks sibling (rendered), and
             // her topic's detail, released; her new name and biography
-            assert.strictEqual(engine.core.fragment_count(), count - 4 + 2);
+            assert.strictEqual(engine._core.fragment_count(), count - 4 + 2);
             // the index follows: the new name, the new label; the old labels are gone
             const page = engine.render_document({ error_policy: 'continue', compose: compose_person(bob) });
             assert.match(page.html, /href="\/person\/alice"[^>]*>Alice <strong[^>]*>Reloaded<\/strong><\/a>/);
@@ -421,13 +419,13 @@ describe('ZooFlmProcessor', function () {
 
         it('a reload that fails in the field compiler leaves the previous index usable', async function () {
             const alice = zoodb.objects.person.alice;
-            const count = engine.core.fragment_count();
+            const count = engine._core.fragment_count();
             await assert.rejects(zoodb.update_objects({
                 person: { alice: alice_raw({ name: 'Alice \\broken', biography: 'x' }) },
             }), ZooFlmError);
             // the previous fragments are alive, and ref() shows the previous name
             assert.strictEqual(alice.name.released, false);
-            assert.strictEqual(engine.core.fragment_count(), count + 2);
+            assert.strictEqual(engine._core.fragment_count(), count + 2);
             const html = engine.render_document({ compose: ({ ref }) => ref('person', 'alice') }).html;
             assert.match(html, /^<a href="\/person\/alice" class="href-ref ref-person">Alice <strong/);
             // a reload that succeeds releases both the previous and the failed fragments
@@ -435,25 +433,25 @@ describe('ZooFlmProcessor', function () {
             await zoodb.update_objects({ person: { alice: alice_raw() } });
             assert.ok(alice.name.released);
             assert.ok(failed.name.released);
-            assert.strictEqual(engine.core.fragment_count(), count - 2 + 1);
+            assert.strictEqual(engine._core.fragment_count(), count - 2 + 1);
             assert.strictEqual(engine.render_document({ compose: ({ ref }) => ref('person', 'alice') }).html,
                                '<a href="/person/alice" class="href-ref ref-person">Alice</a>');
         });
 
         it('a reload that fails at the scan (a duplicate label) leaves the previous index usable', async function () {
             const alice = zoodb.objects.person.alice;
-            const count = engine.core.fragment_count();
+            const count = engine._core.fragment_count();
             await assert.rejects(zoodb.update_objects({
                 person: {
                     alice: alice_raw({ name: 'Alice Again', biography: '\\section{B}\\label{sec:drawing-basics}' }),
                 },
             }), (err) => err instanceof ZooFlmError && /zoodb\.labels\.duplicate/.test(err.message));
-            assert.strictEqual(engine.core.fragment_count(), count + 2);
+            assert.strictEqual(engine._core.fragment_count(), count + 2);
             assert.strictEqual(engine.render_document({ compose: ({ ref }) => ref('person', 'alice') }).html,
                                '<a href="/person/alice" class="href-ref ref-person">Alice</a>');
             assert.strictEqual(alice.name.released, false);
             await zoodb.update_objects({ person: { alice: alice_raw({ name: 'Alice Three' }) } });
-            assert.strictEqual(engine.core.fragment_count(), count - 1 + 1);
+            assert.strictEqual(engine._core.fragment_count(), count - 1 + 1);
             assert.strictEqual(engine.render_document({ compose: ({ ref }) => ref('person', 'alice') }).html,
                                '<a href="/person/alice" class="href-ref ref-person">Alice Three</a>');
         });
@@ -581,7 +579,7 @@ describe('ZooFlmProcessor', function () {
     describe('without the standard setup', function () {
 
         it('runs with its defaults (no citation manager, no image retriever)', async function () {
-            const engine = await ZooFlmEngine.create({ load_wasm });
+            const engine = await ZooFlmEngine.create();
             try {
                 const data = get_simple_test_data();
                 data.objects.dish.soup.description = 'Soup, see \\ref{utensil:spoon} and \\cite{arxiv:1234.5678}.';

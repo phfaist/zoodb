@@ -10,13 +10,10 @@ import * as assert from 'assert';
 import { ZooDb } from '../src/index.js';
 
 import { ZooFlmProcessor } from '../src/dbprocessor/flmprocessor.js';
-import { load_zoodb_flm_wasm_node } from '../src/zooflm/_load_wasm_node.js';
 import { ZooFlmEngine, ZooFlmError } from '../src/zooflm/engine.js';
 
 import { get_simple_test_data, schema_validator } from './_helperstest.js';
 
-
-const load_wasm = load_zoodb_flm_wasm_node;
 
 // The utensils have no page on the site (`default`), but one in the
 // handbook (`handbook`).
@@ -57,7 +54,7 @@ describe('ZooFlmProcessor, an object type without pages', function () {
         let processor;
 
         before(async function () {
-            engine = await ZooFlmEngine.create({ load_wasm });
+            engine = await ZooFlmEngine.create();
             processor = new ZooFlmProcessor({ engine, contexts });
             zoodb = new ZooDb({ processors: [processor], schema_validator });
             await zoodb.load_data(test_data());
@@ -162,7 +159,7 @@ describe('ZooFlmProcessor, an object type without pages', function () {
         for (const [what, value] of [['undefined (a forgotten return)', undefined], ['a number', 42],
                                      ['an object', { href: '/x' }]]) {
             it(`is refused by set_index() for ${what}`, async function () {
-                const engine = await ZooFlmEngine.create({ load_wasm });
+                const engine = await ZooFlmEngine.create();
                 try {
                     const processor = new ZooFlmProcessor({ engine, contexts: {
                         default: {

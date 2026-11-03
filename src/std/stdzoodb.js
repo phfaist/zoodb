@@ -64,10 +64,6 @@ import loMerge from 'lodash/merge.js';
  * FLM options (`flm_options` sub-object, used by `use_flm_engine.js` and
  * `use_flm_processor.js`):
  *
- * - `load_wasm` — the loader of the FLM module (default: the
- *   environment-neutral loader, which fetches the module in a browser; under
- *   Node, pass ``load_zoodb_flm_wasm_node`` from
- *   ``@phfaist/zoodb/zooflm/wasm-node``).  Consumed by `use_flm_engine.js`.
  * - `engine` — the core's configuration as data: ``dollar_math`` (default
  *   `false`), ``settings`` (the settings of the standard features, one map per
  *   feature; user definitions under ``userdefs``), ``off`` (standard features
@@ -163,8 +159,6 @@ export async function makeStandardZooDb(config)
 
             use_flm_processor: null,
             flm_options: {
-
-                load_wasm: null,
 
                 engine: {
                     dollar_math: false,

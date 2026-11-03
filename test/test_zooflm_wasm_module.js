@@ -1,6 +1,8 @@
 // Direct tests of the FLM wasm module (rust/zoodb-flm-wasm → src/zooflm/_wasm/),
-// loaded through the Node loader.  The engine's own behaviour is tested natively
-// (`cargo test` in rust/); these check the module, its loaders and its surface.
+// loaded through the package's internal default loader (under Node, the file
+// that reads the binary).  The engine's own behaviour is tested natively
+// (`cargo test` in rust/); these check the module, its internal loaders and
+// its surface.
 
 import * as assert from 'assert';
 import { spawnSync } from 'child_process';
@@ -8,8 +10,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { load_zoodb_flm_wasm, wasm_url } from '../src/zooflm/_load_wasm.js';
-import { load_zoodb_flm_wasm_node } from '../src/zooflm/_load_wasm_node.js';
+import { instantiate_zoodb_flm_wasm, wasm_url } from '../src/zooflm/_load_wasm.js';
+import { load_zoodb_flm_wasm } from '../src/zooflm/_load_wasm_default.js';
 
 
 const zooflm_dir = fileURLToPath(new URL('../src/zooflm/', import.meta.url));
@@ -17,9 +19,10 @@ const wasm_dir = path.join(zooflm_dir, '_wasm');
 const wasm_file = path.join(wasm_dir, 'zoodb_flm_wasm_bg.wasm');
 const lock_file = fileURLToPath(new URL('../rust/Cargo.lock', import.meta.url));
 
-// The tokens the generated JavaScript and the neutral loader must not contain
-// (as for the citation module); the neutral loader may name its own URL in
-// the one form `new URL(…, import.meta.url)`.
+// The tokens the generated JavaScript, the neutral instantiation
+// (_load_wasm.js) and the browser variant of the default loader must not
+// contain (as for the citation module); _load_wasm.js alone may name the
+// module's URL, in the one form `new URL(…, import.meta.url)`.
 const FORBIDDEN = /import\.meta|require\(|process\.|\bBuffer\b|__dirname|node:|\bfs\b/;
 const ALLOWED_IN_LOADER = /new URL\([^)]*import\.meta\.url\)/g;
 
@@ -40,7 +43,7 @@ describe('FLM wasm module', function () {
 
     let wasm;
     before(async function () {
-        wasm = await load_zoodb_flm_wasm_node();
+        wasm = await load_zoodb_flm_wasm();
     });
 
     describe('generated files and loaders', function () {
@@ -49,7 +52,8 @@ describe('FLM wasm module', function () {
             const files = fs.readdirSync(wasm_dir).filter( (f) => f.endsWith('.js') )
                   .map( (f) => path.join(wasm_dir, f) );
             assert.ok(files.length >= 1);
-            files.push(path.join(zooflm_dir, '_load_wasm.js'));
+            files.push(path.join(zooflm_dir, '_load_wasm.js'),
+                       path.join(zooflm_dir, '_load_wasm_default.browser.js'));
             let urls = 0;
             for (const f of files) {
                 const is_loader = f.endsWith('_load_wasm.js');
@@ -63,7 +67,7 @@ describe('FLM wasm module', function () {
                     assert.strictEqual(m, null, `${f}:${i + 1}: forbidden token ${m && m[0]}`);
                 } );
             }
-            assert.strictEqual(urls, 1, 'the neutral loader names the module URL once');
+            assert.strictEqual(urls, 1, '_load_wasm.js names the module URL once');
         });
 
         it('BUILD_INFO.json is consistent with the lock and the binary', function () {
@@ -100,30 +104,35 @@ describe('FLM wasm module', function () {
                       `linear memory is ${exports.memory.buffer.byteLength} bytes`);
         });
 
-        it('the neutral loader refuses a file: URL without a source and forgets a failure', function () {
+        it('the browser variant refuses a file: URL; the instantiation forgets a failure', function () {
             // In a fresh process: in this one the module is already instantiated.
-            const loader = new URL('../src/zooflm/_load_wasm.js', import.meta.url).href;
+            const neutral = new URL('../src/zooflm/_load_wasm.js', import.meta.url).href;
+            const browser = new URL('../src/zooflm/_load_wasm_default.browser.js', import.meta.url).href;
             const r = spawnSync(process.execPath, [
                 '--input-type=module', '-e',
                 `import { readFileSync } from 'fs';
-                 import { load_zoodb_flm_wasm } from ${JSON.stringify(loader)};
+                 import { instantiate_zoodb_flm_wasm } from ${JSON.stringify(neutral)};
+                 import { load_zoodb_flm_wasm } from ${JSON.stringify(browser)};
                  const outcome = (p) => p.then( (ns) => ({ resolved: typeof ns.ZooFlmCore }),
                                                 (err) => ({ rejected: err.constructor.name, message: err.message }) );
-                 const no_source = await outcome(load_zoodb_flm_wasm());
-                 const bad_bytes = await outcome(load_zoodb_flm_wasm(new Uint8Array([0, 1, 2, 3])));
-                 const bytes = await outcome(load_zoodb_flm_wasm(readFileSync(${JSON.stringify(wasm_file)})));
-                 console.log(JSON.stringify({ no_source, bad_bytes, bytes }));`,
+                 const file_url = await outcome(load_zoodb_flm_wasm());
+                 const bad_bytes = await outcome(instantiate_zoodb_flm_wasm(new Uint8Array([0, 1, 2, 3])));
+                 const bytes = await outcome(instantiate_zoodb_flm_wasm(readFileSync(${JSON.stringify(wasm_file)})));
+                 console.log(JSON.stringify({ file_url, bad_bytes, bytes }));`,
             ], { encoding: 'utf-8' });
             assert.strictEqual(r.status, 0, r.stderr);
-            const { no_source, bad_bytes, bytes } = JSON.parse(r.stdout);
-            assert.strictEqual(no_source.rejected, 'Error');
-            assert.match(no_source.message, /load_zoodb_flm_wasm_node\(\)/);
+            const { file_url, bad_bytes, bytes } = JSON.parse(r.stdout);
+            assert.strictEqual(file_url.rejected, 'Error');
+            assert.match(file_url.message, /browser variant/);
+            assert.match(file_url.message, /cannot fetch the local file file:\/\//);
+            assert.match(file_url.message, /"browser" field/);
+            assert.match(file_url.message, /Node loads src\/zooflm\/_load_wasm_default\.js/);
             assert.strictEqual(bad_bytes.rejected, 'CompileError');
             assert.deepStrictEqual(bytes, { resolved: 'function' });
         });
 
-        it('the neutral loader called with the bytes returns the same namespace', async function () {
-            const ns = await load_zoodb_flm_wasm(fs.readFileSync(wasm_file));
+        it('the instantiation from the bytes resolves to the default loader\'s namespace', async function () {
+            const ns = await instantiate_zoodb_flm_wasm(fs.readFileSync(wasm_file));
             assert.strictEqual(ns, wasm);
             assert.strictEqual(typeof ns.ZooFlmCore, 'function');
         });

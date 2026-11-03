@@ -7,7 +7,6 @@ const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const test_data_dir = path.join(__dirname, 'test_data');
 
-import { load_zoodb_flm_wasm_node } from '../src/zooflm/_load_wasm_node.js';
 import { ZooFlmEngine } from '../src/zooflm/engine.js';
 
 import {
@@ -44,7 +43,7 @@ describe('zoodb.zooflm.citationcompiler', function () {
         let parses;
 
         before(async function () {
-            engine = await ZooFlmEngine.create({ load_wasm: load_zoodb_flm_wasm_node });
+            engine = await ZooFlmEngine.create();
             parses = (text) => engine.parses(text);
         });
 

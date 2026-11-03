@@ -19,6 +19,9 @@
         "yaml": "^2.9.1"
     },
     "main": "./src/index.js",
+    "browser": {
+        "./src/zooflm/_load_wasm_default.js": "./src/zooflm/_load_wasm_default.browser.js"
+    },
     "bin": {
         "zoodb-extend-citations-ttl": "./tools/extend_citations_ttl.mjs",
         "zoodb-merge-citations-cache": "./tools/merge_citations_cache.mjs",
@@ -31,8 +34,7 @@
     "files": [
         "src/",
         "tools/",
-        "/README.md",
-        "/CHANGELOG.md"
+        "/README.md"
     ],
     "devDependencies": {
         "eslint": "^9.17.0",
@@ -47,7 +49,6 @@
     "exports": {
         ".": "./src/index.js",
         "./citationmanager": "./src/citationmanager/index.js",
-        "./citationmanager/wasm": "./src/citationmanager/_load_wasm.js",
         "./citationmanager/source/*": "./src/citationmanager/source/*.js",
         "./schemaloader": "./src/schemaloader.js",
         "./dbdataloader/*": "./src/dbdataloader/*.js",
@@ -58,8 +59,6 @@
         "./zooflm": "./src/zooflm/index.js",
         "./zooflm/citationcompiler": "./src/zooflm/citationcompiler.js",
         "./zooflm/engine": "./src/zooflm/engine.js",
-        "./zooflm/wasm": "./src/zooflm/_load_wasm.js",
-        "./zooflm/wasm-node": "./src/zooflm/_load_wasm_node.js",
         "./util": "./src/util/index.js",
         "./util/*": "./src/util/*.js",
         "./std": "./src/std/index.js",

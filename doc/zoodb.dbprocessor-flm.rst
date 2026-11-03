@@ -153,10 +153,9 @@ The processor also works without the standard setup, for instance in a test:
    import jsonschema from 'jsonschema';
    import { ZooDb } from '@phfaist/zoodb';
    import { ZooFlmEngine } from '@phfaist/zoodb/zooflm/engine';
-   import { load_zoodb_flm_wasm_node } from '@phfaist/zoodb/zooflm/wasm-node';
    import { ZooFlmProcessor } from '@phfaist/zoodb/dbprocessor/flmprocessor';
 
-   const engine = await ZooFlmEngine.create({ load_wasm: load_zoodb_flm_wasm_node });
+   const engine = await ZooFlmEngine.create();
    const processor = new ZooFlmProcessor({ engine, allow_unresolved_citations: true });
    const zoodb = new ZooDb({
        processors: [ processor ],
