@@ -265,6 +265,10 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
 
 ## Next
 
+- **G5, `/gitpreview`** done (2026-11-03, evening; README log): sitegen clone `97d859e` over
+  zoodbtools `f8ecd21` (0.2.0, Philippe's upstream port), with a root Parcel alias of `yaml`
+  (the clone's `docs/jscomponents.md`, Build notes). Left: `previewtool/` (`yarn preview`),
+  whose `previewApp.jsx` keeps 0.2's setup; `appSetup.jsx` of `/gitpreview` is the model.
 - **Brief 15** done (2026-11-03, `15-internal-wasm-loading.md`): the WebAssembly modules
   are internal. Package: the loader trio above and the `browser` field; the exports
   `./citationmanager/wasm`, `./zooflm/wasm`, `./zooflm/wasm-node`, the `load_wasm` option
