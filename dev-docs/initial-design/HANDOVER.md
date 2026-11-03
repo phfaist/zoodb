@@ -1,4 +1,4 @@
-# Handover note for continuing the build (written 2026-10-17, updated 2026-10-26, evening)
+# Handover note for continuing the build (written 2026-10-17, updated 2026-11-03)
 
 Read this first when continuing the ZooDb FLM redesign around flm-rs in a fresh session.
 It says where things are, how each build step is run, the rules that bind, and what comes
@@ -30,10 +30,10 @@ in `README.md` of this folder.
 - **What exists now.** `rust/` is a cargo workspace (`zoodb-autocitefetch-wasm`,
   `zoodb-flm-wasm`; flm-core since 2026-10-20 a git dependency on the branch `main-rs`
   of the public `https://github.com/phfaist/flm.git`, before by path from
-  `/Users/philippe/projects/flm-rs/flm-core`; since 2026-10-26 the lock pins
-  `e7b4ba17` and the committed module is built from it);
-  the FLM module is committed as `src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` (5,223,643
-  bytes since 2026-10-26) with its glue, loaders `src/zooflm/_load_wasm.js` (neutral) and
+  `/Users/philippe/projects/flm-rs/flm-core`; since 2026-11-03 the lock pins
+  `890091ac` and the committed module is built from it);
+  the FLM module is committed as `src/zooflm/_wasm/zoodb_flm_wasm_bg.wasm` (5,296,941
+  bytes since 2026-11-03) with its glue, loaders `src/zooflm/_load_wasm.js` (neutral) and
   `_load_wasm_node.js`;
   the engine `src/zooflm/engine.js` (+ `compose.js`, `fragment.js`, `diagnostics.js`;
   package export `./zooflm/engine`; since step 4 also `parse_fields()` and
@@ -55,15 +55,18 @@ in `README.md` of this folder.
   a build by path records `flm_core_git: { commit, dirty }` instead); `doc/` rewritten.
 - **The `zoodb-example` port** lives in a clone at `scratch/zoodb-example/` (ignored
   through `scratch/.gitignore`, with `*.tgz`), branch `zoodb-flmrs` there, commits
-  `bc0a6ce`, `5cc0c68`, `2242062`, never pushed; its `website/_site/`, `node_modules/`
+  `bc0a6ce`, `5cc0c68`, `2242062`, Philippe's `389b207` (a template renamed) and
+  `cc1ac16` (displayed formulas without a margin of their own, 2026-11-03), never pushed;
+  its `website/_site/`, `node_modules/`
   and the citations cache copy (TTL of the arXiv entry extended) are left in place for
   quick rebuilds. The build check (pack the worktree, point the example's dependency at
   the tarball, install, build, restore `website/package.json` and `yarn.lock`) is spelled
   out in 11, Results, Part C; also clear the clone's root `.parcel-cache` first (the
   build script clears only `website/.parcel-cache`, and the root one puts an earlier
-  build's bundles back into `_site/`). Last rebuilt on 2026-10-26 (night) on the
-  package with brief 14 (citations in place in the search text, external links in a
-  new tab) and flm-core `e7b4ba17`. The original `../zoodb-example` is read-only.
+  build's bundles back into `_site/`). Last rebuilt on 2026-11-03 on the package with
+  flm-core `890091ac` (its install with `YARN_GLOBAL_FOLDER` in the session's
+  scratchpad, so nothing went into `~/.yarn/berry/cache`). The original
+  `../zoodb-example` is read-only.
 - **The EC zoo port** (step 6, brief 13) lives in three clones under `scratch/eczoo/`
   (ignored through `scratch/.gitignore`): `eczoo_sitegen`, `eczoo_data`,
   `eczoo_handbook`, each on a branch `zoodb-flmrs` with its push URL disabled, never
@@ -142,7 +145,8 @@ Commit trailers: the attribution lines of the current session (steps 0 to 6:
 `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>` and
 `Claude-Session: https://claude.ai/code/session_014E8o5tjoMsVYDAGRKzyvwU`; brief 14:
 `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` and
-`Claude-Session: https://claude.ai/code/session_01VvdThGsvMMSWmKY2D6CsRM`).
+`Claude-Session: https://claude.ai/code/session_01VvdThGsvMMSWmKY2D6CsRM`; the flm-core
+update of 2026-11-03: the same model, session `session_01Pmi6FUL3LXkCkJc5VgQSEi`).
 
 ## Rules that bind (from Philippe; see also the memory files)
 
@@ -251,13 +255,33 @@ Results, Part C (about 10 s once the clone's citations cache is fresh).
 
 ## Next
 
+- **flm-core `890091ac`** (2026-11-03, worktree `6f01616`): the new head of `main-rs`
+  keeps a displayed formula inside its paragraph, as python-flm did, and writes a
+  paragraph that holds a list or other blocks as `<div class="flm-pres-par"
+  role="paragraph">`; a fragment of one paragraph is written without its `<p>`, as on
+  0.2.1. On the EC zoo the pages equal the previous build's once `<p>`/`<div>` tags and
+  whitespace are left out (1,276 pages; no `<div>` paragraph in the data), the search
+  text runs a formula on in its paragraph (as 0.2.1's), the `.bib` exports are equal.
+  The page stylesheets follow (Philippe: spacing as with python-flm; paragraphs styled
+  by `.flm-pres-par`, never as `<p>` only): sitegen clone `95f8217` (the display box
+  without a margin of its own, as 0.2.1's `.display-math`; brief 14's `:has()` rules
+  gone; F9 fixed), `6ecca3a` (`.flm-pres-par` beside `p` in the edge and
+  auto-description rules), `92b8d4b` (the exporter bundle on the new module); the
+  example clone `cc1ac16`. Measured on all 513 displayed formulas against 0.2.1's site
+  (its MathJax 3.2.0 from cdnjs): below, 510 within 2 px and 3 within 4 px; above, 511
+  within 2 px and 2 about 6 px lower (MathJax 4's taller inline formula on the line
+  above, as before). Production build 6 min 29 s, exit 0, the code graph SVGs
+  byte-identical. The harness (`measure.mjs`, `summary.js`, `probe_div.mjs`) is in this
+  session's scratchpad
+  (`/private/tmp/claude-501/-Users-philippe-Research-projects-zoodb-zoodb/a3399257-95dc-457e-89d4-987f17573264/scratchpad/harness/`),
+  while it lasts. Not re-run: the handbook (LaTeX), the dev mode.
 - **Step 5** done (12, `e8f7c00`).
 - **Brief 14** done (2026-10-26, `14-site-parity-fixes.md`): Philippe's ruling that the
   EC zoo site looks and behaves as on 0.2.1. Package (`f23cb2c`): `\href`/`\url`/`\email`
   outside the site get `target="_blank"` (ZooDb lowering rule, `link_target_blank`);
   per-call `render_options` take registry-bound keys (a variant registry per set of
   values); the search text has the citations in place. Sitegen clone, 7 commits over
-  `793f2bf` (now at `a744cc1`): random code previews hide the marks, displayed formulas
+  `793f2bf` (to `a744cc1`; since 2026-11-03 at `92b8d4b`, below): random code previews hide the marks, displayed formulas
   spaced as before, `\paragraph` with its dash, `.textit`/`.textbf` back, the pane's lists
   without headings, the search text without the pieces, the exporter bundle rebuilt. The
   production build exits 0 **without** the switch (F1 fixed), 340.8 s, no FLM diagnostic;
